@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabaseClient'
-import FiatCryptoToggle from './FiatCryptoToggle'
+import CurrencyCryptoToggle from './FiatCryptoToggle'
 
 // Currency symbols
 const CURRENCY_SYMBOLS = {
@@ -79,7 +79,7 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
   const [step, setStep] = useState('amount') // amount -> method -> confirm
-  const [activeType, setActiveType] = useState('fiat') // 'fiat' or 'crypto'
+  const [activeType, setActiveType] = useState('currency') // 'currency' or 'cryptocurrency'
 
   useEffect(() => {
     loadInitialData()
