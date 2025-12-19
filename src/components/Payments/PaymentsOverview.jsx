@@ -138,9 +138,9 @@ export default function PaymentsOverview({ merchant, userId, globalCurrency }) {
       {/* Recent Payments */}
       <div className="bg-white rounded-lg border border-slate-200 p-6">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-semibold text-slate-900">Recent Payments</h3>
+          <h3 className="text-lg font-semibold text-slate-900">Recent Transactions</h3>
           <div className="flex gap-2">
-            <span className="text-xs text-slate-400 self-center">Showing last 5</span>
+            <span className="text-xs text-slate-400 self-center">Showing last 10 from ledger</span>
           </div>
         </div>
         {recentPayments.length === 0 ? (
@@ -152,10 +152,13 @@ export default function PaymentsOverview({ merchant, userId, globalCurrency }) {
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-slate-200">
+                <tr className="border-b border-slate-200 bg-slate-50">
                   <th className="text-left py-3 px-4 font-medium text-slate-700">Reference</th>
-                  <th className="text-left py-3 px-4 font-medium text-slate-700">Customer</th>
-                  <th className="text-left py-3 px-4 font-medium text-slate-700">Amount</th>
+                  <th className="text-left py-3 px-4 font-medium text-slate-700">Type</th>
+                  <th className="text-left py-3 px-4 font-medium text-slate-700">Method</th>
+                  <th className="text-right py-3 px-4 font-medium text-slate-700">Amount</th>
+                  <th className="text-right py-3 px-4 font-medium text-slate-700">Fee</th>
+                  <th className="text-right py-3 px-4 font-medium text-slate-700">Net</th>
                   <th className="text-left py-3 px-4 font-medium text-slate-700">Status</th>
                   <th className="text-left py-3 px-4 font-medium text-slate-700">Date</th>
                 </tr>
@@ -165,14 +168,28 @@ export default function PaymentsOverview({ merchant, userId, globalCurrency }) {
                   <tr key={payment.id} className="border-b border-slate-100 hover:bg-slate-50">
                     <td className="py-3 px-4">
                       <div className="font-mono text-xs text-slate-600">{payment.reference_number || payment.id.slice(0, 8)}</div>
-                      <div className="text-[10px] text-slate-400 uppercase tracking-tighter">{payment.payment_method || 'Unknown Method'}</div>
                     </td>
                     <td className="py-3 px-4">
-                      <div className="font-medium text-slate-900">{payment.guest_name || 'Anonymous'}</div>
-                      <div className="text-xs text-slate-500">{payment.guest_email || 'No email provided'}</div>
+                      <span className="text-xs px-2 py-1 bg-blue-50 text-blue-700 rounded capitalize">
+                        {payment.payment_type || 'payment'}
+                      </span>
                     </td>
-                    <td className="py-3 px-4 text-slate-900 font-medium">
+                    <td className="py-3 px-4">
+                      <div className="text-[11px] text-slate-600 uppercase tracking-tight">
+                        {payment.payment_method || '—'}
+                      </div>
+                      <div className="text-[10px] text-slate-500">{payment.guest_name || '—'}</div>
+                    </td>
+                    <td className="py-3 px-4 text-right font-medium text-slate-900">
                       {payment.currency} {Number(payment.amount).toFixed(2)}
+                    </td>
+                    <td className="py-3 px-4 text-right">
+                      <span className={Number(payment.fee_amount) > 0 ? 'text-amber-600 font-medium' : 'text-slate-400'}>
+                        {payment.currency} {Number(payment.fee_amount || 0).toFixed(2)}
+                      </span>
+                    </td>
+                    <td className="py-3 px-4 text-right font-medium text-slate-900">
+                      {payment.currency} {Number(payment.net_amount || (payment.amount - (payment.fee_amount || 0))).toFixed(2)}
                     </td>
                     <td className="py-3 px-4">
                       <span className={`px-2 py-1 rounded-full text-xs font-medium ${
@@ -180,12 +197,14 @@ export default function PaymentsOverview({ merchant, userId, globalCurrency }) {
                           ? 'bg-emerald-100 text-emerald-800'
                           : payment.status === 'pending'
                           ? 'bg-blue-100 text-blue-800'
+                          : payment.status === 'processing'
+                          ? 'bg-purple-100 text-purple-800'
                           : 'bg-red-100 text-red-800'
                       }`}>
                         {payment.status.charAt(0).toUpperCase() + payment.status.slice(1)}
                       </span>
                     </td>
-                    <td className="py-3 px-4 text-slate-600">
+                    <td className="py-3 px-4 text-slate-600 text-xs">
                       {new Date(payment.created_at).toLocaleDateString()}
                     </td>
                   </tr>
