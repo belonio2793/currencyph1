@@ -35,21 +35,47 @@ export default function PaymentsOverview({ merchant, userId, globalCurrency }) {
 
       const pendingInvoices = invoices.filter(i => i.status === 'sent' || i.status === 'draft')
 
-      // Calculate total received from the central payments ledger
-      const totalReceived = payments
-        .filter(p => p.status === 'succeeded')
-        .reduce((sum, p) => sum + (Number(p.amount) || 0), 0)
+      // Calculate totals from the central payments ledger
+      const succeededPayments = payments.filter(p => p.status === 'succeeded')
+
+      const totalReceived = succeededPayments.reduce((sum, p) => sum + (Number(p.amount) || 0), 0)
+      const totalFees = succeededPayments.reduce((sum, p) => sum + (Number(p.fee_amount) || 0), 0)
+      const netRevenue = succeededPayments.reduce((sum, p) => sum + (Number(p.net_amount) || Number(p.amount) - Number(p.fee_amount || 0)), 0)
+
+      // Group by payment type
+      const byType = {}
+      payments.forEach(p => {
+        const type = p.payment_type || 'unknown'
+        if (!byType[type]) byType[type] = { count: 0, amount: 0, fees: 0 }
+        byType[type].count += 1
+        byType[type].amount += Number(p.amount) || 0
+        byType[type].fees += Number(p.fee_amount) || 0
+      })
+
+      // Group by payment method
+      const byMethod = {}
+      payments.forEach(p => {
+        const method = p.payment_method || 'unknown'
+        if (!byMethod[method]) byMethod[method] = { count: 0, amount: 0, fees: 0 }
+        byMethod[method].count += 1
+        byMethod[method].amount += Number(p.amount) || 0
+        byMethod[method].fees += Number(p.fee_amount) || 0
+      })
 
       setStats({
         totalInvoices: invoices.length,
         totalReceived: totalReceived,
+        totalFees: totalFees,
+        netRevenue: netRevenue,
         pendingInvoices: pendingInvoices.length,
         totalPayments: payments.length,
         products: products.length,
         paymentLinks: paymentLinks.length
       })
 
-      setRecentPayments(payments.slice(0, 5))
+      setPaymentsByType(byType)
+      setPaymentsByMethod(byMethod)
+      setRecentPayments(payments.slice(0, 10))
     } catch (err) {
       console.error('Error loading stats:', err)
     } finally {
