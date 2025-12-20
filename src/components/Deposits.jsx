@@ -410,6 +410,13 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
         return
       }
 
+      // For GCash, require reference number
+      if (selectedMethod === 'gcash' && !gcashReferenceNumber.trim()) {
+        setError('Please enter your GCash transaction reference number')
+        setSubmitting(false)
+        return
+      }
+
       const selectedWalletData = wallets.find(w => w.id === selectedWallet)
       let convertedAmount = calculateConvertedAmount()
 
@@ -422,7 +429,7 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
       }
 
       // Determine deposit status based on method
-      // Crypto deposits auto-approve, fiat stays pending
+      // Crypto deposits auto-approve, GCash stays pending until confirmed, other fiat stays pending
       const depositStatus = selectedMethod === 'solana' ? 'approved' : 'pending'
 
       // Create deposit record with conversion info
@@ -437,6 +444,7 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
           wallet_currency: selectedWalletData.currency_code,
           currency_code: selectedWalletData.currency_code,
           deposit_method: selectedMethod,
+          reference_number: selectedMethod === 'gcash' ? gcashReferenceNumber.trim() : null,
           status: depositStatus,
           description: `${DEPOSIT_METHODS[selectedMethod].name} deposit of ${amount} ${selectedCurrency}${convertedAmount && selectedCurrency !== selectedWalletData.currency_code ? ` (≈ ${convertedAmount} ${selectedWalletData.currency_code})` : ''}`
         }])
@@ -459,6 +467,8 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
 
       const statusMessage = depositStatus === 'approved'
         ? 'Deposit approved and credited to your wallet!'
+        : selectedMethod === 'gcash'
+        ? 'GCash deposit initiated. Your transaction will be verified within 1-5 minutes.'
         : 'Deposit initiated. Awaiting payment...'
       setSuccess(statusMessage)
 
