@@ -167,6 +167,8 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
   const [selectedWallet, setSelectedWallet] = useState(null)
   const [showWalletModal, setShowWalletModal] = useState(false)
   const [newWalletCurrency, setNewWalletCurrency] = useState(selectedCurrency)
+  const [gcashReferenceNumber, setGcashReferenceNumber] = useState('')
+  const [showQRModal, setShowQRModal] = useState(false)
 
   // Data state
   const [wallets, setWallets] = useState([])
@@ -409,6 +411,13 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
         return
       }
 
+      // For GCash, require reference number
+      if (selectedMethod === 'gcash' && !gcashReferenceNumber.trim()) {
+        setError('Please enter your GCash transaction reference number')
+        setSubmitting(false)
+        return
+      }
+
       const selectedWalletData = wallets.find(w => w.id === selectedWallet)
       let convertedAmount = calculateConvertedAmount()
 
@@ -421,7 +430,7 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
       }
 
       // Determine deposit status based on method
-      // Crypto deposits auto-approve, fiat stays pending
+      // Crypto deposits auto-approve, GCash stays pending until confirmed, other fiat stays pending
       const depositStatus = selectedMethod === 'solana' ? 'approved' : 'pending'
 
       // Create deposit record with conversion info
@@ -436,6 +445,7 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
           wallet_currency: selectedWalletData.currency_code,
           currency_code: selectedWalletData.currency_code,
           deposit_method: selectedMethod,
+          reference_number: selectedMethod === 'gcash' ? gcashReferenceNumber.trim() : null,
           status: depositStatus,
           description: `${DEPOSIT_METHODS[selectedMethod].name} deposit of ${amount} ${selectedCurrency}${convertedAmount && selectedCurrency !== selectedWalletData.currency_code ? ` (≈ ${convertedAmount} ${selectedWalletData.currency_code})` : ''}`
         }])
@@ -458,6 +468,8 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
 
       const statusMessage = depositStatus === 'approved'
         ? 'Deposit approved and credited to your wallet!'
+        : selectedMethod === 'gcash'
+        ? 'GCash deposit initiated. Your transaction will be verified within 1-5 minutes.'
         : 'Deposit initiated. Awaiting payment...'
       setSuccess(statusMessage)
 
@@ -475,6 +487,7 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
     setAmount('')
     setSelectedCurrency(globalCurrency)
     setSelectedMethod(null)
+    setGcashReferenceNumber('')
     setStep('amount')
     setSuccess('')
     setError('')
@@ -741,6 +754,49 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
               </ol>
             </div>
 
+            {/* GCash QR Code */}
+            {selectedMethod === 'gcash' && (
+              <div className="mb-8 p-6 bg-emerald-50 border border-emerald-200 rounded-lg">
+                <p className="text-sm text-slate-600 mb-4 font-medium">Scan this QR code to pay via GCash:</p>
+                <div className="flex gap-4 items-start">
+                  <div className="flex-shrink-0">
+                    <button
+                      onClick={() => setShowQRModal(true)}
+                      className="cursor-pointer hover:opacity-80 transition transform hover:scale-105"
+                      title="Click to view larger QR code"
+                    >
+                      <img
+                        src="https://cdn.builder.io/api/v1/image/assets%2F22335ca288c7480ead446114856c497b%2F95af4345d27a4b60bdcb084fac1e7abe?format=webp&width=800"
+                        alt="GCash InstaPay QR Code"
+                        className="w-32 h-32 rounded-lg border border-emerald-300 shadow-md"
+                      />
+                    </button>
+                    <p className="text-xs text-slate-500 mt-2 text-center">Click to enlarge</p>
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-sm text-slate-700 mb-4">
+                      Open your GCash app and scan this QR code or use the merchant details below to complete your payment.
+                    </p>
+                    <div className="bg-white p-3 rounded border border-emerald-200 mb-4">
+                      <p className="text-xs text-slate-600"><span className="font-semibold">Mobile No.:</span> 09308510351</p>
+                      <p className="text-xs text-slate-600 mt-2"><span className="font-semibold">User ID:</span> •••••••••••4ROQPN</p>
+                    </div>
+                    <div className="mb-4">
+                      <label className="block text-sm font-medium text-slate-700 mb-2">GCash Reference Number</label>
+                      <input
+                        type="text"
+                        value={gcashReferenceNumber}
+                        onChange={(e) => setGcashReferenceNumber(e.target.value)}
+                        placeholder="Enter your GCash transaction reference (e.g., GCR123456789)"
+                        className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 text-sm"
+                      />
+                      <p className="text-xs text-slate-500 mt-1">You'll find this in your GCash app after sending the payment</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
             {/* Cryptocurrency Address QR */}
             {selectedMethod && selectedMethodData?.type === 'crypto' && selectedMethodData?.address && (
               <div className="mb-8 p-6 bg-purple-50 border border-purple-200 rounded-lg">
@@ -802,16 +858,18 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
             {/* Action Buttons */}
             <div className="flex gap-4">
               <button
-                onClick={handleStartNewDeposit}
-                className="flex-1 px-6 py-3 border border-slate-300 rounded-lg text-slate-900 font-medium hover:bg-slate-50 transition"
+                onClick={() => setStep('amount')}
+                disabled={submitting}
+                className="flex-1 px-6 py-3 border border-slate-300 rounded-lg text-slate-900 font-medium hover:bg-slate-50 transition disabled:opacity-50"
               >
                 Back
               </button>
               <button
-                onClick={handleStartNewDeposit}
-                className="flex-1 px-6 py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition"
+                onClick={handleInitiateDeposit}
+                disabled={submitting || (selectedMethod === 'gcash' && !gcashReferenceNumber.trim())}
+                className="flex-1 px-6 py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition disabled:opacity-50"
               >
-                Done
+                {submitting ? 'Processing...' : 'Confirm Deposit'}
               </button>
             </div>
           </div>
@@ -828,6 +886,7 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
                     <th className="text-left py-3 px-4 text-slate-600 font-medium">Amount</th>
                     <th className="text-left py-3 px-4 text-slate-600 font-medium">Converted Amount</th>
                     <th className="text-left py-3 px-4 text-slate-600 font-medium">Method</th>
+                    <th className="text-left py-3 px-4 text-slate-600 font-medium">Reference</th>
                     <th className="text-left py-3 px-4 text-slate-600 font-medium">Status</th>
                     <th className="text-left py-3 px-4 text-slate-600 font-medium">Date</th>
                   </tr>
@@ -843,6 +902,9 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
                       </td>
                       <td className="py-3 px-4 text-slate-700">
                         {DEPOSIT_METHODS[deposit.deposit_method]?.name || deposit.deposit_method}
+                      </td>
+                      <td className="py-3 px-4 text-xs text-slate-600 font-mono">
+                        {deposit.reference_number || '—'}
                       </td>
                       <td className="py-3 px-4">
                         <span className={`px-3 py-1 rounded-full text-xs font-medium ${
@@ -902,6 +964,49 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
                 className="flex-1 px-4 py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition disabled:opacity-50"
               >
                 {submitting ? 'Creating...' : 'Create Wallet'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* QR Code Modal */}
+      {showQRModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50" onClick={() => setShowQRModal(false)}>
+          <div className="bg-white rounded-xl shadow-2xl max-w-3xl w-full p-8" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-2xl font-semibold text-slate-900">GCash Payment QR Code</h3>
+              <button
+                onClick={() => setShowQRModal(false)}
+                className="text-slate-500 hover:text-slate-700 text-3xl leading-none"
+              >
+                ×
+              </button>
+            </div>
+
+            <div className="flex flex-col items-center gap-6">
+              <img
+                src="https://cdn.builder.io/api/v1/image/assets%2F22335ca288c7480ead446114856c497b%2F95af4345d27a4b60bdcb084fac1e7abe?format=webp&width=800"
+                alt="GCash InstaPay QR Code - Large"
+                className="w-full max-w-md rounded-lg border-4 border-emerald-300 shadow-lg"
+              />
+
+              <div className="w-full bg-emerald-50 p-6 rounded-lg border border-emerald-200">
+                <p className="text-center text-sm text-slate-700 mb-4">
+                  Scan this QR code with your GCash app to complete your payment
+                </p>
+                <div className="bg-white p-4 rounded border border-emerald-200 text-center">
+                  <p className="text-sm font-semibold text-slate-900 mb-2">Merchant Details</p>
+                  <p className="text-xs text-slate-600"><span className="font-semibold">Mobile No.:</span> 09308510351</p>
+                  <p className="text-xs text-slate-600 mt-2"><span className="font-semibold">User ID:</span> •••••••••••4ROQPN</p>
+                </div>
+              </div>
+
+              <button
+                onClick={() => setShowQRModal(false)}
+                className="w-full px-6 py-3 bg-slate-900 text-white rounded-lg font-medium hover:bg-slate-800 transition"
+              >
+                Close
               </button>
             </div>
           </div>
