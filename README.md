@@ -178,9 +178,13 @@ VITE_SUPABASE_URL=https://your-project.supabase.co
 VITE_SUPABASE_ANON_KEY=your-anon-key
 VITE_SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
 
-# Payments
-VITE_COINSPH_API_KEY=your-coinsph-key
-VITE_COINSPH_API_SECRET=your-coinsph-secret
+# Payments (Coins.ph)
+# Frontend
+VITE_COINS_PH_API_KEY=your-coins-ph-key
+VITE_COINS_PH_API_SECRET=your-coins-ph-secret
+# Server-side
+COINS_PH_API_KEY=your-coins-ph-key
+COINS_PH_API_SECRET=your-coins-ph-secret
 
 # Maps & Location
 VITE_MAPTILER_API_KEY=your-maptiler-key
