@@ -899,7 +899,7 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
 
             {/* Payment Instructions */}
             <div className="mb-8">
-              <h3 className="font-semibold text-slate-900 mb-4">📋 Payment Instructions:</h3>
+              <h3 className="font-semibold text-slate-900 mb-4">Payment Instructions</h3>
               <ol className="space-y-3">
                 {selectedMethodData.instructions.map((instruction, idx) => (
                   <li key={idx} className="flex gap-3">
@@ -961,7 +961,7 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
                 {selectedMethodData?.address ? (
                   <>
                     <div className="mb-4">
-                      <p className="text-sm font-semibold text-slate-900 mb-2">📬 Deposit Address</p>
+                      <p className="text-sm font-semibold text-slate-900 mb-2">Deposit Address</p>
                       <div className="grid grid-cols-2 gap-2 text-xs mb-3">
                         <div>
                           <p className="text-slate-600">Currency</p>
@@ -992,21 +992,21 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
                           onClick={() => copyToClipboard(selectedMethodData.address)}
                           className="text-sm text-purple-600 hover:text-purple-700 font-medium"
                         >
-                          📋 Copy Address
+                          Copy Address
                         </button>
                       </div>
                     </div>
 
                     {selectedMethodData.network && (
                       <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg text-xs text-slate-700">
-                        <span className="font-medium">ℹ️ Network: </span>
+                        <span className="font-medium">Network: </span>
                         <span className="font-semibold">{selectedMethodData.network}</span>
                       </div>
                     )}
                   </>
                 ) : (
                   <div className="p-4 bg-yellow-100 border border-yellow-300 rounded text-yellow-800 text-sm">
-                    <p className="font-medium">⚠️ Address not available</p>
+                    <p className="font-medium">Address not available</p>
                     <p className="mt-2">{selectedMethodData.name} via {selectedMethodData.network} is not currently configured for deposits.</p>
                   </div>
                 )}
@@ -1015,7 +1015,7 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
 
             {/* Important Notes */}
             <div className="mb-8 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-              <p className="font-semibold text-yellow-900 mb-2">⚠️ Important:</p>
+              <p className="font-semibold text-yellow-900 mb-2">Important:</p>
               <ul className="text-sm text-yellow-800 space-y-1">
                 {selectedMethodData?.type === 'crypto' && (
                   <>
@@ -1175,7 +1175,7 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
             <div className="space-y-6">
               {/* Instructions */}
               <div>
-                <h4 className="font-semibold text-slate-900 mb-4">📋 Steps to Deposit:</h4>
+                <h4 className="font-semibold text-slate-900 mb-4">Steps to Deposit</h4>
                 <ol className="space-y-3">
                   {selectedAddressMethod.instructions.map((instruction, idx) => (
                     <li key={idx} className="flex gap-3">
@@ -1191,7 +1191,7 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
               {/* Deposit Address */}
               {selectedAddressMethod.address && (
                 <div className="p-6 bg-purple-50 border border-purple-200 rounded-lg">
-                  <p className="text-sm font-semibold text-slate-900 mb-4">📬 Deposit Address</p>
+                  <p className="text-sm font-semibold text-slate-900 mb-4">Deposit Address</p>
 
                   <div className="grid grid-cols-2 gap-4 mb-4">
                     <div>
@@ -1224,7 +1224,7 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
                         onClick={() => copyToClipboard(selectedAddressMethod.address)}
                         className="text-sm text-purple-600 hover:text-purple-700 font-medium"
                       >
-                        📋 Copy Address
+                        Copy Address
                       </button>
                     </div>
                   </div>
@@ -1234,7 +1234,7 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
 
               {/* Important Notes */}
               <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-                <p className="font-semibold text-yellow-900 mb-2">⚠️ Important:</p>
+                <p className="font-semibold text-yellow-900 mb-2">Important:</p>
                 <ul className="text-sm text-yellow-800 space-y-1">
                   <li>• Only send {selectedAddressMethod.name} ({selectedCurrency}) to this address</li>
                   {selectedAddressMethod.network && <li>• Network: {selectedAddressMethod.network}</li>}
