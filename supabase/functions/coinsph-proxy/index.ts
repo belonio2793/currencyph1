@@ -115,11 +115,13 @@ serve(async (req) => {
       method,
       headers: {
         "Content-Type": "application/json",
-        "X-MBX-APIKEY": COINS_PH_API_KEY,
       } as Record<string, string>,
     }
 
     if (!isPublic) {
+      // Add API key for authenticated endpoints
+      (options.headers as Record<string, string>)["X-MBX-APIKEY"] = COINS_PH_API_KEY
+
       // Add timestamp and sign
       const requestParams = {
         ...params,
@@ -139,7 +141,7 @@ serve(async (req) => {
         options.body = JSON.stringify(requestParams)
       }
     } else {
-      // Public endpoints - no signing
+      // Public endpoints - no signing, no API key
       if (method === "GET") {
         const queryString = new URLSearchParams(
           params as Record<string, string>
