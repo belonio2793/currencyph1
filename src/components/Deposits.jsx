@@ -574,30 +574,11 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
               className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white mb-6"
             >
               <option value="">Select a currency</option>
-              {currencyCurrencies.length > 0 && (
-                <>
-                  <option disabled style={{ fontWeight: 'bold', backgroundColor: '#f3f4f6' }}>
-                    ━━━ CURRENCY ━━━
-                  </option>
-                  {currencyCurrencies.map(c => (
-                    <option key={c.code} value={c.code}>
-                      {c.code} - {c.name}
-                    </option>
-                  ))}
-                </>
-              )}
-              {cryptoCurrencies.length > 0 && (
-                <>
-                  <option disabled style={{ fontWeight: 'bold', backgroundColor: '#f3f4f6' }}>
-                    ━━━ CRYPTOCURRENCY ━━━
-                  </option>
-                  {cryptoCurrencies.map(c => (
-                    <option key={c.code} value={c.code}>
-                      {c.code} - {c.name}
-                    </option>
-                  ))}
-                </>
-              )}
+              {displayedCurrencies.map(c => (
+                <option key={c.code} value={c.code}>
+                  {c.code} - {c.name}
+                </option>
+              ))}
             </select>
 
             <div className="flex gap-3">
