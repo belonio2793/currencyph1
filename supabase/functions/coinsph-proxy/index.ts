@@ -146,7 +146,7 @@ serve(async (req) => {
       const signature = await signRequest(requestParams, COINS_PH_API_SECRET)
       requestParams.signature = signature
 
-      console.log("[coinsph-proxy] Authenticated request - API Key present:", COINS_PH_API_KEY.substring(0, 10) + "...")
+      console.log("[coinsph-proxy] Authenticated request - API Key present:", COINS_PH_API_KEY ? "Yes" : "No")
 
       if (method === "GET") {
         const queryString = new URLSearchParams(
