@@ -620,7 +620,7 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
               {cryptoCurrencies.length > 0 && (
                 <>
                   <option disabled style={{ fontWeight: 'bold', backgroundColor: '#f3f4f6' }}>
-                    ━━━ CRYPTOCURRENCIES ━━━
+                    ━━━ CRYPTOCURRENCY ━━━
                   </option>
                   {cryptoCurrencies.map(c => (
                     <option key={c.code} value={c.code}>
