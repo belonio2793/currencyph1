@@ -190,6 +190,41 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
     fetchExchangeRates()
   }, [activeType])
 
+  const fetchExchangeRates = async () => {
+    try {
+      setRatesLoading(true)
+      const rates = {}
+
+      if (activeType === 'currency') {
+        const globalRates = await currencyAPI.getGlobalRates()
+        if (globalRates) {
+          Object.entries(globalRates).forEach(([code, data]) => {
+            rates[code] = data.rate
+          })
+        }
+      } else {
+        // For crypto, fetch rates for each crypto currency we have
+        const cryptoWallets = wallets.filter(w => w.currency_type === 'crypto')
+        for (const wallet of cryptoWallets) {
+          try {
+            const price = await getCryptoPrice(wallet.currency_code)
+            if (price) {
+              rates[wallet.currency_code] = price
+            }
+          } catch (e) {
+            console.warn(`Failed to fetch rate for ${wallet.currency_code}:`, e)
+          }
+        }
+      }
+
+      setExchangeRates(rates)
+      setRatesLoading(false)
+    } catch (err) {
+      console.error('Error fetching exchange rates:', err)
+      setRatesLoading(false)
+    }
+  }
+
   const loadInitialData = async () => {
     try {
       setLoading(true)
