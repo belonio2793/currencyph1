@@ -363,7 +363,7 @@ export default function UniversalDeposit({ onSuccess, onClose }) {
             <select value={currency} onChange={(e) => setCurrency(e.target.value)}>
               {method.currencies.map(curr => {
                 const currencyInfo = CURRENCY_MAP[curr]
-                const displayName = currencyInfo ? `${currencyInfo.name} (${curr}) ${currencyInfo.symbol}` : curr
+                const displayName = currencyInfo ? `${currencyInfo.name} (${curr})` : curr
                 return <option key={curr} value={curr}>{displayName}</option>
               })}
             </select>
