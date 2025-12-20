@@ -333,6 +333,17 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
             <h2 className="text-2xl font-semibold text-slate-900 mb-6">How much would you like to deposit?</h2>
 
             <div className="space-y-6">
+              {/* Create Wallet Button - First Row */}
+              <div className="flex items-center justify-end mb-2">
+                <button
+                  type="button"
+                  onClick={() => setShowWalletModal(true)}
+                  className="text-sm text-blue-600 hover:text-blue-700 font-medium"
+                >
+                  + Create Wallet
+                </button>
+              </div>
+
               {/* Amount Input */}
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-2">Amount</label>
@@ -362,16 +373,7 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
 
               {/* Wallet Selection */}
               <div>
-                <div className="flex items-center justify-between mb-2">
-                  <label className="block text-sm font-medium text-slate-700">Deposit to Wallet</label>
-                  <button
-                    type="button"
-                    onClick={() => setShowWalletModal(true)}
-                    className="text-sm text-blue-600 hover:text-blue-700 font-medium"
-                  >
-                    + Create Wallet
-                  </button>
-                </div>
+                <label className="block text-sm font-medium text-slate-700 mb-2">Deposit to Wallet</label>
                 <select
                   value={selectedWallet || ''}
                   onChange={(e) => setSelectedWallet(e.target.value)}
@@ -380,10 +382,16 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
                   <option value="">Select a wallet</option>
                   {(activeType === 'currency' ? currencyWallets : cryptocurrencyWallets).map(w => (
                     <option key={w.id} value={w.id}>
-                      {w.currency_name} ({w.balance.toFixed(2)}) - {w.id}
+                      {w.currency_name} ({w.balance.toFixed(2)})
                     </option>
                   ))}
                 </select>
+                {selectedWallet && (
+                  <p className="text-xs text-slate-500 mt-2">
+                    <span className="text-slate-400">Wallet ID: </span>
+                    <span className="font-mono text-slate-600">{selectedWallet.substring(0, 8)}...</span>
+                  </p>
+                )}
                 {!selectedWallet && (
                   <p className="text-xs text-slate-500 mt-1">Create a wallet if you don't have one for this currency</p>
                 )}
