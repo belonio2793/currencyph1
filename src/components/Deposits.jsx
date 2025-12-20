@@ -596,24 +596,31 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
 
   // For crypto, add dynamic methods from wallets_house
   if (activeType === 'cryptocurrency' && Object.keys(cryptoAddresses).length > 0) {
-    const dynamicMethods = Object.entries(cryptoAddresses).map(([symbol, data]) => ({
-      id: symbol.toLowerCase(),
-      name: symbol,
-      icon: '₿', // Generic crypto icon
-      type: 'crypto',
-      description: `Send ${symbol} directly to our wallet`,
-      instructions: [
-        `Open your ${symbol} wallet app`,
-        `Scan the QR code or copy the address below`,
-        `Enter the amount in ${symbol}`,
-        `Verify the recipient address and amount`,
-        `Confirm the transaction`,
-        `Your balance will be updated within 1-2 minutes`
-      ],
-      address: data.address,
-      network: data.network,
-      provider: data.provider
-    }))
+    const dynamicMethods = []
+    Object.entries(cryptoAddresses).forEach(([symbol, data]) => {
+      // Handle both single address and multiple networks
+      const addresses = Array.isArray(data) ? data : [data]
+      addresses.forEach((addressData, idx) => {
+        dynamicMethods.push({
+          id: addresses.length > 1 ? `${symbol.toLowerCase()}-${idx}` : symbol.toLowerCase(),
+          name: addresses.length > 1 ? `${symbol} (${addressData.network})` : symbol,
+          icon: '₿', // Generic crypto icon
+          type: 'crypto',
+          description: `Send ${symbol} directly to our wallet${addresses.length > 1 ? ` via ${addressData.network}` : ''}`,
+          instructions: [
+            `Open your ${symbol} wallet app`,
+            `Scan the QR code or copy the address below`,
+            `Enter the amount in ${symbol}`,
+            `Verify the recipient address and amount`,
+            `Confirm the transaction`,
+            `Your balance will be updated within 1-2 minutes`
+          ],
+          address: addressData.address,
+          network: addressData.network,
+          provider: addressData.provider
+        })
+      })
+    })
     // Replace hardcoded methods with dynamic ones
     availableMethods = dynamicMethods
   }
