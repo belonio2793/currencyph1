@@ -48,7 +48,7 @@ export default function WalletDetailPanel({ wallet, userId, globalCurrency, onCl
   }
 
   const symbol = wallet.symbol || wallet.currency_code
-  const isCrypto = wallet.currency_type === 'crypto'
+  const isCrypto = wallet.currency_type === 'cryptocurrency'
 
   // Format account number to display first and last parts
   const formatAccountNumber = (num) => {
