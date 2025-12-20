@@ -95,14 +95,22 @@ async function upsertCachedRates(exchangeRates, cryptoPrices, source = 'openexch
   }
 }
 
-// Handler
-addEventListener('fetch', (event) => {
-  event.respondWith(handle(event.request))
-})
-
-async function handle(req) {
+// Main handler
+async function handle(req: Request): Promise<Response> {
+  // CORS preflight
   if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Methods': 'GET, OPTIONS', 'Access-Control-Allow-Headers': 'Content-Type' } })
+    return new Response('ok', {
+      status: 200,
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+        'Access-Control-Allow-Headers': 'Content-Type',
+      },
+    })
+  }
+
+  if (req.method !== 'GET' && req.method !== 'POST') {
+    return jsonResponse({ error: 'Only GET/POST requests allowed' }, 405)
   }
 
   // First try to return cached entry if fresh
@@ -111,37 +119,85 @@ async function handle(req) {
     if (cached && cached.fetched_at) {
       const age = Date.now() - new Date(cached.fetched_at).getTime()
       if (age < CACHED_TTL_MS) {
-        return jsonResponse({ exchangeRates: cached.exchange_rates || {}, cryptoPrices: cached.crypto_prices || {}, cached: true, fetched_at: cached.fetched_at })
+        console.log('[fetch-rates] Returning fresh cached rates, age:', Math.round(age / 1000), 'seconds')
+        return jsonResponse({
+          exchangeRates: cached.exchange_rates || {},
+          cryptoPrices: cached.crypto_prices || {},
+          cached: true,
+          fetched_at: cached.fetched_at,
+          age: Math.round(age / 1000)
+        })
       }
     }
   } catch (e) {
-    console.warn('cache check failed', e)
+    console.warn('[fetch-rates] Cache check failed:', e)
   }
 
   // Not fresh - fetch new from primary sources
   try {
-    const [exchangeRates, cryptoPrices] = await Promise.all([fetchOpenExchangeRates(), fetchCoinGecko()])
+    console.log('[fetch-rates] Fetching fresh rates from APIs...')
+    const [exchangeRates, cryptoPrices] = await Promise.all([
+      fetchOpenExchangeRates(),
+      fetchCoinGecko()
+    ])
 
     // If exchangeRates not available, try last cached (even if stale)
     if (!exchangeRates) {
+      console.warn('[fetch-rates] OpenExchangeRates failed, falling back to cache')
       const last = await getCachedLatest()
       if (last) {
-        return jsonResponse({ exchangeRates: last.exchange_rates || {}, cryptoPrices: last.crypto_prices || {}, cached: true, fetched_at: last.fetched_at })
+        return jsonResponse({
+          exchangeRates: last.exchange_rates || {},
+          cryptoPrices: last.crypto_prices || {},
+          cached: true,
+          fetched_at: last.fetched_at
+        })
       }
       // fallback to empty
       await upsertCachedRates({}, cryptoPrices || {}, 'fallback')
-      return jsonResponse({ exchangeRates: {}, cryptoPrices: cryptoPrices || {}, cached: false })
+      return jsonResponse({
+        exchangeRates: {},
+        cryptoPrices: cryptoPrices || {},
+        cached: false
+      })
     }
 
     // Store and return
+    console.log('[fetch-rates] Successfully fetched rates, storing cache')
     await upsertCachedRates(exchangeRates, cryptoPrices || {}, 'openexchangerates')
-    return jsonResponse({ exchangeRates, cryptoPrices: cryptoPrices || {}, cached: false, fetched_at: new Date().toISOString() })
+    return jsonResponse({
+      exchangeRates,
+      cryptoPrices: cryptoPrices || {},
+      cached: false,
+      fetched_at: new Date().toISOString()
+    })
   } catch (err) {
-    console.error('fetch-rates handler error', err)
-    const last = await getCachedLatest()
-    if (last) {
-      return jsonResponse({ exchangeRates: last.exchange_rates || {}, cryptoPrices: last.crypto_prices || {}, cached: true, fetched_at: last.fetched_at })
+    console.error('[fetch-rates] Handler error:', err)
+    // Try to return last known good rates
+    try {
+      const last = await getCachedLatest()
+      if (last) {
+        console.log('[fetch-rates] Returning stale cached rates as fallback')
+        return jsonResponse({
+          exchangeRates: last.exchange_rates || {},
+          cryptoPrices: last.crypto_prices || {},
+          cached: true,
+          fetched_at: last.fetched_at,
+          warning: 'Returning stale cache due to error'
+        })
+      }
+    } catch (cacheErr) {
+      console.error('[fetch-rates] Cache fallback also failed:', cacheErr)
     }
-    return jsonResponse({ exchangeRates: {}, cryptoPrices: {}, cached: false, error: String(err) }, 500)
+
+    return jsonResponse({
+      exchangeRates: {},
+      cryptoPrices: {},
+      cached: false,
+      error: String(err)
+    }, 500)
   }
 }
+
+// Start the service
+serve(handle, { hostname: '0.0.0.0', port: 8000 })
