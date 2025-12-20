@@ -850,16 +850,18 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
             {/* Action Buttons */}
             <div className="flex gap-4">
               <button
-                onClick={handleStartNewDeposit}
-                className="flex-1 px-6 py-3 border border-slate-300 rounded-lg text-slate-900 font-medium hover:bg-slate-50 transition"
+                onClick={() => setStep('amount')}
+                disabled={submitting}
+                className="flex-1 px-6 py-3 border border-slate-300 rounded-lg text-slate-900 font-medium hover:bg-slate-50 transition disabled:opacity-50"
               >
                 Back
               </button>
               <button
-                onClick={handleStartNewDeposit}
-                className="flex-1 px-6 py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition"
+                onClick={handleInitiateDeposit}
+                disabled={submitting || (selectedMethod === 'gcash' && !gcashReferenceNumber.trim())}
+                className="flex-1 px-6 py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition disabled:opacity-50"
               >
-                Done
+                {submitting ? 'Processing...' : 'Confirm Deposit'}
               </button>
             </div>
           </div>
