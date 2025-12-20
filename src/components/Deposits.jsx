@@ -644,7 +644,7 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
         dynamicMethods.push({
           id: addresses.length > 1 ? `${selectedCurrency.toLowerCase()}-${idx}` : selectedCurrency.toLowerCase(),
           name: addresses.length > 1 ? `${selectedCurrency} (${addressData.network})` : selectedCurrency,
-          icon: '📮', // Generic wallet icon instead of ₿
+          icon: selectedCurrency,
           type: 'crypto',
           description: `Send ${selectedCurrency} directly to our wallet${addresses.length > 1 ? ` via ${addressData.network}` : ''}`,
           instructions: [
