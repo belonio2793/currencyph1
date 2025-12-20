@@ -260,8 +260,9 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
     try {
       const { data: houseWallets, error } = await supabase
         .from('wallets_house')
-        .select('currency, address, network, provider')
+        .select('currency, address, network, provider, status')
         .eq('wallet_type', 'crypto')
+        .neq('status', 'PENDING')
 
       if (error) throw error
 
