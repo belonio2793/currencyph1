@@ -34,20 +34,6 @@ async function signRequest(params: Record<string, any>, secret: string): Promise
  * Main handler
  */
 serve(async (req) => {
-  // Validate environment variables
-  if (!COINS_PH_API_KEY || !COINS_PH_API_SECRET) {
-    console.error("[coinsph-proxy] Missing API credentials in environment")
-    return new Response(
-      JSON.stringify({ error: "Server configuration error: Missing API credentials" }),
-      {
-        status: 500,
-        headers: {
-          "Content-Type": "application/json",
-          "Access-Control-Allow-Origin": "*",
-        },
-      }
-    )
-  }
   // Handle CORS preflight
   if (req.method === "OPTIONS") {
     return new Response(null, {
@@ -133,20 +119,32 @@ serve(async (req) => {
     }
 
     if (!isPublic) {
-      // Add API key for authenticated endpoints
+      // Verify credentials are available for authenticated requests
+      if (!COINS_PH_API_KEY || !COINS_PH_API_SECRET) {
+        console.error("[coinsph-proxy] Missing API credentials for authenticated request")
+        return new Response(
+          JSON.stringify({ error: "Server configuration error: Missing API credentials" }),
+          {
+            status: 500,
+            headers: {
+              "Content-Type": "application/json",
+              "Access-Control-Allow-Origin": "*",
+            },
+          }
+        )
+      }
+
+      // Add API key header only for authenticated endpoints
       (options.headers as Record<string, string>)["X-MBX-APIKEY"] = COINS_PH_API_KEY
 
       // Add timestamp and sign
-      const timestamp = Math.floor(Date.now())
       const requestParams = {
         ...params,
-        timestamp,
+        timestamp: Math.floor(Date.now()),
       }
 
       const signature = await signRequest(requestParams, COINS_PH_API_SECRET)
       requestParams.signature = signature
-
-      console.log("[coinsph-proxy] Authenticated request - API Key present:", COINS_PH_API_KEY ? "Yes" : "No")
 
       if (method === "GET") {
         const queryString = new URLSearchParams(
@@ -171,42 +169,52 @@ serve(async (req) => {
       }
     }
 
-    console.log("[coinsph-proxy] Making request to Coins.ph:", method, url.substring(0, 150))
+    console.log("[coinsph-proxy] Making request to Coins.ph:", { method, url: url.substring(0, 150) })
 
     // Make the request to Coins.ph
     const response = await fetch(url, options)
-    const responseData = await response.json()
 
     console.log("[coinsph-proxy] Response status:", response.status)
 
+    // Check status before reading body to avoid stream issues
     if (!response.ok) {
-      const errorMsg = responseData.msg || responseData.error || `Coins.ph API error: ${response.status}`
-      console.error("[coinsph-proxy] API Error:", response.status, errorMsg)
-
-      // Additional logging for 401 errors
-      if (response.status === 401) {
-        console.error("[coinsph-proxy] 401 Unauthorized - check API credentials")
-        console.error("[coinsph-proxy] Request path:", path)
-        console.error("[coinsph-proxy] Is public:", isPublic)
+      try {
+        const responseData = await response.json()
+        console.error("[coinsph-proxy] API Error:", response.status, responseData)
+        return new Response(
+          JSON.stringify({
+            error: responseData.msg || responseData.error || `Coins.ph API error: ${response.status}`,
+            details: responseData,
+          }),
+          {
+            status: response.status,
+            headers: {
+              "Content-Type": "application/json",
+              "Access-Control-Allow-Origin": "*",
+            },
+          }
+        )
+      } catch (parseError) {
+        // If response body can't be parsed, return generic error
+        console.error("[coinsph-proxy] API Error (unparseable):", response.status)
+        return new Response(
+          JSON.stringify({
+            error: `Coins.ph API error: ${response.status}`,
+            details: null,
+          }),
+          {
+            status: response.status,
+            headers: {
+              "Content-Type": "application/json",
+              "Access-Control-Allow-Origin": "*",
+            },
+          }
+        )
       }
-
-      return new Response(
-        JSON.stringify({
-          error: errorMsg,
-          details: responseData,
-          status: response.status,
-        }),
-        {
-          status: response.status,
-          headers: {
-            "Content-Type": "application/json",
-            "Access-Control-Allow-Origin": "*",
-          },
-        }
-      )
     }
 
-    // Success
+    // Success - read body only for successful responses
+    const responseData = await response.json()
     return new Response(JSON.stringify(responseData), {
       status: 200,
       headers: {
