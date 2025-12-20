@@ -231,14 +231,14 @@ export class CoinsPhApi {
    * Ping server (test connectivity)
    */
   async ping() {
-    return this.request('GET', '/openapi/v1/ping', {}, true)
+    return this.request('GET', '/openapi/v1/ping', {}, false)
   }
 
   /**
    * Get server time
    */
   async getServerTime() {
-    const response = await this.request('GET', '/openapi/v1/time', {}, true)
+    const response = await this.request('GET', '/openapi/v1/time', {}, false)
     return response.serverTime
   }
 
