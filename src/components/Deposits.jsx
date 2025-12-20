@@ -716,11 +716,7 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
           <div>
             <h1 className="text-3xl font-bold text-slate-900">Add Funds</h1>
             <p className="text-slate-600 mt-2">
-              Deposit money into your wallet using {
-                Object.keys(cryptoAddresses).length > 0
-                  ? `${Object.keys(cryptoAddresses).join(', ')} or other payment methods`
-                  : 'available payment methods'
-              }
+              Deposit cryptocurrencies or fiat to your wallet quickly and securely
             </p>
           </div>
           {(currencyCurrencies.length > 0 || cryptoCurrencies.length > 0) && (
