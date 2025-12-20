@@ -239,18 +239,28 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
         .from('wallets_house')
         .select('currency, address, network, provider')
         .eq('wallet_type', 'crypto')
-        .eq('provider', 'coins.ph')
+        .eq('provider', 'internal')
 
       if (error) throw error
 
-      // Map to { 'BTC': { address: '...', network: '...', provider: 'coins.ph' } }
+      // Map to { 'BTC': { address: '...', network: '...', provider: 'internal' }, ... }
+      // For multiple networks, store as array
       const addressMap = {}
       if (houseWallets && houseWallets.length > 0) {
         houseWallets.forEach(wallet => {
-          addressMap[wallet.currency] = {
+          if (!addressMap[wallet.currency]) {
+            addressMap[wallet.currency] = []
+          }
+          addressMap[wallet.currency].push({
             address: wallet.address,
             network: wallet.network,
             provider: wallet.provider
+          })
+        })
+        // For single address, use the first one directly; for multiple, use array
+        Object.keys(addressMap).forEach(currency => {
+          if (addressMap[currency].length === 1) {
+            addressMap[currency] = addressMap[currency][0]
           }
         })
       }
