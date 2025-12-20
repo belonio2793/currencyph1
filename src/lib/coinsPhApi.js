@@ -241,6 +241,58 @@ export class CoinsPhApi {
     return response.serverTime
   }
 
+  // ==================== WALLET ENDPOINTS ====================
+
+  /**
+   * Get all coins' information
+   */
+  async getAllCoinsInformation() {
+    return this.request('GET', '/openapi/wallet/v1/coin/all/information', {})
+  }
+
+  /**
+   * Get deposit address for a specific coin
+   */
+  async getDepositAddress(coin) {
+    return this.request('GET', '/openapi/wallet/v1/deposit/address', { coin })
+  }
+
+  /**
+   * Get deposit history
+   */
+  async getDepositHistory(coin = null, offset = 0, limit = 100, startTime = null, endTime = null) {
+    const params = { offset, limit }
+    if (coin) params.coin = coin
+    if (startTime) params.startTime = startTime
+    if (endTime) params.endTime = endTime
+    return this.request('GET', '/openapi/wallet/v1/deposit/hisrec', params)
+  }
+
+  /**
+   * Withdraw - initiate a withdrawal
+   */
+  async withdraw(coin, withdrawOrderId = null, network = null, address = null, amount = null, addressTag = null, transactionFeeFlag = null, options = {}) {
+    const params = { coin, ...options }
+    if (withdrawOrderId) params.withdrawOrderId = withdrawOrderId
+    if (network) params.network = network
+    if (address) params.address = address
+    if (amount) params.amount = amount
+    if (addressTag) params.addressTag = addressTag
+    if (transactionFeeFlag !== null) params.transactionFeeFlag = transactionFeeFlag
+    return this.request('POST', '/openapi/wallet/v1/withdraw/apply', params)
+  }
+
+  /**
+   * Get withdraw history
+   */
+  async getWithdrawHistory(coin = null, offset = 0, limit = 100, startTime = null, endTime = null) {
+    const params = { offset, limit }
+    if (coin) params.coin = coin
+    if (startTime) params.startTime = startTime
+    if (endTime) params.endTime = endTime
+    return this.request('GET', '/openapi/wallet/v1/withdraw/history', params)
+  }
+
   /**
    * Get trading rules and limits
    */
