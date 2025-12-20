@@ -137,13 +137,16 @@ serve(async (req) => {
       (options.headers as Record<string, string>)["X-MBX-APIKEY"] = COINS_PH_API_KEY
 
       // Add timestamp and sign
+      const timestamp = Math.floor(Date.now())
       const requestParams = {
         ...params,
-        timestamp: Math.floor(Date.now()),
+        timestamp,
       }
 
       const signature = await signRequest(requestParams, COINS_PH_API_SECRET)
       requestParams.signature = signature
+
+      console.log("[coinsph-proxy] Authenticated request - API Key present:", COINS_PH_API_KEY.substring(0, 10) + "...")
 
       if (method === "GET") {
         const queryString = new URLSearchParams(
