@@ -343,7 +343,7 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
                         </option>
                         {currencyCurrencies.map(c => (
                           <option key={c.code} value={c.code}>
-                            {c.code} {CURRENCY_SYMBOLS[c.code] || ''}
+                            {c.name} ({c.code}) {c.symbol || ''}
                           </option>
                         ))}
                       </>
@@ -355,7 +355,7 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
                         </option>
                         {cryptoCurrencies.map(c => (
                           <option key={c.code} value={c.code}>
-                            {c.code} {CURRENCY_SYMBOLS[c.code] || ''}
+                            {c.name} ({c.code}) {c.symbol || ''}
                           </option>
                         ))}
                       </>
