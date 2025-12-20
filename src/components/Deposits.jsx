@@ -569,6 +569,26 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
                 )}
               </div>
 
+              {/* Conversion Display */}
+              {amount && selectedWallet && selectedCurrency !== selectedWalletData?.currency_code && (
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm text-slate-600">Conversion Rate</p>
+                      <p className="text-xs text-slate-500 mt-1">
+                        {ratesLoading ? 'Loading rates...' : `1 ${selectedCurrency} = ${exchangeRates[selectedCurrency] ? (exchangeRates[selectedWalletData?.currency_code] / exchangeRates[selectedCurrency]).toFixed(6) : '...'} ${selectedWalletData?.currency_code}`}
+                      </p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-sm text-slate-600">You will receive</p>
+                      <p className="text-2xl font-bold text-blue-600">
+                        {ratesLoading || !calculateConvertedAmount() ? 'Calculating...' : `${calculateConvertedAmount()} ${selectedWalletData?.currency_code}`}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
               {/* Select Deposit Method */}
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-3">Payment Method</label>
