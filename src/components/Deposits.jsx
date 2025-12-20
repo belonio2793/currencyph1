@@ -467,7 +467,7 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
 
       // Calculate converted amount using real-time rates
       let convertedAmount = null
-      if (isCryptoDepsit) {
+      if (isCryptoDeposit) {
         // For crypto, convert from crypto to PHP using real-time rates
         const cryptoRate = exchangeRates[selectedCurrency]
         const phpRate = exchangeRates['PHP'] || 1
