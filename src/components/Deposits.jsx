@@ -277,7 +277,9 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
           addressMap[wallet.currency].push({
             address: wallet.address,
             network: wallet.network,
-            provider: wallet.provider
+            provider: wallet.provider,
+            currency_name: wallet.currency_name,
+            currency_symbol: wallet.currency_symbol
           })
         })
         // For single address, use the first one directly; for multiple, use array
