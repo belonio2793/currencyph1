@@ -973,7 +973,7 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
       {/* QR Code Modal */}
       {showQRModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50" onClick={() => setShowQRModal(false)}>
-          <div className="bg-white rounded-xl shadow-2xl max-w-2xl w-full p-8" onClick={(e) => e.stopPropagation()}>
+          <div className="bg-white rounded-xl shadow-2xl max-w-3xl w-full p-8" onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-6">
               <h3 className="text-2xl font-semibold text-slate-900">GCash Payment QR Code</h3>
               <button
@@ -988,7 +988,7 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
               <img
                 src="https://cdn.builder.io/api/v1/image/assets%2F22335ca288c7480ead446114856c497b%2F95af4345d27a4b60bdcb084fac1e7abe?format=webp&width=800"
                 alt="GCash InstaPay QR Code - Large"
-                className="w-80 h-80 rounded-lg border-4 border-emerald-300 shadow-lg"
+                className="w-full max-w-md rounded-lg border-4 border-emerald-300 shadow-lg"
               />
 
               <div className="w-full bg-emerald-50 p-6 rounded-lg border border-emerald-200">
