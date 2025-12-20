@@ -173,6 +173,8 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
   const [deposits, setDeposits] = useState([])
   const [loading, setLoading] = useState(true)
   const [submitting, setSubmitting] = useState(false)
+  const [exchangeRates, setExchangeRates] = useState({})
+  const [ratesLoading, setRatesLoading] = useState(false)
 
   // UI state
   const [error, setError] = useState('')
@@ -183,6 +185,10 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
   useEffect(() => {
     loadInitialData()
   }, [userId])
+
+  useEffect(() => {
+    fetchExchangeRates()
+  }, [activeType])
 
   const loadInitialData = async () => {
     try {
