@@ -370,30 +370,11 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
                   className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
                 >
                   <option value="">Select a wallet</option>
-                  {currencyWallets.length > 0 && (
-                    <>
-                      <option disabled style={{ fontWeight: 'bold', backgroundColor: '#f3f4f6' }}>
-                        ━━━ CURRENCY ━━━
-                      </option>
-                      {currencyWallets.map(w => (
-                        <option key={w.id} value={w.id}>
-                          {w.currency_name} ({w.balance.toFixed(2)})
-                        </option>
-                      ))}
-                    </>
-                  )}
-                  {cryptocurrencyWallets.length > 0 && (
-                    <>
-                      <option disabled style={{ fontWeight: 'bold', backgroundColor: '#f3f4f6' }}>
-                        ━━━ CRYPTOCURRENCY ━━━
-                      </option>
-                      {cryptocurrencyWallets.map(w => (
-                        <option key={w.id} value={w.id}>
-                          {w.currency_name} ({w.balance.toFixed(2)})
-                        </option>
-                      ))}
-                    </>
-                  )}
+                  {(activeType === 'currency' ? currencyWallets : cryptocurrencyWallets).map(w => (
+                    <option key={w.id} value={w.id}>
+                      {w.currency_name} ({w.balance.toFixed(2)})
+                    </option>
+                  ))}
                 </select>
                 {!selectedWallet && (
                   <p className="text-xs text-slate-500 mt-1">Create a wallet if you don't have one for this currency</p>
