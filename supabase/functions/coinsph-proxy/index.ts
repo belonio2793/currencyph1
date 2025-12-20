@@ -1,8 +1,8 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 
 const COINS_PH_API_BASE = "https://api.pro.coins.ph"
-const COINS_PH_API_KEY = "ST09VIZGxK1e7xxPlTYPs1oqtYNb6M9thDssZaDybWAqBbucpGV2NcmebGTWcqpD"
-const COINS_PH_API_SECRET = "vtdLuUyRlJxaCImSXSQi7HHvLTpsm1fttAGiM5eys7enu63yrnqC0sivdXjFLVqI"
+const COINS_PH_API_KEY = Deno.env.get("COINSPH_API_KEY") || ""
+const COINS_PH_API_SECRET = Deno.env.get("COINSPH_API_SECRET") || ""
 
 /**
  * HMAC-SHA256 signing helper
