@@ -196,11 +196,15 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
       const rates = {}
 
       if (activeType === 'currency') {
-        const globalRates = await currencyAPI.getGlobalRates()
-        if (globalRates) {
-          Object.entries(globalRates).forEach(([code, data]) => {
-            rates[code] = data.rate
-          })
+        try {
+          const globalRates = await currencyAPI.getGlobalRates()
+          if (globalRates) {
+            Object.entries(globalRates).forEach(([code, data]) => {
+              rates[code] = data.rate
+            })
+          }
+        } catch (e) {
+          console.warn('Failed to fetch fiat exchange rates:', e)
         }
       } else {
         // For crypto, fetch rates for each crypto currency we have
@@ -212,7 +216,7 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
               rates[wallet.currency_code] = price
             }
           } catch (e) {
-            console.warn(`Failed to fetch rate for ${wallet.currency_code}:`, e)
+            console.warn(`Failed to fetch rate for ${wallet.currency_code}:`, e.message)
           }
         }
       }
