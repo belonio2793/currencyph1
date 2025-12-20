@@ -598,12 +598,12 @@ export default function Rates() {
                 <span className="text-lg font-semibold text-slate-900">{rates.length}</span>
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-sm text-slate-600">Fiat Currencies</span>
-                <span className="text-lg font-semibold text-slate-900">{rates.filter(r => r.metadata?.type === 'fiat').length}</span>
+                <span className="text-sm text-slate-600">Currencies</span>
+                <span className="text-lg font-semibold text-slate-900">{rates.filter(r => r.metadata?.type === 'currency').length}</span>
               </div>
               <div className="flex justify-between items-center">
                 <span className="text-sm text-slate-600">Cryptocurrencies</span>
-                <span className="text-lg font-semibold text-slate-900">{rates.filter(r => r.metadata?.type === 'crypto').length}</span>
+                <span className="text-lg font-semibold text-slate-900">{rates.filter(r => r.metadata?.type === 'cryptocurrency').length}</span>
               </div>
             </div>
           </div>
