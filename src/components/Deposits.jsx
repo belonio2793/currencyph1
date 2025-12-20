@@ -404,7 +404,7 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-3">Payment Method</label>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  {Object.values(DEPOSIT_METHODS).map(method => (
+                  {availableMethods.map(method => (
                     <button
                       key={method.id}
                       onClick={() => {
