@@ -51,16 +51,17 @@ export class CoinsPhApi {
 
   /**
    * Get current price of a symbol
+   * Note: Despite being market data, Coins.ph requires authentication for all endpoints
    */
   async getPrice(symbol) {
-    return this.request('GET', '/openapi/quote/v1/ticker/price', { symbol }, true)
+    return this.request('GET', '/openapi/quote/v1/ticker/price', { symbol }, false)
   }
 
   /**
    * Get ticker info (24h stats)
    */
   async getTicker(symbol) {
-    return this.request('GET', '/openapi/quote/v1/ticker/24hr', { symbol }, true)
+    return this.request('GET', '/openapi/quote/v1/ticker/24hr', { symbol }, false)
   }
 
   /**
@@ -70,28 +71,28 @@ export class CoinsPhApi {
     const params = { symbol, interval, limit }
     if (startTime) params.startTime = startTime
     if (endTime) params.endTime = endTime
-    return this.request('GET', '/openapi/quote/v1/klines', params, true)
+    return this.request('GET', '/openapi/quote/v1/klines', params, false)
   }
 
   /**
    * Get order book
    */
   async getOrderBook(symbol, limit = 20) {
-    return this.request('GET', '/openapi/quote/v1/depth', { symbol, limit }, true)
+    return this.request('GET', '/openapi/quote/v1/depth', { symbol, limit }, false)
   }
 
   /**
    * Get recent trades
    */
   async getRecentTrades(symbol, limit = 100) {
-    return this.request('GET', '/openapi/quote/v1/trades', { symbol, limit }, true)
+    return this.request('GET', '/openapi/quote/v1/trades', { symbol, limit }, false)
   }
 
   /**
    * Get exchange info
    */
   async getExchangeInfo() {
-    return this.request('GET', '/openapi/v1/exchangeInfo', {}, true)
+    return this.request('GET', '/openapi/v1/exchangeInfo', {}, false)
   }
 
   // ==================== AUTHENTICATED ENDPOINTS ====================
