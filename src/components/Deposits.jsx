@@ -586,18 +586,18 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
 
               {/* Conversion Display */}
               {amount && selectedWallet && selectedCurrency !== selectedWalletData?.currency_code && (
-                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <div className={`border rounded-lg p-4 ${ratesLoading || !calculateConvertedAmount() ? 'bg-amber-50 border-amber-200' : 'bg-blue-50 border-blue-200'}`}>
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-sm text-slate-600">Conversion Rate</p>
                       <p className="text-xs text-slate-500 mt-1">
-                        {ratesLoading ? 'Loading rates...' : `1 ${selectedCurrency} = ${exchangeRates[selectedCurrency] ? (exchangeRates[selectedWalletData?.currency_code] / exchangeRates[selectedCurrency]).toFixed(6) : '...'} ${selectedWalletData?.currency_code}`}
+                        {ratesLoading ? 'Loading rates...' : !exchangeRates[selectedCurrency] || !exchangeRates[selectedWalletData?.currency_code] ? '⚠️ Rates unavailable - using original amount' : `1 ${selectedCurrency} = ${(exchangeRates[selectedWalletData?.currency_code] / exchangeRates[selectedCurrency]).toFixed(6)} ${selectedWalletData?.currency_code}`}
                       </p>
                     </div>
                     <div className="text-right">
                       <p className="text-sm text-slate-600">You will receive</p>
-                      <p className="text-2xl font-bold text-blue-600">
-                        {ratesLoading || !calculateConvertedAmount() ? 'Calculating...' : `${calculateConvertedAmount()} ${selectedWalletData?.currency_code}`}
+                      <p className={`text-2xl font-bold ${calculateConvertedAmount() ? 'text-blue-600' : 'text-amber-600'}`}>
+                        {ratesLoading ? 'Calculating...' : `${calculateConvertedAmount() || parseFloat(amount)} ${selectedWalletData?.currency_code}`}
                       </p>
                     </div>
                   </div>
