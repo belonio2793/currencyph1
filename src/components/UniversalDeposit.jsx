@@ -361,9 +361,11 @@ export default function UniversalDeposit({ onSuccess, onClose }) {
           <div className="form-group">
             <label>Currency</label>
             <select value={currency} onChange={(e) => setCurrency(e.target.value)}>
-              {method.currencies.map(curr => (
-                <option key={curr} value={curr}>{curr}</option>
-              ))}
+              {method.currencies.map(curr => {
+                const currencyInfo = CURRENCY_MAP[curr]
+                const displayName = currencyInfo ? `${currencyInfo.name} (${curr}) ${currencyInfo.symbol}` : curr
+                return <option key={curr} value={curr}>{displayName}</option>
+              })}
             </select>
           </div>
 
