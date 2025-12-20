@@ -389,7 +389,7 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
                       </option>
                       {currencyWallets.map(w => (
                         <option key={w.id} value={w.id}>
-                          {w.currency_name} ({w.currency_symbol} {w.balance.toFixed(2)})
+                          {w.currency_name} ({w.balance.toFixed(2)})
                         </option>
                       ))}
                     </>
@@ -401,7 +401,7 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
                       </option>
                       {cryptocurrencyWallets.map(w => (
                         <option key={w.id} value={w.id}>
-                          {w.currency_name} ({w.currency_symbol} {w.balance.toFixed(2)})
+                          {w.currency_name} ({w.balance.toFixed(2)})
                         </option>
                       ))}
                     </>
