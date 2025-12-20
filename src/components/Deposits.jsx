@@ -231,6 +231,34 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
     }
   }
 
+  const loadCryptoAddresses = async () => {
+    try {
+      const { data: houseWallets, error } = await supabase
+        .from('wallets_house')
+        .select('currency, address, network, provider')
+        .eq('wallet_type', 'crypto')
+        .eq('provider', 'coins.ph')
+
+      if (error) throw error
+
+      // Map to { 'BTC': { address: '...', network: '...', provider: 'coins.ph' } }
+      const addressMap = {}
+      if (houseWallets && houseWallets.length > 0) {
+        houseWallets.forEach(wallet => {
+          addressMap[wallet.currency] = {
+            address: wallet.address,
+            network: wallet.network,
+            provider: wallet.provider
+          }
+        })
+      }
+      setCryptoAddresses(addressMap)
+    } catch (err) {
+      console.error('Failed to load crypto addresses:', err)
+      setCryptoAddresses({})
+    }
+  }
+
   const loadInitialData = async () => {
     try {
       setLoading(true)
@@ -241,7 +269,7 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
         return
       }
 
-      // Load wallets and currencies separately
+      // Load wallets, currencies, and crypto addresses in parallel
       const [walletsResult, currenciesResult] = await Promise.all([
         supabase
           .from('wallets')
