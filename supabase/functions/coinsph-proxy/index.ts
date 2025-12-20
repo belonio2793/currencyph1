@@ -118,12 +118,29 @@ serve(async (req) => {
       } as Record<string, string>,
     }
 
+    // Always add API key header (required even for public endpoints)
+    if (!COINS_PH_API_KEY) {
+      console.error("[coinsph-proxy] Missing API key")
+      return new Response(
+        JSON.stringify({ error: "Server configuration error: Missing API key" }),
+        {
+          status: 500,
+          headers: {
+            "Content-Type": "application/json",
+            "Access-Control-Allow-Origin": "*",
+          },
+        }
+      )
+    }
+
+    (options.headers as Record<string, string>)["X-MBX-APIKEY"] = COINS_PH_API_KEY
+
     if (!isPublic) {
-      // Verify credentials are available for authenticated requests
-      if (!COINS_PH_API_KEY || !COINS_PH_API_SECRET) {
-        console.error("[coinsph-proxy] Missing API credentials for authenticated request")
+      // Authenticated endpoints require signing
+      if (!COINS_PH_API_SECRET) {
+        console.error("[coinsph-proxy] Missing API secret for authenticated request")
         return new Response(
-          JSON.stringify({ error: "Server configuration error: Missing API credentials" }),
+          JSON.stringify({ error: "Server configuration error: Missing API secret" }),
           {
             status: 500,
             headers: {
@@ -133,9 +150,6 @@ serve(async (req) => {
           }
         )
       }
-
-      // Add API key header only for authenticated endpoints
-      (options.headers as Record<string, string>)["X-MBX-APIKEY"] = COINS_PH_API_KEY
 
       // Add timestamp and sign
       const requestParams = {
@@ -156,7 +170,7 @@ serve(async (req) => {
         options.body = JSON.stringify(requestParams)
       }
     } else {
-      // Public endpoints - no signing, no API key
+      // Public endpoints - API key is included, but no signing
       if (method === "GET") {
         const queryString = new URLSearchParams(
           params as Record<string, string>
