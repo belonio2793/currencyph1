@@ -328,6 +328,30 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
     }
   }
 
+  const calculateConvertedAmount = () => {
+    if (!amount || !selectedWallet) return null
+
+    const numAmount = parseFloat(amount)
+    const selectedWalletData = wallets.find(w => w.id === selectedWallet)
+
+    if (!selectedWalletData) return null
+
+    // If same currency, no conversion needed
+    if (selectedCurrency === selectedWalletData.currency_code) {
+      return numAmount
+    }
+
+    // Get exchange rates for both currencies
+    const fromRate = exchangeRates[selectedCurrency]
+    const toRate = exchangeRates[selectedWalletData.currency_code]
+
+    if (!fromRate || !toRate) return null
+
+    // Convert: (amount in from currency / from rate) * to rate
+    const convertedAmount = (numAmount / fromRate) * toRate
+    return Math.round(convertedAmount * 100) / 100
+  }
+
   const handleInitiateDeposit = async () => {
     try {
       setSubmitting(true)
@@ -345,27 +369,50 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
         return
       }
 
-      // Create pending deposit record
+      const selectedWalletData = wallets.find(w => w.id === selectedWallet)
+      const convertedAmount = calculateConvertedAmount()
+
+      // Determine deposit status based on method
+      // Crypto deposits auto-approve, fiat stays pending
+      const depositStatus = selectedMethod === 'solana' ? 'approved' : 'pending'
+
+      // Create deposit record with conversion info
       const { data: deposit, error: err } = await supabase
         .from('deposits')
         .insert([{
           user_id: userId,
           wallet_id: selectedWallet,
           amount: parseFloat(amount),
-          currency_code: selectedCurrency,
+          original_currency: selectedCurrency,
+          converted_amount: convertedAmount || parseFloat(amount),
+          wallet_currency: selectedWalletData.currency_code,
+          currency_code: selectedWalletData.currency_code,
           deposit_method: selectedMethod,
-          status: 'pending',
-          description: `${DEPOSIT_METHODS[selectedMethod].name} deposit of ${amount} ${selectedCurrency}`
+          status: depositStatus,
+          description: `${DEPOSIT_METHODS[selectedMethod].name} deposit of ${amount} ${selectedCurrency}${convertedAmount ? ` (${convertedAmount} ${selectedWalletData.currency_code})` : ''}`
         }])
         .select()
         .single()
 
       if (err) throw err
 
+      // Update wallet balance if approved
+      if (depositStatus === 'approved' && convertedAmount) {
+        const newBalance = selectedWalletData.balance + convertedAmount
+        await supabase
+          .from('wallets')
+          .update({ balance: newBalance })
+          .eq('id', selectedWallet)
+      }
+
       // Add to deposits list
       setDeposits([deposit, ...deposits])
-      setSuccess('Deposit initiated. Awaiting payment...')
-      
+
+      const statusMessage = depositStatus === 'approved'
+        ? 'Deposit approved and credited to your wallet!'
+        : 'Deposit initiated. Awaiting payment...'
+      setSuccess(statusMessage)
+
       // Move to confirmation step
       setStep('confirm')
     } catch (err) {
