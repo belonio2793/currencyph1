@@ -443,9 +443,21 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
       return null
     }
 
-    // Convert: (amount in from currency / from rate) * to rate
-    const convertedAmount = (numAmount / fromRate) * toRate
-    return Math.round(convertedAmount * 100) / 100
+    // Check if this is a crypto-to-fiat conversion
+    // For crypto: exchangeRates[crypto] = price in PHP, exchangeRates[PHP] = 1
+    // For fiat: exchangeRates[fiat] = exchange rate relative to a base
+    const isCryptoToFiat = activeType === 'cryptocurrency' && selectedWalletData.currency_code === 'PHP'
+
+    if (isCryptoToFiat) {
+      // For crypto to PHP: amount in crypto * price per crypto
+      // fromRate is the price in PHP, so just multiply
+      const convertedAmount = numAmount * fromRate
+      return Math.round(convertedAmount * 100) / 100
+    } else {
+      // For fiat-to-fiat: (amount in from currency / from rate) * to rate
+      const convertedAmount = (numAmount / fromRate) * toRate
+      return Math.round(convertedAmount * 100) / 100
+    }
   }
 
   const handleInitiateDeposit = async () => {
