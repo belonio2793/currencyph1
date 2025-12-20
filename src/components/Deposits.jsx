@@ -663,17 +663,17 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
     availableMethods = dynamicMethods
   }
 
-  // Reset selected method if it's not available for the current currency
-  // This prevents showing methods from a previous currency selection
+  // When switching currencies in crypto mode, reset the selected method
+  // This ensures only methods for the selected currency are shown
   useEffect(() => {
-    if (activeType === 'cryptocurrency' && selectedMethod) {
-      // Check if the current selectedMethod is valid for the selected currency
-      const isMethodAvailable = availableMethods.some(m => m.id === selectedMethod)
-      if (!isMethodAvailable) {
+    if (activeType === 'cryptocurrency') {
+      // Check if selected method is still valid for the new currency
+      const isValidForCurrency = selectedCurrency && cryptoAddresses[selectedCurrency]
+      if (selectedMethod && !isValidForCurrency) {
         setSelectedMethod(null)
       }
     }
-  }, [selectedCurrency, activeType, availableMethods, selectedMethod])
+  }, [selectedCurrency, activeType])
 
   const copyToClipboard = (text) => {
     navigator.clipboard.writeText(text)
