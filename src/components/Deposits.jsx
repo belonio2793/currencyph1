@@ -663,6 +663,18 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
     availableMethods = dynamicMethods
   }
 
+  // Reset selected method if it's not available for the current currency
+  // This prevents showing methods from a previous currency selection
+  useEffect(() => {
+    if (activeType === 'cryptocurrency' && selectedMethod) {
+      // Check if the current selectedMethod is valid for the selected currency
+      const isMethodAvailable = availableMethods.some(m => m.id === selectedMethod)
+      if (!isMethodAvailable) {
+        setSelectedMethod(null)
+      }
+    }
+  }, [selectedCurrency, activeType, availableMethods, selectedMethod])
+
   const copyToClipboard = (text) => {
     navigator.clipboard.writeText(text)
     setSuccess('Copied to clipboard')
