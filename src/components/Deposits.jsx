@@ -349,7 +349,10 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
     const fromRate = exchangeRates[selectedCurrency]
     const toRate = exchangeRates[selectedWalletData.currency_code]
 
-    if (!fromRate || !toRate) return null
+    if (!fromRate || !toRate) {
+      console.warn('Missing exchange rates for conversion:', { fromRate, toRate, from: selectedCurrency, to: selectedWalletData.currency_code })
+      return null
+    }
 
     // Convert: (amount in from currency / from rate) * to rate
     const convertedAmount = (numAmount / fromRate) * toRate
