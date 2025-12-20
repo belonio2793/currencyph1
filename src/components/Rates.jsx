@@ -261,7 +261,7 @@ export default function Rates() {
   }
 
   const getCurrencyIcon = (type) => {
-    return type === 'crypto' ? '₿' : '$'
+    return type === 'cryptocurrency' ? '₿' : '$'
   }
 
   if (loading) {
