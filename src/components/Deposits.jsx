@@ -380,7 +380,7 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
                   <option value="">Select a wallet</option>
                   {(activeType === 'currency' ? currencyWallets : cryptocurrencyWallets).map(w => (
                     <option key={w.id} value={w.id}>
-                      {w.currency_name} ({w.balance.toFixed(2)})
+                      {w.currency_name} ({w.balance.toFixed(2)}) - {w.id}
                     </option>
                   ))}
                 </select>
