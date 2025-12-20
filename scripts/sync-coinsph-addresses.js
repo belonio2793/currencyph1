@@ -66,6 +66,8 @@ async function getDepositAddress(coin) {
     const queryString = new URLSearchParams(params).toString()
     const url = `${COINS_PH_API_BASE}/openapi/wallet/v1/deposit/address?${queryString}`
 
+    console.log(`  📡 Calling API for ${coin}...`)
+
     const response = await fetch(url, {
       method: 'GET',
       headers: {
@@ -74,13 +76,15 @@ async function getDepositAddress(coin) {
       },
     })
 
+    const responseData = await response.json()
+
     if (!response.ok) {
-      const error = await response.json()
-      console.warn(`⚠️  Failed to fetch address for ${coin}:`, error)
+      console.warn(`  ⚠️  API Error (${response.status}):`, responseData)
       return null
     }
 
-    return await response.json()
+    console.log(`  ✓ Received response:`, JSON.stringify(responseData).substring(0, 100))
+    return responseData
   } catch (error) {
     console.error(`❌ Error fetching address for ${coin}:`, error.message)
     return null
