@@ -11,7 +11,7 @@ export default function CurrencyCryptoToggle({ active, onChange }) {
             : 'text-slate-700 hover:bg-slate-100'
         }`}
       >
-        💵 Currency
+        Currency
       </button>
       <button
         onClick={() => onChange('cryptocurrency')}
@@ -21,7 +21,7 @@ export default function CurrencyCryptoToggle({ active, onChange }) {
             : 'text-slate-700 hover:bg-slate-100'
         }`}
       >
-        ₿ Cryptocurrency
+        Cryptocurrency
       </button>
     </div>
   )
