@@ -629,23 +629,26 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
     activeType === 'currency' ? m.type === 'fiat' : m.type === 'crypto'
   )
 
-  // For crypto, add dynamic methods from wallets_house
+  // For crypto, add dynamic methods from wallets_house - ONLY for selected currency
   if (activeType === 'cryptocurrency' && Object.keys(cryptoAddresses).length > 0) {
     const dynamicMethods = []
-    Object.entries(cryptoAddresses).forEach(([symbol, data]) => {
+
+    // Only show methods for the selected currency
+    if (selectedCurrency && cryptoAddresses[selectedCurrency]) {
+      const data = cryptoAddresses[selectedCurrency]
       // Handle both single address and multiple networks
       const addresses = Array.isArray(data) ? data : [data]
       addresses.forEach((addressData, idx) => {
         dynamicMethods.push({
-          id: addresses.length > 1 ? `${symbol.toLowerCase()}-${idx}` : symbol.toLowerCase(),
-          name: addresses.length > 1 ? `${symbol} (${addressData.network})` : symbol,
-          icon: '₿', // Generic crypto icon
+          id: addresses.length > 1 ? `${selectedCurrency.toLowerCase()}-${idx}` : selectedCurrency.toLowerCase(),
+          name: addresses.length > 1 ? `${selectedCurrency} (${addressData.network})` : selectedCurrency,
+          icon: '📮', // Generic wallet icon instead of ₿
           type: 'crypto',
-          description: `Send ${symbol} directly to our wallet${addresses.length > 1 ? ` via ${addressData.network}` : ''}`,
+          description: `Send ${selectedCurrency} directly to our wallet${addresses.length > 1 ? ` via ${addressData.network}` : ''}`,
           instructions: [
-            `Open your ${symbol} wallet app`,
+            `Open your ${selectedCurrency} wallet app`,
             `Scan the QR code or copy the address below`,
-            `Enter the amount in ${symbol}`,
+            `Enter the amount in ${selectedCurrency}`,
             `Verify the recipient address and amount`,
             `Confirm the transaction`,
             `Your balance will be updated within 1-2 minutes`
@@ -655,7 +658,7 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
           provider: addressData.provider
         })
       })
-    })
+    }
     // Replace hardcoded methods with dynamic ones
     availableMethods = dynamicMethods
   }
