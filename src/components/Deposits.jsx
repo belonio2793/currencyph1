@@ -885,8 +885,11 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
                   <p className="text-xl font-semibold text-slate-900">{amount} {selectedCurrency}</p>
                 </div>
                 <div>
-                  <p className="text-xs text-slate-600 uppercase tracking-wide">Method</p>
+                  <p className="text-xs text-slate-600 uppercase tracking-wide">{activeType === 'cryptocurrency' ? 'Network' : 'Method'}</p>
                   <p className="text-lg font-semibold text-slate-900">{selectedMethodData.name}</p>
+                  {selectedMethodData.network && (
+                    <p className="text-xs text-blue-600 font-medium mt-1">🔗 {selectedMethodData.network}</p>
+                  )}
                 </div>
                 <div>
                   <p className="text-xs text-slate-600 uppercase tracking-wide">Wallet</p>
