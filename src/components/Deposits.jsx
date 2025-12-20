@@ -838,11 +838,10 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
                         }}
                         className="p-4 border-2 border-slate-200 rounded-lg text-left transition-all hover:border-blue-400 hover:bg-blue-50"
                       >
-                        <div className="text-2xl mb-2">{method.icon}</div>
                         <div className="font-semibold text-slate-900">{method.name}</div>
                         <div className="text-sm text-slate-600">{method.description}</div>
                         {method.network && (
-                          <div className="text-xs text-blue-600 font-medium mt-2">🔗 {method.network}</div>
+                          <div className="text-xs text-blue-600 font-medium mt-2">{method.network}</div>
                         )}
                       </button>
                     ))}
