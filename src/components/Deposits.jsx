@@ -252,6 +252,11 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
   const cryptoCurrencies = currencies.filter(c => c.type === 'crypto')
   const displayedCurrencies = activeType === 'currency' ? currencyCurrencies : cryptoCurrencies
 
+  // Filter deposit methods by type
+  const availableMethods = Object.values(DEPOSIT_METHODS).filter(m =>
+    activeType === 'currency' ? m.type === 'fiat' : m.type === 'crypto'
+  )
+
   // Filter wallets by type
   const currencyWallets = wallets.filter(w => w.currency_type === 'fiat')
   const cryptocurrencyWallets = wallets.filter(w => w.currency_type === 'crypto')
