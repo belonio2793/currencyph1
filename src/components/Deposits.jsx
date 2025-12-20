@@ -374,27 +374,30 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
               {/* Wallet Selection */}
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-2">Deposit to Wallet</label>
-                <select
-                  value={selectedWallet || ''}
-                  onChange={(e) => setSelectedWallet(e.target.value)}
-                  className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
-                >
-                  <option value="">Select a wallet</option>
-                  {(activeType === 'currency' ? currencyWallets : cryptocurrencyWallets).map(w => (
-                    <option key={w.id} value={w.id}>
-                      {w.currency_name} ({w.balance.toFixed(2)})
-                    </option>
-                  ))}
-                </select>
-                {selectedWallet && (
-                  <p className="text-xs text-slate-500 mt-2">
-                    <span className="text-slate-400">Wallet ID: </span>
-                    <span className="font-mono text-slate-600">{selectedWallet.substring(0, 8)}...</span>
-                  </p>
-                )}
-                {!selectedWallet && (
-                  <p className="text-xs text-slate-500 mt-1">Create a wallet if you don't have one for this currency</p>
-                )}
+                <div>
+                  <select
+                    value={selectedWallet || ''}
+                    onChange={(e) => setSelectedWallet(e.target.value)}
+                    className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+                  >
+                    <option value="">Select a wallet</option>
+                    {(activeType === 'currency' ? currencyWallets : cryptocurrencyWallets).map(w => (
+                      <option key={w.id} value={w.id}>
+                        {w.currency_name} ({w.balance.toFixed(2)})
+                      </option>
+                    ))}
+                  </select>
+                  {selectedWallet && (
+                    <div className="mt-2 px-2 py-1">
+                      <p className="text-xs text-slate-400">
+                        <span className="font-mono text-slate-500">{selectedWallet}</span>
+                      </p>
+                    </div>
+                  )}
+                  {!selectedWallet && (
+                    <p className="text-xs text-slate-500 mt-2">Create a wallet if you don't have one for this currency</p>
+                  )}
+                </div>
               </div>
 
               {/* Select Deposit Method */}
