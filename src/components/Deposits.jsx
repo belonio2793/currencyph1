@@ -3,6 +3,7 @@ import { supabase } from '../lib/supabaseClient'
 import CurrencyCryptoToggle from './FiatCryptoToggle'
 import { currencyAPI } from '../lib/currencyAPI'
 import { getCryptoPrice } from '../lib/cryptoRatesService'
+import { coinsPhApi } from '../lib/coinsPhApi'
 
 // Currency symbols
 const CURRENCY_SYMBOLS = {
