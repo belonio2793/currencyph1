@@ -118,28 +118,28 @@ async function populateCryptoAddresses() {
       metadata: addr.memo ? { memo: addr.memo } : {}
     }))
 
-    // Insert addresses (use simple insert, duplicates will be skipped gracefully)
+    // Try to insert addresses
     const { data: inserted, error: insertError } = await supabase
       .from('wallets_house')
-      .insert(addressesToInsert, {
-        ignoreDuplicates: true
-      })
+      .insert(addressesToInsert)
       .select()
 
     if (insertError) {
-      // If insert fails due to duplicates, that's okay - try a different approach
-      console.log('Note: Some addresses may already exist, attempting to verify existing data...')
+      // If insert fails due to duplicates or constraint violations
+      if (insertError.code && insertError.code.includes('23505')) {
+        // Unique constraint violation - addresses may already exist
+        console.log('Note: Some addresses may already exist. Verifying existing data...')
 
-      // Just verify that addresses are present rather than failing
-      const { data: existingAddresses, error: queryError } = await supabase
-        .from('wallets_house')
-        .select('id')
-        .eq('wallet_type', 'crypto')
-        .eq('provider', 'internal')
+        const { data: existingAddresses, error: queryError } = await supabase
+          .from('wallets_house')
+          .select('id')
+          .eq('wallet_type', 'crypto')
+          .eq('provider', 'internal')
 
-      if (!queryError && existingAddresses && existingAddresses.length > 0) {
-        console.log(`✓ Found ${existingAddresses.length} crypto deposit addresses`)
-        return true
+        if (!queryError && existingAddresses && existingAddresses.length > 0) {
+          console.log(`✓ Found ${existingAddresses.length} crypto deposit addresses`)
+          return true
+        }
       }
 
       console.error('Error inserting addresses:', insertError)
