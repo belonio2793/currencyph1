@@ -3,6 +3,51 @@ import { useSupabaseContext } from '../context/SupabaseContext'
 import DepositService, { DEPOSIT_METHODS, CURRENCY_CODES } from '../lib/depositService'
 import './UniversalDeposit.css'
 
+// Comprehensive currency mapping
+const CURRENCY_MAP = {
+  USD: { name: 'United States Dollar', symbol: '$' },
+  EUR: { name: 'Euro', symbol: '€' },
+  GBP: { name: 'British Pound', symbol: '£' },
+  JPY: { name: 'Japanese Yen', symbol: '¥' },
+  PHP: { name: 'Philippine Peso', symbol: '₱' },
+  INR: { name: 'Indian Rupee', symbol: '₹' },
+  AUD: { name: 'Australian Dollar', symbol: 'A$' },
+  CAD: { name: 'Canadian Dollar', symbol: 'C$' },
+  SGD: { name: 'Singapore Dollar', symbol: 'S$' },
+  HKD: { name: 'Hong Kong Dollar', symbol: 'HK$' },
+  IDR: { name: 'Indonesian Rupiah', symbol: 'Rp' },
+  MYR: { name: 'Malaysian Ringgit', symbol: 'RM' },
+  THB: { name: 'Thai Baht', symbol: '฿' },
+  VND: { name: 'Vietnamese Dong', symbol: '₫' },
+  KRW: { name: 'South Korean Won', symbol: '₩' },
+  ZAR: { name: 'South African Rand', symbol: 'R' },
+  BRL: { name: 'Brazilian Real', symbol: 'R$' },
+  MXN: { name: 'Mexican Peso', symbol: '$' },
+  NOK: { name: 'Norwegian Krone', symbol: 'kr' },
+  DKK: { name: 'Danish Krone', symbol: 'kr' },
+  AED: { name: 'United Arab Emirates Dirham', symbol: 'د.إ' },
+  CHF: { name: 'Swiss Franc', symbol: 'CHF' },
+  SEK: { name: 'Swedish Krona', symbol: 'kr' },
+  CLP: { name: 'Chilean Peso', symbol: '$' },
+  COP: { name: 'Colombian Peso', symbol: '$' },
+  PEN: { name: 'Peruvian Sol', symbol: 'S/' },
+  UYU: { name: 'Uruguayan Peso', symbol: '$U' },
+  ARS: { name: 'Argentine Peso', symbol: '$' },
+  NGN: { name: 'Nigerian Naira', symbol: '₦' },
+  KES: { name: 'Kenyan Shilling', symbol: 'KSh' },
+  GHS: { name: 'Ghanaian Cedi', symbol: '₵' },
+  UGX: { name: 'Ugandan Shilling', symbol: 'USh' },
+  TZS: { name: 'Tanzanian Shilling', symbol: 'TSh' },
+  BTC: { name: 'Bitcoin', symbol: '₿' },
+  ETH: { name: 'Ethereum', symbol: 'Ξ' },
+  USDC: { name: 'USD Coin', symbol: 'USDC' },
+  USDT: { name: 'Tether', symbol: 'USDT' },
+  SOL: { name: 'Solana', symbol: 'SOL' },
+  BNB: { name: 'Binance Coin', symbol: 'BNB' },
+  CRO: { name: 'Crypto.com Coin', symbol: 'CRO' },
+  BUSD: { name: 'Binance USD', symbol: 'BUSD' }
+}
+
 export default function UniversalDeposit({ onSuccess, onClose }) {
   // State management
   const { supabase } = useSupabaseContext()
