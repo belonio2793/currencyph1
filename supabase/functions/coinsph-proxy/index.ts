@@ -180,11 +180,21 @@ serve(async (req) => {
     console.log("[coinsph-proxy] Response status:", response.status)
 
     if (!response.ok) {
-      console.error("[coinsph-proxy] API Error:", response.status, responseData)
+      const errorMsg = responseData.msg || responseData.error || `Coins.ph API error: ${response.status}`
+      console.error("[coinsph-proxy] API Error:", response.status, errorMsg)
+
+      // Additional logging for 401 errors
+      if (response.status === 401) {
+        console.error("[coinsph-proxy] 401 Unauthorized - check API credentials")
+        console.error("[coinsph-proxy] Request path:", path)
+        console.error("[coinsph-proxy] Is public:", isPublic)
+      }
+
       return new Response(
         JSON.stringify({
-          error: responseData.msg || responseData.error || `Coins.ph API error: ${response.status}`,
+          error: errorMsg,
           details: responseData,
+          status: response.status,
         }),
         {
           status: response.status,
