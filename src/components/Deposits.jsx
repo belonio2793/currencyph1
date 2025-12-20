@@ -1230,12 +1230,6 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
                     </div>
                   </div>
 
-                  {selectedAddressMethod.provider && (
-                    <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg text-xs text-slate-700">
-                      <span className="font-medium">ℹ️ Provider: </span>
-                      <span className="font-semibold">{selectedAddressMethod.provider.charAt(0).toUpperCase() + selectedAddressMethod.provider.slice(1)}</span>
-                    </div>
-                  )}
                 </div>
               )}
 
