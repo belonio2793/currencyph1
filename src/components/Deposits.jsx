@@ -626,7 +626,7 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
 
             {/* Deposit Summary */}
             <div className="bg-slate-50 rounded-lg p-6 mb-6">
-              <div className="grid grid-cols-3 gap-4">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <div>
                   <p className="text-xs text-slate-600 uppercase tracking-wide">Amount</p>
                   <p className="text-xl font-semibold text-slate-900">{amount} {selectedCurrency}</p>
@@ -639,6 +639,12 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
                   <p className="text-xs text-slate-600 uppercase tracking-wide">Wallet</p>
                   <p className="text-lg font-semibold text-slate-900">{selectedWalletData.currency_code}</p>
                 </div>
+                {calculateConvertedAmount() && selectedCurrency !== selectedWalletData.currency_code && (
+                  <div>
+                    <p className="text-xs text-slate-600 uppercase tracking-wide">You Receive</p>
+                    <p className="text-xl font-semibold text-blue-600">{calculateConvertedAmount()} {selectedWalletData.currency_code}</p>
+                  </div>
+                )}
               </div>
             </div>
 
