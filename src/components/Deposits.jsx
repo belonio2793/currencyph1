@@ -486,6 +486,7 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
     setAmount('')
     setSelectedCurrency(globalCurrency)
     setSelectedMethod(null)
+    setGcashReferenceNumber('')
     setStep('amount')
     setSuccess('')
     setError('')
