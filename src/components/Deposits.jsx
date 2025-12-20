@@ -663,7 +663,7 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
     availableMethods = dynamicMethods
   }
 
-  // When switching currencies in crypto mode, reset the selected method
+  // When switching currencies in crypto mode, reset the selected method and step
   // This ensures only methods for the selected currency are shown
   useEffect(() => {
     if (activeType === 'cryptocurrency') {
@@ -671,6 +671,10 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
       const isValidForCurrency = selectedCurrency && cryptoAddresses[selectedCurrency]
       if (selectedMethod && !isValidForCurrency) {
         setSelectedMethod(null)
+        // If we were in confirm step, go back to amount step since method is no longer valid
+        if (step === 'confirm') {
+          setStep('amount')
+        }
       }
     }
   }, [selectedCurrency, activeType])
