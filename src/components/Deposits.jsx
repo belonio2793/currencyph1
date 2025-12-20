@@ -827,26 +827,39 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
               {/* Select Deposit Method */}
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-3">Payment Method</label>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  {availableMethods.map(method => (
-                    <button
-                      key={method.id}
-                      onClick={() => {
-                        setSelectedMethod(method.id)
-                        setStep('confirm')
-                      }}
-                      className={`p-4 border-2 rounded-lg text-left transition-all ${
-                        selectedMethod === method.id
-                          ? 'border-blue-500 bg-blue-50'
-                          : 'border-slate-200 hover:border-slate-300'
-                      }`}
-                    >
-                      <div className="text-2xl mb-2">{method.icon}</div>
-                      <div className="font-semibold text-slate-900">{method.name}</div>
-                      <div className="text-sm text-slate-600">{method.description}</div>
-                    </button>
-                  ))}
-                </div>
+                {availableMethods.length > 0 ? (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    {availableMethods.map(method => (
+                      <button
+                        key={method.id}
+                        onClick={() => {
+                          setSelectedMethod(method.id)
+                          setStep('confirm')
+                        }}
+                        className={`p-4 border-2 rounded-lg text-left transition-all ${
+                          selectedMethod === method.id
+                            ? 'border-blue-500 bg-blue-50'
+                            : 'border-slate-200 hover:border-slate-300'
+                        }`}
+                      >
+                        <div className="text-2xl mb-2">{method.icon}</div>
+                        <div className="font-semibold text-slate-900">{method.name}</div>
+                        <div className="text-sm text-slate-600">{method.description}</div>
+                      </button>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="p-4 bg-amber-50 border border-amber-200 rounded-lg text-amber-700 text-sm">
+                    {activeType === 'cryptocurrency' ? (
+                      <>
+                        <p className="font-medium mb-2">⚠️ No deposit methods available for {selectedCurrency}</p>
+                        <p>This cryptocurrency may not be configured yet. Please select a different currency or contact support.</p>
+                      </>
+                    ) : (
+                      <p>No payment methods available for {selectedCurrency}. Please create a wallet first.</p>
+                    )}
+                  </div>
+                )}
               </div>
             </div>
           </div>
