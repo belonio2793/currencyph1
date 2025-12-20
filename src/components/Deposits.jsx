@@ -247,19 +247,22 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
     setError('')
   }
 
-  // Filter currencies by type
-  const currencyCurrencies = currencies.filter(c => c.type === 'fiat')
-  const cryptoCurrencies = currencies.filter(c => c.type === 'crypto')
+  // Filter wallets by type
+  const currencyWallets = wallets.filter(w => w.currency_type === 'fiat')
+  const cryptocurrencyWallets = wallets.filter(w => w.currency_type === 'crypto')
+
+  // Get currency codes that user has wallets for
+  const userCurrencyCodes = new Set(wallets.map(w => w.currency_code))
+
+  // Filter currencies by type and only show currencies user has wallets for
+  const currencyCurrencies = currencies.filter(c => c.type === 'fiat' && userCurrencyCodes.has(c.code))
+  const cryptoCurrencies = currencies.filter(c => c.type === 'crypto' && userCurrencyCodes.has(c.code))
   const displayedCurrencies = activeType === 'currency' ? currencyCurrencies : cryptoCurrencies
 
   // Filter deposit methods by type
   const availableMethods = Object.values(DEPOSIT_METHODS).filter(m =>
     activeType === 'currency' ? m.type === 'fiat' : m.type === 'crypto'
   )
-
-  // Filter wallets by type
-  const currencyWallets = wallets.filter(w => w.currency_type === 'fiat')
-  const cryptocurrencyWallets = wallets.filter(w => w.currency_type === 'crypto')
 
   const copyToClipboard = (text) => {
     navigator.clipboard.writeText(text)
