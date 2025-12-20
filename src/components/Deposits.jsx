@@ -1152,6 +1152,130 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
         </div>
       )}
 
+      {/* Crypto Deposit Instructions Modal */}
+      {showCryptoAddressModal && selectedAddressMethod && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50" onClick={() => setShowCryptoAddressModal(false)}>
+          <div className="bg-white rounded-xl shadow-2xl max-w-3xl w-full p-8" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between mb-6">
+              <div>
+                <h3 className="text-2xl font-semibold text-slate-900">
+                  {selectedAddressMethod.name} Deposit Instructions
+                </h3>
+                {selectedAddressMethod.network && (
+                  <p className="text-sm text-slate-600 mt-1">🔗 Network: {selectedAddressMethod.network}</p>
+                )}
+              </div>
+              <button
+                onClick={() => setShowCryptoAddressModal(false)}
+                className="text-slate-500 hover:text-slate-700 text-3xl leading-none"
+              >
+                ×
+              </button>
+            </div>
+
+            <div className="space-y-6">
+              {/* Instructions */}
+              <div>
+                <h4 className="font-semibold text-slate-900 mb-4">📋 Steps to Deposit:</h4>
+                <ol className="space-y-3">
+                  {selectedAddressMethod.instructions.map((instruction, idx) => (
+                    <li key={idx} className="flex gap-3">
+                      <span className="flex-shrink-0 w-6 h-6 rounded-full bg-blue-100 text-blue-700 text-sm font-semibold flex items-center justify-center">
+                        {idx + 1}
+                      </span>
+                      <span className="text-slate-700">{instruction}</span>
+                    </li>
+                  ))}
+                </ol>
+              </div>
+
+              {/* Deposit Address */}
+              {selectedAddressMethod.address && (
+                <div className="p-6 bg-purple-50 border border-purple-200 rounded-lg">
+                  <p className="text-sm font-semibold text-slate-900 mb-4">📬 Deposit Address</p>
+
+                  <div className="grid grid-cols-2 gap-4 mb-4">
+                    <div>
+                      <p className="text-xs text-slate-600">Currency</p>
+                      <p className="font-semibold text-slate-900">{selectedCurrency}</p>
+                    </div>
+                    {selectedAddressMethod.network && (
+                      <div>
+                        <p className="text-xs text-slate-600">Network</p>
+                        <p className="font-semibold text-slate-900">{selectedAddressMethod.network}</p>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="flex gap-4 items-start mb-4">
+                    <div className="flex-shrink-0">
+                      <svg width="120" height="120" viewBox="0 0 120 120">
+                        <rect width="120" height="120" fill="white" rx="8" />
+                        <text x="50%" y="50%" dominantBaseline="middle" textAnchor="middle" fontSize="10" fill="#1e1b4b">
+                          [QR Code]
+                        </text>
+                      </svg>
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-xs font-medium text-slate-600 mb-2">Copy the address or scan the QR code:</p>
+                      <p className="font-mono text-xs bg-white p-3 rounded border border-slate-300 break-all text-slate-800 mb-2">
+                        {selectedAddressMethod.address}
+                      </p>
+                      <button
+                        onClick={() => copyToClipboard(selectedAddressMethod.address)}
+                        className="text-sm text-purple-600 hover:text-purple-700 font-medium"
+                      >
+                        📋 Copy Address
+                      </button>
+                    </div>
+                  </div>
+
+                  {selectedAddressMethod.provider && (
+                    <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg text-xs text-slate-700">
+                      <span className="font-medium">ℹ️ Provider: </span>
+                      <span className="font-semibold">{selectedAddressMethod.provider.charAt(0).toUpperCase() + selectedAddressMethod.provider.slice(1)}</span>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Important Notes */}
+              <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+                <p className="font-semibold text-yellow-900 mb-2">⚠️ Important:</p>
+                <ul className="text-sm text-yellow-800 space-y-1">
+                  <li>• Only send {selectedAddressMethod.name} ({selectedCurrency}) to this address</li>
+                  {selectedAddressMethod.network && <li>• Network: {selectedAddressMethod.network}</li>}
+                  <li>• Do not send other tokens or cryptocurrencies</li>
+                  <li>• Transactions cannot be reversed</li>
+                  <li>• Keep the transaction hash for your records</li>
+                  <li>• Your balance will be updated within 1-2 minutes after confirmation</li>
+                </ul>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setShowCryptoAddressModal(false)}
+                  className="flex-1 px-6 py-3 border border-slate-300 rounded-lg text-slate-900 font-medium hover:bg-slate-50 transition"
+                >
+                  Close
+                </button>
+                <button
+                  onClick={() => {
+                    setSelectedMethod(selectedAddressMethod.id)
+                    setShowCryptoAddressModal(false)
+                    setStep('confirm')
+                  }}
+                  className="flex-1 px-6 py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition"
+                >
+                  Proceed with Deposit
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* QR Code Modal */}
       {showQRModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50" onClick={() => setShowQRModal(false)}>
