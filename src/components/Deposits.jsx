@@ -211,18 +211,31 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
           console.warn('Failed to fetch fiat exchange rates:', e)
         }
       } else {
-        // For crypto, fetch rates for each crypto currency we have
-        const cryptoWallets = wallets.filter(w => w.currency_type === 'crypto')
-        for (const wallet of cryptoWallets) {
+        // For crypto, fetch rates for all available crypto currencies
+        // First try to get rates for currencies from house addresses
+        const cryptoCurrenciesToFetch = new Set(Object.keys(cryptoAddresses))
+
+        // Also include any crypto wallets the user has
+        wallets.forEach(wallet => {
+          if (wallet.currency_type === 'crypto') {
+            cryptoCurrenciesToFetch.add(wallet.currency_code)
+          }
+        })
+
+        // Fetch rates for all crypto currencies
+        for (const cryptoCode of cryptoCurrenciesToFetch) {
           try {
-            const price = await getCryptoPrice(wallet.currency_code)
+            const price = await getCryptoPrice(cryptoCode)
             if (price) {
-              rates[wallet.currency_code] = price
+              rates[cryptoCode] = price
             }
           } catch (e) {
-            console.warn(`Failed to fetch rate for ${wallet.currency_code}:`, e.message)
+            console.warn(`Failed to fetch rate for ${cryptoCode}:`, e.message)
           }
         }
+
+        // Ensure PHP rate is set to 1 for conversion calculations
+        rates['PHP'] = 1
       }
 
       setExchangeRates(rates)
