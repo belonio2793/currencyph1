@@ -225,6 +225,12 @@ export default function App() {
       setShowAuth(false)
     }
 
+    // Direct /depots route should activate deposit tab
+    if (path === '/depots') {
+      setActiveTab('deposit')
+      setShowAuth(false)
+    }
+
     // Handle payment checkout routes
     if (path.startsWith('/payment/')) {
       setActiveTab('checkout')
