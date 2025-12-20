@@ -1021,7 +1021,6 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
                   <>
                     <li>• Only send {selectedMethodData.name} ({selectedCurrency}) to this address</li>
                     {selectedMethodData.network && <li>• Network: {selectedMethodData.network}</li>}
-                    {selectedMethodData.provider && <li>• Provider: {selectedMethodData.provider.charAt(0).toUpperCase() + selectedMethodData.provider.slice(1)}</li>}
                     <li>• Do not send other tokens or cryptocurrencies</li>
                     <li>• Transactions cannot be reversed</li>
                     <li>• Keep the transaction hash for your records</li>
