@@ -336,12 +336,12 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
                     onChange={(e) => setSelectedCurrency(e.target.value)}
                     className="px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
                   >
-                    {fiatCurrencies.length > 0 && (
+                    {currencyCurrencies.length > 0 && (
                       <>
                         <option disabled style={{ fontWeight: 'bold', backgroundColor: '#f3f4f6' }}>
-                          ━━━ CURRENCIES ━━━
+                          ━━━ CURRENCY ━━━
                         </option>
-                        {fiatCurrencies.map(c => (
+                        {currencyCurrencies.map(c => (
                           <option key={c.code} value={c.code}>
                             {c.code} {CURRENCY_SYMBOLS[c.code] || ''}
                           </option>
