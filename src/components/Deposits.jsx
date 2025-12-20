@@ -824,9 +824,11 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
                 </div>
               )}
 
-              {/* Select Deposit Method */}
+              {/* Select Deposit Method / Network */}
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-3">Payment Method</label>
+                <label className="block text-sm font-medium text-slate-700 mb-3">
+                  {activeType === 'cryptocurrency' ? 'Blockchain Network' : 'Payment Method'}
+                </label>
                 {availableMethods.length > 0 ? (
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                     {availableMethods.map(method => (
@@ -845,6 +847,9 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
                         <div className="text-2xl mb-2">{method.icon}</div>
                         <div className="font-semibold text-slate-900">{method.name}</div>
                         <div className="text-sm text-slate-600">{method.description}</div>
+                        {method.network && (
+                          <div className="text-xs text-blue-600 font-medium mt-2">🔗 {method.network}</div>
+                        )}
                       </button>
                     ))}
                   </div>
