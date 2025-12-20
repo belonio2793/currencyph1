@@ -60,7 +60,7 @@ export class CoinsPhApi {
    * Get ticker info (24h stats)
    */
   async getTicker(symbol) {
-    return this.request('GET', '/openapi/quote/v1/ticker/24hr', { symbol }, false)
+    return this.request('GET', '/openapi/quote/v1/ticker/24hr', { symbol }, true)
   }
 
   /**
