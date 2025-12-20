@@ -563,7 +563,13 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
         <div className="mb-8 flex items-center justify-between flex-wrap gap-4">
           <div>
             <h1 className="text-3xl font-bold text-slate-900">Add Funds</h1>
-            <p className="text-slate-600 mt-2">Deposit money into your wallet using GCash or Solana</p>
+            <p className="text-slate-600 mt-2">
+              Deposit money into your wallet using {
+                Object.keys(cryptoAddresses).length > 0
+                  ? `${Object.keys(cryptoAddresses).join(', ')} or other payment methods`
+                  : 'available payment methods'
+              }
+            </p>
           </div>
           {(currencyCurrencies.length > 0 || cryptoCurrencies.length > 0) && (
             <CurrencyCryptoToggle active={activeType} onChange={setActiveType} />
