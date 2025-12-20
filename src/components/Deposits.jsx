@@ -313,16 +313,19 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
       // For create wallet modal, show ALL active currencies (not just those with existing wallets)
       setCurrencies(allCurrencies)
 
-      // Load user's deposits
-      const { data: depositsData, error: depositsError } = await supabase
-        .from('deposits')
-        .select('*')
-        .eq('user_id', userId)
-        .order('created_at', { ascending: false })
-        .limit(10)
+      // Load user's deposits and crypto addresses in parallel
+      const [depositsResult] = await Promise.all([
+        supabase
+          .from('deposits')
+          .select('*')
+          .eq('user_id', userId)
+          .order('created_at', { ascending: false })
+          .limit(10),
+        loadCryptoAddresses()
+      ])
 
-      if (depositsError) throw depositsError
-      setDeposits(depositsData || [])
+      if (depositsResult.error) throw depositsResult.error
+      setDeposits(depositsResult.data || [])
 
       setLoading(false)
     } catch (err) {
