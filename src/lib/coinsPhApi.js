@@ -53,7 +53,7 @@ export class CoinsPhApi {
    * Get current price of a symbol
    */
   async getPrice(symbol) {
-    return this.request('GET', '/openapi/quote/v1/ticker/price', { symbol }, false)
+    return this.request('GET', '/openapi/quote/v1/ticker/price', { symbol }, true)
   }
 
   /**
