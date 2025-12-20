@@ -740,6 +740,7 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
                 <thead>
                   <tr className="border-b border-slate-200">
                     <th className="text-left py-3 px-4 text-slate-600 font-medium">Amount</th>
+                    <th className="text-left py-3 px-4 text-slate-600 font-medium">Converted Amount</th>
                     <th className="text-left py-3 px-4 text-slate-600 font-medium">Method</th>
                     <th className="text-left py-3 px-4 text-slate-600 font-medium">Status</th>
                     <th className="text-left py-3 px-4 text-slate-600 font-medium">Date</th>
@@ -749,7 +750,10 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
                   {deposits.slice(0, 5).map(deposit => (
                     <tr key={deposit.id} className="border-b border-slate-100">
                       <td className="py-3 px-4 font-semibold text-slate-900">
-                        {deposit.amount} {deposit.currency_code}
+                        {deposit.amount} {deposit.original_currency || deposit.currency_code}
+                      </td>
+                      <td className="py-3 px-4 text-slate-700">
+                        {deposit.converted_amount ? `${deposit.converted_amount} ${deposit.wallet_currency || deposit.currency_code}` : '—'}
                       </td>
                       <td className="py-3 px-4 text-slate-700">
                         {DEPOSIT_METHODS[deposit.deposit_method]?.name || deposit.deposit_method}
