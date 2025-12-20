@@ -788,13 +788,17 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
                     <div>
                       <p className="text-sm text-slate-600">Conversion Rate</p>
                       <p className="text-xs text-slate-500 mt-1">
-                        {ratesLoading ? 'Loading rates...' : !exchangeRates[selectedCurrency] || !exchangeRates[selectedWalletData?.currency_code] ? '⚠️ Rates unavailable - using original amount' : `1 ${selectedCurrency} = ${(exchangeRates[selectedWalletData?.currency_code] / exchangeRates[selectedCurrency]).toFixed(6)} ${selectedWalletData?.currency_code}`}
+                        {ratesLoading ? 'Loading rates...' : !exchangeRates[selectedCurrency] || !exchangeRates[selectedWalletData?.currency_code] ? '⚠️ Rates unavailable' :
+                          activeType === 'cryptocurrency'
+                            ? `1 ${selectedCurrency} = ${exchangeRates[selectedCurrency].toLocaleString(undefined, { maximumFractionDigits: 2 })} ${selectedWalletData?.currency_code}`
+                            : `1 ${selectedCurrency} = ${(exchangeRates[selectedWalletData?.currency_code] / exchangeRates[selectedCurrency]).toFixed(6)} ${selectedWalletData?.currency_code}`
+                        }
                       </p>
                     </div>
                     <div className="text-right">
                       <p className="text-sm text-slate-600">You will receive</p>
                       <p className={`text-2xl font-bold ${calculateConvertedAmount() ? 'text-blue-600' : 'text-amber-600'}`}>
-                        {ratesLoading ? 'Calculating...' : `${calculateConvertedAmount() || parseFloat(amount)} ${selectedWalletData?.currency_code}`}
+                        {ratesLoading ? 'Calculating...' : `${(calculateConvertedAmount() || parseFloat(amount)).toLocaleString(undefined, { maximumFractionDigits: 2 })} ${selectedWalletData?.currency_code}`}
                       </p>
                     </div>
                   </div>
