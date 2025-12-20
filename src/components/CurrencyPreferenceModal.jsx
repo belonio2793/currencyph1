@@ -2,28 +2,28 @@ import React, { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabaseClient'
 
 const CURRENCIES = [
-  // Fiat currencies
-  { code: 'PHP', name: 'Philippine Peso', symbol: '₱', type: 'fiat' },
-  { code: 'USD', name: 'US Dollar', symbol: '$', type: 'fiat' },
-  { code: 'EUR', name: 'Euro', symbol: '€', type: 'fiat' },
-  { code: 'GBP', name: 'British Pound', symbol: '£', type: 'fiat' },
-  { code: 'JPY', name: 'Japanese Yen', symbol: '¥', type: 'fiat' },
-  { code: 'CNY', name: 'Chinese Yuan', symbol: '¥', type: 'fiat' },
-  { code: 'INR', name: 'Indian Rupee', symbol: '₹', type: 'fiat' },
-  { code: 'AUD', name: 'Australian Dollar', symbol: 'A$', type: 'fiat' },
-  { code: 'CAD', name: 'Canadian Dollar', symbol: 'C$', type: 'fiat' },
-  { code: 'SGD', name: 'Singapore Dollar', symbol: 'S$', type: 'fiat' },
-  { code: 'HKD', name: 'Hong Kong Dollar', symbol: 'HK$', type: 'fiat' },
-  { code: 'MYR', name: 'Malaysian Ringgit', symbol: 'RM', type: 'fiat' },
-  { code: 'THB', name: 'Thai Baht', symbol: '฿', type: 'fiat' },
-  { code: 'VND', name: 'Vietnamese Dong', symbol: '₫', type: 'fiat' },
-  { code: 'IDR', name: 'Indonesian Rupiah', symbol: 'Rp', type: 'fiat' },
+  // Currencies
+  { code: 'PHP', name: 'Philippine Peso', symbol: '₱', type: 'currency' },
+  { code: 'USD', name: 'US Dollar', symbol: '$', type: 'currency' },
+  { code: 'EUR', name: 'Euro', symbol: '€', type: 'currency' },
+  { code: 'GBP', name: 'British Pound', symbol: '£', type: 'currency' },
+  { code: 'JPY', name: 'Japanese Yen', symbol: '¥', type: 'currency' },
+  { code: 'CNY', name: 'Chinese Yuan', symbol: '¥', type: 'currency' },
+  { code: 'INR', name: 'Indian Rupee', symbol: '₹', type: 'currency' },
+  { code: 'AUD', name: 'Australian Dollar', symbol: 'A$', type: 'currency' },
+  { code: 'CAD', name: 'Canadian Dollar', symbol: 'C$', type: 'currency' },
+  { code: 'SGD', name: 'Singapore Dollar', symbol: 'S$', type: 'currency' },
+  { code: 'HKD', name: 'Hong Kong Dollar', symbol: 'HK$', type: 'currency' },
+  { code: 'MYR', name: 'Malaysian Ringgit', symbol: 'RM', type: 'currency' },
+  { code: 'THB', name: 'Thai Baht', symbol: '฿', type: 'currency' },
+  { code: 'VND', name: 'Vietnamese Dong', symbol: '₫', type: 'currency' },
+  { code: 'IDR', name: 'Indonesian Rupiah', symbol: 'Rp', type: 'currency' },
   // Cryptocurrencies
-  { code: 'BTC', name: 'Bitcoin', symbol: '₿', type: 'crypto' },
-  { code: 'ETH', name: 'Ethereum', symbol: 'Ξ', type: 'crypto' },
-  { code: 'USDT', name: 'Tether', symbol: '₮', type: 'crypto' },
-  { code: 'USDC', name: 'USD Coin', symbol: 'ⓤ', type: 'crypto' },
-  { code: 'BNB', name: 'Binance Coin', symbol: 'Ⓑ', type: 'crypto' },
+  { code: 'BTC', name: 'Bitcoin', symbol: '₿', type: 'cryptocurrency' },
+  { code: 'ETH', name: 'Ethereum', symbol: 'Ξ', type: 'cryptocurrency' },
+  { code: 'USDT', name: 'Tether', symbol: '₮', type: 'cryptocurrency' },
+  { code: 'USDC', name: 'USD Coin', symbol: 'ⓤ', type: 'cryptocurrency' },
+  { code: 'BNB', name: 'Binance Coin', symbol: 'Ⓑ', type: 'cryptocurrency' },
 ]
 
 export default function CurrencyPreferenceModal({ onClose, setGlobalCurrency, globalCurrency = 'PHP' }) {
