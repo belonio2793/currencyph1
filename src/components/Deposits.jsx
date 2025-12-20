@@ -455,8 +455,8 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
       let targetWalletId = selectedWallet
       let targetWalletData = wallets.find(w => w.id === selectedWallet)
 
-      const isChryptoDepsit = activeType === 'cryptocurrency'
-      if (isCryptoDepsit) {
+      const isCryptoDeposit = activeType === 'cryptocurrency'
+      if (isCryptoDeposit) {
         const phpWallet = wallets.find(w => w.currency_code === 'PHP')
         if (!phpWallet) {
           throw new Error('PHP wallet not found. Please create one first.')
