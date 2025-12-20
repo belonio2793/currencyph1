@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react'
 import { supabase } from '../lib/supabaseClient'
-import FiatCryptoToggle from './FiatCryptoToggle'
+import CurrencyCryptoToggle from './FiatCryptoToggle'
 
 export default function Rates() {
   const [currencies, setCurrencies] = useState({})
@@ -15,8 +15,8 @@ export default function Rates() {
   const [result, setResult] = useState(null)
 
   const [searchTerm, setSearchTerm] = useState('')
-  const [typeFilter, setTypeFilter] = useState('fiat')
-  const [activeType, setActiveType] = useState('fiat') // 'fiat' or 'crypto'
+  const [typeFilter, setTypeFilter] = useState('currency')
+  const [activeType, setActiveType] = useState('currency') // 'currency' or 'cryptocurrency'
   const [sortBy, setSortBy] = useState('recent')
   const [sortDirection, setSortDirection] = useState('desc')
   const [favorites, setFavorites] = useState(['PHP', 'USD', 'EUR', 'BTC', 'ETH'])
@@ -32,7 +32,7 @@ export default function Rates() {
       setLoading(true)
       setError(null)
 
-      const [currenciesRes, fiatPairsRes, cryptoPairsRes, cryptoMetadataRes] = await Promise.all([
+      const [currenciesRes, currencyPairsRes, cryptocurrencyPairsRes, cryptocurrencyMetadataRes] = await Promise.all([
         supabase
           .from('currencies')
           .select('code,name,type,symbol,decimals,is_default,active')
