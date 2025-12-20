@@ -9,8 +9,8 @@ const CORS_HEADERS = {
 
 const supabaseUrl = Deno.env.get("SUPABASE_URL")
 const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")
-const coinsPhApiKey = Deno.env.get("COINSPH_API_KEY")
-const coinsPhApiSecret = Deno.env.get("COINSPH_API_SECRET")
+const coinsPhApiKey = Deno.env.get("COINS_PH_API_KEY")
+const coinsPhApiSecret = Deno.env.get("COINS_PH_API_SECRET")
 
 const supabase = createClient(supabaseUrl, supabaseServiceKey)
 
