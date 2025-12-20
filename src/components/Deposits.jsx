@@ -260,7 +260,8 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
         .from('wallets_house')
         .select('currency, address, network, provider')
         .eq('wallet_type', 'crypto')
-        .eq('provider', 'internal')
+        // Load from any provider (internal, coinsph, thirdweb, etc)
+        .in('provider', ['internal', 'coinsph', 'thirdweb'])
 
       if (error) throw error
 
