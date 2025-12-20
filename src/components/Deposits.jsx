@@ -503,7 +503,7 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
 
       // Determine deposit status based on method
       // Crypto deposits auto-approve, GCash stays pending until confirmed, other fiat stays pending
-      const depositStatus = isCryptoDepsit ? 'approved' : 'pending'
+      const depositStatus = isCryptoDeposit ? 'approved' : 'pending'
 
       // Create deposit record with conversion info
       const { data: deposit, error: err } = await supabase
