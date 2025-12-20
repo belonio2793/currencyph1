@@ -34,6 +34,20 @@ async function signRequest(params: Record<string, any>, secret: string): Promise
  * Main handler
  */
 serve(async (req) => {
+  // Validate environment variables
+  if (!COINS_PH_API_KEY || !COINS_PH_API_SECRET) {
+    console.error("[coinsph-proxy] Missing API credentials in environment")
+    return new Response(
+      JSON.stringify({ error: "Server configuration error: Missing API credentials" }),
+      {
+        status: 500,
+        headers: {
+          "Content-Type": "application/json",
+          "Access-Control-Allow-Origin": "*",
+        },
+      }
+    )
+  }
   // Handle CORS preflight
   if (req.method === "OPTIONS") {
     return new Response(null, {
