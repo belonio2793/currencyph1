@@ -967,8 +967,21 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
               <div className="mb-8 p-6 bg-purple-50 border border-purple-200 rounded-lg">
                 {selectedMethodData?.address ? (
                   <>
-                    <p className="text-sm text-slate-600 mb-3 font-medium">Send {selectedMethodData.name} to this address:</p>
-                    <div className="flex gap-4 items-center">
+                    <div className="mb-4">
+                      <p className="text-sm font-semibold text-slate-900 mb-2">📬 Deposit Address</p>
+                      <div className="grid grid-cols-2 gap-2 text-xs mb-3">
+                        <div>
+                          <p className="text-slate-600">Currency</p>
+                          <p className="font-semibold text-slate-900">{selectedCurrency}</p>
+                        </div>
+                        <div>
+                          <p className="text-slate-600">Network</p>
+                          <p className="font-semibold text-slate-900">{selectedMethodData.network}</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="flex gap-4 items-start mb-4">
                       <div className="flex-shrink-0">
                         <svg width="120" height="120" viewBox="0 0 120 120">
                           <rect width="120" height="120" fill="white" rx="8" />
@@ -978,22 +991,24 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
                         </svg>
                       </div>
                       <div className="flex-1">
-                        <p className="font-mono text-xs bg-white p-3 rounded border border-slate-300 break-all text-slate-800">
+                        <p className="text-xs font-medium text-slate-600 mb-2">Copy the address or scan the QR code:</p>
+                        <p className="font-mono text-xs bg-white p-3 rounded border border-slate-300 break-all text-slate-800 mb-2">
                           {selectedMethodData.address}
                         </p>
                         <button
                           onClick={() => copyToClipboard(selectedMethodData.address)}
-                          className="mt-2 text-sm text-purple-600 hover:text-purple-700 font-medium"
+                          className="text-sm text-purple-600 hover:text-purple-700 font-medium"
                         >
-                          Copy Address
+                          📋 Copy Address
                         </button>
                       </div>
                     </div>
+
                     {selectedMethodData.network && (
-                      <p className="text-xs text-slate-600 mt-3">Network: <span className="font-semibold">{selectedMethodData.network}</span></p>
-                    )}
-                    {selectedMethodData.provider && (
-                      <p className="text-xs text-slate-600">Provider: <span className="font-semibold">{selectedMethodData.provider}</span></p>
+                      <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg text-xs text-slate-700">
+                        <span className="font-medium">ℹ️ Network: </span>
+                        <span className="font-semibold">{selectedMethodData.network}</span>
+                      </div>
                     )}
                   </>
                 ) : (
