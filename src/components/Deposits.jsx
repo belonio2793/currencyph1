@@ -955,35 +955,44 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
             )}
 
             {/* Cryptocurrency Address QR */}
-            {selectedMethod && selectedMethodData?.type === 'crypto' && selectedMethodData?.address && (
+            {selectedMethod && selectedMethodData?.type === 'crypto' && (
               <div className="mb-8 p-6 bg-purple-50 border border-purple-200 rounded-lg">
-                <p className="text-sm text-slate-600 mb-3 font-medium">Send {selectedMethodData.name} to this address:</p>
-                <div className="flex gap-4 items-center">
-                  <div className="flex-shrink-0">
-                    <svg width="120" height="120" viewBox="0 0 120 120">
-                      <rect width="120" height="120" fill="white" rx="8" />
-                      <text x="50%" y="50%" dominantBaseline="middle" textAnchor="middle" fontSize="10" fill="#1e1b4b">
-                        [QR Code]
-                      </text>
-                    </svg>
+                {selectedMethodData?.address ? (
+                  <>
+                    <p className="text-sm text-slate-600 mb-3 font-medium">Send {selectedMethodData.name} to this address:</p>
+                    <div className="flex gap-4 items-center">
+                      <div className="flex-shrink-0">
+                        <svg width="120" height="120" viewBox="0 0 120 120">
+                          <rect width="120" height="120" fill="white" rx="8" />
+                          <text x="50%" y="50%" dominantBaseline="middle" textAnchor="middle" fontSize="10" fill="#1e1b4b">
+                            [QR Code]
+                          </text>
+                        </svg>
+                      </div>
+                      <div className="flex-1">
+                        <p className="font-mono text-xs bg-white p-3 rounded border border-slate-300 break-all text-slate-800">
+                          {selectedMethodData.address}
+                        </p>
+                        <button
+                          onClick={() => copyToClipboard(selectedMethodData.address)}
+                          className="mt-2 text-sm text-purple-600 hover:text-purple-700 font-medium"
+                        >
+                          Copy Address
+                        </button>
+                      </div>
+                    </div>
+                    {selectedMethodData.network && (
+                      <p className="text-xs text-slate-600 mt-3">Network: <span className="font-semibold">{selectedMethodData.network}</span></p>
+                    )}
+                    {selectedMethodData.provider && (
+                      <p className="text-xs text-slate-600">Provider: <span className="font-semibold">{selectedMethodData.provider}</span></p>
+                    )}
+                  </>
+                ) : (
+                  <div className="p-4 bg-yellow-100 border border-yellow-300 rounded text-yellow-800 text-sm">
+                    <p className="font-medium">⚠️ Address not available</p>
+                    <p className="mt-2">{selectedMethodData.name} via {selectedMethodData.network} is not currently configured for deposits.</p>
                   </div>
-                  <div className="flex-1">
-                    <p className="font-mono text-xs bg-white p-3 rounded border border-slate-300 break-all text-slate-800">
-                      {selectedMethodData.address}
-                    </p>
-                    <button
-                      onClick={() => copyToClipboard(selectedMethodData.address)}
-                      className="mt-2 text-sm text-purple-600 hover:text-purple-700 font-medium"
-                    >
-                      Copy Address
-                    </button>
-                  </div>
-                </div>
-                {selectedMethodData.network && (
-                  <p className="text-xs text-slate-600 mt-3">Network: <span className="font-semibold">{selectedMethodData.network}</span></p>
-                )}
-                {selectedMethodData.provider && (
-                  <p className="text-xs text-slate-600">Provider: <span className="font-semibold">{selectedMethodData.provider}</span></p>
                 )}
               </div>
             )}
