@@ -394,12 +394,12 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
                       ))}
                     </>
                   )}
-                  {cryptoWallets.length > 0 && (
+                  {cryptocurrencyWallets.length > 0 && (
                     <>
                       <option disabled style={{ fontWeight: 'bold', backgroundColor: '#f3f4f6' }}>
-                        ━━━ CRYPTOCURRENCIES ━━━
+                        ━━━ CRYPTOCURRENCY ━━━
                       </option>
-                      {cryptoWallets.map(w => (
+                      {cryptocurrencyWallets.map(w => (
                         <option key={w.id} value={w.id}>
                           {w.currency_name} ({w.currency_symbol} {w.balance.toFixed(2)})
                         </option>
