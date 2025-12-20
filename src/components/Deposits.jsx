@@ -773,17 +773,19 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
             <div className="mb-8 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
               <p className="font-semibold text-yellow-900 mb-2">⚠️ Important:</p>
               <ul className="text-sm text-yellow-800 space-y-1">
-                {selectedMethod === 'solana' && (
+                {selectedMethodData?.type === 'crypto' && (
                   <>
-                    <li>• Only send Solana (SOL) to this address</li>
-                    <li>• Do not send other tokens or NFTs</li>
+                    <li>• Only send {selectedMethodData.name} ({selectedMethodData.name}) to this address</li>
+                    {selectedMethodData.network && <li>• Network: {selectedMethodData.network}</li>}
+                    <li>• Do not send other tokens or cryptocurrencies</li>
                     <li>• Transactions cannot be reversed</li>
                     <li>• Keep the transaction hash for your records</li>
+                    <li>• Address is from our official Coins.ph account</li>
                   </>
                 )}
-                {selectedMethod === 'gcash' && (
+                {selectedMethodData?.type === 'fiat' && (
                   <>
-                    <li>• Ensure you have sufficient balance in GCash</li>
+                    <li>• Ensure you have sufficient balance</li>
                     <li>• Double-check the amount before confirming</li>
                     <li>• Transaction may take 1-5 minutes to process</li>
                   </>
