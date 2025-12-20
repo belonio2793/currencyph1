@@ -296,13 +296,36 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
       if (walletsResult.error) throw walletsResult.error
       if (currenciesResult.error) throw currenciesResult.error
 
-      const walletsData = walletsResult.data || []
+      let walletsData = walletsResult.data || []
       const allCurrencies = currenciesResult.data || []
 
       // Create a map of currencies for quick lookup
       const currencyMap = Object.fromEntries(
         allCurrencies.map(c => [c.code, c])
       )
+
+      // Ensure user has a PHP wallet for receiving crypto deposits
+      const hasPHPWallet = walletsData.some(w => w.currency_code === 'PHP')
+      if (!hasPHPWallet) {
+        try {
+          const { data: newPHPWallet, error: createErr } = await supabase
+            .from('wallets')
+            .insert([{
+              user_id: userId,
+              currency_code: 'PHP',
+              balance: 0
+            }])
+            .select()
+            .single()
+
+          if (!createErr && newPHPWallet) {
+            walletsData = [...walletsData, newPHPWallet]
+            console.log('Created PHP wallet for user')
+          }
+        } catch (err) {
+          console.warn('Could not auto-create PHP wallet:', err)
+        }
+      }
 
       // Enrich wallets with currency type and name info
       const enrichedWallets = walletsData.map(w => ({
@@ -314,7 +337,7 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
 
       setWallets(enrichedWallets)
 
-      // Set PHP as default wallet if it exists, otherwise use first wallet
+      // Set PHP as default wallet (it should always exist now)
       const phpWallet = enrichedWallets.find(w => w.currency_code === 'PHP')
       if (phpWallet) {
         setSelectedWallet(phpWallet.id)
