@@ -183,7 +183,7 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
       const [walletsResult, currenciesResult] = await Promise.all([
         supabase
           .from('wallets')
-          .select('id, user_id, currency_code, balance, created_at')
+          .select('id, user_id, currency_code, balance, created_at, account_number')
           .eq('user_id', userId),
         supabase
           .from('currencies')
