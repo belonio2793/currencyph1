@@ -438,8 +438,8 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
         return
       }
 
-      if (!selectedWallet) {
-        setError('Please select a wallet')
+      if (!selectedMethod) {
+        setError('Please select a payment method')
         setSubmitting(false)
         return
       }
@@ -451,36 +451,75 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
         return
       }
 
-      const selectedWalletData = wallets.find(w => w.id === selectedWallet)
-      let convertedAmount = calculateConvertedAmount()
+      // For crypto deposits, always use PHP wallet as target
+      let targetWalletId = selectedWallet
+      let targetWalletData = wallets.find(w => w.id === selectedWallet)
 
-      // If conversion failed due to missing rates, use the original amount
-      if (!convertedAmount && selectedCurrency !== selectedWalletData.currency_code) {
-        console.warn('Conversion rates unavailable, using original amount')
-        convertedAmount = parseFloat(amount)
-      } else if (!convertedAmount) {
-        convertedAmount = parseFloat(amount)
+      const isChryptoDepsit = activeType === 'cryptocurrency'
+      if (isCryptoDepsit) {
+        const phpWallet = wallets.find(w => w.currency_code === 'PHP')
+        if (!phpWallet) {
+          throw new Error('PHP wallet not found. Please create one first.')
+        }
+        targetWalletId = phpWallet.id
+        targetWalletData = phpWallet
+      }
+
+      // Calculate converted amount using real-time rates
+      let convertedAmount = null
+      if (isCryptoDepsit) {
+        // For crypto, convert from crypto to PHP using real-time rates
+        const cryptoRate = exchangeRates[selectedCurrency]
+        const phpRate = exchangeRates['PHP'] || 1
+
+        if (!cryptoRate) {
+          setError(`Could not fetch exchange rate for ${selectedCurrency}. Please try again.`)
+          setSubmitting(false)
+          return
+        }
+
+        // Convert: (amount in crypto) * (crypto rate / PHP rate)
+        convertedAmount = parseFloat(amount) * (cryptoRate / phpRate)
+        convertedAmount = Math.round(convertedAmount * 100) / 100
+      } else {
+        // For fiat deposits
+        const fromRate = exchangeRates[selectedCurrency]
+        const toRate = exchangeRates[targetWalletData?.currency_code]
+
+        if (fromRate && toRate) {
+          convertedAmount = (parseFloat(amount) / fromRate) * toRate
+          convertedAmount = Math.round(convertedAmount * 100) / 100
+        } else {
+          console.warn('Rates unavailable, using original amount')
+          convertedAmount = parseFloat(amount)
+        }
+      }
+
+      if (!convertedAmount || convertedAmount <= 0) {
+        setError('Could not calculate conversion amount. Please try again.')
+        setSubmitting(false)
+        return
       }
 
       // Determine deposit status based on method
       // Crypto deposits auto-approve, GCash stays pending until confirmed, other fiat stays pending
-      const depositStatus = selectedMethod === 'solana' ? 'approved' : 'pending'
+      const depositStatus = isCryptoDepsit ? 'approved' : 'pending'
 
       // Create deposit record with conversion info
       const { data: deposit, error: err } = await supabase
         .from('deposits')
         .insert([{
           user_id: userId,
-          wallet_id: selectedWallet,
+          wallet_id: targetWalletId,
           amount: parseFloat(amount),
           original_currency: selectedCurrency,
           converted_amount: convertedAmount,
-          wallet_currency: selectedWalletData.currency_code,
-          currency_code: selectedWalletData.currency_code,
+          wallet_currency: targetWalletData.currency_code,
+          currency_code: targetWalletData.currency_code,
           deposit_method: selectedMethod,
           reference_number: selectedMethod === 'gcash' ? gcashReferenceNumber.trim() : null,
           status: depositStatus,
-          description: `${DEPOSIT_METHODS[selectedMethod].name} deposit of ${amount} ${selectedCurrency}${convertedAmount && selectedCurrency !== selectedWalletData.currency_code ? ` (≈ ${convertedAmount} ${selectedWalletData.currency_code})` : ''}`
+          description: `${selectedMethod} deposit of ${amount} ${selectedCurrency}${convertedAmount ? ` (≈ ${convertedAmount} ${targetWalletData.currency_code} at ${(convertedAmount / parseFloat(amount)).toFixed(6)})` : ''}`
         }])
         .select()
         .single()
@@ -489,18 +528,25 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
 
       // Update wallet balance if approved
       if (depositStatus === 'approved' && convertedAmount) {
-        const newBalance = selectedWalletData.balance + convertedAmount
+        const newBalance = targetWalletData.balance + convertedAmount
         await supabase
           .from('wallets')
           .update({ balance: newBalance })
-          .eq('id', selectedWallet)
+          .eq('id', targetWalletId)
+
+        // Update local state
+        setWallets(wallets.map(w =>
+          w.id === targetWalletId
+            ? { ...w, balance: newBalance }
+            : w
+        ))
       }
 
       // Add to deposits list
       setDeposits([deposit, ...deposits])
 
       const statusMessage = depositStatus === 'approved'
-        ? 'Deposit approved and credited to your wallet!'
+        ? `Crypto deposit received! ${convertedAmount} PHP has been credited to your account.`
         : selectedMethod === 'gcash'
         ? 'GCash deposit initiated. Your transaction will be verified within 1-5 minutes.'
         : 'Deposit initiated. Awaiting payment...'
