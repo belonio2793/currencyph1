@@ -172,6 +172,7 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
   const [wallets, setWallets] = useState([])
   const [currencies, setCurrencies] = useState([])
   const [deposits, setDeposits] = useState([])
+  const [cryptoAddresses, setCryptoAddresses] = useState({}) // { 'BTC': { address: '...', network: '...', provider: 'coins.ph' } }
   const [loading, setLoading] = useState(true)
   const [submitting, setSubmitting] = useState(false)
   const [exchangeRates, setExchangeRates] = useState({})
