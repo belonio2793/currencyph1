@@ -876,6 +876,7 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
                     <th className="text-left py-3 px-4 text-slate-600 font-medium">Amount</th>
                     <th className="text-left py-3 px-4 text-slate-600 font-medium">Converted Amount</th>
                     <th className="text-left py-3 px-4 text-slate-600 font-medium">Method</th>
+                    <th className="text-left py-3 px-4 text-slate-600 font-medium">Reference</th>
                     <th className="text-left py-3 px-4 text-slate-600 font-medium">Status</th>
                     <th className="text-left py-3 px-4 text-slate-600 font-medium">Date</th>
                   </tr>
@@ -891,6 +892,9 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
                       </td>
                       <td className="py-3 px-4 text-slate-700">
                         {DEPOSIT_METHODS[deposit.deposit_method]?.name || deposit.deposit_method}
+                      </td>
+                      <td className="py-3 px-4 text-xs text-slate-600 font-mono">
+                        {deposit.reference_number || '—'}
                       </td>
                       <td className="py-3 px-4">
                         <span className={`px-3 py-1 rounded-full text-xs font-medium ${
