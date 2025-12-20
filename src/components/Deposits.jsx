@@ -382,12 +382,12 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
                   className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
                 >
                   <option value="">Select a wallet</option>
-                  {fiatWallets.length > 0 && (
+                  {currencyWallets.length > 0 && (
                     <>
                       <option disabled style={{ fontWeight: 'bold', backgroundColor: '#f3f4f6' }}>
-                        ━━━ CURRENCIES ━━━
+                        ━━━ CURRENCY ━━━
                       </option>
-                      {fiatWallets.map(w => (
+                      {currencyWallets.map(w => (
                         <option key={w.id} value={w.id}>
                           {w.currency_name} ({w.currency_symbol} {w.balance.toFixed(2)})
                         </option>
