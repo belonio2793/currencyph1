@@ -498,9 +498,33 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
     : currencies.filter(c => c.type === 'crypto' && !userCurrencyCodes.has(c.code))
 
   // Filter deposit methods by type
-  const availableMethods = Object.values(DEPOSIT_METHODS).filter(m =>
+  let availableMethods = Object.values(DEPOSIT_METHODS).filter(m =>
     activeType === 'currency' ? m.type === 'fiat' : m.type === 'crypto'
   )
+
+  // For crypto, add dynamic methods from wallets_house
+  if (activeType === 'cryptocurrency' && Object.keys(cryptoAddresses).length > 0) {
+    const dynamicMethods = Object.entries(cryptoAddresses).map(([symbol, data]) => ({
+      id: symbol.toLowerCase(),
+      name: symbol,
+      icon: '₿', // Generic crypto icon
+      type: 'crypto',
+      description: `Send ${symbol} directly to our wallet`,
+      instructions: [
+        `Open your ${symbol} wallet app`,
+        `Scan the QR code or copy the address below`,
+        `Enter the amount in ${symbol}`,
+        `Verify the recipient address and amount`,
+        `Confirm the transaction`,
+        `Your balance will be updated within 1-2 minutes`
+      ],
+      address: data.address,
+      network: data.network,
+      provider: data.provider
+    }))
+    // Replace hardcoded methods with dynamic ones
+    availableMethods = dynamicMethods
+  }
 
   const copyToClipboard = (text) => {
     navigator.clipboard.writeText(text)
