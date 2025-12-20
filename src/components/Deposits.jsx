@@ -32,6 +32,7 @@ const DEPOSIT_METHODS = {
     id: 'gcash',
     name: 'GCash',
     icon: '📱',
+    type: 'fiat',
     description: 'Instant mobile payment (Philippines)',
     instructions: [
       'Open your GCash app',
@@ -45,6 +46,7 @@ const DEPOSIT_METHODS = {
     id: 'solana',
     name: 'Solana',
     icon: '◎',
+    type: 'crypto',
     description: 'Cryptocurrency transfer',
     instructions: [
       'Open your Solana wallet app',
