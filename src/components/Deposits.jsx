@@ -832,14 +832,10 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
                       <button
                         key={method.id}
                         onClick={() => {
-                          setSelectedMethod(method.id)
-                          setStep('confirm')
+                          setSelectedAddressMethod(method)
+                          setShowCryptoAddressModal(true)
                         }}
-                        className={`p-4 border-2 rounded-lg text-left transition-all ${
-                          selectedMethod === method.id
-                            ? 'border-blue-500 bg-blue-50'
-                            : 'border-slate-200 hover:border-slate-300'
-                        }`}
+                        className="p-4 border-2 border-slate-200 rounded-lg text-left transition-all hover:border-blue-400 hover:bg-blue-50"
                       >
                         <div className="text-2xl mb-2">{method.icon}</div>
                         <div className="font-semibold text-slate-900">{method.name}</div>
