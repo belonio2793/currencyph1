@@ -614,9 +614,9 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
 
   // Filter currencies by type
   // For fiat: only show those with existing wallets
-  // For crypto: show all available cryptos (from house addresses)
+  // For crypto: show only those with addresses configured in wallets_house
   const currencyCurrencies = currencies.filter(c => c.type === 'fiat' && userCurrencyCodes.has(c.code))
-  const cryptoCurrencies = currencies.filter(c => c.type === 'crypto')
+  const cryptoCurrencies = currencies.filter(c => c.type === 'crypto' && cryptoAddresses[c.code])
   const displayedCurrencies = activeType === 'currency' ? currencyCurrencies : cryptoCurrencies
 
   // For Create Wallet modal, show currencies they don't have yet
