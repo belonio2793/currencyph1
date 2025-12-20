@@ -89,8 +89,15 @@ async function getDepositAddress(coin) {
 
 /**
  * Get all coins' information
+ * Falls back to popular coins if API endpoint doesn't work
  */
 async function getAllCoins() {
+  // List of popular cryptocurrencies supported by Coins.ph
+  const popularCoins = [
+    'BTC', 'ETH', 'USDT', 'BNB', 'SOL', 'XRP', 'ADA',
+    'DOGE', 'DOT', 'BCH', 'LTC', 'USDC', 'LINK', 'MATIC', 'UNI'
+  ]
+
   try {
     const params = {
       timestamp: Math.floor(Date.now()),
@@ -110,17 +117,21 @@ async function getAllCoins() {
       },
     })
 
-    if (!response.ok) {
-      const error = await response.json()
-      console.error('❌ Failed to fetch coins information:', error)
-      return []
+    if (response.ok) {
+      const data = await response.json()
+      const coins = Array.isArray(data) ? data : data.data || []
+      if (coins.length > 0) {
+        return coins
+      }
     }
 
-    const data = await response.json()
-    return Array.isArray(data) ? data : data.data || []
+    // Fallback to popular coins if API fails
+    console.warn('⚠️  API endpoint unavailable, using fallback coin list')
+    return popularCoins.map(coin => ({ coin }))
   } catch (error) {
-    console.error('❌ Error fetching coins information:', error.message)
-    return []
+    console.warn('⚠️  Error fetching coins from API:', error.message)
+    // Fallback to popular coins
+    return popularCoins.map(coin => ({ coin }))
   }
 }
 
