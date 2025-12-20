@@ -88,8 +88,8 @@ export default function CurrencyPreferenceModal({ onClose, setGlobalCurrency, gl
   }
 
   const selectedCurrencyObj = CURRENCIES.find(c => c.code === selectedCurrency)
-  const fiatCurrencies = CURRENCIES.filter(c => c.type === 'fiat')
-  const cryptoCurrencies = CURRENCIES.filter(c => c.type === 'crypto')
+  const currencyCurrencies = CURRENCIES.filter(c => c.type === 'currency')
+  const cryptocurrencyCurrencies = CURRENCIES.filter(c => c.type === 'cryptocurrency')
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
@@ -113,11 +113,11 @@ export default function CurrencyPreferenceModal({ onClose, setGlobalCurrency, gl
 
         {/* Content */}
         <div className="p-6 space-y-6">
-          {/* Fiat Currencies */}
+          {/* Currencies */}
           <div className="space-y-3">
-            <h3 className="text-sm font-semibold text-slate-900">Fiat Currencies</h3>
+            <h3 className="text-sm font-semibold text-slate-900">Currencies</h3>
             <div className="grid grid-cols-2 gap-2">
-              {fiatCurrencies.map(currency => (
+              {currencyCurrencies.map(currency => (
                 <button
                   key={currency.code}
                   type="button"
@@ -144,7 +144,7 @@ export default function CurrencyPreferenceModal({ onClose, setGlobalCurrency, gl
           <div className="space-y-3">
             <h3 className="text-sm font-semibold text-slate-900">Cryptocurrencies</h3>
             <div className="grid grid-cols-2 gap-2">
-              {cryptoCurrencies.map(currency => (
+              {cryptocurrencyCurrencies.map(currency => (
                 <button
                   key={currency.code}
                   type="button"
