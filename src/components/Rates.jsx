@@ -403,7 +403,7 @@ export default function Rates() {
 
               {/* Filters and Sort */}
               <div className="flex flex-wrap gap-3 items-center">
-                <FiatCryptoToggle active={activeType} onChange={handleTypeChange} />
+                <CurrencyCryptoToggle active={activeType} onChange={handleTypeChange} />
 
                 <select
                   value={sortBy}
