@@ -9,8 +9,8 @@ import { createClient } from '@supabase/supabase-js'
 const COINS_PH_API_BASE = 'https://api.pro.coins.ph'
 const SUPABASE_URL = process.env.SUPABASE_URL
 const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY
-const COINS_PH_API_KEY = process.env.COINS_PH_API_KEY
-const COINS_PH_API_SECRET = process.env.COINS_PH_API_SECRET
+const COINS_PH_API_KEY = process.env.COINSPH_API_KEY
+const COINS_PH_API_SECRET = process.env.COINSPH_API_SECRET
 
 if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) {
   console.error('❌ Missing Supabase credentials')
