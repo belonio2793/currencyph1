@@ -53,28 +53,28 @@ export default function Rates() {
       ])
 
       if (currenciesRes.error) throw currenciesRes.error
-      if (fiatPairsRes.error) throw fiatPairsRes.error
-      if (cryptoPairsRes.error) throw cryptoPairsRes.error
-      if (cryptoMetadataRes.error) throw cryptoMetadataRes.error
+      if (currencyPairsRes.error) throw currencyPairsRes.error
+      if (cryptocurrencyPairsRes.error) throw cryptocurrencyPairsRes.error
+      if (cryptocurrencyMetadataRes.error) throw cryptocurrencyMetadataRes.error
 
       const currencyMap = {}
-      const cryptoMetadataMap = {}
+      const cryptocurrencyMetadataMap = {}
 
       currenciesRes.data?.forEach(c => {
         currencyMap[c.code] = c
       })
 
-      cryptoMetadataRes.data?.forEach(c => {
-        cryptoMetadataMap[c.code] = c
+      cryptocurrencyMetadataRes.data?.forEach(c => {
+        cryptocurrencyMetadataMap[c.code] = c
       })
 
       setCurrencies(currencyMap)
 
       const ratesByCode = {}
 
-      // Normalize fiat pairs: accept rates stored either as PHP->X (units of X per PHP)
+      // Normalize currency pairs: accept rates stored either as PHP->X (units of X per PHP)
       // or X->PHP (PHP per X) and convert to a consistent representation: units of currency per PHP
-      fiatPairsRes.data?.forEach(pair => {
+      currencyPairsRes.data?.forEach(pair => {
         // Determine target code and compute normalized rate as "units of target currency per 1 PHP"
         let targetCode = null
         let normalizedRate = null
@@ -93,7 +93,7 @@ export default function Rates() {
           const metadata = currencyMap[targetCode] || {
             code: targetCode,
             name: targetCode,
-            type: 'fiat',
+            type: 'currency',
             symbol: '',
             decimals: 2
           }
@@ -108,8 +108,8 @@ export default function Rates() {
         }
       })
 
-      // Normalize crypto pairs similarly. Accept both directions and convert to units of crypto per 1 PHP
-      cryptoPairsRes.data?.forEach(pair => {
+      // Normalize cryptocurrency pairs similarly. Accept both directions and convert to units of cryptocurrency per 1 PHP
+      cryptocurrencyPairsRes.data?.forEach(pair => {
         let targetCode = null
         let normalizedRate = null
 
@@ -124,11 +124,11 @@ export default function Rates() {
         }
 
         if (targetCode && !ratesByCode[targetCode]) {
-          const cryptoMetadata = cryptoMetadataMap[targetCode]
+          const cryptocurrencyMetadata = cryptocurrencyMetadataMap[targetCode]
           const metadata = {
             code: targetCode,
-            name: cryptoMetadata?.name || targetCode,
-            type: 'crypto',
+            name: cryptocurrencyMetadata?.name || targetCode,
+            type: 'cryptocurrency',
             symbol: '',
             decimals: 8
           }
