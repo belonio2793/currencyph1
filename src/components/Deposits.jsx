@@ -377,7 +377,15 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
       }
 
       const selectedWalletData = wallets.find(w => w.id === selectedWallet)
-      const convertedAmount = calculateConvertedAmount()
+      let convertedAmount = calculateConvertedAmount()
+
+      // If conversion failed due to missing rates, use the original amount
+      if (!convertedAmount && selectedCurrency !== selectedWalletData.currency_code) {
+        console.warn('Conversion rates unavailable, using original amount')
+        convertedAmount = parseFloat(amount)
+      } else if (!convertedAmount) {
+        convertedAmount = parseFloat(amount)
+      }
 
       // Determine deposit status based on method
       // Crypto deposits auto-approve, fiat stays pending
@@ -391,12 +399,12 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
           wallet_id: selectedWallet,
           amount: parseFloat(amount),
           original_currency: selectedCurrency,
-          converted_amount: convertedAmount || parseFloat(amount),
+          converted_amount: convertedAmount,
           wallet_currency: selectedWalletData.currency_code,
           currency_code: selectedWalletData.currency_code,
           deposit_method: selectedMethod,
           status: depositStatus,
-          description: `${DEPOSIT_METHODS[selectedMethod].name} deposit of ${amount} ${selectedCurrency}${convertedAmount ? ` (${convertedAmount} ${selectedWalletData.currency_code})` : ''}`
+          description: `${DEPOSIT_METHODS[selectedMethod].name} deposit of ${amount} ${selectedCurrency}${convertedAmount && selectedCurrency !== selectedWalletData.currency_code ? ` (≈ ${convertedAmount} ${selectedWalletData.currency_code})` : ''}`
         }])
         .select()
         .single()
