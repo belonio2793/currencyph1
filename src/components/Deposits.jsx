@@ -378,22 +378,15 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
                   <select
                     value={selectedWallet || ''}
                     onChange={(e) => setSelectedWallet(e.target.value)}
-                    className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+                    className="w-full px-4 py-4 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-base"
                   >
                     <option value="">Select a wallet</option>
                     {(activeType === 'currency' ? currencyWallets : cryptocurrencyWallets).map(w => (
-                      <option key={w.id} value={w.id}>
-                        {w.currency_name} ({w.balance.toFixed(2)})
+                      <option key={w.id} value={w.id} className="py-2">
+                        {w.currency_name} ({w.balance.toFixed(2)}) • {w.id}
                       </option>
                     ))}
                   </select>
-                  {selectedWallet && (
-                    <div className="mt-2 px-2 py-1">
-                      <p className="text-xs text-slate-400">
-                        <span className="font-mono text-slate-500">{selectedWallet}</span>
-                      </p>
-                    </div>
-                  )}
                   {!selectedWallet && (
                     <p className="text-xs text-slate-500 mt-2">Create a wallet if you don't have one for this currency</p>
                   )}
