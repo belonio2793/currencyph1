@@ -92,7 +92,14 @@ function WalletDropdown({ wallets, selectedWallet, onChange }) {
                 {selectedWalletData.currency_name} ({selectedWalletData.balance.toFixed(2)})
               </div>
               <div className="text-xs text-slate-500 mt-1">
-                Wallet ID - Account Number: <span className="font-mono">{selectedWalletData.id}</span>
+                <span className="text-blue-600">Wallet ID:</span>{' '}
+                <span className="font-mono">{selectedWalletData.id}</span>
+                {selectedWalletData.account_number && (
+                  <>
+                    {' '} • <span className="text-blue-600">Account Number:</span>{' '}
+                    <span className="font-mono">{selectedWalletData.account_number}</span>
+                  </>
+                )}
               </div>
             </div>
           ) : (
@@ -128,8 +135,14 @@ function WalletDropdown({ wallets, selectedWallet, onChange }) {
                     {w.currency_name} ({w.balance.toFixed(2)})
                   </div>
                   <div className="text-sm text-slate-500 mt-1">
-                    <span className="text-blue-600 text-xs">Wallet ID - Account Number:</span>{' '}
+                    <span className="text-blue-600 text-xs">Wallet ID:</span>{' '}
                     <span className="font-mono text-slate-600">{w.id}</span>
+                    {w.account_number && (
+                      <>
+                        {' '} • <span className="text-blue-600 text-xs">Account Number:</span>{' '}
+                        <span className="font-mono text-slate-600">{w.account_number}</span>
+                      </>
+                    )}
                   </div>
                 </button>
               ))
