@@ -358,7 +358,16 @@ export default function HomePage({ userId, userEmail, globalCurrency = 'PHP', se
           {/* Total Debt */}
           <div className="bg-gradient-to-br from-red-50 to-red-100 rounded-xl p-4 sm:p-6 border border-red-200">
             <p className="text-xs sm:text-sm text-red-600 font-medium uppercase tracking-wider mb-2">Total Debt</p>
-            <p className="text-2xl sm:text-3xl font-light text-red-900">{formatNumber(totalDebtConverted != null ? totalDebtConverted : getTotalDebt())} {globalCurrency}</p>
+            <p className="text-lg sm:text-2xl font-light text-red-900">{formatNumber(totalDebtConverted != null ? totalDebtConverted : getTotalDebt())} {globalCurrency}</p>
+            <p className="text-xs sm:text-sm font-light text-red-700 mt-1">
+              {loadingCrypto ? (
+                <span className="italic text-red-500">loading {globalCryptocurrency}...</span>
+              ) : cryptoDebt !== null ? (
+                <>{cryptoDebt.toFixed(8)} {globalCryptocurrency}</>
+              ) : (
+                <span className="italic text-red-500">crypto unavailable</span>
+              )}
+            </p>
           </div>
         </div>
 
