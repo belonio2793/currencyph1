@@ -15,43 +15,122 @@
 -- ============================================================================
 
 -- ============================================================================
--- STEP 1: Create function to get current exchange rate for any pair
+-- STEP 1: Create function to get exchange rate WITH timestamp (for user confirmation)
 -- ============================================================================
 
-CREATE OR REPLACE FUNCTION get_exchange_rate_cached(
+CREATE OR REPLACE FUNCTION get_exchange_rate_with_timestamp(
   p_from_currency VARCHAR(16),
-  p_to_currency VARCHAR(16),
-  p_max_age_seconds INTEGER DEFAULT 3600
+  p_to_currency VARCHAR(16)
 )
-RETURNS NUMERIC AS $$
+RETURNS TABLE(
+  rate NUMERIC,
+  rate_timestamp TIMESTAMPTZ,
+  rate_age_seconds INTEGER,
+  is_fresh BOOLEAN,
+  fallback BOOLEAN,
+  source VARCHAR(64)
+) AS $$
 DECLARE
   v_rate NUMERIC;
+  v_timestamp TIMESTAMPTZ;
   v_age_seconds INTEGER;
+  v_is_fresh BOOLEAN;
+  v_fallback BOOLEAN := FALSE;
+  v_source VARCHAR(64);
 BEGIN
-  -- If converting to same currency, return 1
+  -- If converting to same currency
   IF p_from_currency = p_to_currency THEN
-    RETURN 1;
+    RETURN QUERY SELECT
+      1::NUMERIC,
+      NOW(),
+      0::INTEGER,
+      TRUE,
+      FALSE,
+      'same_currency'::VARCHAR(64);
+    RETURN;
   END IF;
-  
-  -- Try to get from crypto_rates_valid (valid rates only)
-  SELECT rate, EXTRACT(EPOCH FROM (NOW() - updated_at))::INTEGER
-  INTO v_rate, v_age_seconds
+
+  -- Try to get fresh rate (< 1 hour old)
+  SELECT rate, updated_at, EXTRACT(EPOCH FROM (NOW() - updated_at))::INTEGER, 'coingecko'::VARCHAR(64)
+  INTO v_rate, v_timestamp, v_age_seconds, v_source
   FROM crypto_rates_valid
   WHERE from_currency = p_from_currency
     AND to_currency = p_to_currency
   ORDER BY updated_at DESC
   LIMIT 1;
-  
-  -- If rate found and fresh enough, return it
-  IF v_rate IS NOT NULL AND (v_age_seconds IS NULL OR v_age_seconds <= p_max_age_seconds) THEN
-    RETURN v_rate;
+
+  -- If fresh rate found, return it
+  IF v_rate IS NOT NULL AND v_age_seconds <= 3600 THEN
+    RETURN QUERY SELECT
+      v_rate,
+      v_timestamp,
+      v_age_seconds,
+      TRUE,
+      FALSE,
+      v_source;
+    RETURN;
   END IF;
-  
-  -- If no rate found, raise error
-  RAISE EXCEPTION 'No exchange rate found for %→% (max age: % seconds)',
-    p_from_currency, p_to_currency, p_max_age_seconds;
-  
-  RETURN NULL;
+
+  -- Fallback: Use ANY rate we have (even if stale)
+  SELECT rate, updated_at, EXTRACT(EPOCH FROM (NOW() - updated_at))::INTEGER
+  INTO v_rate, v_timestamp, v_age_seconds
+  FROM crypto_rates
+  WHERE from_currency = p_from_currency
+    AND to_currency = p_to_currency
+    AND expires_at > NOW() - INTERVAL '7 days'  -- Not older than 7 days
+  ORDER BY updated_at DESC
+  LIMIT 1;
+
+  IF v_rate IS NOT NULL THEN
+    RETURN QUERY SELECT
+      v_rate,
+      v_timestamp,
+      v_age_seconds,
+      FALSE,
+      TRUE,
+      'fallback_rate'::VARCHAR(64);
+    RETURN;
+  END IF;
+
+  -- Last resort: Return NULL (no rate available at all)
+  RETURN QUERY SELECT
+    NULL::NUMERIC,
+    NULL::TIMESTAMPTZ,
+    NULL::INTEGER,
+    FALSE,
+    TRUE,
+    'no_rate_available'::VARCHAR(64);
+END;
+$$ LANGUAGE plpgsql;
+
+-- ============================================================================
+-- STEP 1B: Simpler function for just getting the rate (with fallback)
+-- ============================================================================
+
+CREATE OR REPLACE FUNCTION get_exchange_rate_cached(
+  p_from_currency VARCHAR(16),
+  p_to_currency VARCHAR(16)
+)
+RETURNS NUMERIC AS $$
+DECLARE
+  v_result RECORD;
+BEGIN
+  -- If converting to same currency, return 1
+  IF p_from_currency = p_to_currency THEN
+    RETURN 1;
+  END IF;
+
+  -- Get rate with timestamp/fallback info
+  SELECT rate INTO v_result
+  FROM get_exchange_rate_with_timestamp(p_from_currency, p_to_currency);
+
+  -- If no rate found at all, raise error
+  IF v_result.rate IS NULL THEN
+    RAISE EXCEPTION 'No exchange rate found for %→% (even stale rates unavailable)',
+      p_from_currency, p_to_currency;
+  END IF;
+
+  RETURN v_result.rate;
 END;
 $$ LANGUAGE plpgsql;
 
