@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { currencyAPI } from '../lib/payments'
+import { formatNumber } from '../lib/currency'
 
 export default function TransactionHistory({ userId }) {
   const [transactions, setTransactions] = useState([])
