@@ -168,7 +168,6 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
   const [showWalletModal, setShowWalletModal] = useState(false)
   const [newWalletCurrency, setNewWalletCurrency] = useState(selectedCurrency)
   const [gcashReferenceNumber, setGcashReferenceNumber] = useState('')
-  const [showQRModal, setShowQRModal] = useState(false)
 
   // Data state
   const [wallets, setWallets] = useState([])
