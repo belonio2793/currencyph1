@@ -700,7 +700,7 @@ export default function App() {
                       <>
                         {activeTab === 'deposit' && <Deposits userId={userId} globalCurrency={globalCurrency} />}
                         {activeTab === 'rates' && <Rates globalCurrency={globalCurrency} />}
-                        {activeTab === 'dashboard' && <Dashboard userId={userId} onNavigate={setActiveTab} />}
+                        {activeTab === 'dashboard' && <Dashboard userId={userId} onNavigate={setActiveTab} globalCurrency={globalCurrency} globalCryptocurrency={globalCryptocurrency} userEmail={userEmail} />}
                         {activeTab === 'wallet' && <Wallet userId={userId} totalBalancePHP={totalBalancePHP} globalCurrency={globalCurrency} />}
                         {activeTab === 'send' && <SendMoney userId={userId} />}
                         {activeTab === 'receive' && <ReceiveMoney userId={userId} />}
