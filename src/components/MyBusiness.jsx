@@ -1267,12 +1267,12 @@ export default function MyBusiness({ userId }) {
   // Show existing business dashboard with tabs
   return (
     <div className="min-h-screen bg-slate-50">
-      <div className="max-w-7xl mx-auto px-4 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10 lg:py-12">
         {/* Header */}
-        <div className="mb-8 flex items-start justify-between">
+        <div className="mb-8 sm:mb-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
           <div>
-            <h1 className="text-4xl font-light text-slate-900 tracking-wide mb-2">My Business</h1>
-            <p className="text-slate-500">Manage your businesses, employees, and integrations</p>
+            <h1 className="text-3xl sm:text-4xl font-light text-slate-900 tracking-wide mb-2">My Business</h1>
+            <p className="text-slate-600 text-sm sm:text-base">Manage your businesses, employees, and integrations</p>
           </div>
 
           {/* Business Selector Dropdown */}
@@ -1307,7 +1307,7 @@ export default function MyBusiness({ userId }) {
         </div>
 
         {/* Main Tab Navigation */}
-        <div className="bg-white border-b border-slate-200 mb-8">
+        <div className="bg-white border-b border-slate-200 mb-8 sm:mb-10 lg:mb-12 -mx-4 sm:-mx-6 lg:-mx-8 px-4 sm:px-6 lg:px-8\">
           <div className="flex gap-1">
             <button
               onClick={() => setMainTab('businesses')}
