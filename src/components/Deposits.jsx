@@ -913,20 +913,34 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
               </div>
             </div>
 
-            {/* Payment Instructions */}
-            <div className="mb-8">
-              <h3 className="font-semibold text-slate-900 mb-4">Payment Instructions</h3>
-              <ol className="space-y-3">
-                {selectedMethodData.instructions.map((instruction, idx) => (
-                  <li key={idx} className="flex gap-3">
-                    <span className="flex-shrink-0 w-6 h-6 rounded-full bg-blue-100 text-blue-700 text-sm font-semibold flex items-center justify-center">
-                      {idx + 1}
-                    </span>
-                    <span className="text-slate-700">{instruction}</span>
-                  </li>
-                ))}
-              </ol>
-            </div>
+            {/* Exchange Rate Summary */}
+            {ratesLoading ? (
+              <div className="mb-8 p-6 bg-blue-50 border border-blue-200 rounded-lg">
+                <p className="text-slate-700">Loading exchange rates...</p>
+              </div>
+            ) : (
+              <div className="mb-8 p-6 bg-blue-50 border border-blue-200 rounded-lg">
+                <h3 className="font-semibold text-slate-900 mb-4">Exchange Rate Summary</h3>
+                <div className="space-y-3">
+                  <div className="flex justify-between items-center">
+                    <span className="text-slate-700">You Send:</span>
+                    <span className="font-semibold text-slate-900">{amount} {selectedCurrency}</span>
+                  </div>
+                  {exchangeRates[selectedCurrency] && (
+                    <div className="flex justify-between items-center text-sm text-slate-600">
+                      <span>Rate:</span>
+                      <span>1 {selectedCurrency} = {exchangeRates[selectedCurrency]?.toFixed(2) || 'N/A'} {selectedWalletData.currency_code}</span>
+                    </div>
+                  )}
+                  {calculateConvertedAmount() && selectedCurrency !== selectedWalletData.currency_code && (
+                    <div className="flex justify-between items-center pt-3 border-t border-blue-200">
+                      <span className="text-slate-900 font-medium">You Receive:</span>
+                      <span className="text-lg font-bold text-blue-600">{calculateConvertedAmount()} {selectedWalletData.currency_code}</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
 
             {/* GCash Reference Number */}
             {selectedMethod === 'gcash' && (
