@@ -136,31 +136,67 @@ export const currencyAPI = {
         new Promise((_, reject) => setTimeout(() => reject(new Error('Crypto prices fetch timeout')), 7000))
       ])
 
-      if (error || !data || !data.cryptoPrices) {
-        console.warn('Error fetching crypto prices:', error?.message)
-        return null
-      }
-
-      return {
-        BTC: {
-          name: 'Bitcoin',
-          symbol: 'BTC',
-          prices: data.cryptoPrices.bitcoin || {},
-          lastUpdated: new Date()
-        },
-        ETH: {
-          name: 'Ethereum',
-          symbol: 'ETH',
-          prices: data.cryptoPrices.ethereum || {},
-          lastUpdated: new Date()
-        },
-        DOGE: {
-          name: 'Dogecoin',
-          symbol: 'DOGE',
-          prices: data.cryptoPrices.dogecoin || {},
-          lastUpdated: new Date()
+      if (!error && data && data.cryptoPrices) {
+        return {
+          BTC: {
+            name: 'Bitcoin',
+            symbol: 'BTC',
+            prices: data.cryptoPrices.bitcoin || {},
+            lastUpdated: new Date()
+          },
+          ETH: {
+            name: 'Ethereum',
+            symbol: 'ETH',
+            prices: data.cryptoPrices.ethereum || {},
+            lastUpdated: new Date()
+          },
+          DOGE: {
+            name: 'Dogecoin',
+            symbol: 'DOGE',
+            prices: data.cryptoPrices.dogecoin || {},
+            lastUpdated: new Date()
+          }
         }
       }
+
+      // Fallback: Try to fetch from cached_rates table in database
+      console.warn('Edge function failed, trying database fallback:', error?.message)
+      try {
+        const { data: cachedData, error: cacheError } = await supabase
+          .from('cached_rates')
+          .select('crypto_prices, fetched_at')
+          .order('fetched_at', { ascending: false })
+          .limit(1)
+          .single()
+
+        if (!cacheError && cachedData?.crypto_prices) {
+          console.log('Using cached crypto prices from database')
+          return {
+            BTC: {
+              name: 'Bitcoin',
+              symbol: 'BTC',
+              prices: cachedData.crypto_prices.bitcoin || {},
+              lastUpdated: new Date(cachedData.fetched_at)
+            },
+            ETH: {
+              name: 'Ethereum',
+              symbol: 'ETH',
+              prices: cachedData.crypto_prices.ethereum || {},
+              lastUpdated: new Date(cachedData.fetched_at)
+            },
+            DOGE: {
+              name: 'Dogecoin',
+              symbol: 'DOGE',
+              prices: cachedData.crypto_prices.dogecoin || {},
+              lastUpdated: new Date(cachedData.fetched_at)
+            }
+          }
+        }
+      } catch (cacheErr) {
+        console.warn('Database fallback also failed:', cacheErr?.message)
+      }
+
+      return null
     } catch (error) {
       console.warn('Error fetching crypto prices:', error?.message)
       return null
