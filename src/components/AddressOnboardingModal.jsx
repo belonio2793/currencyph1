@@ -4,6 +4,8 @@ import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import { PHILIPPINES_CITIES, PHILIPPINES_PROVINCES } from '../data/philippineCitiesProvinces'
+import ExpandableModal from './ExpandableModal'
+import { useDevice } from '../context/DeviceContext'
 
 // Fix default marker icons
 delete L.Icon.Default.prototype._getIconUrl
@@ -26,6 +28,7 @@ function MapClickHandler({ onMapClick }) {
 }
 
 export default function AddressOnboardingModal({ userId, isOpen, onClose, onAddressCreated }) {
+  const { isMobile } = useDevice()
   const [step, setStep] = useState(1)
   const [loading, setLoading] = useState(false)
   const [fetchingLocation, setFetchingLocation] = useState(false)
@@ -47,7 +50,6 @@ export default function AddressOnboardingModal({ userId, isOpen, onClose, onAddr
     longitude: 120.9842
   })
 
-  // Filter cities based on search input
   const filteredCities = useMemo(() => {
     const searchTerm = citySearchInput.toLowerCase().trim()
     if (!searchTerm) return PHILIPPINES_CITIES
@@ -56,7 +58,6 @@ export default function AddressOnboardingModal({ userId, isOpen, onClose, onAddr
     )
   }, [citySearchInput])
 
-  // Filter provinces based on search input
   const filteredProvinces = useMemo(() => {
     const searchTerm = provinceSearchInput.toLowerCase().trim()
     if (!searchTerm) return PHILIPPINES_PROVINCES
@@ -65,7 +66,6 @@ export default function AddressOnboardingModal({ userId, isOpen, onClose, onAddr
     )
   }, [provinceSearchInput])
 
-  // Track character propagation for city
   const handleCitySearchChange = (e) => {
     const value = e.target.value
     setCitySearchInput(value)
@@ -73,7 +73,6 @@ export default function AddressOnboardingModal({ userId, isOpen, onClose, onAddr
     setShowCityDropdown(true)
   }
 
-  // Track character propagation for province
   const handleProvinceSearchChange = (e) => {
     const value = e.target.value
     setProvinceSearchInput(value)
@@ -81,21 +80,18 @@ export default function AddressOnboardingModal({ userId, isOpen, onClose, onAddr
     setShowProvinceDropdown(true)
   }
 
-  // Handle city selection from dropdown
   const selectCity = (city) => {
     setFormData(prev => ({ ...prev, city }))
     setCitySearchInput(city)
     setShowCityDropdown(false)
   }
 
-  // Handle province selection from dropdown
   const selectProvince = (province) => {
     setFormData(prev => ({ ...prev, province }))
     setProvinceSearchInput(province)
     setShowProvinceDropdown(false)
   }
 
-  // Initialize search inputs when step changes to 2
   useEffect(() => {
     if (step === 2) {
       setCitySearchInput(formData.city)
@@ -103,7 +99,6 @@ export default function AddressOnboardingModal({ userId, isOpen, onClose, onAddr
     }
   }, [step])
 
-  // Close dropdowns when clicking outside
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (e.target.closest('.city-dropdown-container') === null) {
@@ -182,7 +177,6 @@ export default function AddressOnboardingModal({ userId, isOpen, onClose, onAddr
       return
     }
 
-    // Check if user is a guest-local account
     if (userId && userId.includes('guest-local')) {
       alert('Please sign up to create addresses')
       return
@@ -220,206 +214,198 @@ export default function AddressOnboardingModal({ userId, isOpen, onClose, onAddr
 
   if (!isOpen) return null
 
-  return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-3 sm:p-4">
-      <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] sm:max-h-[95vh] overflow-y-auto">
-        {/* Header */}
-        <div className="sticky top-0 bg-white border-b border-slate-200 px-4 sm:px-6 py-3 sm:py-4 flex items-start justify-between z-10 gap-2">
-          <div className="flex-1 min-w-0">
-            <h2 className="text-lg sm:text-xl font-semibold text-slate-900">Add Your First Address</h2>
-            <p className="text-xs sm:text-sm text-slate-500 mt-1">Help us locate you for better service</p>
-          </div>
-          <button
-            onClick={onClose}
-            disabled={loading}
-            className="text-slate-400 hover:text-slate-600 disabled:opacity-50 flex-shrink-0"
-          >
-            <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
-        </div>
+  const footerContent = (
+    <div className="w-full flex gap-3">
+      {step === 2 && (
+        <button
+          onClick={() => setStep(1)}
+          disabled={loading}
+          className="flex-1 px-3 sm:px-4 py-1.5 sm:py-2 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 font-medium transition-colors disabled:opacity-50 text-sm sm:text-base"
+        >
+          ← Back
+        </button>
+      )}
+      {step === 1 ? (
+        <button
+          onClick={() => setStep(2)}
+          className="flex-1 px-3 sm:px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium transition-colors text-sm sm:text-base"
+        >
+          Next →
+        </button>
+      ) : (
+        <button
+          onClick={handleSaveAddress}
+          disabled={loading}
+          className="flex-1 px-3 sm:px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 font-medium transition-colors disabled:opacity-50 text-sm sm:text-base"
+        >
+          {loading ? 'Creating...' : '✓ Create'}
+        </button>
+      )}
+    </div>
+  )
 
-        {/* Content */}
-        <div className="p-4 sm:p-6 space-y-4 sm:space-y-6">
-          {step === 1 ? (
-            <>
-              {/* Step 1: Map Selection */}
+  return (
+    <ExpandableModal
+      isOpen={isOpen}
+      onClose={onClose}
+      title="Add Your First Address"
+      icon="📍"
+      size="lg"
+      footer={footerContent}
+      defaultExpanded={!isMobile}
+    >
+      <div className="space-y-4 sm:space-y-6">
+        {step === 1 ? (
+          <>
+            <div>
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-2 sm:mb-3">
+                <label className="block text-xs sm:text-sm font-medium text-slate-900">
+                  📍 Select Location on Map (Click to place marker)
+                </label>
+                <button
+                  onClick={handleFetchLocation}
+                  disabled={fetchingLocation}
+                  className="px-2 sm:px-3 py-1 text-xs sm:text-sm bg-blue-100 text-blue-700 rounded hover:bg-blue-200 transition-colors disabled:opacity-50 font-medium whitespace-nowrap"
+                  title="Use your current GPS location"
+                >
+                  {fetchingLocation ? '📍 Fetching...' : '📍 Use Current Location'}
+                </button>
+              </div>
+              <div className="h-60 sm:h-80 rounded-lg overflow-hidden border border-slate-200 relative">
+                <MapContainer
+                  center={[formData.latitude, formData.longitude]}
+                  zoom={13}
+                  style={{ height: '100%', width: '100%' }}
+                  attributionControl={false}
+                >
+                  <TileLayer
+                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                  />
+                  <MapClickHandler onMapClick={handleMapClick} />
+                  {mapPosition && (
+                    <Marker position={[mapPosition.latitude, mapPosition.longitude]} />
+                  )}
+                </MapContainer>
+              </div>
+              <p className="text-xs text-slate-500 mt-2 break-all">
+                Latitude: {formData.latitude.toFixed(4)}, Longitude: {formData.longitude.toFixed(4)}
+              </p>
+            </div>
+          </>
+        ) : (
+          <>
+            <div className="space-y-3 sm:space-y-4">
               <div>
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-2 sm:mb-3">
-                  <label className="block text-xs sm:text-sm font-medium text-slate-900">
-                    📍 Select Location on Map (Click to place marker)
-                  </label>
-                  <button
-                    onClick={handleFetchLocation}
-                    disabled={fetchingLocation}
-                    className="px-2 sm:px-3 py-1 text-xs sm:text-sm bg-blue-100 text-blue-700 rounded hover:bg-blue-200 transition-colors disabled:opacity-50 font-medium whitespace-nowrap"
-                    title="Use your current GPS location"
-                  >
-                    {fetchingLocation ? '📍 Fetching...' : '📍 Use Current Location'}
-                  </button>
-                </div>
-                <div className="h-60 sm:h-80 rounded-lg overflow-hidden border border-slate-200 relative">
-                  <MapContainer
-                    center={[formData.latitude, formData.longitude]}
-                    zoom={13}
-                    style={{ height: '100%', width: '100%' }}
-                    attributionControl={false}
-                  >
-                    <TileLayer
-                      url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                    />
-                    <MapClickHandler onMapClick={handleMapClick} />
-                    {mapPosition && (
-                      <Marker position={[mapPosition.latitude, mapPosition.longitude]} />
-                    )}
-                  </MapContainer>
-                </div>
-                <p className="text-xs text-slate-500 mt-2 break-all">
-                  Latitude: {formData.latitude.toFixed(4)}, Longitude: {formData.longitude.toFixed(4)}
-                </p>
+                <label className="block text-xs sm:text-sm font-medium text-slate-900 mb-1">
+                  Address Name (Nickname) *
+                </label>
+                <input
+                  type="text"
+                  name="address_name"
+                  value={formData.address_name}
+                  onChange={handleInputChange}
+                  placeholder="e.g., My Home"
+                  className="w-full px-2 sm:px-3 py-1.5 sm:py-2 border border-slate-300 rounded-lg focus:outline-none focus:border-blue-500 text-sm"
+                  required
+                />
               </div>
 
-              <button
-                onClick={() => setStep(2)}
-                className="w-full px-3 sm:px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium transition-colors text-sm sm:text-base"
-              >
-                Next: Add Details →
-              </button>
-            </>
-          ) : (
-            <>
-              {/* Step 2: Address Details */}
-              <div className="space-y-3 sm:space-y-4">
-                <div>
-                  <label className="block text-xs sm:text-sm font-medium text-slate-900 mb-1">
-                    Address Name (Nickname) *
-                  </label>
-                  <input
-                    type="text"
-                    name="address_name"
-                    value={formData.address_name}
-                    onChange={handleInputChange}
-                    placeholder="e.g., My Home"
-                    className="w-full px-2 sm:px-3 py-1.5 sm:py-2 border border-slate-300 rounded-lg focus:outline-none focus:border-blue-500 text-sm"
-                    required
-                  />
-                </div>
+              <div>
+                <label className="block text-xs sm:text-sm font-medium text-slate-900 mb-1">
+                  Street Address
+                </label>
+                <input
+                  type="text"
+                  name="street_address"
+                  value={formData.street_address}
+                  onChange={handleInputChange}
+                  placeholder="123 Main St"
+                  className="w-full px-2 sm:px-3 py-1.5 sm:py-2 border border-slate-300 rounded-lg focus:outline-none focus:border-blue-500 text-sm"
+                />
+              </div>
 
-                <div>
-                  <label className="block text-xs sm:text-sm font-medium text-slate-900 mb-1">
-                    Street Address
-                  </label>
-                  <input
-                    type="text"
-                    name="street_address"
-                    value={formData.street_address}
-                    onChange={handleInputChange}
-                    placeholder="123 Main St"
-                    className="w-full px-2 sm:px-3 py-1.5 sm:py-2 border border-slate-300 rounded-lg focus:outline-none focus:border-blue-500 text-sm"
-                  />
-                </div>
+              <div className="relative city-dropdown-container">
+                <label className="block text-xs sm:text-sm font-medium text-slate-900 mb-1">
+                  City {searchCharCount.city > 0 && <span className="text-xs text-slate-500">({searchCharCount.city} chars)</span>}
+                </label>
+                <input
+                  type="text"
+                  value={citySearchInput}
+                  onChange={handleCitySearchChange}
+                  onFocus={() => setShowCityDropdown(true)}
+                  placeholder="Search cities..."
+                  className="w-full px-2 sm:px-3 py-1.5 sm:py-2 border border-slate-300 rounded-lg focus:outline-none focus:border-blue-500 text-sm"
+                  autoComplete="off"
+                />
+                {showCityDropdown && (
+                  <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-slate-300 rounded-lg shadow-lg z-50 max-h-48 sm:max-h-64 overflow-y-auto">
+                    {filteredCities.length > 0 ? (
+                      filteredCities.slice(0, 10).map((city, idx) => (
+                        <div
+                          key={idx}
+                          onClick={() => selectCity(city)}
+                          className="px-2 sm:px-3 py-1.5 sm:py-2 hover:bg-blue-50 cursor-pointer text-xs sm:text-sm text-slate-700 border-b border-slate-100 last:border-b-0"
+                        >
+                          {city}
+                        </div>
+                      ))
+                    ) : (
+                      <div className="px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm text-slate-500">No cities found</div>
+                    )}
+                  </div>
+                )}
+              </div>
 
-                <div className="relative city-dropdown-container">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-4">
+                <div className="relative province-dropdown-container">
                   <label className="block text-xs sm:text-sm font-medium text-slate-900 mb-1">
-                    City {searchCharCount.city > 0 && <span className="text-xs text-slate-500">({searchCharCount.city} chars)</span>}
+                    Province {searchCharCount.province > 0 && <span className="text-xs text-slate-500">({searchCharCount.province} chars)</span>}
                   </label>
                   <input
                     type="text"
-                    value={citySearchInput}
-                    onChange={handleCitySearchChange}
-                    onFocus={() => setShowCityDropdown(true)}
-                    placeholder="Search cities..."
+                    value={provinceSearchInput}
+                    onChange={handleProvinceSearchChange}
+                    onFocus={() => setShowProvinceDropdown(true)}
+                    placeholder="Search provinces..."
                     className="w-full px-2 sm:px-3 py-1.5 sm:py-2 border border-slate-300 rounded-lg focus:outline-none focus:border-blue-500 text-sm"
                     autoComplete="off"
                   />
-                  {showCityDropdown && (
+                  {showProvinceDropdown && (
                     <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-slate-300 rounded-lg shadow-lg z-50 max-h-48 sm:max-h-64 overflow-y-auto">
-                      {filteredCities.length > 0 ? (
-                        filteredCities.slice(0, 10).map((city, idx) => (
+                      {filteredProvinces.length > 0 ? (
+                        filteredProvinces.slice(0, 10).map((province, idx) => (
                           <div
                             key={idx}
-                            onClick={() => selectCity(city)}
+                            onClick={() => selectProvince(province)}
                             className="px-2 sm:px-3 py-1.5 sm:py-2 hover:bg-blue-50 cursor-pointer text-xs sm:text-sm text-slate-700 border-b border-slate-100 last:border-b-0"
                           >
-                            {city}
+                            {province}
                           </div>
                         ))
                       ) : (
-                        <div className="px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm text-slate-500">No cities found</div>
+                        <div className="px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm text-slate-500">No provinces found</div>
                       )}
                     </div>
                   )}
                 </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-4">
-                  <div className="relative province-dropdown-container">
-                    <label className="block text-xs sm:text-sm font-medium text-slate-900 mb-1">
-                      Province {searchCharCount.province > 0 && <span className="text-xs text-slate-500">({searchCharCount.province} chars)</span>}
-                    </label>
-                    <input
-                      type="text"
-                      value={provinceSearchInput}
-                      onChange={handleProvinceSearchChange}
-                      onFocus={() => setShowProvinceDropdown(true)}
-                      placeholder="Search provinces..."
-                      className="w-full px-2 sm:px-3 py-1.5 sm:py-2 border border-slate-300 rounded-lg focus:outline-none focus:border-blue-500 text-sm"
-                      autoComplete="off"
-                    />
-                    {showProvinceDropdown && (
-                      <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-slate-300 rounded-lg shadow-lg z-50 max-h-48 sm:max-h-64 overflow-y-auto">
-                        {filteredProvinces.length > 0 ? (
-                          filteredProvinces.slice(0, 10).map((province, idx) => (
-                            <div
-                              key={idx}
-                              onClick={() => selectProvince(province)}
-                              className="px-2 sm:px-3 py-1.5 sm:py-2 hover:bg-blue-50 cursor-pointer text-xs sm:text-sm text-slate-700 border-b border-slate-100 last:border-b-0"
-                            >
-                              {province}
-                            </div>
-                          ))
-                        ) : (
-                          <div className="px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm text-slate-500">No provinces found</div>
-                        )}
-                      </div>
-                    )}
-                  </div>
-                  <div>
-                    <label className="block text-xs sm:text-sm font-medium text-slate-900 mb-1">
-                      Postal Code
-                    </label>
-                    <input
-                      type="text"
-                      name="postal_code"
-                      value={formData.postal_code}
-                      onChange={handleInputChange}
-                      placeholder="1234"
-                      className="w-full px-2 sm:px-3 py-1.5 sm:py-2 border border-slate-300 rounded-lg focus:outline-none focus:border-blue-500 text-sm"
-                    />
-                  </div>
+                <div>
+                  <label className="block text-xs sm:text-sm font-medium text-slate-900 mb-1">
+                    Postal Code
+                  </label>
+                  <input
+                    type="text"
+                    name="postal_code"
+                    value={formData.postal_code}
+                    onChange={handleInputChange}
+                    placeholder="1234"
+                    className="w-full px-2 sm:px-3 py-1.5 sm:py-2 border border-slate-300 rounded-lg focus:outline-none focus:border-blue-500 text-sm"
+                  />
                 </div>
               </div>
-
-              <div className="flex gap-2 sm:gap-3 mt-4 sm:mt-6">
-                <button
-                  onClick={() => setStep(1)}
-                  disabled={loading}
-                  className="flex-1 px-3 sm:px-4 py-1.5 sm:py-2 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 font-medium transition-colors disabled:opacity-50 text-sm sm:text-base"
-                >
-                  ← Back
-                </button>
-                <button
-                  onClick={handleSaveAddress}
-                  disabled={loading}
-                  className="flex-1 px-3 sm:px-4 py-1.5 sm:py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 font-medium transition-colors disabled:opacity-50 text-sm sm:text-base"
-                >
-                  {loading ? 'Creating...' : '✓ Create Address'}
-                </button>
-              </div>
-            </>
-          )}
-        </div>
+            </div>
+          </>
+        )}
       </div>
-    </div>
+    </ExpandableModal>
   )
 }
