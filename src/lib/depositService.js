@@ -549,23 +549,47 @@ export class DepositService {
 
       const result = await response.json()
 
-      // Store initial deposit record
-      const { data: deposit, error: depositError } = await this.supabase
-        .from('deposits')
-        .insert([{
-          user_id: this.user.id,
-          wallet_id: this.wallet.id,
-          amount,
-          currency_code: currency,
-          deposit_method: depositMethod,
-          status: 'pending',
-          payment_reference: result.paymentReference,
-          external_tx_id: result.externalId,
-          description: `${methodConfig.name} deposit of ${amount} ${currency}`,
-          notes: JSON.stringify(methodDetails)
-        }])
-        .select()
-        .single()
+      // Store initial deposit record (or update existing one if edge function created it)
+      let deposit = null
+      let depositError = null
+
+      if (result.depositId) {
+        // Edge function already created the deposit, update it with metadata
+        const { data: updated, error: updateError } = await this.supabase
+          .from('deposits')
+          .update({
+            description: `${methodConfig.name} deposit of ${amount} ${currency}`,
+            notes: JSON.stringify(methodDetails),
+            status: 'pending'
+          })
+          .eq('id', result.depositId)
+          .select()
+          .single()
+
+        deposit = updated
+        depositError = updateError
+      } else {
+        // Edge function didn't create deposit, create it now
+        const { data: inserted, error: insertError } = await this.supabase
+          .from('deposits')
+          .insert([{
+            user_id: this.user.id,
+            wallet_id: this.wallet.id,
+            amount,
+            currency_code: currency,
+            deposit_method: depositMethod,
+            status: 'pending',
+            payment_reference: result.paymentReference,
+            external_tx_id: result.externalId,
+            description: `${methodConfig.name} deposit of ${amount} ${currency}`,
+            notes: JSON.stringify(methodDetails)
+          }])
+          .select()
+          .single()
+
+        deposit = inserted
+        depositError = insertError
+      }
 
       if (depositError) {
         console.error('Failed to record deposit:', depositError)
