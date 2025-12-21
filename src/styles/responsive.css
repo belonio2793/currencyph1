@@ -1,0 +1,232 @@
+/* Responsive Utilities - Mobile First Approach */
+
+/* Modal Containers */
+.modal-responsive {
+  @apply fixed inset-0 z-50 flex items-center justify-center p-4;
+}
+
+.modal-content-responsive {
+  @apply bg-white rounded-lg shadow-xl w-full overflow-hidden flex flex-col;
+}
+
+@screen md {
+  .modal-content-responsive {
+    @apply rounded-lg;
+  }
+}
+
+/* Mobile-first modal sizing */
+.modal-mobile {
+  @apply inset-0 rounded-t-2xl rounded-b-none max-h-screen;
+}
+
+.modal-desktop {
+  @apply max-w-2xl top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 max-h-[90vh];
+}
+
+/* Form Controls - Responsive Sizing */
+.input-responsive {
+  @apply w-full px-3 sm:px-4 py-2.5 sm:py-3 border border-slate-300 rounded-lg text-sm sm:text-base min-h-10 sm:min-h-11;
+  @apply focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all;
+}
+
+.select-responsive {
+  @apply w-full px-3 sm:px-4 py-2.5 sm:py-3 border border-slate-300 rounded-lg text-sm sm:text-base min-h-10 sm:min-h-11;
+  @apply focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white transition-all;
+}
+
+.button-responsive {
+  @apply px-4 sm:px-6 py-2.5 sm:py-3 text-sm sm:text-base font-medium rounded-lg transition-colors;
+  @apply min-h-10 sm:min-h-11;
+}
+
+.button-responsive-lg {
+  @apply px-5 sm:px-8 py-3 sm:py-4 text-base sm:text-lg font-medium rounded-lg transition-colors;
+  @apply min-h-11 sm:min-h-12;
+}
+
+/* Grid Responsive */
+.grid-responsive-2 {
+  @apply grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4;
+}
+
+.grid-responsive-3 {
+  @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 lg:gap-6;
+}
+
+.grid-responsive-4 {
+  @apply grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-3 lg:gap-4;
+}
+
+/* Typography Responsive */
+.heading-responsive-h1 {
+  @apply text-2xl sm:text-3xl md:text-4xl font-bold;
+}
+
+.heading-responsive-h2 {
+  @apply text-xl sm:text-2xl md:text-3xl font-bold;
+}
+
+.heading-responsive-h3 {
+  @apply text-lg sm:text-xl md:text-2xl font-semibold;
+}
+
+.text-responsive-base {
+  @apply text-sm sm:text-base md:text-base;
+}
+
+.text-responsive-sm {
+  @apply text-xs sm:text-sm;
+}
+
+/* Spacing Responsive */
+.gap-responsive-sm {
+  @apply gap-2 sm:gap-3 md:gap-4;
+}
+
+.gap-responsive-md {
+  @apply gap-3 sm:gap-4 md:gap-6;
+}
+
+.gap-responsive-lg {
+  @apply gap-4 sm:gap-6 md:gap-8;
+}
+
+.p-responsive-sm {
+  @apply p-3 sm:p-4 md:p-6;
+}
+
+.p-responsive-md {
+  @apply p-4 sm:p-6 md:p-8;
+}
+
+.p-responsive-lg {
+  @apply p-6 sm:p-8 md:p-10;
+}
+
+/* Modal Header */
+.modal-header-responsive {
+  @apply p-4 sm:p-6 border-b border-slate-200 flex items-center justify-between sticky top-0 bg-white;
+}
+
+/* Modal Body */
+.modal-body-responsive {
+  @apply p-4 sm:p-6 flex-1 overflow-y-auto space-y-3 sm:space-y-4;
+}
+
+/* Modal Footer */
+.modal-footer-responsive {
+  @apply p-4 sm:p-6 border-t border-slate-200 flex items-center justify-end gap-2 sm:gap-3 flex-wrap;
+}
+
+/* Dropdown/Select */
+.dropdown-responsive {
+  @apply absolute z-50 w-full mt-2 bg-white border border-slate-300 rounded-lg shadow-lg;
+  @apply max-h-72 sm:max-h-96 overflow-y-auto;
+}
+
+.dropdown-item-responsive {
+  @apply w-full text-left px-3 sm:px-4 py-2.5 sm:py-3 min-h-10 sm:min-h-11;
+  @apply border-b border-slate-100 last:border-b-0 hover:bg-slate-50 transition-colors;
+  @apply text-sm sm:text-base;
+}
+
+/* Cards */
+.card-responsive {
+  @apply bg-white rounded-lg border border-slate-200 p-4 sm:p-6;
+}
+
+.card-responsive-lg {
+  @apply bg-white rounded-lg border border-slate-200 p-6 sm:p-8;
+}
+
+/* Touch target minimum size (44px) */
+.touch-target {
+  @apply min-h-11 min-w-11;
+}
+
+/* Responsive Padding for modal/dialog */
+.modal-padding {
+  @apply p-4 sm:p-6 md:p-8;
+}
+
+/* Responsive form sections */
+.form-section-responsive {
+  @apply space-y-3 sm:space-y-4;
+}
+
+.form-group-responsive {
+  @apply flex flex-col;
+}
+
+.form-label-responsive {
+  @apply text-xs sm:text-sm font-medium text-slate-700 mb-1.5 sm:mb-2;
+}
+
+.form-input-responsive {
+  @apply w-full px-3 sm:px-4 py-2 sm:py-3 border border-slate-300 rounded-lg;
+  @apply focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent;
+  @apply text-sm sm:text-base;
+}
+
+/* Responsive overlay */
+.overlay-responsive {
+  @apply fixed inset-0 bg-black/50 backdrop-blur-sm z-40;
+}
+
+/* Responsive container */
+.container-responsive {
+  @apply max-w-7xl mx-auto px-4 sm:px-6;
+}
+
+.container-responsive-narrow {
+  @apply max-w-4xl mx-auto px-4 sm:px-6;
+}
+
+.container-responsive-wide {
+  @apply w-full px-4 sm:px-6;
+}
+
+/* Error and success messaging */
+.alert-responsive {
+  @apply p-3 sm:p-4 rounded-lg text-sm sm:text-base;
+}
+
+.alert-responsive-error {
+  @apply bg-red-50 text-red-700 border border-red-200;
+}
+
+.alert-responsive-success {
+  @apply bg-green-50 text-green-700 border border-green-200;
+}
+
+.alert-responsive-warning {
+  @apply bg-yellow-50 text-yellow-700 border border-yellow-200;
+}
+
+.alert-responsive-info {
+  @apply bg-blue-50 text-blue-700 border border-blue-200;
+}
+
+/* Responsive badge */
+.badge-responsive {
+  @apply inline-block px-2 sm:px-3 py-0.5 sm:py-1 rounded-full text-xs sm:text-sm font-medium;
+}
+
+/* Responsive flex */
+.flex-responsive-center {
+  @apply flex flex-col sm:flex-row items-center sm:items-center gap-2 sm:gap-4;
+}
+
+.flex-responsive-between {
+  @apply flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4;
+}
+
+/* Responsive title */
+.title-responsive {
+  @apply text-lg sm:text-xl md:text-2xl font-bold text-slate-900;
+}
+
+.subtitle-responsive {
+  @apply text-sm sm:text-base text-slate-600;
+}
