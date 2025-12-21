@@ -45,16 +45,45 @@ async function fetchOpenExchangeRates() {
   }
 }
 
-async function fetchCoinGecko() {
+async function fetchCoinGecko(toCurrency = 'php') {
   try {
     const cryptoIds = [
-      'bitcoin','ethereum','litecoin','dogecoin','ripple','cardano','solana','avalanche-2','matic-network','polkadot','chainlink','uniswap','aave','usd-coin','tether'
+      'bitcoin','ethereum','litecoin','dogecoin','ripple','cardano','solana','avalanche-2','matic-network','polkadot','chainlink','uniswap','aave','usd-coin','tether','binancecoin','stellar','tron','hedera-hashgraph','the-open-network','sui'
     ].join(',')
-    const url = `https://api.coingecko.com/api/v3/simple/price?ids=${cryptoIds}&vs_currencies=usd&include_market_cap=true&include_24hr_vol=true`
-    const resp = await fetch(url, { headers: { Accept: 'application/json' } })
-    if (!resp.ok) return null
-    const json = await resp.json()
-    return json
+    const url = `https://api.coingecko.com/api/v3/simple/price?ids=${cryptoIds}&vs_currencies=${toCurrency}&precision=8&include_market_cap=true&include_24hr_vol=true`
+
+    // Retry logic
+    let lastError
+    for (let attempt = 0; attempt < 3; attempt++) {
+      try {
+        const resp = await Promise.race([
+          fetch(url, { headers: { Accept: 'application/json' } }),
+          new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), 15000))
+        ])
+
+        if (!resp.ok) {
+          if (resp.status >= 500) {
+            // Server error, retry
+            lastError = new Error(`CoinGecko ${resp.status}`)
+            await new Promise(resolve => setTimeout(resolve, 1000 * Math.pow(2, attempt)))
+            continue
+          }
+          return null
+        }
+
+        const json = await resp.json()
+        return json
+      } catch (e) {
+        lastError = e
+        if (attempt < 2) {
+          const delay = 500 * Math.pow(2, attempt) + Math.random() * 1000
+          await new Promise(resolve => setTimeout(resolve, delay))
+        }
+      }
+    }
+
+    console.warn('CoinGecko fetch failed after retries:', lastError?.message || lastError)
+    return null
   } catch (e) {
     console.warn('CoinGecko fetch failed', e?.message || e)
     return null
