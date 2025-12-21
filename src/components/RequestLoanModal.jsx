@@ -227,7 +227,7 @@ export default function RequestLoanModal({ userId, loanType, onClose, onSuccess,
                 <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg flex flex-col justify-center">
                   <div className="text-xs text-slate-600">Total with 10% interest</div>
                   <div className="text-lg font-semibold text-blue-600">
-                    {Number(totalOwed).toFixed(2)} {currency}
+                    {formatNumber(totalOwed)} {currency}
                   </div>
                 </div>
               )}
