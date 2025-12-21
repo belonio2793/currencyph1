@@ -111,20 +111,34 @@ export class DepositStatusChangeService {
       let shouldUpdateWallet = false
 
       if (newStatus === 'approved' && deposit.status === 'pending') {
-        // Approval: Credit the wallet
+        // Approval: Credit the wallet (with currency conversion if needed)
         shouldUpdateWallet = true
         walletImpact = await this._calculateWalletImpact(
           deposit.wallet_id,
           deposit.amount,
-          'credit'
+          'credit',
+          deposit.currency_code,
+          depositId
         )
+
+        // If conversion happened, update deposit with conversion details
+        if (walletImpact.conversion) {
+          await this._recordConversionAudit(
+            depositId,
+            deposit.user_id,
+            'conversion_initiated',
+            walletImpact.conversion
+          )
+        }
       } else if (deposit.status === 'approved' && newStatus === 'pending') {
         // Reversal: Debit the wallet
         shouldUpdateWallet = true
         walletImpact = await this._calculateWalletImpact(
           deposit.wallet_id,
           deposit.amount,
-          'debit'
+          'debit',
+          deposit.currency_code,
+          depositId
         )
       }
 
