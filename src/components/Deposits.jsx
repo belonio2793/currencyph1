@@ -560,19 +560,25 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
           user_id: userId,
           wallet_id: targetWalletId,
           amount: parseFloat(amount),
-          original_currency: selectedCurrency,
-          converted_amount: convertedAmount,
-          wallet_currency: targetWalletData.currency_code,
           currency_code: targetWalletData.currency_code,
           deposit_method: selectedMethod,
-          reference_number: selectedMethod === 'gcash' ? gcashReferenceNumber.trim() : null,
+          phone_number: selectedMethod === 'gcash' ? gcashReferenceNumber.trim() : null,
           status: depositStatus,
-          description: `${selectedMethod} deposit of ${amount} ${selectedCurrency}${convertedAmount ? ` (≈ ${convertedAmount} ${targetWalletData.currency_code} at ${(convertedAmount / parseFloat(amount)).toFixed(6)})` : ''}`
+          description: `${selectedMethod} deposit of ${amount} ${selectedCurrency}${convertedAmount ? ` (≈ ${convertedAmount} ${targetWalletData.currency_code} at ${(convertedAmount / parseFloat(amount)).toFixed(6)})` : ''}`,
+          notes: JSON.stringify({
+            original_currency: selectedCurrency,
+            converted_amount: convertedAmount,
+            conversion_rate: convertedAmount ? (convertedAmount / parseFloat(amount)).toFixed(6) : null,
+            wallet_currency: targetWalletData.currency_code
+          })
         }])
         .select()
         .single()
 
-      if (err) throw err
+      if (err) {
+        console.error('Deposit insert error details:', err)
+        throw new Error(err.message || JSON.stringify(err))
+      }
 
       // Add to deposits list
       setDeposits([deposit, ...deposits])
