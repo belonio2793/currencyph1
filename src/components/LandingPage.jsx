@@ -569,7 +569,7 @@ export default function LandingPage({ userId, userEmail, globalCurrency = 'PHP',
   // Convert total balance to cryptocurrency for dual display
   useEffect(() => {
     const convertToCrypto = async () => {
-      const totalBalanceValue = parseFloat(getTotalBalance()) || 0
+      const totalBalanceValue = wallets.reduce((sum, w) => sum + (w.balance || 0), 0)
       if (!totalBalanceValue || !globalCryptocurrency || !globalCurrency || !userEmail) {
         setCryptoBalance(null)
         return
@@ -587,7 +587,7 @@ export default function LandingPage({ userId, userEmail, globalCurrency = 'PHP',
     }
 
     convertToCrypto()
-  }, [getTotalBalance(), globalCurrency, globalCryptocurrency, userEmail])
+  }, [wallets, globalCurrency, globalCryptocurrency, userEmail])
 
   const calculateMultiCurrencyConversion = () => {
     const numAmount = parseFloat(amount) || 0
