@@ -300,17 +300,6 @@ export default function Rates() {
 
   return (
     <div className="space-y-6">
-      {/* Header Section */}
-      <div className="bg-gradient-to-r from-blue-600 to-blue-800 dark:from-blue-700 dark:to-blue-900 text-white py-6 px-6">
-        <div className="max-w-6xl mx-auto">
-          <h1 className="text-2xl font-bold mb-2 text-white">Exchange Rates</h1>
-          <p className="text-white text-lg mb-6">Real-time currency and cryptocurrency exchange rates from PHP</p>
-          <div className="text-sm text-white/80">
-            Last updated: {lastUpdated.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
-          </div>
-        </div>
-      </div>
-
       {/* Main Grid */}
       <div className="grid grid-cols-3 gap-6">
         {/* Left Column - Converter */}
