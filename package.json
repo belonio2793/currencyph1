@@ -93,7 +93,8 @@
     "migrate-shipping-ports": "node scripts/apply-migration-055.js",
     "migrate-planning-ports": "node scripts/apply-migration-056.js",
     "apply-planning-migrations": "node scripts/apply-all-planning-migrations.js",
-    "repair-deposits": "node scripts/repair-deposit-conversions.js"
+    "repair-deposits": "node scripts/repair-deposit-conversions.js",
+    "bulletproof-schema": "bash scripts/bulletproof-schema-repair.sh"
   },
   "dependencies": {
     "@noble/ed25519": "^3.0.0",
