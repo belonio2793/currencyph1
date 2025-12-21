@@ -1,12 +1,16 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { supabase } from '../lib/supabaseClient'
 import { preferencesManager } from '../lib/preferencesManager'
+import ExpandableModal from './ExpandableModal'
+import { useDevice } from '../context/DeviceContext'
 import ActionTimer from './ActionTimer'
 import BettingControls from './BettingControls'
 import PlayerSeats from './PlayerSeats'
 import GameChat from './GameChat'
 
 export default function PokerGameModal({ open, onClose, table, userId, userEmail, onShowAuth, onLeaveTable }) {
+  const { isMobile } = useDevice()
+  
   // Game state
   const [gameState, setGameState] = useState(null)
   const [hand, setHand] = useState(null)
@@ -44,7 +48,6 @@ export default function PokerGameModal({ open, onClose, table, userId, userEmail
       const autoScroll = preferencesManager.getAutoScrollToTop(userId)
       if (autoScroll) {
         contentScrollRef.current.scrollTop = 0
-        // Double-call to ensure it scrolls
         setTimeout(() => {
           if (contentScrollRef.current) {
             contentScrollRef.current.scrollTop = 0
@@ -102,171 +105,22 @@ export default function PokerGameModal({ open, onClose, table, userId, userEmail
       return
     }
 
-    // Check if hand is in active state
-    const isHandActive = ['preflop', 'flop', 'turn', 'river'].includes(hand.round_state)
-
-    if (!isHandActive) {
+    if (hand.current_player_seat === currentPlayerSeat && hand.stage !== 'finished') {
+      setActionRequired(true)
+    } else {
       setActionRequired(false)
-      return
     }
+  }, [hand?.current_player_seat, hand?.stage, currentPlayerSeat, myPosition, userId])
 
-    // Check if it's our turn
-    const isOurTurn = myPosition === currentPlayerSeat
-
-    // Check if we've already acted
-    const lastAction = betHistory.find(b => b.user_id === userId && b.round_state === hand.round_state)
-
-    // Action required if it's our turn and we haven't acted yet
-    setActionRequired(isOurTurn && !lastAction)
-  }, [hand?.round_state, hand?.id, myPosition, userId, currentPlayerSeat, betHistory])
-
+  // Load game data
   async function loadGameData() {
-    setLoading(true)
-    setError(null)
     try {
-      // Load seats
-      const { data: seatsData, error: seatsErr } = await supabase
-        .from('poker_seats')
-        .select('*')
-        .eq('table_id', table.id)
-        .order('seat_number')
-      
-      if (seatsErr) throw seatsErr
-      setSeats(seatsData || [])
-      
-      // Find my seat
-      if (userId) {
-        const mySeat = seatsData?.find(s => s.user_id === userId)
-        setMyPosition(mySeat?.seat_number || null)
-      }
-      
-      // Load latest hand
-      const { data: handsData, error: handsErr } = await supabase
-        .from('poker_hands')
-        .select('*')
-        .eq('table_id', table.id)
-        .order('created_at', { ascending: false })
-        .limit(1)
+      if (!table) return
 
-      if (handsErr) throw handsErr
-
-      if (handsData && handsData[0]) {
-        setHand(handsData[0])
-        setGameState(handsData[0].round_state)
-        setDealerSeat(handsData[0].dealer_seat)
-
-        // Load cards if dealt
-        const { data: holeCards } = await supabase
-          .from('poker_hole_cards')
-          .select('*')
-          .eq('hand_id', handsData[0].id)
-
-        // Load community cards
-        if (handsData[0].community_cards) {
-          setCommunityCards(handsData[0].community_cards)
-        }
-
-        // Determine who should act next (simplified - in real poker this is more complex)
-        if (['preflop', 'flop', 'turn', 'river'].includes(handsData[0].round_state)) {
-          const actedPlayers = betHistory.map(b => b.user_id)
-          const needsToAct = seatsData?.find(s => !actedPlayers.includes(s.user_id))
-          if (needsToAct) {
-            setCurrentPlayerSeat(needsToAct.seat_number)
-          }
-        }
-      } else {
-        setGameState('waiting')
-        setWaitingForPlayers(seatsData && seatsData.length < 2)
-        setDealerSeat(null)
-      }
-      
-      // Load bets and calculate pot
-      const { data: betsData } = await supabase
-        .from('poker_bets')
-        .select('*')
-        .eq('hand_id', hand?.id || '')
-      
-      if (betsData) {
-        const totalPot = betsData.reduce((sum, bet) => sum + (Number(bet.amount) || 0), 0)
-        setPot(totalPot)
-        setBetHistory(betsData)
-      }
-    } catch (err) {
-      console.error('Error loading game data:', err)
-      setError(err.message)
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  function subscribeToRealtime() {
-    // Subscribe to hand changes
-    if (table?.id) {
-      handsUnsubscribeRef.current = supabase
-        .channel(`poker_hands:table_id=eq.${table.id}`)
-        .on('postgres_changes', { event: '*', schema: 'public', table: 'poker_hands', filter: `table_id=eq.${table.id}` }, (payload) => {
-          if (payload.new) {
-            setHand(payload.new)
-            setGameState(payload.new.round_state)
-            setCommunityCards(payload.new.community_cards || [])
-          }
-        })
-        .subscribe()
-    }
-    
-    // Subscribe to seat changes
-    if (table?.id) {
-      seatsUnsubscribeRef.current = supabase
-        .channel(`poker_seats:table_id=eq.${table.id}`)
-        .on('postgres_changes', { event: '*', schema: 'public', table: 'poker_seats', filter: `table_id=eq.${table.id}` }, (payload) => {
-          loadGameData()
-        })
-        .subscribe()
-    }
-    
-    // Subscribe to bet changes
-    if (hand?.id) {
-      betsUnsubscribeRef.current = supabase
-        .channel(`poker_bets:hand_id=eq.${hand.id}`)
-        .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'poker_bets', filter: `hand_id=eq.${hand.id}` }, (payload) => {
-          if (payload.new) {
-            setBetHistory(prev => [...prev, payload.new])
-            setPot(prev => prev + (Number(payload.new.amount) || 0))
-          }
-        })
-        .subscribe()
-    }
-  }
-
-  function unsubscribeFromRealtime() {
-    if (handsUnsubscribeRef.current) {
-      handsUnsubscribeRef.current.unsubscribe()
-      handsUnsubscribeRef.current = null
-    }
-    if (seatsUnsubscribeRef.current) {
-      seatsUnsubscribeRef.current.unsubscribe()
-      seatsUnsubscribeRef.current = null
-    }
-    if (betsUnsubscribeRef.current) {
-      betsUnsubscribeRef.current.unsubscribe()
-      betsUnsubscribeRef.current = null
-    }
-  }
-
-  async function startHand() {
-    if (!userId) {
-      onShowAuth?.('register')
-      return
-    }
-    if (seats.length < 2) {
-      setWaitingForPlayers(true)
-      return
-    }
-    
-    setLoading(true)
-    try {
       const anonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
-      const res = await fetch(FUNCTIONS_BASE + '/start_hand', {
+
+      // Get table seats
+      const seatsRes = await fetch(FUNCTIONS_BASE + '/get_seats', {
         method: 'POST',
         headers: {
           'content-type': 'application/json',
@@ -274,29 +128,66 @@ export default function PokerGameModal({ open, onClose, table, userId, userEmail
         },
         body: JSON.stringify({ tableId: table.id })
       })
-      
-      if (!res.ok) {
-        let errorMsg = 'Failed to start hand'
-        try {
-          const json = await res.json()
-          errorMsg = json.error || errorMsg
-        } catch (e) {}
-        throw new Error(errorMsg)
+
+      if (seatsRes.ok) {
+        const seatsData = await seatsRes.json()
+        setSeats(seatsData || [])
+
+        const myCurrentSeat = seatsData?.find((s) => s.user_id === userId)
+        if (myCurrentSeat) setCurrentPlayerSeat(myCurrentSeat.seat_number)
       }
-      
-      const data = await res.json()
-      setHand(data)
-      setGameState('preflop')
-      setWaitingForPlayers(false)
-      await loadGameData()
+
+      // Get current hand
+      const handsRes = await fetch(FUNCTIONS_BASE + '/get_current_hand', {
+        method: 'POST',
+        headers: {
+          'content-type': 'application/json',
+          'Authorization': `Bearer ${anonKey}`
+        },
+        body: JSON.stringify({ tableId: table.id })
+      })
+
+      if (handsRes.ok) {
+        const handData = await handsRes.json()
+        setHand(handData)
+        setGameState(handData?.stage || 'waiting')
+        setPot(handData?.pot || 0)
+        setCommunityCards(handData?.community_cards || [])
+        if (handData?.stage === 'waiting') {
+          setWaitingForPlayers(seatsData?.length < 2)
+        } else {
+          setWaitingForPlayers(false)
+        }
+      }
     } catch (err) {
-      setError(err.message)
-      console.error('Error starting hand:', err)
-    } finally {
-      setLoading(false)
+      console.error('Error loading game data:', err)
+      setError('Failed to load game')
     }
   }
 
+  // Subscribe to real-time updates
+  function subscribeToRealtime() {
+    if (!table) return
+
+    handsUnsubscribeRef.current = supabase
+      .channel(`poker_hands:table_id=eq.${table.id}`)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'poker_hands' }, loadGameData)
+      .subscribe()
+
+    seatsUnsubscribeRef.current = supabase
+      .channel(`poker_seats:table_id=eq.${table.id}`)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'poker_seats' }, loadGameData)
+      .subscribe()
+  }
+
+  // Unsubscribe
+  function unsubscribeFromRealtime() {
+    handsUnsubscribeRef.current?.unsubscribe()
+    seatsUnsubscribeRef.current?.unsubscribe()
+    betsUnsubscribeRef.current?.unsubscribe()
+  }
+
+  // Submit player action
   async function submitAction(action, amount = 0) {
     if (!userId || !hand) return
 
@@ -337,6 +228,7 @@ export default function PokerGameModal({ open, onClose, table, userId, userEmail
     }
   }
 
+  // Sit at table
   async function sitAtTable(seatNumber) {
     if (!userId || !userEmail) {
       onShowAuth?.('register')
@@ -345,14 +237,11 @@ export default function PokerGameModal({ open, onClose, table, userId, userEmail
 
     setLoading(true)
     try {
-      // Use provided seat number or calculate next available
       const targetSeat = seatNumber || (seats.length + 1)
 
-      // Get current wallet balance
       const { data: wallets } = await supabase.from('wallets').select('*').eq('user_id', userId)
       const currentBalance = wallets && wallets.length > 0 ? Number(wallets[0].balance) : 0
 
-      // Join table with starting balance
       const anonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
       const res = await fetch(FUNCTIONS_BASE + '/join_table', {
         method: 'POST',
@@ -382,11 +271,36 @@ export default function PokerGameModal({ open, onClose, table, userId, userEmail
     }
   }
 
+  // Start hand
+  async function startHand() {
+    if (!userId || !table) return
+    try {
+      const anonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
+      const res = await fetch(FUNCTIONS_BASE + '/start_hand', {
+        method: 'POST',
+        headers: {
+          'content-type': 'application/json',
+          'Authorization': `Bearer ${anonKey}`
+        },
+        body: JSON.stringify({ tableId: table.id })
+      })
+
+      if (!res.ok) {
+        const json = await res.json()
+        throw new Error(json.error || 'Failed to start hand')
+      }
+
+      await loadGameData()
+    } catch (err) {
+      setError(err.message || 'Could not start hand')
+      console.error('Error starting hand:', err)
+    }
+  }
+
+  // Leave seat
   function leaveSeat() {
     if (!userId || !table) return
-    // Use the parent callback which handles rake and proper cleanup
     onLeaveTable?.(table.id)
-    // Close modal after a short delay to allow cleanup
     setTimeout(() => {
       onClose?.()
     }, 500)
@@ -398,232 +312,224 @@ export default function PokerGameModal({ open, onClose, table, userId, userEmail
 
   if (!open || !table) return null
 
+  const footer = (
+    <div className="flex gap-2 w-full">
+      {isSeated && (
+        <button
+          onClick={leaveSeat}
+          className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 font-medium transition-colors"
+        >
+          Leave Seat
+        </button>
+      )}
+      <button
+        onClick={onClose}
+        className="flex-1 px-4 py-2 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 font-medium transition-colors"
+      >
+        Close
+      </button>
+    </div>
+  )
+
   return (
-    <div className="fixed inset-0 z-50 bg-black/40 dark:bg-black/80 flex items-center justify-center p-4">
-      <div className="bg-white dark:bg-gradient-to-br dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 rounded-2xl max-w-6xl w-full max-h-[90vh] overflow-hidden border border-slate-200 dark:border-slate-700 shadow-2xl">
-        
-        {/* Header */}
-        <div className="bg-gradient-to-r from-slate-100 to-slate-50 dark:from-slate-800 dark:to-slate-900 border-b border-slate-200 dark:border-slate-700 p-6 flex items-center justify-between">
-          <div>
-            <h2 className="text-2xl font-bold text-slate-900 dark:text-white">{table.name}</h2>
-            <p className="text-sm text-slate-600 dark:text-slate-400 mt-1">
-              Stakes: {table.stake_min}/{table.stake_max}
-              <span className="ml-4">•</span>
-              <span className="ml-4 text-emerald-400">{tableStatusText}</span>
+    <ExpandableModal
+      isOpen={open}
+      onClose={onClose}
+      title={table.name}
+      icon="♠️"
+      size="fullscreen"
+      footer={footer}
+      defaultExpanded={true}
+      showCloseButton={false}
+    >
+      <div ref={contentScrollRef} className="space-y-4 pb-4">
+        {/* Header Info */}
+        <div className="flex items-center justify-between gap-4 p-3 bg-slate-100 rounded-lg">
+          <div className="flex-1">
+            <p className="text-xs text-slate-600">Stakes</p>
+            <p className="font-semibold text-slate-900">
+              {table.stake_min}/{table.stake_max}
             </p>
           </div>
-          <div className="flex items-center gap-8">
-            <div className="text-right">
-              <div className="text-xs text-slate-400 mb-1">Current Pot</div>
-              <div className="text-2xl font-bold text-amber-400">
-                {pot.toLocaleString()}
-              </div>
-              <div className="text-xs text-slate-400">chips</div>
-            </div>
+          <div className="flex-1 text-center">
+            <p className="text-xs text-slate-600">Status</p>
+            <p className="font-semibold text-emerald-600 text-sm">{tableStatusText}</p>
+          </div>
+          <div className="flex-1 text-right">
+            <p className="text-xs text-slate-600">Pot</p>
+            <p className="font-bold text-amber-600 text-lg">{pot.toLocaleString()}</p>
+          </div>
+        </div>
+
+        {/* Error Display */}
+        {error && (
+          <div className="bg-red-50 border border-red-200 rounded-lg p-3">
+            <p className="text-red-700 text-sm">{error}</p>
             <button
-              onClick={onClose}
-              className="text-slate-400 hover:text-white transition p-2 hover:bg-slate-700 rounded-lg"
+              onClick={() => setError(null)}
+              className="text-xs text-red-600 hover:text-red-700 mt-1 underline"
             >
-              ✕
+              Dismiss
             </button>
           </div>
+        )}
+
+        {/* Main Game Area */}
+        <div className="bg-slate-100 rounded-lg p-4 border border-slate-200">
+          <PlayerSeats
+            seats={seats}
+            table={table}
+            userId={userId}
+            gameState={gameState}
+            currentPlayerSeat={currentPlayerSeat}
+            dealerSeat={dealerSeat}
+            onSitClick={sitAtTable}
+          />
         </div>
 
-        {/* Content */}
-        <div ref={contentScrollRef} className="overflow-y-auto h-[calc(90vh-100px)]">
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 p-6">
-            
-            {/* Main Game Area */}
-            <div className="lg:col-span-3 space-y-6">
-              
-              {/* Poker Table Visualization */}
-              <div className="bg-slate-100 dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 p-8">
-                <PlayerSeats
-                  seats={seats}
-                  table={table}
-                  userId={userId}
-                  gameState={gameState}
-                  currentPlayerSeat={currentPlayerSeat}
-                  dealerSeat={dealerSeat}
-                  onSitClick={sitAtTable}
-                />
-              </div>
-              
-              {/* Community Cards */}
-              <div className="bg-slate-100 dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 p-6 space-y-4">
-                <div className="flex justify-center gap-2">
-                  <div className="text-slate-600 dark:text-slate-400 text-sm font-semibold mr-4">Community:</div>
-                  <div className="flex gap-2">
-                    {communityCards.length === 0 ? (
-                      <div className="text-slate-600 dark:text-slate-500 text-sm italic">Waiting for cards...</div>
-                    ) : (
-                      communityCards.map((card, i) => (
-                        <div key={i} className="w-12 h-16 bg-white dark:bg-slate-700 rounded border-2 border-slate-300 dark:border-slate-600 flex items-center justify-center font-bold text-sm text-slate-900 dark:text-white">
-                          {card}
-                        </div>
-                      ))
-                    )}
-                  </div>
-                </div>
-              </div>
-              
-              {/* Action Timer & Controls */}
-              {gameState && gameState !== 'waiting' && gameState !== 'finished' ? (
-                <div className="space-y-4">
-                  <ActionTimer actionRequired={actionRequired} onExpired={() => submitAction('fold')} />
-                  
-                  {isSigned && isSeated && actionRequired && (
-                    <BettingControls
-                      maxBet={playerBalance}
-                      onBet={(amount) => submitAction('bet', amount)}
-                      onCall={() => submitAction('call')}
-                      onRaise={(amount) => submitAction('raise', amount)}
-                      onCheck={() => submitAction('check')}
-                      onFold={() => submitAction('fold')}
-                      selectedBet={selectedBet}
-                      onBetChange={setSelectedBet}
-                    />
-                  )}
-                  
-                  {(!isSigned || !isSeated) && (
-                    <div className="bg-blue-50 dark:bg-blue-900 border border-blue-200 dark:border-blue-700 rounded-lg p-4 text-blue-900 dark:text-blue-100 text-center">
-                      {!isSigned ? (
-                        <button
-                          onClick={() => onShowAuth?.('login')}
-                          className="text-blue-600 dark:text-blue-300 underline hover:text-blue-700 dark:hover:text-blue-200"
-                        >
-                          Sign in to play
-                        </button>
-                      ) : (
-                        <span>Join the table to participate in this hand</span>
-                      )}
-                    </div>
-                  )}
-                </div>
+        {/* Community Cards */}
+        {gameState && gameState !== 'waiting' && (
+          <div className="bg-slate-50 rounded-lg p-4 border border-slate-200">
+            <p className="text-xs text-slate-600 font-semibold mb-3">Community Cards</p>
+            <div className="flex justify-center gap-2 flex-wrap">
+              {communityCards.length === 0 ? (
+                <p className="text-sm text-slate-500">Waiting for cards...</p>
               ) : (
-                <div className="bg-slate-100 dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 p-6 text-center space-y-4 text-slate-900 dark:text-white">
-                  {!isSigned ? (
-                    <div className="space-y-3">
-                      <p className="text-slate-600 dark:text-slate-300">Sign in to play poker</p>
-                      <button
-                        onClick={() => onShowAuth?.('login')}
-                        className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition"
-                      >
-                        Sign In / Register
-                      </button>
-                    </div>
-                  ) : !isSeated ? (
-                    <div className="space-y-3">
-                      <p className="text-slate-600 dark:text-slate-300">Join the table to play</p>
-                      <button
-                        onClick={sitAtTable}
-                        disabled={loading}
-                        className="w-full px-6 py-2 bg-emerald-600 hover:bg-emerald-700 disabled:bg-emerald-900 disabled:opacity-50 text-white font-semibold rounded-lg transition"
-                      >
-                        {loading ? 'Taking Seat...' : 'Take a Seat'}
-                      </button>
-                    </div>
-                  ) : (
-                    <div className="space-y-3">
-                      <p className="text-slate-600 dark:text-slate-300">Ready to play?</p>
-                      <button
-                        onClick={startHand}
-                        disabled={loading || waitingForPlayers}
-                        className="w-full px-6 py-2 bg-emerald-600 hover:bg-emerald-700 disabled:bg-emerald-900 disabled:opacity-50 text-white font-semibold rounded-lg transition"
-                      >
-                        {waitingForPlayers ? `Waiting for players (${seats.length}/2)...` : loading ? 'Starting...' : 'Start Hand'}
-                      </button>
-                    </div>
-                  )}
-                </div>
+                communityCards.map((card, i) => (
+                  <div
+                    key={i}
+                    className="w-12 h-16 bg-white rounded border-2 border-slate-300 flex items-center justify-center font-bold text-sm"
+                  >
+                    {card}
+                  </div>
+                ))
               )}
-              
             </div>
-            
-            {/* Right Sidebar */}
-            <div className="space-y-6">
-              
-              {/* Player Info */}
-              {isSigned && (
-                <div className="bg-slate-100 dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 p-4 space-y-3">
-                  <div>
-                    <div className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-3">Your Chip Balance</div>
-                    <div className="text-3xl font-bold text-amber-600 dark:text-amber-400">
-                      {playerBalance.toLocaleString()}
-                    </div>
-                    <div className="text-xs text-slate-600 dark:text-slate-400 mt-1">chips</div>
-                  </div>
+          </div>
+        )}
 
-                  {isSeated && (
-                    <div className="pt-2 space-y-2 border-t border-slate-200 dark:border-slate-700">
-                      <div className="text-xs text-slate-600 dark:text-slate-400 font-semibold">Seat Status</div>
-                      <div className="text-sm text-emerald-700 dark:text-emerald-300 flex items-center gap-2">
-                        <span className="w-2 h-2 bg-emerald-400 rounded-full"></span>
-                        Seated at Table
-                      </div>
-                      <button
-                        onClick={leaveSeat}
-                        className="w-full mt-2 px-3 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-semibold rounded-lg transition"
-                      >
-                        Leave Seat
-                      </button>
-                    </div>
-                  )}
-                </div>
-              )}
-              
-              {/* Bet History */}
-              <div className="bg-slate-100 dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 p-4">
-                <div className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-3">Recent Bets</div>
-                <div className="space-y-2 max-h-64 overflow-y-auto">
-                  {betHistory.length === 0 ? (
-                    <div className="text-xs text-slate-500 dark:text-slate-500 italic">No bets yet</div>
-                  ) : (
-                    betHistory.slice(-5).reverse().map((bet, i) => (
-                      <div key={i} className="text-xs text-slate-700 dark:text-slate-300 flex justify-between">
-                        <span>{bet.action}</span>
-                        <span className="text-amber-400">{bet.amount} chips</span>
-                      </div>
-                    ))
-                  )}
-                </div>
-              </div>
-              
-              {/* Game Chat */}
-              <div className="bg-white dark:bg-slate-900 border-2 border-slate-200 dark:border-slate-700 rounded-lg overflow-hidden flex flex-col h-96">
-                <button
-                  onClick={() => setChatCollapsed(!chatCollapsed)}
-                  className="w-full px-4 py-3 flex items-center justify-between bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 transition border-b border-slate-200 dark:border-slate-700 flex-shrink-0"
-                >
-                  <span className="text-sm font-semibold text-slate-300">Table Chat</span>
-                  <span className="text-xs text-slate-400">{chatCollapsed ? '▶' : '▼'}</span>
-                </button>
-                {!chatCollapsed && (
-                  <div className="p-4 flex-1 overflow-hidden flex flex-col">
-                    <GameChat tableId={table.id} userId={userId} />
-                  </div>
+        {/* Action Controls */}
+        {gameState && gameState !== 'waiting' && gameState !== 'finished' ? (
+          <div className="space-y-3">
+            {actionRequired && (
+              <>
+                <ActionTimer actionRequired={actionRequired} onExpired={() => submitAction('fold')} />
+                {isSigned && isSeated && (
+                  <BettingControls
+                    maxBet={playerBalance}
+                    onBet={(amount) => submitAction('bet', amount)}
+                    onCall={() => submitAction('call')}
+                    onRaise={(amount) => submitAction('raise', amount)}
+                    onCheck={() => submitAction('check')}
+                    onFold={() => submitAction('fold')}
+                    selectedBet={selectedBet}
+                    onBetChange={setSelectedBet}
+                  />
+                )}
+              </>
+            )}
+
+            {(!isSigned || !isSeated) && (
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 text-center">
+                {!isSigned ? (
+                  <button
+                    onClick={() => onShowAuth?.('login')}
+                    className="text-blue-600 hover:text-blue-700 text-sm font-medium underline"
+                  >
+                    Sign in to play
+                  </button>
+                ) : (
+                  <p className="text-sm text-slate-600">Join the table to participate</p>
                 )}
               </div>
-              
-              {/* Error Display */}
-              {error && (
-                <div className="bg-red-900 border border-red-700 rounded-lg p-3">
-                  <p className="text-red-100 text-xs">{error}</p>
-                  <button
-                    onClick={() => setError(null)}
-                    className="text-xs text-red-300 hover:text-red-200 mt-2 underline"
-                  >
-                    Dismiss
-                  </button>
-                </div>
-              )}
-              
+            )}
+          </div>
+        ) : (
+          <div className="bg-slate-50 border border-slate-200 rounded-lg p-4 space-y-3 text-center">
+            {!isSigned ? (
+              <>
+                <p className="text-sm text-slate-600">Sign in to play poker</p>
+                <button
+                  onClick={() => onShowAuth?.('login')}
+                  className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium transition-colors"
+                >
+                  Sign In / Register
+                </button>
+              </>
+            ) : !isSeated ? (
+              <>
+                <p className="text-sm text-slate-600">Join the table to play</p>
+                <button
+                  onClick={() => sitAtTable()}
+                  disabled={loading}
+                  className="w-full px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 disabled:opacity-50 font-medium transition-colors"
+                >
+                  {loading ? 'Taking Seat...' : 'Take a Seat'}
+                </button>
+              </>
+            ) : (
+              <>
+                <p className="text-sm text-slate-600">Ready to play?</p>
+                <button
+                  onClick={startHand}
+                  disabled={loading || waitingForPlayers}
+                  className="w-full px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 disabled:opacity-50 font-medium transition-colors"
+                >
+                  {waitingForPlayers ? `Waiting for players (${seats.length}/2)...` : loading ? 'Starting...' : 'Start Hand'}
+                </button>
+              </>
+            )}
+          </div>
+        )}
+
+        {/* Player Info */}
+        {isSigned && (
+          <div className="bg-slate-50 border border-slate-200 rounded-lg p-4 space-y-2">
+            <div>
+              <p className="text-xs text-slate-600 font-semibold">Your Chip Balance</p>
+              <p className="text-2xl font-bold text-amber-600">{playerBalance.toLocaleString()}</p>
             </div>
-            
+            {isSeated && (
+              <div className="pt-2 border-t border-slate-300">
+                <p className="text-xs text-emerald-600 font-medium">✓ Seated at Table</p>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Game Chat */}
+        <div className="border border-slate-200 rounded-lg overflow-hidden">
+          <button
+            onClick={() => setChatCollapsed(!chatCollapsed)}
+            className="w-full px-4 py-3 flex items-center justify-between bg-slate-100 hover:bg-slate-200 transition border-b border-slate-200 font-semibold text-sm"
+          >
+            <span>Table Chat</span>
+            <span className="text-xs">{chatCollapsed ? '▶' : '▼'}</span>
+          </button>
+          {!chatCollapsed && (
+            <div className="p-3 max-h-60 overflow-y-auto">
+              <GameChat tableId={table.id} userId={userId} />
+            </div>
+          )}
+        </div>
+
+        {/* Bet History */}
+        <div className="bg-slate-50 border border-slate-200 rounded-lg p-4">
+          <p className="text-xs text-slate-600 font-semibold mb-2">Recent Bets</p>
+          <div className="space-y-1 max-h-32 overflow-y-auto">
+            {betHistory.length === 0 ? (
+              <p className="text-xs text-slate-500 italic">No bets yet</p>
+            ) : (
+              betHistory.slice(-5).reverse().map((bet, i) => (
+                <div key={i} className="text-xs text-slate-700 flex justify-between">
+                  <span>{bet.action}</span>
+                  <span className="text-amber-600">{bet.amount} chips</span>
+                </div>
+              ))
+            )}
           </div>
         </div>
-        
       </div>
-    </div>
+    </ExpandableModal>
   )
 }
