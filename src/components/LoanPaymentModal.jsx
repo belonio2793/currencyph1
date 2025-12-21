@@ -21,7 +21,7 @@ export default function LoanPaymentModal({ loan, userId, onClose, onSuccess, wal
       return false
     }
     if (amount > maxPayment) {
-      setError(`Maximum payment amount is ${maxPayment.toFixed(2)} ${loan.currency_code}`)
+      setError(`Maximum payment amount is ${formatNumber(maxPayment)} ${loan.currency_code}`)
       return false
     }
     return true
@@ -131,16 +131,16 @@ export default function LoanPaymentModal({ loan, userId, onClose, onSuccess, wal
               <div className="bg-slate-50 border border-slate-200 rounded-lg p-4 space-y-2">
                 <div className="flex justify-between text-sm">
                   <span className="text-slate-600">Total Owed:</span>
-                  <span className="font-medium text-slate-900">{Number(loan.total_owed).toFixed(2)} {loan.currency_code}</span>
+                  <span className="font-medium text-slate-900">{formatNumber(loan.total_owed)} {loan.currency_code}</span>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-slate-600">Already Paid:</span>
-                  <span className="font-medium text-slate-900">{Number(loan.amount_paid || 0).toFixed(2)} {loan.currency_code}</span>
+                  <span className="font-medium text-slate-900">{formatNumber(loan.amount_paid || 0)} {loan.currency_code}</span>
                 </div>
                 <div className="border-t border-slate-300 my-2"></div>
                 <div className="flex justify-between">
                   <span className="text-slate-600 font-medium">Remaining Balance:</span>
-                  <span className="font-bold text-lg text-red-600">{Number(maxPayment).toFixed(2)} {loan.currency_code}</span>
+                  <span className="font-bold text-lg text-red-600">{formatNumber(maxPayment)} {loan.currency_code}</span>
                 </div>
               </div>
 
@@ -165,7 +165,7 @@ export default function LoanPaymentModal({ loan, userId, onClose, onSuccess, wal
                   </div>
                 </div>
                 <p className="text-xs text-slate-500 mt-1">
-                  Maximum: {Number(maxPayment).toFixed(2)} {loan.currency_code}
+                  Maximum: {formatNumber(maxPayment)} {loan.currency_code}
                 </p>
               </div>
 
@@ -199,7 +199,7 @@ export default function LoanPaymentModal({ loan, userId, onClose, onSuccess, wal
                   >
                     {wallets && wallets.map(wallet => (
                       <option key={wallet.id} value={wallet.id}>
-                        {wallet.currency_code} - {Number(wallet.balance).toFixed(2)}
+                        {wallet.currency_code} - {formatNumber(wallet.balance)}
                       </option>
                     ))}
                   </select>
@@ -212,7 +212,7 @@ export default function LoanPaymentModal({ loan, userId, onClose, onSuccess, wal
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 space-y-2">
                 <p className="text-sm text-slate-600">You are about to pay</p>
                 <p className="text-2xl font-bold text-blue-600">
-                  {Number(paymentAmount).toFixed(2)} {loan.currency_code}
+                  {formatNumber(paymentAmount)} {loan.currency_code}
                 </p>
                 <div className="border-t border-blue-300 my-3"></div>
                 <div className="text-sm space-y-2">
@@ -225,7 +225,7 @@ export default function LoanPaymentModal({ loan, userId, onClose, onSuccess, wal
                   <div className="flex justify-between">
                     <span className="text-slate-600">New Balance After:</span>
                     <span className="font-medium text-slate-900">
-                      {Number(maxPayment - parseFloat(paymentAmount)).toFixed(2)} {loan.currency_code}
+                      {formatNumber(maxPayment - parseFloat(paymentAmount))} {loan.currency_code}
                     </span>
                   </div>
                 </div>
