@@ -643,14 +643,15 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
       // Handle both single address and multiple networks
       const addresses = Array.isArray(data) ? data : [data]
       addresses.forEach((addressData, idx) => {
+        const cryptoName = addressData.currency_name || selectedCurrency
         dynamicMethods.push({
           id: addresses.length > 1 ? `${selectedCurrency.toLowerCase()}-${idx}` : selectedCurrency.toLowerCase(),
           name: addresses.length > 1 ? `${selectedCurrency} (${addressData.network})` : selectedCurrency,
           icon: selectedCurrency,
           type: 'crypto',
-          description: `Send ${selectedCurrency} directly to our wallet${addresses.length > 1 ? ` via ${addressData.network}` : ''}`,
+          description: `Send ${cryptoName} (${selectedCurrency}) directly to our wallet${addresses.length > 1 ? ` via ${addressData.network}` : ''}`,
           instructions: [
-            `Open your ${selectedCurrency} wallet app`,
+            `Open your ${cryptoName} wallet app`,
             `Scan the QR code or copy the address below`,
             `Enter the amount in ${selectedCurrency}`,
             `Verify the recipient address and amount`,
@@ -659,7 +660,9 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
           ],
           address: addressData.address,
           network: addressData.network,
-          provider: addressData.provider
+          provider: addressData.provider,
+          cryptoSymbol: selectedCurrency,
+          cryptoName: cryptoName
         })
       })
     }
