@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabaseClient'
+import ExpandableModal from './ExpandableModal'
+import { useDevice } from '../context/DeviceContext'
 
-// Hardcoded default DIDIT session URL for all users
 const DEFAULT_DIDIT_SESSION_URL = 'https://verify.didit.me/session/0YcwjP8Jj41H'
 
 export default function DiditVerificationModal({ userId, onClose, onSuccess }) {
+  const { isMobile } = useDevice()
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [verificationStatus, setVerificationStatus] = useState(null)
@@ -14,7 +16,6 @@ export default function DiditVerificationModal({ userId, onClose, onSuccess }) {
     initializeSession()
   }, [userId])
 
-  // Check verification status periodically
   useEffect(() => {
     if (!userId || error) return
 
@@ -29,7 +30,6 @@ export default function DiditVerificationModal({ userId, onClose, onSuccess }) {
         if (!fetchErr && data) {
           setVerificationStatus(data)
 
-          // If status changed to approved, trigger success callback
           if (data.status === 'approved') {
             setTimeout(() => {
               if (onSuccess) onSuccess()
@@ -41,7 +41,6 @@ export default function DiditVerificationModal({ userId, onClose, onSuccess }) {
       }
     }
 
-    // Check status every 2 seconds
     checkStatus()
     const interval = setInterval(() => {
       checkStatus()
@@ -56,7 +55,6 @@ export default function DiditVerificationModal({ userId, onClose, onSuccess }) {
       setError('')
       setLoading(true)
 
-      // Check if user already has a verification record
       const { data: existingStatus, error: fetchErr } = await supabase
         .from('user_verifications')
         .select('*')
@@ -66,20 +64,17 @@ export default function DiditVerificationModal({ userId, onClose, onSuccess }) {
       if (!fetchErr && existingStatus) {
         setVerificationStatus(existingStatus)
 
-        // If already approved, show success
         if (existingStatus.status === 'approved') {
           setLoading(false)
           return
         }
 
-        // If already pending, show the session URL
         if (existingStatus.status === 'pending') {
           setLoading(false)
           return
         }
       }
 
-      // Register the default session URL for this user
       const sessionIdMatch = DEFAULT_DIDIT_SESSION_URL.match(/session\/([A-Za-z0-9_-]+)/i)
       const sessionId = sessionIdMatch ? sessionIdMatch[1] : 'session-unknown'
 
@@ -117,100 +112,111 @@ export default function DiditVerificationModal({ userId, onClose, onSuccess }) {
     }
   }
 
-  const handleClose = () => {
-    onClose()
-  }
-
   if (!userId) {
     return (
-      <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-        <div className="bg-white rounded-lg p-8 max-w-md w-full">
-          <h2 className="text-2xl font-bold text-slate-900 mb-4">Verification Required</h2>
-          <p className="text-slate-600 mb-6">Please log in to verify your identity.</p>
+      <ExpandableModal
+        isOpen={true}
+        onClose={onClose}
+        title="Verification Required"
+        icon="🔐"
+        footer={
           <button
-            onClick={handleClose}
-            className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium"
+            onClick={onClose}
+            className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium"
           >
             Close
           </button>
-        </div>
-      </div>
+        }
+      >
+        <p className="text-slate-600">Please log in to verify your identity.</p>
+      </ExpandableModal>
     )
   }
 
-  // Show approved state
   if (verificationStatus?.status === 'approved') {
     return (
-      <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-        <div className="bg-white rounded-lg p-8 max-w-md w-full">
-          <div className="text-center">
-            <div className="text-5xl mb-4">✓</div>
-            <h2 className="text-2xl font-bold text-green-600 mb-2">Verification Approved</h2>
-            <p className="text-slate-600 mb-6">Your identity has been verified successfully.</p>
-            <button
-              onClick={handleClose}
-              className="w-full px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 font-medium"
-            >
-              Continue
-            </button>
-          </div>
+      <ExpandableModal
+        isOpen={true}
+        onClose={onClose}
+        title="Verification Approved"
+        icon="✓"
+        footer={
+          <button
+            onClick={onClose}
+            className="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 font-medium"
+          >
+            Continue
+          </button>
+        }
+      >
+        <div className="text-center py-8">
+          <div className="text-5xl mb-4">✓</div>
+          <h2 className="text-2xl font-bold text-green-600 mb-2">Verification Approved</h2>
+          <p className="text-slate-600">Your identity has been verified successfully.</p>
         </div>
-      </div>
+      </ExpandableModal>
     )
   }
 
-  // Show rejected state
   if (verificationStatus?.status === 'rejected') {
     return (
-      <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-        <div className="bg-white rounded-lg p-8 max-w-md w-full">
-          <div className="text-center">
-            <div className="text-5xl mb-4">✕</div>
-            <h2 className="text-2xl font-bold text-red-600 mb-2">Verification Declined</h2>
-            <p className="text-slate-600 mb-6">Your verification could not be completed. Please try again or contact support.</p>
-            <div className="flex gap-3">
-              <button
-                onClick={initializeSession}
-                className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium"
-              >
-                Try Again
-              </button>
-              <button
-                onClick={handleClose}
-                className="flex-1 px-4 py-2 bg-slate-200 text-slate-700 rounded-lg hover:bg-slate-300 font-medium"
-              >
-                Close
-              </button>
-            </div>
+      <ExpandableModal
+        isOpen={true}
+        onClose={onClose}
+        title="Verification Declined"
+        icon="✕"
+        footer={
+          <div className="flex gap-3 w-full">
+            <button
+              onClick={initializeSession}
+              className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium"
+            >
+              Try Again
+            </button>
+            <button
+              onClick={onClose}
+              className="flex-1 px-4 py-2 bg-slate-200 text-slate-700 rounded-lg hover:bg-slate-300 font-medium"
+            >
+              Close
+            </button>
           </div>
+        }
+      >
+        <div className="text-center py-8">
+          <div className="text-5xl mb-4">✕</div>
+          <h2 className="text-2xl font-bold text-red-600 mb-2">Verification Declined</h2>
+          <p className="text-slate-600">Your verification could not be completed. Please try again or contact support.</p>
         </div>
-      </div>
+      </ExpandableModal>
     )
   }
 
-  // Show loading state
   if (loading) {
     return (
-      <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-        <div className="bg-white rounded-lg p-8 max-w-md w-full">
-          <div className="text-center">
-            <div className="inline-block animate-spin text-4xl mb-4">⚙️</div>
-            <h2 className="text-xl font-bold text-slate-900 mb-2">Preparing Verification</h2>
-            <p className="text-slate-600">Setting up your identity verification session...</p>
-          </div>
+      <ExpandableModal
+        isOpen={true}
+        onClose={onClose}
+        title="Preparing Verification"
+        icon="⚙️"
+      >
+        <div className="text-center py-8">
+          <div className="inline-block animate-spin text-4xl mb-4">⚙️</div>
+          <h2 className="text-xl font-bold text-slate-900 mb-2">Preparing Verification</h2>
+          <p className="text-slate-600">Setting up your identity verification session...</p>
         </div>
-      </div>
+      </ExpandableModal>
     )
   }
 
-  // Show error state
   if (error) {
     return (
-      <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-        <div className="bg-white rounded-lg p-8 max-w-md w-full">
-          <h2 className="text-2xl font-bold text-red-600 mb-4">Error</h2>
-          <p className="text-slate-600 mb-6">{error}</p>
-          <div className="flex gap-3">
+      <ExpandableModal
+        isOpen={true}
+        onClose={onClose}
+        title="Error"
+        icon="⚠️"
+        footer={
+          <div className="flex gap-3 w-full">
             <button
               onClick={initializeSession}
               className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium"
@@ -218,35 +224,39 @@ export default function DiditVerificationModal({ userId, onClose, onSuccess }) {
               Retry
             </button>
             <button
-              onClick={handleClose}
+              onClick={onClose}
               className="flex-1 px-4 py-2 bg-slate-200 text-slate-700 rounded-lg hover:bg-slate-300 font-medium"
             >
               Close
             </button>
           </div>
-        </div>
-      </div>
+        }
+      >
+        <p className="text-slate-600 text-center py-4">{error}</p>
+      </ExpandableModal>
     )
   }
 
-  // Show verification in progress with iframe
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg overflow-hidden flex flex-col w-full max-w-2xl max-h-[90vh]">
-        {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b border-slate-200 bg-white">
-          <h2 className="text-xl font-bold text-slate-900">Identity Verification</h2>
-          <button
-            onClick={handleClose}
-            className="text-slate-400 hover:text-slate-600"
-            title="Close"
-          >
-            ✕
-          </button>
-        </div>
+    <ExpandableModal
+      isOpen={true}
+      onClose={onClose}
+      title="Identity Verification"
+      icon="🔐"
+      size="xl"
+      defaultExpanded={!isMobile}
+      footer={
+        <p className="text-xs text-slate-600 text-center w-full">
+          Status updates automatically every 2 seconds • {statusCheckCount > 0 && `Syncing... (${statusCheckCount * 2}s)`}
+        </p>
+      }
+    >
+      <div className="space-y-4">
+        <p className="text-sm text-slate-600">
+          Complete the verification process below. Your status will update automatically.
+        </p>
 
-        {/* Iframe container */}
-        <div className="flex-1 overflow-hidden relative bg-slate-50 min-h-[500px]">
+        <div className="relative bg-slate-50 min-h-[500px] rounded-lg overflow-hidden border border-slate-200">
           {statusCheckCount > 0 && (
             <div className="absolute top-4 right-4 z-10 text-xs text-slate-500 bg-white px-3 py-1.5 rounded border border-slate-200">
               Syncing... ({statusCheckCount * 2}s)
@@ -270,14 +280,7 @@ export default function DiditVerificationModal({ userId, onClose, onSuccess }) {
             </div>
           )}
         </div>
-
-        {/* Footer */}
-        <div className="p-4 border-t border-slate-200 bg-slate-50">
-          <p className="text-xs text-slate-600 text-center">
-            Complete the verification process in the window above. Status updates automatically every 2 seconds.
-          </p>
-        </div>
       </div>
-    </div>
+    </ExpandableModal>
   )
 }
