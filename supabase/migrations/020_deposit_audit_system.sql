@@ -104,19 +104,19 @@ ALTER TABLE wallet_balance_reconciliation ENABLE ROW LEVEL SECURITY;
 CREATE POLICY deposit_status_history_select ON deposit_status_history
   FOR SELECT USING (
     auth.uid() = user_id OR
-    EXISTS (SELECT 1 FROM users WHERE id = auth.uid() AND role = 'admin')
+    auth.jwt() ->> 'role' = 'admin'
   );
 
 CREATE POLICY deposit_audit_log_select ON deposit_audit_log
   FOR SELECT USING (
     auth.uid() = user_id OR
     auth.uid() = admin_id OR
-    EXISTS (SELECT 1 FROM users WHERE id = auth.uid() AND role = 'admin')
+    auth.jwt() ->> 'role' = 'admin'
   );
 
 CREATE POLICY deposit_reversal_registry_select ON deposit_reversal_registry
   FOR SELECT USING (
-    EXISTS (SELECT 1 FROM users WHERE id = auth.uid() AND role = 'admin')
+    auth.jwt() ->> 'role' = 'admin'
   );
 
 -- Add new columns to deposits table if they don't exist (check before altering)
