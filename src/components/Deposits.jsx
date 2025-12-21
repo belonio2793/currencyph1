@@ -904,10 +904,10 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
         )}
 
         {/* Step 2: Payment Instructions */}
-        {step === 'confirm' && (selectedMethodData || selectedAddressMethod) && selectedWalletData && (
+        {step === 'confirm' && activeMethodData && selectedWalletData && (
           <div className="bg-white rounded-xl shadow-lg border border-slate-200 p-8 mb-6">
             <h2 className="text-2xl font-semibold text-slate-900 mb-6">
-              {amount} {selectedCurrency} via {selectedMethodData.name}
+              {amount} {selectedCurrency} via {activeMethodData.name}
             </h2>
 
             {/* Deposit Summary */}
@@ -919,9 +919,9 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
                 </div>
                 <div>
                   <p className="text-xs text-slate-600 uppercase tracking-wide">{activeType === 'cryptocurrency' ? 'Network' : 'Method'}</p>
-                  <p className="text-lg font-semibold text-slate-900">{selectedMethodData.name}</p>
-                  {selectedMethodData.network && (
-                    <p className="text-xs text-blue-600 font-medium mt-1">🔗 {selectedMethodData.network}</p>
+                  <p className="text-lg font-semibold text-slate-900">{activeMethodData.name}</p>
+                  {activeMethodData.network && (
+                    <p className="text-xs text-blue-600 font-medium mt-1">🔗 {activeMethodData.network}</p>
                   )}
                 </div>
                 <div>
