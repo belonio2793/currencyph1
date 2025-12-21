@@ -120,7 +120,7 @@ function WalletDropdown({ wallets, selectedWallet, onChange }) {
                   }`}
                 >
                   <div className="text-slate-900 font-medium">
-                    {w.currency_name} ({w.balance.toFixed(2)})
+                    {w.currency_name} • Balance: {w.balance.toFixed(2)}
                   </div>
                   <div className="text-sm text-slate-500 mt-1">
                     <span className="text-blue-600 text-xs">Wallet ID:</span>{' '}
