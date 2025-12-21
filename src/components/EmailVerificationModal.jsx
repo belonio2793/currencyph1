@@ -138,127 +138,116 @@ export default function EmailVerificationModal({ userId, userEmail, onClose, onS
     }
   }
 
+  const footerContent = step === 'send' ? (
+    <button
+      onClick={sendVerificationEmail}
+      disabled={loading || resendAvailableIn > 0}
+      className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed font-medium transition-colors"
+    >
+      {loading ? (
+        'Sending...'
+      ) : resendAvailableIn > 0 ? (
+        `Resend in ${resendAvailableIn}s`
+      ) : (
+        'Send Verification Email'
+      )}
+    </button>
+  ) : (
+    <div className="flex gap-2 w-full">
+      <button
+        type="button"
+        onClick={sendVerificationEmail}
+        disabled={loading || resendAvailableIn > 0}
+        className="flex-1 px-4 py-2 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 font-medium transition-colors disabled:opacity-50"
+      >
+        {resendAvailableIn > 0 ? `Resend in ${resendAvailableIn}s` : 'Resend'}
+      </button>
+      <button
+        type="submit"
+        form="verify-email-form"
+        disabled={loading || !verificationCode.trim()}
+        className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium transition-colors disabled:opacity-50"
+      >
+        {loading ? 'Verifying...' : 'Verify Email'}
+      </button>
+    </div>
+  )
+
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg p-8 max-w-md w-full">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-bold text-slate-900">Verify Email</h2>
-          <button
-            onClick={onClose}
-            className="text-slate-400 hover:text-slate-600 text-2xl"
-          >
-            ✕
-          </button>
+    <ExpandableModal
+      isOpen={true}
+      onClose={onClose}
+      title="Verify Email"
+      icon="✉️"
+      size="md"
+      footer={footerContent}
+      defaultExpanded={!isMobile}
+    >
+      {/* Error */}
+      {error && (
+        <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded text-sm text-red-700">
+          {error}
         </div>
+      )}
 
-        {/* Error */}
-        {error && (
-          <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded text-sm text-red-700">
-            {error}
-          </div>
-        )}
+      {/* Success */}
+      {success && (
+        <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded text-sm text-green-700">
+          ✓ {success}
+        </div>
+      )}
 
-        {/* Success */}
-        {success && (
-          <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded text-sm text-green-700">
-            ✓ {success}
-          </div>
-        )}
-
-        {/* Send Email Step */}
-        {step === 'send' && (
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-slate-700 mb-2">
-                Email Address
-              </label>
-              <div className="px-3 py-2 border border-slate-300 rounded-lg bg-slate-50 text-slate-700">
-                {userEmail}
-              </div>
-              <p className="text-xs text-slate-500 mt-2">
-                We'll send a confirmation email to this address.
-              </p>
+      {/* Send Email Step */}
+      {step === 'send' && (
+        <div className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-2">
+              Email Address
+            </label>
+            <div className="px-3 py-2 border border-slate-300 rounded-lg bg-slate-50 text-slate-700">
+              {userEmail}
             </div>
-
-            <button
-              onClick={sendVerificationEmail}
-              disabled={loading || resendAvailableIn > 0}
-              className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed font-medium transition-colors"
-            >
-              {loading ? (
-                'Sending...'
-              ) : resendAvailableIn > 0 ? (
-                `Resend in ${resendAvailableIn}s`
-              ) : (
-                'Send Verification Email'
-              )}
-            </button>
-
-            <p className="text-xs text-slate-500 text-center">
-              You'll receive a confirmation code via email.
+            <p className="text-xs text-slate-500 mt-2">
+              We'll send a confirmation email to this address.
             </p>
           </div>
-        )}
+          <p className="text-xs text-slate-500 text-center">
+            You'll receive a confirmation code via email.
+          </p>
+        </div>
+      )}
 
-        {/* Verify Code Step */}
-        {step === 'verify' && (
-          <form onSubmit={handleVerifyCode} className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-slate-700 mb-2">
-                Email Address
-              </label>
-              <div className="px-3 py-2 border border-slate-300 rounded-lg bg-slate-50 text-slate-700">
-                {userEmail}
-              </div>
+      {/* Verify Code Step */}
+      {step === 'verify' && (
+        <form id="verify-email-form" onSubmit={handleVerifyCode} className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-2">
+              Email Address
+            </label>
+            <div className="px-3 py-2 border border-slate-300 rounded-lg bg-slate-50 text-slate-700">
+              {userEmail}
             </div>
+          </div>
 
-            <div>
-              <label className="block text-sm font-medium text-slate-700 mb-2">
-                Verification Code
-              </label>
-              <input
-                type="text"
-                value={verificationCode}
-                onChange={(e) => setVerificationCode(e.target.value.toUpperCase())}
-                placeholder="Enter code from email"
-                className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono text-center text-lg tracking-widest"
-                disabled={loading}
-                maxLength="8"
-              />
-              <p className="text-xs text-slate-500 mt-2">
-                Check your email for the verification code.
-              </p>
-            </div>
-
-            <button
-              type="submit"
-              disabled={loading || !verificationCode.trim()}
-              className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed font-medium transition-colors"
-            >
-              {loading ? 'Verifying...' : 'Verify Email'}
-            </button>
-
-            <div className="pt-4 border-t border-slate-200">
-              <p className="text-sm text-slate-600 mb-3">Didn't receive the email?</p>
-              <button
-                onClick={sendVerificationEmail}
-                disabled={loading || resendAvailableIn > 0}
-                type="button"
-                className="w-full px-3 py-1.5 text-sm text-blue-600 hover:bg-blue-50 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-medium"
-              >
-                {loading ? (
-                  'Sending...'
-                ) : resendAvailableIn > 0 ? (
-                  `Resend in ${resendAvailableIn}s`
-                ) : (
-                  'Resend Verification Email'
-                )}
-              </button>
-            </div>
-          </form>
-        )}
-      </div>
-    </div>
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-2">
+              Verification Code
+            </label>
+            <input
+              type="text"
+              value={verificationCode}
+              onChange={(e) => setVerificationCode(e.target.value.toUpperCase())}
+              placeholder="Enter code from email"
+              className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono text-center text-lg tracking-widest"
+              disabled={loading}
+              maxLength="8"
+            />
+            <p className="text-xs text-slate-500 mt-2">
+              Check your email for the verification code.
+            </p>
+          </div>
+        </form>
+      )}
+    </ExpandableModal>
   )
 }
