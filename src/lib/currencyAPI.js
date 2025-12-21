@@ -95,6 +95,33 @@ export const currencyAPI = {
         console.warn('Edge function invocation failed:', e && e.message)
       }
 
+      // 2b) Fallback to database cached rates
+      try {
+        const { data: cachedData, error: cacheError } = await supabase
+          .from('cached_rates')
+          .select('exchange_rates, fetched_at')
+          .order('fetched_at', { ascending: false })
+          .limit(1)
+          .single()
+
+        if (!cacheError && cachedData?.exchange_rates) {
+          console.log('Using cached exchange rates from database')
+          const lastUpdated = new Date(cachedData.fetched_at)
+          const rates = {}
+          CURRENCIES.forEach(currency => {
+            if (currency.code === 'USD') {
+              rates[currency.code] = { ...currency, rate: 1, lastUpdated }
+              return
+            }
+            const rateVal = cachedData.exchange_rates[currency.code]
+            rates[currency.code] = { ...currency, rate: typeof rateVal === 'number' ? rateVal : 0, lastUpdated }
+          })
+          return rates
+        }
+      } catch (e) {
+        console.warn('Database fallback for exchange rates failed:', e && e.message)
+      }
+
       // 3) Fallback to public exchangerate.host
       try {
         const resp = await fetch('https://api.exchangerate.host/latest?base=USD')
