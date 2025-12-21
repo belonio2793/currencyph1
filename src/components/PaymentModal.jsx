@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { formatNumber } from '../lib/currency'
 
 export default function PaymentModal({ ride, onClose, onCompletePayment, loading }) {
   const [selectedPayment, setSelectedPayment] = useState('wallet')
