@@ -92,7 +92,8 @@
     "seed-property-data": "node scripts/seed-property-data.js",
     "migrate-shipping-ports": "node scripts/apply-migration-055.js",
     "migrate-planning-ports": "node scripts/apply-migration-056.js",
-    "apply-planning-migrations": "node scripts/apply-all-planning-migrations.js"
+    "apply-planning-migrations": "node scripts/apply-all-planning-migrations.js",
+    "repair-deposits": "node scripts/repair-deposit-conversions.js"
   },
   "dependencies": {
     "@noble/ed25519": "^3.0.0",
