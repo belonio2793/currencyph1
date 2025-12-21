@@ -982,7 +982,7 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
                   {calculateConvertedAmount() && selectedCurrency !== selectedWalletData.currency_code && (
                     <div className="flex justify-between items-center pt-3 border-t border-blue-200">
                       <span className="text-slate-900 font-medium">You Receive:</span>
-                      <span className="text-lg font-bold text-blue-600">{calculateConvertedAmount()} {selectedWalletData.currency_code}</span>
+                      <span className="text-lg font-bold text-blue-600">{formatNumber(calculateConvertedAmount())} {selectedWalletData.currency_code}</span>
                     </div>
                   )}
                 </div>
