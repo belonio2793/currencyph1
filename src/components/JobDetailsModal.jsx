@@ -95,93 +95,118 @@ export default function JobDetailsModal({
     offers: offers.length
   }
 
+  const footerContent = (
+    <div className="flex gap-2 w-full flex-wrap">
+      {currentUserId === job.posted_by_user_id && (
+        <button
+          className="flex-1 min-w-[100px] px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium transition-colors"
+          onClick={() => onEdit && onEdit(job)}
+          title="Edit this job posting"
+        >
+          ✎ Edit Job
+        </button>
+      )}
+      {currentUserId !== job.posted_by_user_id && (
+        <button
+          className="flex-1 min-w-[100px] px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 font-medium transition-colors"
+          onClick={() => setShowOfferForm(!showOfferForm)}
+        >
+          {showOfferForm ? 'Cancel' : 'Submit Offer'}
+        </button>
+      )}
+      <button
+        onClick={onClose}
+        className="flex-1 min-w-[100px] px-4 py-2 bg-slate-600 text-white rounded-lg hover:bg-slate-700 font-medium transition-colors"
+      >
+        Close
+      </button>
+    </div>
+  )
+
   return (
-    <div className="modal-overlay" onClick={onClose}>
-      <div className="job-details-modal" onClick={e => e.stopPropagation()}>
-        {/* Header Section */}
-        <div className="job-modal-header">
-          <div className="job-header-left">
-            <div className="job-avatar">
-              {job.job_title.charAt(0).toUpperCase()}
-            </div>
-            <div className="job-header-info">
-              <h2>{job.job_title}</h2>
-              <p className="job-location">{job.city}{job.province ? `, ${job.province}` : ''}</p>
-              <p className="job-posted-date">Posted {job.created_at ? new Date(job.created_at).toLocaleDateString() : 'Recently'}</p>
-            </div>
-          </div>
-          <div className="job-header-right">
-            {currentUserId === job.posted_by_user_id && (
-              <button
-                className="btn-edit-job"
-                onClick={() => onEdit && onEdit(job)}
-                title="Edit this job posting"
-              >
-                ✎ Edit
-              </button>
-            )}
-            {currentUserId !== job.posted_by_user_id && (
-              <button
-                className="btn-submit-offer-header"
-                onClick={() => setShowOfferForm(!showOfferForm)}
-              >
-                Submit Offer
-              </button>
-            )}
-            <button className="close-btn" onClick={onClose}>×</button>
-          </div>
-        </div>
+    <ExpandableModal
+      isOpen={true}
+      onClose={onClose}
+      title={job.job_title}
+      icon="💼"
+      size="lg"
+      footer={footerContent}
+      defaultExpanded={!isMobile}
+    >
+      {/* Job Header Info */}
+      <div className="mb-4 pb-4 border-b border-slate-200">
+        <p className="text-sm text-slate-600">{job.city}{job.province ? `, ${job.province}` : ''}</p>
+        <p className="text-xs text-slate-500 mt-1">Posted {job.created_at ? new Date(job.created_at).toLocaleDateString() : 'Recently'}</p>
+      </div>
 
-        {/* Stats Grid */}
-        <div className="job-stats-grid">
-          <div className="stat-item">
-            <div className="stat-value">{jobStats.category}</div>
-            <div className="stat-label">Category</div>
-          </div>
-          <div className="stat-item">
-            <div className="stat-value">{jobStats.type}</div>
-            <div className="stat-label">Type</div>
-          </div>
-          <div className="stat-item">
-            <div className="stat-value">{jobStats.rate}</div>
-            <div className="stat-label">Rate</div>
-          </div>
-          <div className="stat-item">
-            <div className="stat-value">{jobStats.offers}</div>
-            <div className="stat-label">Offers</div>
-          </div>
+      {/* Stats Grid */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
+        <div className="text-center bg-slate-50 rounded-lg p-3 border border-slate-200">
+          <div className="text-base sm:text-lg font-bold text-slate-900">{jobStats.category}</div>
+          <div className="text-xs text-slate-600 font-medium">Category</div>
         </div>
+        <div className="text-center bg-slate-50 rounded-lg p-3 border border-slate-200">
+          <div className="text-base sm:text-lg font-bold text-slate-900">{jobStats.type}</div>
+          <div className="text-xs text-slate-600 font-medium">Type</div>
+        </div>
+        <div className="text-center bg-green-50 rounded-lg p-3 border border-green-200">
+          <div className="text-base sm:text-lg font-bold text-green-600">{jobStats.rate}</div>
+          <div className="text-xs text-slate-600 font-medium">Rate</div>
+        </div>
+        <div className="text-center bg-blue-50 rounded-lg p-3 border border-blue-200">
+          <div className="text-base sm:text-lg font-bold text-blue-600">{jobStats.offers}</div>
+          <div className="text-xs text-slate-600 font-medium">Offers</div>
+        </div>
+      </div>
 
-        {/* Tabs */}
-        <div className="job-modal-tabs">
+      {/* Tabs */}
+      <div className="mb-4 border-b border-slate-200 -mx-4 sm:-mx-6">
+        <div className="flex gap-1 overflow-x-auto px-4 sm:px-6">
           <button
-            className={`tab-btn ${activeTab === 'overview' ? 'active' : ''}`}
+            className={`px-4 py-2 text-sm font-medium border-b-2 whitespace-nowrap transition-colors ${
+              activeTab === 'overview'
+                ? 'text-blue-600 border-blue-600'
+                : 'text-slate-600 border-transparent hover:text-slate-900'
+            }`}
             onClick={() => setActiveTab('overview')}
           >
             Overview
           </button>
           <button
-            className={`tab-btn ${activeTab === 'offers' ? 'active' : ''}`}
+            className={`px-4 py-2 text-sm font-medium border-b-2 whitespace-nowrap transition-colors ${
+              activeTab === 'offers'
+                ? 'text-blue-600 border-blue-600'
+                : 'text-slate-600 border-transparent hover:text-slate-900'
+            }`}
             onClick={() => setActiveTab('offers')}
           >
             Offers ({offers.length})
           </button>
           <button
-            className={`tab-btn ${activeTab === 'ratings' ? 'active' : ''}`}
+            className={`px-4 py-2 text-sm font-medium border-b-2 whitespace-nowrap transition-colors ${
+              activeTab === 'ratings'
+                ? 'text-blue-600 border-blue-600'
+                : 'text-slate-600 border-transparent hover:text-slate-900'
+            }`}
             onClick={() => setActiveTab('ratings')}
           >
             Ratings ({ratings.length})
           </button>
           <button
-            className={`tab-btn ${activeTab === 'remarks' ? 'active' : ''}`}
+            className={`px-4 py-2 text-sm font-medium border-b-2 whitespace-nowrap transition-colors ${
+              activeTab === 'remarks'
+                ? 'text-blue-600 border-blue-600'
+                : 'text-slate-600 border-transparent hover:text-slate-900'
+            }`}
             onClick={() => setActiveTab('remarks')}
           >
             Remarks
           </button>
         </div>
+      </div>
 
-        {/* Content */}
-        <div className="job-modal-content">
+      {/* Content */}
+      <div>
           {error && (
             <div className="error-message">
               {error}
@@ -302,8 +327,7 @@ export default function JobDetailsModal({
               jobOwnerId={job.posted_by_user_id}
             />
           )}
-        </div>
       </div>
-    </div>
+    </ExpandableModal>
   )
 }
