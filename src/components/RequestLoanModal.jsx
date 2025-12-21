@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabaseClient'
+import { useDevice } from '../context/DeviceContext'
+import ExpandableModal from './ExpandableModal'
 import { formatNumber } from '../lib/currency'
 
 export default function RequestLoanModal({ userId, loanType, onClose, onSuccess, wallets }) {
@@ -158,33 +160,68 @@ export default function RequestLoanModal({ userId, loanType, onClose, onSuccess,
     }
   }
 
-  return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 overflow-y-auto">
-      <div className="bg-white rounded-lg shadow-lg max-w-4xl w-full my-8">
-        {/* Header */}
-        <div className="border-b border-slate-200 px-6 py-4 flex items-center justify-between">
-          <div>
-            <h2 className="text-xl font-semibold text-slate-900">
-              Request {loanType === 'personal' ? 'Personal' : 'Business'} Loan
-            </h2>
-            {loanType === 'business' && (
-              <p className="text-sm text-slate-600 mt-1">
-                Step {currentPage} of {totalPages}
-              </p>
-            )}
-          </div>
-          <button
-            onClick={onClose}
-            className="text-slate-400 hover:text-slate-600 transition-colors"
-          >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
-        </div>
+  const { isMobile } = useDevice()
 
-        {/* Content */}
-        <form onSubmit={handleSubmit} className="p-6">
+  const handleButtonSubmit = (e) => {
+    e.preventDefault()
+    handleSubmit(e)
+  }
+
+  const getFooterButtons = () => (
+    <div className="flex gap-3 w-full flex-wrap">
+      <button
+        type="button"
+        onClick={onClose}
+        className="flex-1 min-w-[100px] px-4 py-2 border-2 border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors font-medium"
+      >
+        Cancel
+      </button>
+
+      {currentPage > 1 && (
+        <button
+          type="button"
+          onClick={handlePrevious}
+          className="flex-1 min-w-[100px] px-4 py-2 border-2 border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors font-medium"
+        >
+          Previous
+        </button>
+      )}
+
+      {currentPage < totalPages && (
+        <button
+          type="button"
+          onClick={handleNext}
+          className="flex-1 min-w-[100px] px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
+        >
+          Next
+        </button>
+      )}
+
+      {currentPage === totalPages && (
+        <button
+          type="submit"
+          disabled={loading}
+          className="flex-1 min-w-[100px] px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          {loading ? 'Submitting...' : 'Request Loan'}
+        </button>
+      )}
+    </div>
+  )
+
+  return (
+    <ExpandableModal
+      isOpen={true}
+      onClose={onClose}
+      title={`Request ${loanType === 'personal' ? 'Personal' : 'Business'} Loan`}
+      icon="💱"
+      size={isMobile ? 'fullscreen' : 'lg'}
+      footer={getFooterButtons()}
+      badgeContent={loanType === 'business' ? `Step ${currentPage}/${totalPages}` : null}
+      showBadge={loanType === 'business'}
+      defaultExpanded={!isMobile}
+    >
+      <form onSubmit={handleButtonSubmit} className="space-y-6">
           {/* Error Message */}
           {error && (
             <div className="p-3 bg-red-50 border border-red-200 text-red-700 rounded-lg text-sm mb-6">
@@ -481,7 +518,6 @@ export default function RequestLoanModal({ userId, loanType, onClose, onSuccess,
             )}
           </div>
         </form>
-      </div>
-    </div>
+    </ExpandableModal>
   )
 }
