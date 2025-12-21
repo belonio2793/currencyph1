@@ -313,16 +313,22 @@ async function handle(req: Request): Promise<Response> {
 
     // Store and return
     console.log('[fetch-rates] Successfully fetched rates, storing cache')
-    await Promise.all([
-      upsertCachedRates(exchangeRates || {}, cryptoPrices || {}, 'mixed'),
-      storeCryptoPricesInDatabase(cryptoPricesPHP || {}, 'php')
+    const [_, rateConfirmations] = await Promise.all([
+      Promise.all([
+        upsertCachedRates(exchangeRates || {}, cryptoPrices || {}, 'mixed'),
+        storeCryptoPricesInDatabase(cryptoPricesPHP || {}, 'php')
+      ]),
+      getRateConfirmations(cryptoPricesPHP || {}, 'php')
     ])
 
     return jsonResponse({
       exchangeRates: exchangeRates || {},
       cryptoPrices: cryptoPrices || {},
       cached: false,
-      fetched_at: new Date().toISOString()
+      fetched_at: new Date().toISOString(),
+      rate_confirmations: rateConfirmations.slice(0, 10), // Return first 10 for UI
+      total_confirmations: rateConfirmations.length,
+      message: 'All rates updated with timestamps for user confirmation'
     })
   } catch (err) {
     console.error('[fetch-rates] Handler error:', err)
