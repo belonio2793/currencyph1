@@ -1,25 +1,34 @@
-import { coinsPhApi } from './coinsPhApi'
+/**
+ * Cryptocurrency rates service using CoinGecko API
+ * CoinGecko is free, reliable, and doesn't require authentication
+ */
 
 /**
- * Map cryptocurrency codes to coins.ph trading symbols
- * coins.ph uses symbols like BTCPHP, ETHPHP, etc.
+ * Map cryptocurrency codes to CoinGecko IDs
  */
-const cryptoSymbols = {
-  'BTC': 'BTCPHP',
-  'ETH': 'ETHPHP',
-  'USDT': 'USDTPHP',
-  'BNB': 'BNBPHP',
-  'SOL': 'SOLPHP',
-  'XRP': 'XRPPHP',
-  'ADA': 'ADAPHP',
-  'DOGE': 'DOGEPHP',
-  'DOT': 'DOTPHP',
-  'BCH': 'BCPHP',
-  'LTC': 'LTCPHP',
-  'USDC': 'USDCPHP',
-  'LINK': 'LINKPHP',
-  'MATIC': 'MATICPHP',
-  'UNI': 'UNIPHP'
+const coingeckoIds = {
+  'BTC': 'bitcoin',
+  'ETH': 'ethereum',
+  'USDT': 'tether',
+  'BNB': 'binancecoin',
+  'SOL': 'solana',
+  'XRP': 'ripple',
+  'ADA': 'cardano',
+  'DOGE': 'dogecoin',
+  'DOT': 'polkadot',
+  'BCH': 'bitcoin-cash',
+  'LTC': 'litecoin',
+  'USDC': 'usd-coin',
+  'LINK': 'chainlink',
+  'MATIC': 'matic-network',
+  'UNI': 'uniswap',
+  'AVAX': 'avalanche-2',
+  'TON': 'the-open-network',
+  'HBAR': 'hedera-hashgraph',
+  'SUI': 'sui',
+  'TRX': 'tron',
+  'XLM': 'stellar',
+  'AED': 'aed'
 }
 
 /**
@@ -30,10 +39,10 @@ const rateCache = new Map()
 const CACHE_DURATION = 60000 // 1 minute
 
 /**
- * Get the trading symbol for a cryptocurrency
+ * Get the CoinGecko ID for a cryptocurrency
  */
-function getSymbol(cryptoCode) {
-  return cryptoSymbols[cryptoCode] || `${cryptoCode}PHP`
+function getCoingeckoId(cryptoCode) {
+  return coingeckoIds[cryptoCode] || cryptoCode.toLowerCase()
 }
 
 /**
@@ -46,33 +55,84 @@ function isCacheValid(key) {
 }
 
 /**
- * Get real-time cryptocurrency price in PHP from coins.ph API
+ * Get real-time cryptocurrency price in PHP from CoinGecko API
  */
 export async function getCryptoPrice(cryptoCode) {
   try {
-    const symbol = getSymbol(cryptoCode)
+    const coingeckoId = getCoingeckoId(cryptoCode)
     
     // Check cache first
-    if (isCacheValid(symbol)) {
-      return rateCache.get(symbol).rate
+    if (isCacheValid(coingeckoId)) {
+      return rateCache.get(coingeckoId).rate
     }
 
-    // Fetch from API
-    const response = await coinsPhApi.getPrice(symbol)
-    const price = parseFloat(response.price)
+    // Fetch from CoinGecko API (free, no authentication required)
+    const response = await fetch(
+      `https://api.coingecko.com/api/v3/simple/price?ids=${coingeckoId}&vs_currencies=php&precision=8`
+    )
+
+    if (!response.ok) {
+      throw new Error(`CoinGecko API returned ${response.status}`)
+    }
+
+    const data = await response.json()
+    const price = data[coingeckoId]?.php
+
+    if (!price) {
+      throw new Error(`No price data for ${cryptoCode}`)
+    }
 
     // Cache the result
-    rateCache.set(symbol, {
+    rateCache.set(coingeckoId, {
       rate: price,
       timestamp: Date.now()
     })
 
     return price
   } catch (error) {
-    console.warn(`Failed to fetch ${cryptoCode} price:`, error.message)
+    console.warn(`Failed to fetch ${cryptoCode} price from CoinGecko:`, error.message)
     // Return cached value even if expired, or null
-    const cached = rateCache.get(getSymbol(cryptoCode))
+    const cached = rateCache.get(getCoingeckoId(cryptoCode))
     return cached ? cached.rate : null
+  }
+}
+
+/**
+ * Get multiple cryptocurrency prices in one request
+ */
+export async function getMultipleCryptoPrices(cryptoCodes) {
+  try {
+    const coingeckoIds = cryptoCodes
+      .map(code => getCoingeckoId(code))
+      .join(',')
+    
+    const response = await fetch(
+      `https://api.coingecko.com/api/v3/simple/price?ids=${coingeckoIds}&vs_currencies=php&precision=8`
+    )
+
+    if (!response.ok) {
+      throw new Error(`CoinGecko API returned ${response.status}`)
+    }
+
+    const data = await response.json()
+    const prices = {}
+
+    cryptoCodes.forEach(code => {
+      const coingeckoId = getCoingeckoId(code)
+      const price = data[coingeckoId]?.php
+      if (price) {
+        prices[code] = price
+        rateCache.set(coingeckoId, {
+          rate: price,
+          timestamp: Date.now()
+        })
+      }
+    })
+
+    return prices
+  } catch (error) {
+    console.warn('Failed to fetch multiple crypto prices:', error.message)
+    return {}
   }
 }
 
@@ -163,6 +223,7 @@ export function clearRateCache() {
 
 export default {
   getCryptoPrice,
+  getMultipleCryptoPrices,
   getCryptoPriceInCurrency,
   convertFiatToCrypto,
   clearRateCache
