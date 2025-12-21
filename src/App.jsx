@@ -16,7 +16,6 @@ import PageLoader from './components/PageLoader'
 import { ShoppingCartProvider } from './context/ShoppingCartContext'
 import { DeviceProvider } from './context/DeviceContext'
 import { LayoutOverrideProvider } from './context/LayoutOverrideContext'
-import LayoutSwitcher from './components/LayoutSwitcher'
 
 // Lazy load feature pages for code splitting
 const HomePage = lazy(() => import('./components/HomePage'))
@@ -540,8 +539,6 @@ export default function App() {
     <LayoutOverrideProvider>
       <DeviceProvider>
         <ShoppingCartProvider>
-          <LayoutSwitcher />
-
           {/* Planning Setup page - standalone fullscreen interface */}
           {activeTab === 'planning-setup' && (
             <Suspense fallback={<PageLoader />}>
