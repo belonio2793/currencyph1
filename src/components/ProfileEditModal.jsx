@@ -467,29 +467,32 @@ export default function ProfileEditModal({ userId: propUserId, onClose }) {
 
   const isGuestAccount = userId && userId.includes('guest')
 
+  const { isMobile } = useDevice()
+
   if (!userId) {
     return null
   }
 
-  return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[95vh] overflow-y-auto">
-        {/* Header */}
-        <div className="sticky top-0 bg-white border-b border-slate-200 px-6 py-4 flex items-center justify-between">
-          <h2 className="text-2xl font-light text-slate-900">Profile</h2>
-          <button
-            onClick={onClose}
-            className="text-slate-400 hover:text-slate-600 transition-colors"
-            aria-label="Close modal"
-          >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
-        </div>
+  const footer = (
+    <button
+      onClick={onClose}
+      className="w-full px-4 py-2 bg-slate-200 text-slate-700 rounded-lg hover:bg-slate-300 transition-colors font-medium"
+    >
+      Close
+    </button>
+  )
 
-        {/* Content */}
-        <div className="px-6 py-6">
+  return (
+    <ExpandableModal
+      isOpen={true}
+      onClose={onClose}
+      title="Profile"
+      icon="👤"
+      size={isMobile ? 'fullscreen' : 'xl'}
+      footer={footer}
+      defaultExpanded={!isMobile}
+    >
+      <div className="space-y-4">
           {loading ? (
             <div className="text-center text-slate-500">Loading profile...</div>
           ) : (
@@ -923,7 +926,6 @@ export default function ProfileEditModal({ userId: propUserId, onClose }) {
               </div>
             </>
           )}
-        </div>
       </div>
 
       {/* Nested Modals */}
@@ -1079,6 +1081,6 @@ export default function ProfileEditModal({ userId: propUserId, onClose }) {
           </div>
         </div>
       )}
-    </div>
+    </ExpandableModal>
   )
 }
