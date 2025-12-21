@@ -1,7 +1,10 @@
 import React, { useEffect, useState } from 'react'
 import { supabase } from '../lib/supabaseClient'
+import ExpandableModal from './ExpandableModal'
+import { useDevice } from '../context/DeviceContext'
 
 export default function PokerModal({ open, onClose, userId, userEmail, onShowAuth }) {
+  const { isMobile } = useDevice()
   const [tables, setTables] = useState([])
   const [loading, setLoading] = useState(false)
   const [selected, setSelected] = useState(null)
@@ -47,7 +50,6 @@ export default function PokerModal({ open, onClose, userId, userEmail, onShowAut
       })
       const json = await res.json()
       if (!res.ok) throw new Error(json.error || 'Failed to sit')
-      // refresh seats
       await openTable(tables.find(t => t.id === tableId))
     } catch (e) {
       alert('Could not join table: ' + (e.message || e))
@@ -63,84 +65,136 @@ export default function PokerModal({ open, onClose, userId, userEmail, onShowAut
       const json = await res.json()
       if (!res.ok) throw new Error(json.error || 'Failed to start hand')
       alert('Hand started')
-      // refresh seats/hands
       await openTable(tables.find(t => t.id === tableId))
     } catch (e) {
       alert('Could not start hand: ' + (e.message || e))
     }
   }
 
-  if (!open) return null
+  const footer = (
+    <div className="flex gap-2 w-full">
+      <button
+        onClick={loadTables}
+        className="flex-1 px-3 py-2 bg-slate-100 text-slate-700 rounded-lg hover:bg-slate-200 font-medium transition-colors"
+      >
+        Refresh
+      </button>
+      <button
+        onClick={onClose}
+        className="flex-1 px-3 py-2 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 font-medium transition-colors"
+      >
+        Close
+      </button>
+    </div>
+  )
 
   return (
-    <div className="fixed inset-0 z-60 flex items-center justify-center bg-black/50 p-4" onClick={onClose}>
-      <div className="bg-white rounded-lg shadow max-w-4xl w-full max-h-[80vh] overflow-auto" onClick={e => e.stopPropagation()}>
-        <div className="flex items-center justify-between p-4 border-b">
-          <h3 className="text-lg font-semibold">Poker Lobby</h3>
-          <button onClick={onClose} className="p-2">Close</button>
+    <ExpandableModal
+      isOpen={open}
+      onClose={onClose}
+      title="Poker Lobby"
+      icon="♠️"
+      size={isMobile ? 'fullscreen' : 'xl'}
+      footer={footer}
+      defaultExpanded={!isMobile}
+    >
+      <div className="mb-4">
+        <div className="text-sm text-slate-600 mb-4">
+          Play virtual PHP poker with other users. Deposit to your wallet to get balance.
         </div>
-        <div className="p-4">
-          <div className="mb-4 flex items-center justify-between">
-            <div className="text-sm text-slate-600">Play virtual PHP poker with other users. Deposit to your wallet to get balance.</div>
-            <div>
-              <button onClick={loadTables} className="px-3 py-2 bg-slate-50 border rounded">Refresh</button>
-            </div>
-          </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <h4 className="font-medium mb-2">Tables</h4>
-              {loading ? <div>Loading...</div> : (
-                <div className="space-y-2">
-                  {tables.map(t => (
-                    <div key={t.id} className="p-3 border rounded flex items-center justify-between">
-                      <div>
-                        <div className="font-semibold">{t.name}</div>
-                        <div className="text-xs text-slate-500">Stakes: {t.stake_min}/{t.stake_max} {t.currency_code} • Seats: {t.max_seats}</div>
+        <div className={`grid ${isMobile ? 'grid-cols-1' : 'grid-cols-1 md:grid-cols-2'} gap-4`}>
+          {/* Tables List */}
+          <div>
+            <h4 className="font-medium mb-3">Tables</h4>
+            {loading ? (
+              <div className="text-center py-8 text-slate-500">Loading tables...</div>
+            ) : tables.length === 0 ? (
+              <div className="text-center py-8 text-slate-500">No tables available</div>
+            ) : (
+              <div className="space-y-2 max-h-96 overflow-y-auto">
+                {tables.map(t => (
+                  <div key={t.id} className="p-3 border border-slate-200 rounded-lg flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                    <div className="flex-1">
+                      <div className="font-semibold text-slate-900">{t.name}</div>
+                      <div className="text-xs text-slate-500 mt-1">
+                        Stakes: {t.stake_min}/{t.stake_max} {t.currency_code} • Seats: {t.max_seats}
                       </div>
-                      <div className="flex items-center gap-2">
-                        <button onClick={() => openTable(t)} className="px-3 py-2 bg-white border rounded">Open</button>
-                        <button onClick={() => handleSit(t.id)} className="px-3 py-2 bg-blue-600 text-white rounded">Sit</button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            <div>
-              <h4 className="font-medium mb-2">Table</h4>
-              {selected ? (
-                <div>
-                  <div className="mb-3 flex items-center justify-between">
-                    <div>
-                      <div className="font-semibold">{selected.name}</div>
-                      <div className="text-xs text-slate-500">Stakes: {selected.stake_min}/{selected.stake_max}</div>
                     </div>
                     <div className="flex items-center gap-2">
-                      <button onClick={() => handleStartHand(selected.id)} className="px-3 py-2 bg-emerald-600 text-white rounded">Start Hand</button>
+                      <button
+                        onClick={() => openTable(t)}
+                        className="px-3 py-2 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 font-medium transition-colors text-sm"
+                      >
+                        Open
+                      </button>
+                      <button
+                        onClick={() => handleSit(t.id)}
+                        className="px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium transition-colors text-sm"
+                      >
+                        Sit
+                      </button>
                     </div>
                   </div>
+                ))}
+              </div>
+            )}
+          </div>
 
-                  {tableLoading ? <div>Loading seats...</div> : (
-                    <div className="grid grid-cols-3 gap-2">
-                      {Array.from({ length: selected.max_seats }).map((_, i) => {
-                        const seat = seats[i]
-                        return (
-                          <div key={i} className={`p-2 border rounded ${seat ? 'bg-slate-50' : 'bg-white'}`}>
-                            <div className="text-sm">Seat {i + 1}</div>
-                            <div className="text-xs text-slate-600 mt-1">{seat ? (seat.user_id === userId ? 'You' : seat.user_id) : 'Empty'}</div>
-                          </div>
-                        )
-                      })}
+          {/* Table Details */}
+          <div>
+            <h4 className="font-medium mb-3">Table Details</h4>
+            {selected ? (
+              <div className="space-y-4">
+                <div className="p-3 border border-slate-200 rounded-lg">
+                  <div className="flex items-center justify-between gap-3 mb-3">
+                    <div className="flex-1">
+                      <div className="font-semibold text-slate-900">{selected.name}</div>
+                      <div className="text-xs text-slate-500 mt-1">
+                        Stakes: {selected.stake_min}/{selected.stake_max}
+                      </div>
                     </div>
-                  )}
+                    <button
+                      onClick={() => handleStartHand(selected.id)}
+                      className="px-3 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 font-medium transition-colors text-sm whitespace-nowrap"
+                    >
+                      Start Hand
+                    </button>
+                  </div>
                 </div>
-              ) : <div className="text-sm text-slate-500">Open a table to view seats and actions.</div>}
-            </div>
+
+                {/* Seats Grid */}
+                {tableLoading ? (
+                  <div className="text-center py-8 text-slate-500">Loading seats...</div>
+                ) : (
+                  <div className="grid grid-cols-3 gap-2">
+                    {Array.from({ length: selected.max_seats }).map((_, i) => {
+                      const seat = seats[i]
+                      return (
+                        <div
+                          key={i}
+                          className={`p-2 border rounded-lg text-center ${
+                            seat ? 'bg-slate-100 border-slate-300' : 'bg-white border-slate-200'
+                          }`}
+                        >
+                          <div className="text-sm font-medium text-slate-700">Seat {i + 1}</div>
+                          <div className="text-xs text-slate-600 mt-1">
+                            {seat ? (seat.user_id === userId ? '👤 You' : '👤 Player') : '⭕ Empty'}
+                          </div>
+                        </div>
+                      )
+                    })}
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div className="text-center py-8 text-slate-500">
+                Open a table to view seats and actions
+              </div>
+            )}
           </div>
         </div>
       </div>
-    </div>
+    </ExpandableModal>
   )
 }
