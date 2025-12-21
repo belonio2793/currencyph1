@@ -257,21 +257,45 @@ async function processGcashDeposit(
 
     const gcashData = await gcashResponse.json()
 
+    // Calculate received amount if currency is not PHP
+    let receivedAmount: number | null = null
+    let exchangeRate: number | null = null
+    let rateSource = 'openexchangerates'
+
+    if (request.currency !== 'PHP') {
+      const conversionResult = await convertToPhp(request.amount, request.currency)
+      if (conversionResult) {
+        receivedAmount = conversionResult.convertedAmount
+        exchangeRate = conversionResult.exchangeRate
+        rateSource = conversionResult.source
+      }
+    }
+
     // Store deposit
+    const depositData: Record<string, any> = {
+      user_id: request.userId,
+      wallet_id: request.walletId,
+      amount: request.amount,
+      currency_code: request.currency,
+      deposit_method: 'gcash',
+      status: 'pending',
+      payment_reference: paymentReference,
+      external_tx_id: gcashData.transaction_id,
+      phone_number: phoneNumber,
+      qr_code_data: gcashData.qr_code || null
+    }
+
+    // Add conversion details if available
+    if (receivedAmount !== null && exchangeRate !== null && request.currency !== 'PHP') {
+      depositData.received_amount = receivedAmount
+      depositData.exchange_rate = exchangeRate
+      depositData.rate_source = rateSource
+      depositData.rate_fetched_at = new Date().toISOString()
+    }
+
     const { data: deposit, error: depositError } = await supabase
       .from('deposits')
-      .insert([{
-        user_id: request.userId,
-        wallet_id: request.walletId,
-        amount: request.amount,
-        currency_code: request.currency,
-        deposit_method: 'gcash',
-        status: 'pending',
-        payment_reference: paymentReference,
-        external_tx_id: gcashData.transaction_id,
-        phone_number: phoneNumber,
-        qr_code_data: gcashData.qr_code || null
-      }])
+      .insert([depositData])
       .select()
       .single()
 
