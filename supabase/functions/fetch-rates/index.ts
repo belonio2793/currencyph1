@@ -346,12 +346,15 @@ async function handle(req: Request): Promise<Response> {
       const last = await getCachedLatest()
       if (last) {
         console.log('[fetch-rates] Returning stale cached rates as fallback')
+        const fallbackConfirmations = await getRateConfirmations(last.crypto_prices || {}, 'php')
         return jsonResponse({
           exchangeRates: last.exchange_rates || {},
           cryptoPrices: last.crypto_prices || {},
           cached: true,
           fetched_at: last.fetched_at,
-          warning: 'Returning stale cache due to error'
+          rate_confirmations: fallbackConfirmations.slice(0, 10),
+          total_confirmations: fallbackConfirmations.length,
+          warning: 'Returning stale cache due to error - rates may be outdated'
         })
       }
     } catch (cacheErr) {
@@ -362,7 +365,8 @@ async function handle(req: Request): Promise<Response> {
       exchangeRates: {},
       cryptoPrices: {},
       cached: false,
-      error: String(err)
+      error: String(err),
+      fetched_at: new Date().toISOString()
     }, 500)
   }
 }
