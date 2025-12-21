@@ -240,6 +240,8 @@ export default function LandingPage({ userId, userEmail, globalCurrency = 'PHP',
   const [cryptoRates, setCryptoRates] = useState({})
   const [cryptoConvertedAmounts, setCryptoConvertedAmounts] = useState({})
   const [addingCrypto, setAddingCrypto] = useState(false)
+  const [cryptoBalance, setCryptoBalance] = useState(null)
+  const [loadingCrypto, setLoadingCrypto] = useState(false)
 
   const cryptos = ['BTC', 'ETH', 'LTC', 'DOGE', 'XRP', 'ADA', 'SOL', 'AVAX', 'MATIC', 'DOT', 'LINK', 'UNI', 'AAVE', 'USDC', 'USDT']
 
