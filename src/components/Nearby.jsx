@@ -823,8 +823,8 @@ export default function Nearby({ userId, setActiveTab, setCurrentListingSlug }) 
       {viewMode === 'listings' && (
       <>
       {/* Header Section */}
-      <div className="px-4 sm:px-6 py-6 sm:py-8 border-b border-slate-200">
-        <div className="max-w-6xl mx-auto">
+      <div className="px-4 sm:px-6 lg:px-8 py-6 sm:py-8 lg:py-10 border-b border-slate-200">
+        <div className="max-w-7xl mx-auto">
           <h1 className="text-xl sm:text-2xl md:text-3xl font-bold mb-1 sm:mb-2 text-slate-900">Explore Philippines</h1>
 
           <div className="mt-6 sm:mt-8">
