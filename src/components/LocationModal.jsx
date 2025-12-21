@@ -5,6 +5,8 @@ import 'leaflet/dist/leaflet.css'
 import philippineCities from '../data/philippineCities.json'
 import { requestLocationPermission } from '../lib/locationHelpers'
 import { forwardGeocode } from '../lib/nominatimService.js'
+import ExpandableModal from './ExpandableModal'
+import { useDevice } from '../context/DeviceContext'
 
 const createCustomIcon = (color) => {
   return L.divIcon({
