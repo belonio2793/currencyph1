@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabaseClient'
+import ExpandableModal from './ExpandableModal'
+import { useDevice } from '../context/DeviceContext'
 
 export default function EmailVerificationModal({ userId, userEmail, onClose, onSuccess }) {
+  const { isMobile } = useDevice()
   const [step, setStep] = useState('send') // 'send', 'verify'
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
