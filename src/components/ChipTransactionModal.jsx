@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabaseClient'
 import { convertUSDToLocalCurrency, formatPriceWithCurrency } from '../lib/currencyManager'
+import { formatNumber } from '../lib/currency'
 
 export default function ChipTransactionModal({ open, onClose, userId, onPurchaseComplete }) {
   const [packages, setPackages] = useState([])
