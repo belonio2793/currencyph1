@@ -1,9 +1,11 @@
 import { supabase } from './supabaseClient'
 import { depositStatusChangeService } from './depositStatusChangeService'
+import { getLatestRateWithConfirmation, buildRateConfirmationMessage } from './rateConfirmationService'
 
 /**
  * Service for managing deposit currency conversions
  * Handles conversion flow, confirmation, and audit trails
+ * Now includes rate confirmations with timestamps for user display
  */
 export class DepositConversionService {
   constructor(supabaseClient = supabase) {
