@@ -135,7 +135,75 @@ END;
 $$ LANGUAGE plpgsql;
 
 -- ============================================================================
--- STEP 2: Create function to value a wallet in target currency
+-- STEP 2: Create function to value a wallet WITH rate details (for user display)
+-- ============================================================================
+
+CREATE OR REPLACE FUNCTION get_wallet_valuation_detailed(
+  p_wallet_id UUID,
+  p_target_currency VARCHAR(16) DEFAULT 'PHP'
+)
+RETURNS TABLE(
+  wallet_id UUID,
+  currency_code VARCHAR(16),
+  balance NUMERIC,
+  valuation_in_target NUMERIC,
+  exchange_rate NUMERIC,
+  rate_timestamp TIMESTAMPTZ,
+  rate_age_seconds INTEGER,
+  is_fresh_rate BOOLEAN,
+  rate_source VARCHAR(64)
+) AS $$
+DECLARE
+  v_balance NUMERIC;
+  v_currency_code VARCHAR(16);
+  v_rate_info RECORD;
+BEGIN
+  -- Get wallet details
+  SELECT w.id, w.balance, w.currency_code
+  INTO p_wallet_id, v_balance, v_currency_code
+  FROM wallets w
+  WHERE w.id = p_wallet_id;
+
+  IF NOT FOUND THEN
+    RAISE EXCEPTION 'Wallet not found: %', p_wallet_id;
+  END IF;
+
+  -- If already in target currency
+  IF v_currency_code = p_target_currency THEN
+    RETURN QUERY SELECT
+      p_wallet_id,
+      v_currency_code,
+      v_balance,
+      v_balance,
+      1::NUMERIC,
+      NOW(),
+      0::INTEGER,
+      TRUE,
+      'same_currency'::VARCHAR(64);
+    RETURN;
+  END IF;
+
+  -- Get exchange rate with timestamp
+  SELECT rate, rate_timestamp, rate_age_seconds, is_fresh, source
+  INTO v_rate_info
+  FROM get_exchange_rate_with_timestamp(v_currency_code, p_target_currency);
+
+  -- Return with all rate details
+  RETURN QUERY SELECT
+    p_wallet_id,
+    v_currency_code,
+    v_balance,
+    v_balance * v_rate_info.rate,
+    v_rate_info.rate,
+    v_rate_info.rate_timestamp,
+    v_rate_info.rate_age_seconds,
+    v_rate_info.is_fresh,
+    v_rate_info.source;
+END;
+$$ LANGUAGE plpgsql;
+
+-- ============================================================================
+-- STEP 2B: Simple function to value a wallet (backward compatible)
 -- ============================================================================
 
 CREATE OR REPLACE FUNCTION get_wallet_valuation(
@@ -154,22 +222,22 @@ BEGIN
   INTO v_balance, v_currency_code
   FROM wallets
   WHERE id = p_wallet_id;
-  
+
   IF NOT FOUND THEN
     RAISE EXCEPTION 'Wallet not found: %', p_wallet_id;
   END IF;
-  
+
   -- If already in target currency, return balance
   IF v_currency_code = p_target_currency THEN
     RETURN v_balance;
   END IF;
-  
+
   -- Get exchange rate
   v_exchange_rate := get_exchange_rate_cached(v_currency_code, p_target_currency);
-  
+
   -- Calculate valuation
   v_valuation := v_balance * v_exchange_rate;
-  
+
   RETURN v_valuation;
 END;
 $$ LANGUAGE plpgsql;
