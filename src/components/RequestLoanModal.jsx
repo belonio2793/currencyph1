@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabaseClient'
+import { formatNumber } from '../lib/currency'
 
 export default function RequestLoanModal({ userId, loanType, onClose, onSuccess, wallets }) {
   const [currentPage, setCurrentPage] = useState(1)
