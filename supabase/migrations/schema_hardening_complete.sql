@@ -456,17 +456,17 @@ UNION ALL
 SELECT 
   'payment' as transaction_type,
   p.id,
-  p.user_id,
-  NULL::UUID,
+  p.customer_id as user_id,
+  NULL::UUID as wallet_id,
   p.amount,
-  p.currency,
-  p.received_amount,
+  p.currency as original_currency,
+  p.received_amount as credited_amount,
   p.exchange_rate,
   p.rate_source,
   p.rate_fetched_at,
   p.status,
   p.created_at,
-  'PHP'
+  'PHP' as wallet_currency
 FROM payments p
 WHERE p.received_amount IS NOT NULL
 
@@ -475,17 +475,17 @@ UNION ALL
 SELECT 
   'transfer' as transaction_type,
   t.id,
-  t.from_user_id,
-  t.from_wallet_id,
-  t.sender_amount,
-  t.sender_currency,
-  t.recipient_amount,
+  t.from_user_id as user_id,
+  t.from_wallet_id as wallet_id,
+  t.sender_amount as original_amount,
+  t.sender_currency as original_currency,
+  t.recipient_amount as credited_amount,
   t.exchange_rate,
   t.rate_source,
   t.rate_fetched_at,
   t.status,
   t.created_at,
-  t.recipient_currency
+  t.recipient_currency as wallet_currency
 FROM transfers t
 WHERE t.exchange_rate IS NOT NULL;
 
