@@ -563,7 +563,83 @@ END;
 $$ LANGUAGE plpgsql;
 
 -- ============================================================================
--- STEP 10: Create function for quick balance check
+-- STEP 10: Create function for quick balance check WITH rate timestamps
+-- ============================================================================
+
+CREATE OR REPLACE FUNCTION get_user_balances_detailed(p_user_id UUID)
+RETURNS TABLE (
+  currency_code VARCHAR(16),
+  currency_name TEXT,
+  balance NUMERIC(36, 8),
+  balance_in_php NUMERIC(36, 8),
+  exchange_rate NUMERIC,
+  rate_timestamp TIMESTAMPTZ,
+  rate_age_seconds INTEGER,
+  is_fresh_rate BOOLEAN,
+  rate_source VARCHAR(64),
+  percentage_of_total NUMERIC
+) AS $$
+DECLARE
+  v_total_balance NUMERIC;
+BEGIN
+  -- Get total balance in PHP
+  v_total_balance := get_user_total_balance(p_user_id, 'PHP');
+
+  -- Return balance breakdown with rate info
+  RETURN QUERY
+  SELECT
+    w.currency_code,
+    c.name,
+    w.balance,
+    CASE
+      WHEN w.currency_code = 'PHP' THEN w.balance
+      ELSE COALESCE(
+        w.balance * (SELECT rate FROM crypto_rates_valid
+         WHERE from_currency = w.currency_code
+           AND to_currency = 'PHP'
+         ORDER BY updated_at DESC LIMIT 1),
+        w.balance
+      )
+    END,
+    (SELECT rate FROM get_exchange_rate_with_timestamp(w.currency_code, 'PHP')),
+    (SELECT rate_timestamp FROM get_exchange_rate_with_timestamp(w.currency_code, 'PHP')),
+    (SELECT rate_age_seconds FROM get_exchange_rate_with_timestamp(w.currency_code, 'PHP')),
+    (SELECT is_fresh FROM get_exchange_rate_with_timestamp(w.currency_code, 'PHP')),
+    (SELECT source FROM get_exchange_rate_with_timestamp(w.currency_code, 'PHP')),
+    CASE
+      WHEN v_total_balance > 0 THEN
+        (CASE
+          WHEN w.currency_code = 'PHP' THEN w.balance
+          ELSE COALESCE(
+            w.balance * (SELECT rate FROM crypto_rates_valid
+             WHERE from_currency = w.currency_code
+               AND to_currency = 'PHP'
+             ORDER BY updated_at DESC LIMIT 1),
+            w.balance
+          )
+        END) / v_total_balance * 100
+      ELSE 0
+    END
+  FROM wallets w
+  JOIN currencies c ON c.code = w.currency_code
+  WHERE w.user_id = p_user_id
+    AND w.is_active = TRUE
+  ORDER BY
+    CASE
+      WHEN w.currency_code = 'PHP' THEN w.balance
+      ELSE COALESCE(
+        w.balance * (SELECT rate FROM crypto_rates_valid
+         WHERE from_currency = w.currency_code
+           AND to_currency = 'PHP'
+         ORDER BY updated_at DESC LIMIT 1),
+        w.balance
+      )
+    END DESC;
+END;
+$$ LANGUAGE plpgsql;
+
+-- ============================================================================
+-- STEP 10B: Simple balance check (backward compatible)
 -- ============================================================================
 
 CREATE OR REPLACE FUNCTION get_user_balances(p_user_id UUID)
@@ -579,31 +655,31 @@ DECLARE
 BEGIN
   -- Get total balance in PHP
   v_total_balance := get_user_total_balance(p_user_id, 'PHP');
-  
+
   -- Return balance breakdown
   RETURN QUERY
-  SELECT 
+  SELECT
     w.currency_code,
     c.name,
     w.balance,
-    CASE 
+    CASE
       WHEN w.currency_code = 'PHP' THEN w.balance
       ELSE w.balance * COALESCE(
-        (SELECT rate FROM crypto_rates_valid 
-         WHERE from_currency = w.currency_code 
-           AND to_currency = 'PHP' 
+        (SELECT rate FROM crypto_rates_valid
+         WHERE from_currency = w.currency_code
+           AND to_currency = 'PHP'
          ORDER BY updated_at DESC LIMIT 1),
         1
       )
     END,
-    CASE 
+    CASE
       WHEN v_total_balance > 0 THEN
-        (CASE 
+        (CASE
           WHEN w.currency_code = 'PHP' THEN w.balance
           ELSE w.balance * COALESCE(
-            (SELECT rate FROM crypto_rates_valid 
-             WHERE from_currency = w.currency_code 
-               AND to_currency = 'PHP' 
+            (SELECT rate FROM crypto_rates_valid
+             WHERE from_currency = w.currency_code
+               AND to_currency = 'PHP'
              ORDER BY updated_at DESC LIMIT 1),
             1
           )
@@ -614,13 +690,13 @@ BEGIN
   JOIN currencies c ON c.code = w.currency_code
   WHERE w.user_id = p_user_id
     AND w.is_active = TRUE
-  ORDER BY 
-    CASE 
+  ORDER BY
+    CASE
       WHEN w.currency_code = 'PHP' THEN w.balance
       ELSE w.balance * COALESCE(
-        (SELECT rate FROM crypto_rates_valid 
-         WHERE from_currency = w.currency_code 
-           AND to_currency = 'PHP' 
+        (SELECT rate FROM crypto_rates_valid
+         WHERE from_currency = w.currency_code
+           AND to_currency = 'PHP'
          ORDER BY updated_at DESC LIMIT 1),
         1
       )
