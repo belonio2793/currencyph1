@@ -36,29 +36,14 @@ const DEPOSIT_METHODS = {
     name: 'GCash',
     icon: '📱',
     type: 'fiat',
-    description: 'Instant mobile payment (Philippines)',
-    instructions: [
-      'Open your GCash app',
-      'Go to Send Money or Payment option',
-      'Enter the merchant details provided below',
-      'Confirm the amount and complete the transaction',
-      'Your balance will be updated within 1-5 minutes'
-    ]
+    description: 'Instant mobile payment (Philippines)'
   },
   solana: {
     id: 'solana',
     name: 'Solana',
     icon: '◎',
     type: 'crypto',
-    description: 'Cryptocurrency transfer',
-    instructions: [
-      'Open your Solana wallet app',
-      'Scan the QR code or copy the address below',
-      'Enter the amount in SOL',
-      'Verify the recipient address and amount',
-      'Confirm the transaction',
-      'Your balance will be updated within 1-2 minutes'
-    ]
+    description: 'Cryptocurrency transfer'
   }
 }
 
