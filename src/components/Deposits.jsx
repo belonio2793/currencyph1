@@ -213,7 +213,7 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
         }
       } else {
         // For crypto, fetch rates for all available crypto currencies
-        // First try to get rates for currencies from house addresses
+        // First collect all cryptos to fetch
         const cryptoCurrenciesToFetch = new Set(Object.keys(cryptoAddresses))
 
         // Also include any crypto wallets the user has
@@ -223,31 +223,32 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
           }
         })
 
-        // Fetch rates for all crypto currencies with a timeout
-        const ratePromises = Array.from(cryptoCurrenciesToFetch).map(async (cryptoCode) => {
+        // Fetch all crypto prices in one API call (more efficient than individual calls)
+        if (cryptoCurrenciesToFetch.size > 0) {
           try {
-            // Set a timeout of 5 seconds per currency to avoid hanging
-            const pricePromise = getCryptoPrice(cryptoCode)
-            const timeoutPromise = new Promise((_, reject) =>
-              setTimeout(() => reject(new Error('Timeout')), 5000)
-            )
+            const cryptoCodes = Array.from(cryptoCurrenciesToFetch)
+            const pricesFromApi = await getMultipleCryptoPrices(cryptoCodes, 'PHP')
 
-            const price = await Promise.race([pricePromise, timeoutPromise])
-            if (price) {
-              return { cryptoCode, price }
+            if (pricesFromApi && Object.keys(pricesFromApi).length > 0) {
+              Object.assign(rates, pricesFromApi)
+            } else {
+              // If batch fetch fails, try individual fetches as fallback
+              console.warn('Batch crypto price fetch returned no data, trying individual fetches...')
+              for (const cryptoCode of cryptoCodes) {
+                try {
+                  const price = await getCryptoPrice(cryptoCode, 'PHP')
+                  if (price) {
+                    rates[cryptoCode] = price
+                  }
+                } catch (e) {
+                  console.warn(`Failed to fetch individual rate for ${cryptoCode}:`, e.message)
+                }
+              }
             }
           } catch (e) {
-            console.warn(`Failed to fetch rate for ${cryptoCode}:`, e.message)
+            console.error('Failed to fetch batch crypto rates:', e.message)
           }
-          return null
-        })
-
-        const results = await Promise.all(ratePromises)
-        results.forEach(result => {
-          if (result) {
-            rates[result.cryptoCode] = result.price
-          }
-        })
+        }
 
         // Ensure PHP rate is set to 1 for conversion calculations
         rates['PHP'] = 1
