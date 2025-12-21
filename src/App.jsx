@@ -198,6 +198,11 @@ export default function App() {
     }
   }, [activeTab, userId])
 
+  // Save currency preferences whenever they change
+  useEffect(() => {
+    preferencesManager.setCurrencyPreferences(userId, globalCurrency, globalCryptocurrency)
+  }, [globalCurrency, globalCryptocurrency, userId])
+
   const handleRouting = () => {
     const path = window.location.pathname
     const hash = window.location.hash
