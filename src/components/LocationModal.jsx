@@ -37,6 +37,7 @@ export default function LocationModal({
   userLocation,
   savedLocations = []
 }) {
+  const { isMobile } = useDevice()
   const [activeTab, setActiveTab] = useState('city') // 'city', 'map', 'address', 'coordinates', 'saved'
   const [selectedLocation, setSelectedLocation] = useState(null)
   const [address, setAddress] = useState('')
@@ -46,6 +47,7 @@ export default function LocationModal({
   const [loading, setLoading] = useState(false)
   const [citySearch, setCitySearch] = useState('')
   const [filteredCities, setFilteredCities] = useState([])
+  const [isExpanded, setIsExpanded] = useState(!isMobile)
   const mapRef = useRef(null)
 
   useEffect(() => {
