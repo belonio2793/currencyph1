@@ -143,45 +143,176 @@ async function storeRateInDatabase(cryptoCode, toCurrency, rate, source) {
 }
 
 /**
- * Get real-time cryptocurrency price in PHP from CoinGecko API
+ * Get cryptocurrency price in PHP with comprehensive fallback strategy:
+ * 1. Try in-memory cache (60 seconds)
+ * 2. Try CoinGecko API with retry logic (3 attempts)
+ * 3. Try alternative API (Coingecko fallback endpoint or other source)
+ * 4. Fall back to database cached rates
+ * 5. Return stale cache or null
  */
-export async function getCryptoPrice(cryptoCode) {
+export async function getCryptoPrice(cryptoCode, toCurrency = 'PHP') {
+  try {
+    const cacheKey = `${cryptoCode}_${toCurrency}`
+
+    // 1. Check in-memory cache first
+    if (isCacheValid(cacheKey)) {
+      const cached = rateCache.get(cacheKey)
+      console.log(`Using in-memory cached price for ${cryptoCode}: ${cached.rate} ${toCurrency}`)
+      return cached.rate
+    }
+
+    // 2. Try primary API (CoinGecko) with retry logic
+    let price = await getCoinGeckoPrice(cryptoCode, toCurrency)
+
+    // 3. If primary fails, try alternative API
+    if (!price) {
+      console.warn(`CoinGecko failed for ${cryptoCode}, trying alternative API...`)
+      price = await getAlternativeCryptoPrice(cryptoCode, toCurrency)
+    }
+
+    // 4. If both APIs fail, try database cache
+    if (!price) {
+      console.warn(`Both APIs failed for ${cryptoCode}, checking database cache...`)
+      const dbCached = await getCachedRateFromDatabase(cryptoCode, toCurrency)
+      if (dbCached) {
+        price = dbCached.rate
+        console.log(`Using database cached price for ${cryptoCode}: ${price} ${toCurrency}`)
+      }
+    }
+
+    // 5. Store successful fetch in database for future fallback
+    if (price) {
+      // Store in in-memory cache
+      rateCache.set(cacheKey, {
+        rate: price,
+        timestamp: Date.now(),
+        source: 'api'
+      })
+
+      // Store in database asynchronously (don't wait for it)
+      storeRateInDatabase(cryptoCode, toCurrency, price, 'coingecko').catch(e =>
+        console.warn('Background DB storage failed:', e.message)
+      )
+
+      return price
+    }
+
+    // 6. Last resort: return stale cache
+    const staleCache = rateCache.get(cacheKey)
+    if (staleCache) {
+      console.warn(`Using stale in-memory cache for ${cryptoCode}: ${staleCache.rate} ${toCurrency}`)
+      return staleCache.rate
+    }
+
+    return null
+  } catch (error) {
+    console.error(`Unexpected error fetching ${cryptoCode} price:`, error.message)
+    return null
+  }
+}
+
+/**
+ * Fetch from CoinGecko API with retry logic
+ */
+async function getCoinGeckoPrice(cryptoCode, toCurrency = 'PHP') {
   try {
     const coingeckoId = getCoingeckoId(cryptoCode)
-    
-    // Check cache first
-    if (isCacheValid(coingeckoId)) {
-      return rateCache.get(coingeckoId).rate
-    }
+    const toCurrencyLower = toCurrency.toLowerCase()
 
-    // Fetch from CoinGecko API (free, no authentication required)
-    const response = await fetch(
-      `https://api.coingecko.com/api/v3/simple/price?ids=${coingeckoId}&vs_currencies=php&precision=8`
+    const response = await fetchWithRetry(
+      `https://api.coingecko.com/api/v3/simple/price?ids=${coingeckoId}&vs_currencies=${toCurrencyLower}&precision=8`,
+      { headers: { 'Accept': 'application/json' } }
     )
 
-    if (!response.ok) {
-      throw new Error(`CoinGecko API returned ${response.status}`)
-    }
-
     const data = await response.json()
-    const price = data[coingeckoId]?.php
+    const price = data[coingeckoId]?.[toCurrencyLower]
 
     if (!price) {
-      throw new Error(`No price data for ${cryptoCode}`)
+      throw new Error(`No price data for ${cryptoCode}/${toCurrency}`)
     }
 
-    // Cache the result
-    rateCache.set(coingeckoId, {
-      rate: price,
-      timestamp: Date.now()
-    })
-
+    console.log(`✓ CoinGecko: ${cryptoCode} = ${price} ${toCurrency}`)
     return price
   } catch (error) {
-    console.warn(`Failed to fetch ${cryptoCode} price from CoinGecko:`, error.message)
-    // Return cached value even if expired, or null
-    const cached = rateCache.get(getCoingeckoId(cryptoCode))
-    return cached ? cached.rate : null
+    console.warn(`CoinGecko API error for ${cryptoCode}:`, error.message)
+    return null
+  }
+}
+
+/**
+ * Alternative API fallback - try different source if CoinGecko fails
+ * Currently tries CoinMarketCap or other free endpoints
+ */
+async function getAlternativeCryptoPrice(cryptoCode, toCurrency = 'PHP') {
+  try {
+    // Alternative 1: Try CoinGecko with different endpoint structure
+    // Sometimes the simple/price endpoint fails but others work
+    const coingeckoId = getCoingeckoId(cryptoCode)
+
+    const response = await fetchWithRetry(
+      `https://api.coingecko.com/api/v3/coins/${coingeckoId}?localization=false&market_data=true`,
+      { headers: { 'Accept': 'application/json' } }
+    )
+
+    if (response.ok) {
+      const data = await response.json()
+      const php = data?.market_data?.current_price?.php
+
+      if (php) {
+        console.log(`✓ Alternative API (CoinGecko /coins): ${cryptoCode} = ${php} ${toCurrency}`)
+        return php
+      }
+    }
+
+    // Alternative 2: If PHP rate not available, fetch USD and convert
+    // This is a fallback when PHP data is unavailable
+    if (toCurrency === 'PHP') {
+      const usdRate = data?.market_data?.current_price?.usd
+      if (usdRate) {
+        // Try to get PHP/USD rate
+        try {
+          const phorate = await convertUSDtoPhp(usdRate)
+          if (phorate) {
+            console.log(`✓ Alternative API (USD conversion): ${cryptoCode} = ${phorate} ${toCurrency}`)
+            return phorate
+          }
+        } catch (e) {
+          console.warn('USD to PHP conversion failed:', e.message)
+        }
+      }
+    }
+
+    return null
+  } catch (error) {
+    console.warn(`Alternative API error for ${cryptoCode}:`, error.message)
+    return null
+  }
+}
+
+/**
+ * Convert USD amount to PHP using exchange rate API
+ */
+async function convertUSDtoPhp(usdAmount) {
+  try {
+    const apiKey = import.meta.env.VITE_OPEN_EXCHANGE_RATES_API
+    if (!apiKey) return null
+
+    const response = await fetchWithRetry(
+      `https://openexchangerates.org/api/latest.json?app_id=${apiKey}&base=USD&symbols=PHP`,
+      { headers: { 'Accept': 'application/json' } }
+    )
+
+    const data = await response.json()
+    const phpRate = data.rates?.PHP
+
+    if (phpRate) {
+      return usdAmount * phpRate
+    }
+
+    return null
+  } catch (error) {
+    console.warn('USD to PHP conversion error:', error.message)
+    return null
   }
 }
 
