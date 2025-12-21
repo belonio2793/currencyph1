@@ -589,8 +589,10 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
       // Move to confirmation step
       setStep('confirm')
     } catch (err) {
+      const errorMsg = err?.message || err?.toString?.() || JSON.stringify(err) || 'Failed to initiate deposit'
       console.error('Error creating deposit:', err)
-      setError(err.message || 'Failed to initiate deposit')
+      console.error('Error message:', errorMsg)
+      setError(errorMsg)
     } finally {
       setSubmitting(false)
     }
