@@ -204,7 +204,7 @@ export default function ChipTransactionModal({ open, onClose, userId, onPurchase
           PHP ₱{phpPrice.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
         </span>
         <span className="text-slate-400">
-          {' '}(USD ${usdPrice.toFixed(2)})
+          {' '}(USD ${formatNumber(usdPrice)})
         </span>
       </span>
     )
