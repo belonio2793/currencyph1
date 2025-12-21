@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { currencyAPI } from '../lib/payments'
 import { getWalletDisplayPreferences } from '../lib/walletPreferences'
+import { formatNumber } from '../lib/currency'
 
 export default function Dashboard({ userId, onNavigate }) {
   const [wallets, setWallets] = useState([])
