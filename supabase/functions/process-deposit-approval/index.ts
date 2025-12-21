@@ -88,8 +88,18 @@ export async function handler(req: Request): Promise<Response> {
         throw new Error('Wallet not found')
       }
 
+      // Use received_amount (PHP equivalent) if available, otherwise use raw amount
+      // This ensures crypto deposits are properly converted to PHP
+      const creditAmount = deposit.received_amount
+        ? parseFloat(deposit.received_amount)
+        : parseFloat(deposit.amount)
+
+      const depositAmountForDisplay = deposit.received_amount
+        ? `${deposit.amount} ${deposit.currency_code} (${creditAmount} PHP)`
+        : `${deposit.amount} ${deposit.currency_code}`
+
       // Update wallet balance
-      const newBalance = parseFloat(wallet.balance) + parseFloat(deposit.amount)
+      const newBalance = parseFloat(wallet.balance) + creditAmount
       const { error: balanceError } = await supabase
         .from('wallets')
         .update({
@@ -110,12 +120,18 @@ export async function handler(req: Request): Promise<Response> {
           wallet_id: deposit.wallet_id,
           user_id: deposit.user_id,
           type: 'deposit',
-          amount: deposit.amount,
+          amount: creditAmount,
           balance_before: wallet.balance,
           balance_after: newBalance,
-          currency_code: deposit.currency_code,
-          description: `Deposit approved: ${deposit.amount} ${deposit.currency_code}`,
-          reference_id: deposit.id
+          currency_code: 'PHP',
+          description: `Deposit approved: ${depositAmountForDisplay}`,
+          reference_id: deposit.id,
+          metadata: {
+            original_amount: deposit.amount,
+            original_currency: deposit.currency_code,
+            exchange_rate: deposit.exchange_rate || null,
+            received_amount: deposit.received_amount || null
+          }
         })
 
       if (txError) {
