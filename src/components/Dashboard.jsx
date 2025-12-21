@@ -2,12 +2,15 @@ import { useState, useEffect } from 'react'
 import { currencyAPI } from '../lib/payments'
 import { getWalletDisplayPreferences } from '../lib/walletPreferences'
 import { formatNumber } from '../lib/currency'
+import { convertFiatToCryptoDb } from '../lib/cryptoRatesDb'
 
-export default function Dashboard({ userId, onNavigate }) {
+export default function Dashboard({ userId, onNavigate, globalCurrency = 'PHP', globalCryptocurrency = 'BTC', userEmail }) {
   const [wallets, setWallets] = useState([])
   const [totalBalance, setTotalBalance] = useState(0)
   const [loading, setLoading] = useState(true)
   const [displayCurrencies, setDisplayCurrencies] = useState(['PHP'])
+  const [cryptoBalance, setCryptoBalance] = useState(null)
+  const [loadingCrypto, setLoadingCrypto] = useState(false)
 
   useEffect(() => {
     loadData()
