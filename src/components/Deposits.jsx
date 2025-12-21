@@ -534,9 +534,8 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
         return
       }
 
-      // Determine deposit status based on method
-      // Crypto deposits auto-approve, GCash stays pending until confirmed, other fiat stays pending
-      const depositStatus = isCryptoDeposit ? 'approved' : 'pending'
+      // All deposits start as pending - status will update based on verification
+      const depositStatus = 'pending'
 
       // Create deposit record with conversion info
       const { data: deposit, error: err } = await supabase
@@ -559,31 +558,11 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
 
       if (err) throw err
 
-      // Update wallet balance if approved
-      if (depositStatus === 'approved' && convertedAmount) {
-        const newBalance = targetWalletData.balance + convertedAmount
-        await supabase
-          .from('wallets')
-          .update({ balance: newBalance })
-          .eq('id', targetWalletId)
-
-        // Update local state
-        setWallets(wallets.map(w =>
-          w.id === targetWalletId
-            ? { ...w, balance: newBalance }
-            : w
-        ))
-      }
-
       // Add to deposits list
       setDeposits([deposit, ...deposits])
 
-      const statusMessage = depositStatus === 'approved'
-        ? `Crypto deposit received! ${convertedAmount} PHP has been credited to your account.`
-        : selectedMethod === 'gcash'
-        ? 'GCash deposit initiated. Your transaction will be verified within 1-5 minutes.'
-        : 'Deposit initiated. Awaiting payment...'
-      setSuccess(statusMessage)
+      setSuccess('Pending')
+      setError('')
 
       // Move to confirmation step
       setStep('confirm')
