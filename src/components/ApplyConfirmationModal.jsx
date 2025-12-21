@@ -2,7 +2,8 @@ import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabaseClient'
 import { jobApplicationService } from '../lib/jobApplicationService'
 import { formatFieldValue } from '../lib/formatters'
-import './ApplyConfirmationModal.css'
+import ExpandableModal from './ExpandableModal'
+import { useDevice } from '../context/DeviceContext'
 
 export default function ApplyConfirmationModal({
   job,
@@ -10,6 +11,7 @@ export default function ApplyConfirmationModal({
   onAccept,
   userId
 }) {
+  const { isMobile } = useDevice()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [userProfile, setUserProfile] = useState(null)
@@ -27,14 +29,12 @@ export default function ApplyConfirmationModal({
   const loadUserProfile = async () => {
     try {
       setUserLoading(true)
-      // Get current user from auth
       const { data: authData } = await supabase.auth.getUser()
       if (!authData?.user) {
         setError('Not authenticated')
         return
       }
 
-      // Try to load from profiles table, fall back to auth metadata
       let profileData = null
       try {
         const { data, error } = await supabase
@@ -78,141 +78,133 @@ export default function ApplyConfirmationModal({
     setError('')
 
     try {
-      const { data, error: appError } = await jobApplicationService.createApplication({
-        business_id: job.business_id,
-        job_id: job.id,
-        cover_letter: coverLetter,
-        position_applied_for: job.job_title,
-        salary_expectation: job.pay_rate,
-        salary_currency: job.pay_currency || 'PHP',
-        applicant_name: userProfile.full_name,
-        applicant_email: userProfile.email,
-        applicant_phone: userProfile.phone_number || ''
+      const result = await jobApplicationService.applyForJob({
+        jobId: job.id,
+        userId: userId,
+        coverLetter: coverLetter.trim(),
+        applicationData: userProfile
       })
 
-      if (appError) throw appError
-
-      onClose()
-      if (onAccept) {
-        onAccept()
+      if (result.success) {
+        onAccept?.(result.data)
+        onClose()
+      } else {
+        setError(result.error || 'Failed to submit application')
       }
     } catch (err) {
       console.error('Error submitting application:', err)
-      let errorMessage = 'Failed to submit your application'
-      if (err?.message) {
-        errorMessage = err.message
-      }
-      setError(errorMessage)
+      setError(err.message || 'An error occurred while submitting your application')
     } finally {
       setLoading(false)
     }
   }
 
-  if (!job) return null
+  const footer = (
+    <div className="flex gap-2 w-full">
+      <button
+        type="button"
+        onClick={onClose}
+        disabled={loading}
+        className="flex-1 px-4 py-2 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 font-medium disabled:opacity-50"
+      >
+        Cancel
+      </button>
+      <button
+        type="button"
+        onClick={handleSubmitApplication}
+        disabled={loading || !userProfile || userLoading}
+        className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium disabled:opacity-50"
+      >
+        {loading ? 'Submitting...' : 'Submit Application'}
+      </button>
+    </div>
+  )
+
+  if (userLoading) {
+    return (
+      <ExpandableModal
+        isOpen={!!job}
+        onClose={onClose}
+        title="Apply for Position"
+        icon="📋"
+        size={isMobile ? 'fullscreen' : 'md'}
+        footer={footer}
+        defaultExpanded={!isMobile}
+      >
+        <div className="flex items-center justify-center py-8">
+          <p className="text-slate-600">Loading your profile...</p>
+        </div>
+      </ExpandableModal>
+    )
+  }
 
   return (
-    <div className="apply-modal-overlay" onClick={onClose}>
-      <div className="apply-modal-container" onClick={e => e.stopPropagation()}>
-        {/* Header with Title */}
-        <div className="apply-modal-header">
-          <h2>Apply for Job</h2>
-        </div>
-
-        {/* Scrollable Content */}
-        <div className="apply-modal-content">
-          {/* Job Title */}
-          <div className="apply-job-title">
-            <h3>{job.job_title}</h3>
+    <ExpandableModal
+      isOpen={!!job}
+      onClose={onClose}
+      title="Apply for Position"
+      icon="📋"
+      size={isMobile ? 'fullscreen' : 'md'}
+      footer={footer}
+      defaultExpanded={!isMobile}
+    >
+      <div className="space-y-4">
+        {error && (
+          <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
+            {error}
           </div>
+        )}
 
-          {/* Job Details Section */}
-          <div className="apply-section">
-            <h4 className="apply-section-title">JOB DETAILS</h4>
-            <div className="apply-detail-item">
-              <span className="apply-detail-label">Category:</span>
-              <span className="apply-detail-value">{formatFieldValue(job.job_category)}</span>
-            </div>
-            <div className="apply-detail-item">
-              <span className="apply-detail-label">Type:</span>
-              <span className="apply-detail-value">{formatFieldValue(job.job_type)}</span>
-            </div>
-            <div className="apply-detail-item">
-              <span className="apply-detail-label">Location:</span>
-              <span className="apply-detail-value">{job.city}{job.province ? `, ${job.province}` : ''}</span>
-            </div>
-          </div>
-
-          {/* Compensation Section */}
-          <div className="apply-section">
-            <h4 className="apply-section-title">COMPENSATION</h4>
-            <div className="apply-detail-item">
-              <span className="apply-detail-label">Rate:</span>
-              <span className="apply-detail-value">₱{job.pay_rate?.toFixed(2) || 'Negotiable'}</span>
-            </div>
-            <div className="apply-detail-item">
-              <span className="apply-detail-label">Pay Type:</span>
-              <span className="apply-detail-value">{formatFieldValue(job.pay_type)}</span>
-            </div>
-          </div>
-
-          {/* Description Section */}
-          {job.job_description && (
-            <div className="apply-section">
-              <h4 className="apply-section-title">DESCRIPTION</h4>
-              <p className="apply-description-text">{job.job_description}</p>
-            </div>
+        {/* Job Summary */}
+        <div className="bg-slate-50 border border-slate-200 rounded-lg p-4 space-y-2">
+          <h3 className="font-semibold text-slate-900">Position: {job?.job_title}</h3>
+          {job?.job_category && (
+            <p className="text-sm text-slate-600">Category: {job.job_category}</p>
           )}
-
-          {/* Timeline Section */}
-          {job.start_date && (
-            <div className="apply-section">
-              <h4 className="apply-section-title">TIMELINE</h4>
-              <div className="apply-detail-item">
-                <span className="apply-detail-label">Start Date:</span>
-                <span className="apply-detail-value">{new Date(job.start_date).toLocaleDateString()}</span>
-              </div>
-            </div>
-          )}
-
-          {/* Cover Letter Section */}
-          <div className="apply-section">
-            <h4 className="apply-section-title">YOUR COVER LETTER</h4>
-            <textarea
-              value={coverLetter}
-              onChange={(e) => setCoverLetter(e.target.value)}
-              className="apply-textarea"
-              placeholder="Tell the employer about your interest in this position..."
-              disabled={loading || userLoading}
-            />
-          </div>
-
-          {/* Error Message */}
-          {error && (
-            <div className="apply-error-message">
-              {error}
-              <button onClick={() => setError('')} className="apply-error-close">×</button>
-            </div>
+          {job?.location && (
+            <p className="text-sm text-slate-600">Location: {job.location}</p>
           )}
         </div>
 
-        {/* Footer Actions */}
-        <div className="apply-modal-footer">
-          <button
-            className="apply-btn-cancel"
-            onClick={onClose}
-            disabled={loading || userLoading}
-          >
-            Cancel
-          </button>
-          <button
-            className="apply-btn-submit"
-            onClick={handleSubmitApplication}
-            disabled={loading || userLoading}
-          >
-            {loading ? 'Submitting...' : userLoading ? 'Loading...' : 'Submit Application'}
-          </button>
+        {/* Applicant Info */}
+        {userProfile && (
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 space-y-2">
+            <h3 className="font-semibold text-slate-900 text-sm">Your Information</h3>
+            <div className="space-y-1 text-sm">
+              <p><span className="text-slate-600">Name:</span> <span className="font-medium">{userProfile.full_name}</span></p>
+              <p><span className="text-slate-600">Email:</span> <span className="font-medium">{userProfile.email}</span></p>
+              {userProfile.phone_number && (
+                <p><span className="text-slate-600">Phone:</span> <span className="font-medium">{userProfile.phone_number}</span></p>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Cover Letter */}
+        <div>
+          <label className="block text-sm font-medium text-slate-700 mb-2">
+            Cover Letter
+          </label>
+          <textarea
+            value={coverLetter}
+            onChange={(e) => setCoverLetter(e.target.value)}
+            disabled={loading}
+            className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:border-blue-500 disabled:opacity-50 text-sm resize-none"
+            rows={5}
+            placeholder="Tell the employer why you're interested in this position..."
+          />
+          <p className="text-xs text-slate-500 mt-1">
+            {coverLetter.length} characters
+          </p>
+        </div>
+
+        {/* Confirmation */}
+        <div className="bg-amber-50 border border-amber-200 rounded-lg p-3">
+          <p className="text-xs text-amber-900">
+            ℹ️ By clicking "Submit Application", you confirm that all the information provided is accurate and agree to the job application terms.
+          </p>
         </div>
       </div>
-    </div>
+    </ExpandableModal>
   )
 }
