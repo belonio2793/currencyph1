@@ -102,7 +102,16 @@ export default function Dashboard({ userId, onNavigate, globalCurrency = 'PHP', 
       <div className="mb-6">
         <div className="bg-gradient-to-br from-slate-900 to-slate-800 rounded-2xl p-6 text-white shadow-lg">
           <p className="text-slate-300 text-sm font-light tracking-wide mb-3">Total Balance</p>
-          <h2 className="text-5xl font-light mb-2">${formatNumber(totalBalance)}</h2>
+          <h2 className="text-5xl font-light mb-2">${formatNumber(totalBalance)} {globalCurrency}</h2>
+          <p className="text-slate-300 text-sm mb-4">
+            {loadingCrypto ? (
+              <span className="italic text-slate-400">loading {globalCryptocurrency}...</span>
+            ) : cryptoBalance !== null ? (
+              <>{cryptoBalance.toFixed(8)} {globalCryptocurrency}</>
+            ) : (
+              <span className="italic text-slate-400">crypto unavailable</span>
+            )}
+          </p>
           <p className="text-slate-400 text-sm">Across all currencies</p>
         </div>
       </div>
