@@ -305,10 +305,10 @@ export default function Rates() {
           {/* Main Grid */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
         {/* Left Column - Converter */}
-        <div className="col-span-2 space-y-6">
+        <div className="lg:col-span-2 space-y-6">
           {/* Converter Card */}
-          <div className="bg-white rounded-2xl shadow-lg p-8 border border-slate-200">
-            <h2 className="text-2xl font-semibold text-slate-900 mb-6">Currency Converter</h2>
+          <div className="bg-white rounded-2xl shadow-lg p-6 sm:p-8 border border-slate-200">
+            <h2 className="text-xl sm:text-2xl font-semibold text-slate-900 mb-6">Currency Converter</h2>
 
             <div className="space-y-6">
               {/* From Currency */}
@@ -373,9 +373,9 @@ export default function Rates() {
           </div>
 
           {/* Rates Table */}
-          <div className="bg-white rounded-2xl shadow-lg p-8 border border-slate-200">
+          <div className="bg-white rounded-2xl shadow-lg p-6 sm:p-8 border border-slate-200">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-semibold text-slate-900">All Rates</h2>
+              <h2 className="text-xl sm:text-2xl font-semibold text-slate-900">All Rates</h2>
               <div className="text-sm text-slate-500">
                 {filteredRates.length} currency pair{filteredRates.length !== 1 ? 's' : ''}
               </div>
