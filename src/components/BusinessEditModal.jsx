@@ -1,8 +1,10 @@
 import { useState } from 'react'
 import { supabase } from '../lib/supabaseClient'
-import './BusinessEditModal.css'
+import ExpandableModal from './ExpandableModal'
+import { useDevice } from '../context/DeviceContext'
 
 export default function BusinessEditModal({ business, userId, onClose, onUpdated }) {
+  const { isMobile } = useDevice()
   const [formData, setFormData] = useState({
     business_name: business?.business_name || '',
     registration_type: business?.registration_type || 'sole',
@@ -32,12 +34,10 @@ export default function BusinessEditModal({ business, userId, onClose, onUpdated
     setError('')
 
     try {
-      // Validate required fields
       if (!formData.business_name.trim()) {
         throw new Error('Business name is required')
       }
 
-      // Update business in database
       const { error: updateError } = await supabase
         .from('businesses')
         .update({
@@ -70,193 +70,195 @@ export default function BusinessEditModal({ business, userId, onClose, onUpdated
     }
   }
 
+  const footer = (
+    <div className="flex gap-2 w-full">
+      <button
+        type="button"
+        onClick={onClose}
+        className="flex-1 px-4 py-2 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 font-medium"
+        disabled={loading}
+      >
+        Cancel
+      </button>
+      <button
+        type="submit"
+        form="business-edit-form"
+        className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-slate-400 font-medium"
+        disabled={loading}
+      >
+        {loading ? 'Saving...' : 'Save Changes'}
+      </button>
+    </div>
+  )
+
   return (
-    <div className="modal-overlay" onClick={onClose}>
-      <div className="modal-content business-edit-modal" onClick={(e) => e.stopPropagation()}>
-        <div className="modal-header">
-          <h2>Edit Business Details</h2>
-          <button className="btn-close" onClick={onClose}>X</button>
+    <ExpandableModal
+      isOpen={true}
+      onClose={onClose}
+      title="Edit Business Details"
+      icon="🏢"
+      size="lg"
+      footer={footer}
+      defaultExpanded={!isMobile}
+    >
+      {error && (
+        <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded text-sm text-red-700 flex justify-between items-center">
+          <span>{error}</span>
+          <button onClick={() => setError('')} className="text-red-600 hover:text-red-800">×</button>
+        </div>
+      )}
+
+      <form id="business-edit-form" onSubmit={handleSubmit} className="space-y-6">
+        {/* Basic Information */}
+        <div className="space-y-4">
+          <h3 className="text-lg font-semibold text-slate-900">Basic Information</h3>
+          
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-2">Business Name *</label>
+            <input
+              type="text"
+              name="business_name"
+              value={formData.business_name}
+              onChange={handleChange}
+              placeholder="Enter business name"
+              className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              required
+            />
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-2">Registration Type</label>
+              <select
+                name="registration_type"
+                value={formData.registration_type}
+                onChange={handleChange}
+                className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="sole">Sole Proprietor</option>
+                <option value="partnership">Partnership</option>
+                <option value="corporation">Corporation</option>
+                <option value="llc">LLC</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-2">City/Region</label>
+              <input
+                type="text"
+                name="city_of_registration"
+                value={formData.city_of_registration}
+                onChange={handleChange}
+                placeholder="e.g., Manila"
+                className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+          </div>
         </div>
 
-        {error && (
-          <div className="error-message">
-            {error}
-            <button onClick={() => setError('')} className="close-error">X</button>
-          </div>
-        )}
+        {/* Registration Details */}
+        <div className="space-y-4">
+          <h3 className="text-lg font-semibold text-slate-900">Registration Details</h3>
 
-        <form onSubmit={handleSubmit}>
-          {/* Basic Information */}
-          <div className="form-section">
-            <h3>Basic Information</h3>
-            
-            <div className="form-group">
-              <label htmlFor="business_name">Business Name *</label>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-2">TIN</label>
               <input
                 type="text"
-                id="business_name"
-                name="business_name"
-                value={formData.business_name}
+                name="tin"
+                value={formData.tin}
                 onChange={handleChange}
-                placeholder="Enter business name"
-                required
+                placeholder="Tax Identification Number"
+                className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
 
-            <div className="form-row">
-              <div className="form-group">
-                <label htmlFor="registration_type">Registration Type</label>
-                <select
-                  id="registration_type"
-                  name="registration_type"
-                  value={formData.registration_type}
-                  onChange={handleChange}
-                >
-                  <option value="sole">Sole Proprietor</option>
-                  <option value="partnership">Partnership</option>
-                  <option value="corporation">Corporation</option>
-                  <option value="llc">LLC</option>
-                </select>
-              </div>
-
-              <div className="form-group">
-                <label htmlFor="city_of_registration">City/Region</label>
-                <input
-                  type="text"
-                  id="city_of_registration"
-                  name="city_of_registration"
-                  value={formData.city_of_registration}
-                  onChange={handleChange}
-                  placeholder="e.g., Manila"
-                />
-              </div>
-            </div>
-          </div>
-
-          {/* Registration Details */}
-          <div className="form-section">
-            <h3>Registration Details</h3>
-
-            <div className="form-row">
-              <div className="form-group">
-                <label htmlFor="tin">TIN</label>
-                <input
-                  type="text"
-                  id="tin"
-                  name="tin"
-                  value={formData.tin}
-                  onChange={handleChange}
-                  placeholder="Tax Identification Number"
-                />
-              </div>
-
-              <div className="form-group">
-                <label htmlFor="currency_registration_id">Currency Registration ID</label>
-                <input
-                  type="text"
-                  id="currency_registration_id"
-                  name="currency_registration_id"
-                  value={formData.currency_registration_id}
-                  readOnly
-                  placeholder="CRN-XXXXXXXXXXXXXXXX"
-                  style={{ backgroundColor: '#f3f4f6', color: '#6b7280', cursor: 'not-allowed' }}
-                />
-              </div>
-            </div>
-
-            <div className="form-group">
-              <label htmlFor="address">Address</label>
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-2">Currency Registration ID</label>
               <input
                 type="text"
-                id="address"
-                name="address"
-                value={formData.address}
-                onChange={handleChange}
-                placeholder="Business address"
+                name="currency_registration_id"
+                value={formData.currency_registration_id}
+                readOnly
+                placeholder="CRN-XXXXXXXXXXXXXXXX"
+                className="w-full px-3 py-2 border border-slate-300 rounded-lg bg-slate-100 text-slate-600 cursor-not-allowed"
               />
             </div>
           </div>
 
-          {/* Contact Information */}
-          <div className="form-section">
-            <h3>Contact Information</h3>
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-2">Address</label>
+            <input
+              type="text"
+              name="address"
+              value={formData.address}
+              onChange={handleChange}
+              placeholder="Business address"
+              className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+        </div>
 
-            <div className="form-row">
-              <div className="form-group">
-                <label htmlFor="phone">Phone</label>
-                <input
-                  type="tel"
-                  id="phone"
-                  name="phone"
-                  value={formData.phone}
-                  onChange={handleChange}
-                  placeholder="Phone number"
-                />
-              </div>
+        {/* Contact Information */}
+        <div className="space-y-4">
+          <h3 className="text-lg font-semibold text-slate-900">Contact Information</h3>
 
-              <div className="form-group">
-                <label htmlFor="email">Email</label>
-                <input
-                  type="email"
-                  id="email"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleChange}
-                  placeholder="Email address"
-                />
-              </div>
-            </div>
-
-            <div className="form-group">
-              <label htmlFor="website">Website</label>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-2">Phone</label>
               <input
-                type="url"
-                id="website"
-                name="website"
-                value={formData.website}
+                type="tel"
+                name="phone"
+                value={formData.phone}
                 onChange={handleChange}
-                placeholder="https://example.com"
+                placeholder="Phone number"
+                className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-2">Email</label>
+              <input
+                type="email"
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
+                placeholder="Email address"
+                className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
           </div>
 
-          {/* Description */}
-          <div className="form-section">
-            <h3>Business Description</h3>
-
-            <div className="form-group">
-              <label htmlFor="description">Description</label>
-              <textarea
-                id="description"
-                name="description"
-                value={formData.description}
-                onChange={handleChange}
-                placeholder="Tell us about your business..."
-                rows="4"
-              ></textarea>
-            </div>
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-2">Website</label>
+            <input
+              type="url"
+              name="website"
+              value={formData.website}
+              onChange={handleChange}
+              placeholder="https://example.com"
+              className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
           </div>
+        </div>
 
-          {/* Action Buttons */}
-          <div className="modal-actions">
-            <button
-              type="button"
-              onClick={onClose}
-              className="btn-cancel"
-              disabled={loading}
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              className="btn-submit"
-              disabled={loading}
-            >
-              {loading ? 'Saving...' : 'Save Changes'}
-            </button>
+        {/* Description */}
+        <div className="space-y-4">
+          <h3 className="text-lg font-semibold text-slate-900">Business Description</h3>
+
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-2">Description</label>
+            <textarea
+              name="description"
+              value={formData.description}
+              onChange={handleChange}
+              placeholder="Tell us about your business..."
+              rows="4"
+              className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
           </div>
-        </form>
-      </div>
-    </div>
+        </div>
+      </form>
+    </ExpandableModal>
   )
 }
