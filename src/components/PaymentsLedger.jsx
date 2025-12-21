@@ -169,19 +169,19 @@ export default function PaymentsLedger({ globalCurrency = 'PHP' }) {
 
           <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-4">
             <p className="text-xs font-semibold text-emerald-700 uppercase mb-1">Gross Revenue</p>
-            <p className="text-2xl font-bold text-emerald-900">{globalCurrency} {summary.totalAmount.toFixed(2)}</p>
+            <p className="text-2xl font-bold text-emerald-900">{globalCurrency} {formatNumber(summary.totalAmount)}</p>
             <p className="text-xs text-emerald-600 mt-2">Succeeded payments only</p>
           </div>
 
           <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
             <p className="text-xs font-semibold text-purple-700 uppercase mb-1">Total Fees</p>
-            <p className="text-2xl font-bold text-purple-900">{globalCurrency} {summary.totalFees.toFixed(2)}</p>
+            <p className="text-2xl font-bold text-purple-900">{globalCurrency} {formatNumber(summary.totalFees)}</p>
             <p className="text-xs text-purple-600 mt-2">Fee collected</p>
           </div>
 
           <div className="bg-indigo-50 border border-indigo-200 rounded-lg p-4">
             <p className="text-xs font-semibold text-indigo-700 uppercase mb-1">Net Revenue</p>
-            <p className="text-2xl font-bold text-indigo-900">{globalCurrency} {summary.netRevenue.toFixed(2)}</p>
+            <p className="text-2xl font-bold text-indigo-900">{globalCurrency} {formatNumber(summary.netRevenue)}</p>
             <p className="text-xs text-indigo-600 mt-2">After fees</p>
           </div>
         </div>
@@ -305,13 +305,13 @@ export default function PaymentsLedger({ globalCurrency = 'PHP' }) {
                         </td>
                         <td className="px-6 py-4 text-sm text-slate-600">{payment.payment_method || '-'}</td>
                         <td className="px-6 py-4 text-sm font-medium text-slate-900 text-right">
-                          {globalCurrency} {Number(payment.amount || 0).toFixed(2)}
+                          {globalCurrency} {formatNumber(payment.amount || 0)}
                         </td>
                         <td className="px-6 py-4 text-sm text-slate-600 text-right">
-                          {globalCurrency} {Number(payment.fee_amount || 0).toFixed(2)}
+                          {globalCurrency} {formatNumber(payment.fee_amount || 0)}
                         </td>
                         <td className="px-6 py-4 text-sm font-medium text-slate-900 text-right">
-                          {globalCurrency} {Number(payment.net_amount || payment.amount - (payment.fee_amount || 0)).toFixed(2)}
+                          {globalCurrency} {formatNumber(payment.net_amount || payment.amount - (payment.fee_amount || 0))}
                         </td>
                         <td className="px-6 py-4 text-sm">
                           <span className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${statusColors.badge}`}>
@@ -399,7 +399,7 @@ export default function PaymentsLedger({ globalCurrency = 'PHP' }) {
               <div className="grid grid-cols-2 gap-4">
                 <div className="bg-slate-50 rounded-lg p-4 border border-slate-200">
                   <p className="text-xs font-semibold text-slate-600 uppercase mb-1">Amount</p>
-                  <p className="text-2xl font-bold text-slate-900">{globalCurrency} {Number(selectedPayment.amount || 0).toFixed(2)}</p>
+                  <p className="text-2xl font-bold text-slate-900">{globalCurrency} {formatNumber(selectedPayment.amount || 0)}</p>
                 </div>
                 <div className="bg-slate-50 rounded-lg p-4 border border-slate-200">
                   <p className="text-xs font-semibold text-slate-600 uppercase mb-1">Status</p>
@@ -415,15 +415,15 @@ export default function PaymentsLedger({ globalCurrency = 'PHP' }) {
                 <div className="space-y-3">
                   <div className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
                     <span className="text-slate-700">Gross Amount</span>
-                    <span className="font-semibold text-slate-900">{globalCurrency} {Number(selectedPayment.amount || 0).toFixed(2)}</span>
+                    <span className="font-semibold text-slate-900">{globalCurrency} {formatNumber(selectedPayment.amount || 0)}</span>
                   </div>
                   <div className="flex items-center justify-between p-3 bg-red-50 rounded-lg">
                     <span className="text-slate-700">Fee Amount</span>
-                    <span className="font-semibold text-red-900">-{globalCurrency} {Number(selectedPayment.fee_amount || 0).toFixed(2)}</span>
+                    <span className="font-semibold text-red-900">-{globalCurrency} {formatNumber(selectedPayment.fee_amount || 0)}</span>
                   </div>
                   <div className="flex items-center justify-between p-3 bg-emerald-50 rounded-lg border-2 border-emerald-200">
                     <span className="font-semibold text-slate-900">Net Amount</span>
-                    <span className="font-bold text-emerald-900">{globalCurrency} {Number(selectedPayment.net_amount || selectedPayment.amount - (selectedPayment.fee_amount || 0)).toFixed(2)}</span>
+                    <span className="font-bold text-emerald-900">{globalCurrency} {formatNumber(selectedPayment.net_amount || selectedPayment.amount - (selectedPayment.fee_amount || 0))}</span>
                   </div>
                 </div>
               </div>
