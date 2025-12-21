@@ -989,9 +989,9 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
             )}
 
             {/* Cryptocurrency Address QR */}
-            {selectedMethod && selectedMethodData?.type === 'crypto' && (
+            {activeMethodData?.type === 'crypto' && (
               <div className="mb-8 p-6 bg-purple-50 border border-purple-200 rounded-lg">
-                {selectedMethodData?.address ? (
+                {activeMethodData?.address ? (
                   <>
                     <div className="mb-4">
                       <p className="text-sm font-semibold text-slate-900 mb-2">Deposit Address</p>
@@ -1002,7 +1002,7 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
                         </div>
                         <div>
                           <p className="text-slate-600">Network</p>
-                          <p className="font-semibold text-slate-900">{selectedMethodData.network}</p>
+                          <p className="font-semibold text-slate-900">{activeMethodData.network}</p>
                         </div>
                       </div>
                     </div>
@@ -1010,27 +1010,27 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
                     <div className="mb-4">
                       <p className="text-xs font-medium text-slate-600 mb-2">Copy the address below:</p>
                       <p className="font-mono text-xs bg-white p-3 rounded border border-slate-300 break-all text-slate-800 mb-2">
-                        {selectedMethodData.address}
+                        {activeMethodData.address}
                       </p>
                       <button
-                        onClick={() => copyToClipboard(selectedMethodData.address)}
+                        onClick={() => copyToClipboard(activeMethodData.address)}
                         className="text-sm text-purple-600 hover:text-purple-700 font-medium"
                       >
                         Copy Address
                       </button>
                     </div>
 
-                    {selectedMethodData.network && (
+                    {activeMethodData.network && (
                       <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg text-xs text-slate-700">
                         <span className="font-medium">Network: </span>
-                        <span className="font-semibold">{selectedMethodData.network}</span>
+                        <span className="font-semibold">{activeMethodData.network}</span>
                       </div>
                     )}
                   </>
                 ) : (
                   <div className="p-4 bg-yellow-100 border border-yellow-300 rounded text-yellow-800 text-sm">
                     <p className="font-medium">Address not available</p>
-                    <p className="mt-2">{selectedMethodData.name} via {selectedMethodData.network} is not currently configured for deposits.</p>
+                    <p className="mt-2">{activeMethodData.name} via {activeMethodData.network} is not currently configured for deposits.</p>
                   </div>
                 )}
               </div>
@@ -1040,16 +1040,16 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
             <div className="mb-8 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
               <p className="font-semibold text-yellow-900 mb-2">Important:</p>
               <ul className="text-sm text-yellow-800 space-y-1">
-                {selectedMethodData?.type === 'crypto' && (
+                {activeMethodData?.type === 'crypto' && (
                   <>
-                    <li>• Only send {selectedMethodData.cryptoName} ({selectedMethodData.cryptoSymbol}) to this address</li>
-                    {selectedMethodData.network && <li>• Network: {selectedMethodData.network}</li>}
+                    <li>• Only send {activeMethodData.cryptoName} ({activeMethodData.cryptoSymbol}) to this address</li>
+                    {activeMethodData.network && <li>• Network: {activeMethodData.network}</li>}
                     <li>• Do not send other tokens or cryptocurrencies</li>
                     <li>• Transactions cannot be reversed</li>
                     <li>• Keep the transaction hash for your records</li>
                   </>
                 )}
-                {selectedMethodData?.type === 'fiat' && (
+                {activeMethodData?.type === 'fiat' && (
                   <>
                     <li>• Ensure you have sufficient balance</li>
                     <li>• Double-check the amount before confirming</li>
