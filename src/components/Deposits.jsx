@@ -1134,6 +1134,9 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
                     const convertedAmount = notesMeta.converted_amount || deposit.converted_amount
                     const walletCurrency = notesMeta.wallet_currency || deposit.wallet_currency || deposit.currency_code
 
+                    // Get wallet information for this deposit
+                    const depositWallet = wallets.find(w => w.id === deposit.wallet_id)
+
                     // Helper function to format numbers with proper decimal/thousand separators
                     const formatAmount = (num) => {
                       if (!num && num !== 0) return '—'
@@ -1161,6 +1164,12 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
                         </td>
                         <td className="py-3 px-4 text-slate-700">
                           {methodName}
+                        </td>
+                        <td className="py-3 px-4 text-xs text-slate-600 font-mono">
+                          {depositWallet?.id || deposit.wallet_id || '—'}
+                        </td>
+                        <td className="py-3 px-4 text-xs text-slate-600 font-mono">
+                          {depositWallet?.account_number || '—'}
                         </td>
                         <td className="py-3 px-4 text-xs text-slate-600 font-mono">
                           {deposit.reference_number || deposit.phone_number || '—'}
