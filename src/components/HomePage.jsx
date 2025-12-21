@@ -291,23 +291,23 @@ export default function HomePage({ userId, userEmail, globalCurrency = 'PHP', se
         )}
 
         {/* Quick Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 mb-6 sm:mb-8">
           {/* Total Balance */}
-          <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-6 border border-blue-200">
-            <p className="text-sm text-blue-600 font-medium uppercase tracking-wider mb-1">Total Balance</p>
-            <p className="text-3xl font-light text-blue-900">{formatNumber(totalBalanceConverted != null ? totalBalanceConverted : getTotalBalance())} {globalCurrency}</p>
+          <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-4 sm:p-6 border border-blue-200">
+            <p className="text-xs sm:text-sm text-blue-600 font-medium uppercase tracking-wider mb-2">Total Balance</p>
+            <p className="text-2xl sm:text-3xl font-light text-blue-900">{formatNumber(totalBalanceConverted != null ? totalBalanceConverted : getTotalBalance())} {globalCurrency}</p>
           </div>
 
           {/* Net (Balance - Debt) */}
-          <div className={`rounded-xl p-6 border ${isNegativeNet ? 'bg-gradient-to-br from-rose-50 to-rose-100 border-rose-200' : 'bg-gradient-to-br from-emerald-50 to-emerald-100 border-emerald-200'}`}>
-            <p className={`text-sm font-medium uppercase tracking-wider mb-1 ${isNegativeNet ? 'text-rose-600' : 'text-emerald-600'}`}>Net</p>
-            <p className={`text-3xl font-light ${isNegativeNet ? 'text-rose-900' : 'text-emerald-900'}`}>{formatNumber(netDisplay)} {globalCurrency}</p>
+          <div className={`rounded-xl p-4 sm:p-6 border ${isNegativeNet ? 'bg-gradient-to-br from-rose-50 to-rose-100 border-rose-200' : 'bg-gradient-to-br from-emerald-50 to-emerald-100 border-emerald-200'}`}>
+            <p className={`text-xs sm:text-sm font-medium uppercase tracking-wider mb-2 ${isNegativeNet ? 'text-rose-600' : 'text-emerald-600'}`}>Net</p>
+            <p className={`text-2xl sm:text-3xl font-light ${isNegativeNet ? 'text-rose-900' : 'text-emerald-900'}`}>{formatNumber(netDisplay)} {globalCurrency}</p>
           </div>
 
           {/* Total Debt */}
-          <div className="bg-gradient-to-br from-red-50 to-red-100 rounded-xl p-6 border border-red-200">
-            <p className="text-sm text-red-600 font-medium uppercase tracking-wider mb-1">Total Debt</p>
-            <p className="text-3xl font-light text-red-900">{formatNumber(totalDebtConverted != null ? totalDebtConverted : getTotalDebt())} {globalCurrency}</p>
+          <div className="bg-gradient-to-br from-red-50 to-red-100 rounded-xl p-4 sm:p-6 border border-red-200">
+            <p className="text-xs sm:text-sm text-red-600 font-medium uppercase tracking-wider mb-2">Total Debt</p>
+            <p className="text-2xl sm:text-3xl font-light text-red-900">{formatNumber(totalDebtConverted != null ? totalDebtConverted : getTotalDebt())} {globalCurrency}</p>
           </div>
         </div>
 
