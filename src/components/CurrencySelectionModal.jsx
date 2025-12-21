@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import ResponsiveModal from './ResponsiveModal'
 import ResponsiveButton from './ResponsiveButton'
 import { getResponsiveFontSize } from '../lib/responsiveUtils'
@@ -53,6 +53,14 @@ export default function CurrencySelectionModal({ isOpen, onClose, globalCurrency
     { code: 'UNI', label: 'UNI - Uniswap' }
   ]
 
+  // Sync local state when modal opens or global currency changes
+  useEffect(() => {
+    if (isOpen) {
+      setLocalFiatCurrency(globalCurrency)
+      setLocalCryptoCurrency(globalCryptocurrency)
+    }
+  }, [isOpen, globalCurrency, globalCryptocurrency])
+
   const handleApply = () => {
     setGlobalCurrency(localFiatCurrency)
     setGlobalCryptocurrency(localCryptoCurrency)
@@ -63,6 +71,16 @@ export default function CurrencySelectionModal({ isOpen, onClose, globalCurrency
     setLocalFiatCurrency(globalCurrency)
     setLocalCryptoCurrency(globalCryptocurrency)
     onClose()
+  }
+
+  const getFiatCurrencyLabel = (code) => {
+    const curr = fiatCurrencies.find(c => c.code === code)
+    return curr ? curr.label : code
+  }
+
+  const getCryptoCurrencyLabel = (code) => {
+    const crypto = cryptocurrencies.find(c => c.code === code)
+    return crypto ? crypto.label : code
   }
 
   return (
@@ -88,21 +106,43 @@ export default function CurrencySelectionModal({ isOpen, onClose, globalCurrency
         </>
       }
     >
-      {/* Content with responsive spacing */}
       <div className="space-y-4 sm:space-y-6">
+        {/* Currently Selected Currency Info */}
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 sm:p-5">
+          <h3 className="text-sm font-semibold text-blue-900 mb-2">Currently Selected</h3>
+          <div className="text-sm text-blue-800 space-y-1">
+            <p><span className="font-medium">Display Currency:</span> <span className="inline-flex items-center gap-2">
+              {getFiatCurrencyLabel(globalCurrency)}
+              {globalCurrency === 'PHP' && <span className="text-xs bg-green-100 text-green-800 px-2 py-0.5 rounded font-medium">Default</span>}
+            </span></p>
+            <p><span className="font-medium">Display Cryptocurrency:</span> {getCryptoCurrencyLabel(globalCryptocurrency)}</p>
+          </div>
+        </div>
+
         {/* Fiat Currency Section */}
         <div className="space-y-2 sm:space-y-3">
-          <label className="text-sm sm:text-base font-medium text-slate-900">
-            Display Currency
-          </label>
+          <div className="flex items-center justify-between">
+            <label className="text-sm sm:text-base font-medium text-slate-900">
+              Display Currency
+            </label>
+            {localFiatCurrency === globalCurrency && (
+              <span className="text-xs font-medium text-blue-600 bg-blue-50 px-2 py-1 rounded">
+                ✓ Currently Selected
+              </span>
+            )}
+          </div>
           <select
             value={localFiatCurrency}
             onChange={(e) => setLocalFiatCurrency(e.target.value)}
-            className="w-full px-3 sm:px-4 py-2.5 sm:py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm sm:text-base bg-white"
+            className={`w-full px-3 sm:px-4 py-2.5 sm:py-3 border-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm sm:text-base bg-white transition-colors ${
+              localFiatCurrency === globalCurrency
+                ? 'border-blue-500 bg-blue-50'
+                : 'border-slate-300 hover:border-slate-400'
+            }`}
           >
             {fiatCurrencies.map(curr => (
               <option key={curr.code} value={curr.code}>
-                {curr.label}
+                {curr.label}{curr.code === 'PHP' ? ' (Default)' : ''}
               </option>
             ))}
           </select>
@@ -110,13 +150,24 @@ export default function CurrencySelectionModal({ isOpen, onClose, globalCurrency
 
         {/* Cryptocurrency Section */}
         <div className="space-y-2 sm:space-y-3">
-          <label className="text-sm sm:text-base font-medium text-slate-900">
-            Display Cryptocurrency
-          </label>
+          <div className="flex items-center justify-between">
+            <label className="text-sm sm:text-base font-medium text-slate-900">
+              Display Cryptocurrency
+            </label>
+            {localCryptoCurrency === globalCryptocurrency && (
+              <span className="text-xs font-medium text-blue-600 bg-blue-50 px-2 py-1 rounded">
+                ✓ Currently Selected
+              </span>
+            )}
+          </div>
           <select
             value={localCryptoCurrency}
             onChange={(e) => setLocalCryptoCurrency(e.target.value)}
-            className="w-full px-3 sm:px-4 py-2.5 sm:py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm sm:text-base bg-white"
+            className={`w-full px-3 sm:px-4 py-2.5 sm:py-3 border-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm sm:text-base bg-white transition-colors ${
+              localCryptoCurrency === globalCryptocurrency
+                ? 'border-blue-500 bg-blue-50'
+                : 'border-slate-300 hover:border-slate-400'
+            }`}
           >
             {cryptocurrencies.map(crypto => (
               <option key={crypto.code} value={crypto.code}>
@@ -124,6 +175,13 @@ export default function CurrencySelectionModal({ isOpen, onClose, globalCurrency
               </option>
             ))}
           </select>
+        </div>
+
+        {/* Info Message */}
+        <div className="bg-slate-50 border border-slate-200 rounded-lg p-3 sm:p-4">
+          <p className="text-xs sm:text-sm text-slate-600">
+            <span className="font-medium">💡 Tip:</span> Your currency selection will be saved and applied to all monetary values across the application.
+          </p>
         </div>
       </div>
     </ResponsiveModal>
