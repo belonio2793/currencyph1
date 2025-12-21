@@ -566,6 +566,29 @@ export default function LandingPage({ userId, userEmail, globalCurrency = 'PHP',
     return () => clearInterval(interval)
   }, [exchangeRates, globalCurrency])
 
+  // Convert total balance to cryptocurrency for dual display
+  useEffect(() => {
+    const convertToCrypto = async () => {
+      const totalBalanceValue = parseFloat(getTotalBalance()) || 0
+      if (!totalBalanceValue || !globalCryptocurrency || !globalCurrency || !userEmail) {
+        setCryptoBalance(null)
+        return
+      }
+
+      setLoadingCrypto(true)
+      try {
+        const crypto = await convertFiatToCryptoDb(totalBalanceValue, globalCurrency, globalCryptocurrency)
+        setCryptoBalance(crypto)
+      } catch (error) {
+        console.error('Failed to convert balance to crypto:', error)
+        setCryptoBalance(null)
+      }
+      setLoadingCrypto(false)
+    }
+
+    convertToCrypto()
+  }, [getTotalBalance(), globalCurrency, globalCryptocurrency, userEmail])
+
   const calculateMultiCurrencyConversion = () => {
     const numAmount = parseFloat(amount) || 0
     if (numAmount <= 0) {
