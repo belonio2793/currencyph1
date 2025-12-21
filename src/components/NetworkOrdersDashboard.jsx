@@ -4,6 +4,7 @@ import L from 'leaflet'
 import { shippingRouteService } from '../lib/shippingRouteService'
 import { supabase } from '../lib/supabaseClient'
 import { logErrorSafely } from '../lib/safeErrorHandler'
+import { formatNumber } from '../lib/currency'
 
 delete L.Icon.Default.prototype._getIconUrl
 L.Icon.Default.mergeOptions({
