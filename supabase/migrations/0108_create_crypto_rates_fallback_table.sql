@@ -10,6 +10,9 @@
 
 BEGIN;
 
+-- Ensure extension for gen_random_uuid()
+CREATE EXTENSION IF NOT EXISTS pgcrypto;
+
 -- Create crypto_rates table
 CREATE TABLE IF NOT EXISTS public.crypto_rates (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -29,7 +32,7 @@ CREATE TABLE IF NOT EXISTS public.crypto_rates (
   -- Timestamps
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW(),
-  expires_at TIMESTAMPTZ DEFAULT NOW() + INTERVAL '1 hour',  -- Cache expiry
+  expires_at TIMESTAMPTZ DEFAULT NOW() + INTERVAL '1 hour',
   
   -- Uniqueness constraint
   UNIQUE (from_currency, to_currency)
@@ -43,10 +46,9 @@ CREATE INDEX IF NOT EXISTS idx_crypto_rates_updated_at
 ON public.crypto_rates(updated_at DESC);
 
 CREATE INDEX IF NOT EXISTS idx_crypto_rates_expires_at 
-ON public.crypto_rates(expires_at DESC)
-WHERE expires_at > NOW();
+ON public.crypto_rates(expires_at DESC);
 
--- Create trigger to update updated_at timestamp
+-- Create trigger function to auto-update updated_at
 CREATE OR REPLACE FUNCTION update_crypto_rates_updated_at()
 RETURNS TRIGGER AS $$
 BEGIN
@@ -55,22 +57,22 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+-- Drop existing trigger if exists
 DROP TRIGGER IF EXISTS trigger_crypto_rates_updated_at ON public.crypto_rates;
 
+-- Create trigger
 CREATE TRIGGER trigger_crypto_rates_updated_at
 BEFORE UPDATE ON public.crypto_rates
 FOR EACH ROW
 EXECUTE FUNCTION update_crypto_rates_updated_at();
 
--- Allow RLS for this table (but we'll make it public readable)
+-- Enable RLS and create policies
 ALTER TABLE public.crypto_rates ENABLE ROW LEVEL SECURITY;
 
--- Public read policy (rates are public data)
 CREATE POLICY "Allow public read of crypto_rates" ON public.crypto_rates
   FOR SELECT
   USING (true);
 
--- Service role can insert/update (for edge functions)
 CREATE POLICY "Allow service role full access to crypto_rates" ON public.crypto_rates
   FOR ALL
   USING (auth.role() = 'service_role')
@@ -96,7 +98,7 @@ FROM public.crypto_rates
 WHERE expires_at > NOW()
 ORDER BY from_currency, to_currency, updated_at DESC;
 
--- Cleanup function (can be called periodically to remove expired entries)
+-- Cleanup function for expired rates
 CREATE OR REPLACE FUNCTION cleanup_expired_crypto_rates()
 RETURNS TABLE(deleted_count INT) AS $$
 DECLARE
