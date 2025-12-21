@@ -3,6 +3,7 @@ import ExpandableModal from './ExpandableModal'
 import { useDevice } from '../context/DeviceContext'
 
 export default function RatingModal({ ride, otherUserName, onClose, onSubmitRating, loading }) {
+  const { isMobile } = useDevice()
   const [rating, setRating] = useState(0)
   const [hoveredRating, setHoveredRating] = useState(0)
   const [categories, setCategories] = useState({
