@@ -47,8 +47,10 @@ async function fetchOpenExchangeRates() {
 
 async function fetchCoinGecko(toCurrency = 'php') {
   try {
+    // All 30 cryptocurrencies from /deposits
     const cryptoIds = [
-      'bitcoin','ethereum','litecoin','dogecoin','ripple','cardano','solana','avalanche-2','matic-network','polkadot','chainlink','uniswap','aave','usd-coin','tether','binancecoin','stellar','tron','hedera-hashgraph','the-open-network','sui'
+      'bitcoin','ethereum','litecoin','dogecoin','ripple','cardano','solana','avalanche-2','polkadot','chainlink','uniswap','aave','usd-coin','tether','binancecoin','stellar','tron','hedera-hashgraph','the-open-network','sui',
+      'bitcoin-cash','shiba-inu','paypal-usd','world-coin','tether-gold','pepe','hyperliquid','asterzk','ethena','sky'
     ].join(',')
     const url = `https://api.coingecko.com/api/v3/simple/price?ids=${cryptoIds}&vs_currencies=${toCurrency}&precision=8&include_market_cap=true&include_24hr_vol=true`
 
