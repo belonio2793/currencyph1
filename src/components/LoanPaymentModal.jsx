@@ -101,26 +101,46 @@ export default function LoanPaymentModal({ loan, userId, onClose, onSuccess, wal
     }
   }
 
-  return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg shadow-lg max-w-md w-full">
-        {/* Header */}
-        <div className="border-b border-slate-200 px-6 py-4 flex items-center justify-between">
-          <h2 className="text-xl font-semibold text-slate-900">
-            {step === 1 ? 'Enter Payment Amount' : 'Confirm Payment'}
-          </h2>
-          <button
-            onClick={onClose}
-            className="text-slate-400 hover:text-slate-600 transition-colors"
-          >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
-        </div>
+  const footer = (
+    <div className="flex gap-2 w-full">
+      {step === 2 && (
+        <button
+          type="button"
+          onClick={() => setStep(1)}
+          className="flex-1 px-4 py-2 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors font-medium"
+        >
+          Back
+        </button>
+      )}
+      <button
+        type="button"
+        onClick={onClose}
+        className="flex-1 px-4 py-2 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors font-medium"
+      >
+        Cancel
+      </button>
+      <button
+        type="submit"
+        form="loan-payment-form"
+        disabled={loading}
+        className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+      >
+        {loading ? 'Processing...' : step === 1 ? 'Review' : 'Confirm Payment'}
+      </button>
+    </div>
+  )
 
-        {/* Content */}
-        <form onSubmit={handlePayment} className="p-6 space-y-4">
+  return (
+    <ExpandableModal
+      isOpen={true}
+      onClose={onClose}
+      title={step === 1 ? 'Enter Payment Amount' : 'Confirm Payment'}
+      icon="💳"
+      size={isMobile ? 'fullscreen' : 'md'}
+      footer={footer}
+      defaultExpanded={!isMobile}
+    >
+      <form onSubmit={handlePayment} id="loan-payment-form" className="space-y-4">
           {/* Error Message */}
           {error && (
             <div className="p-3 bg-red-50 border border-red-200 text-red-700 rounded-lg text-sm">
@@ -240,34 +260,7 @@ export default function LoanPaymentModal({ loan, userId, onClose, onSuccess, wal
             </>
           )}
 
-          {/* Buttons */}
-          <div className="flex gap-3 pt-4 border-t border-slate-200">
-            {step === 2 && (
-              <button
-                type="button"
-                onClick={() => setStep(1)}
-                className="flex-1 px-4 py-2 border-2 border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors font-medium"
-              >
-                Back
-              </button>
-            )}
-            <button
-              type="button"
-              onClick={onClose}
-              className={`${step === 2 ? 'flex-1' : 'flex-1'} px-4 py-2 border-2 border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors font-medium`}
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              disabled={loading}
-              className={`${step === 2 ? 'flex-1' : 'flex-1'} px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed`}
-            >
-              {loading ? 'Processing...' : step === 1 ? 'Review' : 'Confirm Payment'}
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
+      </form>
+    </ExpandableModal>
   )
 }
