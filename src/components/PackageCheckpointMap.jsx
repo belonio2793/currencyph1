@@ -158,7 +158,7 @@ export default function PackageCheckpointMap({ trackingCode, onClose }) {
           {totalDistance > 0 && (
             <div className="stat">
               <span className="stat-label">Total Distance:</span>
-              <span className="stat-value">{totalDistance.toFixed(2)} km</span>
+              <span className="stat-value">{formatNumber(totalDistance)} km</span>
             </div>
           )}
           <div className="stat">
