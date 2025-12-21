@@ -670,10 +670,16 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
     }
   }, [selectedCurrency, activeType])
 
-  const copyToClipboard = (text) => {
-    navigator.clipboard.writeText(text)
-    setSuccess('Copied to clipboard')
-    setTimeout(() => setSuccess(''), 2000)
+  const copyToClipboard = async (text) => {
+    try {
+      await navigator.clipboard.writeText(text)
+      setSuccess('Copied to clipboard')
+      setTimeout(() => setSuccess(''), 2000)
+    } catch (err) {
+      console.error('Failed to copy to clipboard:', err)
+      setError('Failed to copy address')
+      setTimeout(() => setError(''), 2000)
+    }
   }
 
   if (loading) {
@@ -698,7 +704,8 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
   }
 
   const selectedWalletData = wallets.find(w => w.id === selectedWallet)
-  const selectedMethodData = DEPOSIT_METHODS[selectedMethod]
+  // For fiat methods, use DEPOSIT_METHODS; for crypto methods, use selectedAddressMethod
+  const selectedMethodData = selectedMethod && DEPOSIT_METHODS[selectedMethod] ? DEPOSIT_METHODS[selectedMethod] : null
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 py-8 px-4">
@@ -1281,9 +1288,13 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
                 </button>
                 <button
                   onClick={() => {
-                    setSelectedMethod(selectedAddressMethod.id)
-                    setShowCryptoAddressModal(false)
-                    setStep('confirm')
+                    if (selectedAddressMethod && selectedAddressMethod.id) {
+                      setSelectedMethod(selectedAddressMethod.id)
+                      setShowCryptoAddressModal(false)
+                      setStep('confirm')
+                    } else {
+                      setError('Invalid method selected. Please try again.')
+                    }
                   }}
                   className="flex-1 px-6 py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition"
                 >
