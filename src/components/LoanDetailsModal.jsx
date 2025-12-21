@@ -188,29 +188,26 @@ export default function LoanDetailsModal({ loan, userId, onClose, onSubmitOffer 
     }
   }
 
-  return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 overflow-y-auto">
-      <div className="bg-white rounded-lg shadow-lg max-w-2xl w-full my-8">
-        {/* Header */}
-        <div className="border-b border-slate-200 px-6 py-4 flex items-center justify-between">
-          <h2 className="text-2xl font-semibold text-slate-900">Loan Details</h2>
-          <button
-            onClick={onClose}
-            className="text-slate-400 hover:text-slate-600 transition-colors"
-          >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M6 18L18 6M6 6l12 12"
-              />
-            </svg>
-          </button>
-        </div>
+  const footerContent = (
+    <button
+      onClick={onClose}
+      className="w-full px-4 py-2 bg-slate-600 text-white rounded-lg hover:bg-slate-700 font-medium transition-colors"
+    >
+      Close
+    </button>
+  )
 
-        {/* Content */}
-        <div className="p-6 max-h-[80vh] overflow-y-auto">
+  return (
+    <ExpandableModal
+      isOpen={true}
+      onClose={onClose}
+      title="Loan Details"
+      icon="💰"
+      size="lg"
+      footer={footerContent}
+      defaultExpanded={!isMobile}
+    >
+      {/* Content */}
           {loading ? (
             <div className="text-center py-12">
               <p className="text-slate-600">Loading loan details...</p>
@@ -560,8 +557,6 @@ export default function LoanDetailsModal({ loan, userId, onClose, onSubmitOffer 
               )}
             </>
           )}
-        </div>
-      </div>
-    </div>
+    </ExpandableModal>
   )
 }
