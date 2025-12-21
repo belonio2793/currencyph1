@@ -1,4 +1,7 @@
 import React, { useState } from 'react'
+import ResponsiveModal from './ResponsiveModal'
+import ResponsiveButton from './ResponsiveButton'
+import { getResponsiveFontSize } from '../lib/responsiveUtils'
 
 export default function CurrencySelectionModal({ isOpen, onClose, globalCurrency, setGlobalCurrency, globalCryptocurrency, setGlobalCryptocurrency }) {
   const [localFiatCurrency, setLocalFiatCurrency] = useState(globalCurrency)
@@ -62,86 +65,67 @@ export default function CurrencySelectionModal({ isOpen, onClose, globalCurrency
     onClose()
   }
 
-  if (!isOpen) return null
-
   return (
-    <>
-      {/* Overlay */}
-      <div className="fixed inset-0 bg-black bg-opacity-50 z-50" onClick={handleCancel} />
+    <ResponsiveModal
+      isOpen={isOpen}
+      onClose={handleCancel}
+      title="Currency Selection"
+      size="lg"
+      footer={
+        <>
+          <ResponsiveButton
+            variant="secondary"
+            onClick={handleCancel}
+          >
+            Cancel
+          </ResponsiveButton>
+          <ResponsiveButton
+            variant="primary"
+            onClick={handleApply}
+          >
+            Apply
+          </ResponsiveButton>
+        </>
+      }
+    >
+      {/* Content with responsive spacing */}
+      <div className="space-y-4 sm:space-y-6">
+        {/* Fiat Currency Section */}
+        <div className="space-y-2 sm:space-y-3">
+          <label className="text-sm sm:text-base font-medium text-slate-900">
+            Display Currency
+          </label>
+          <select
+            value={localFiatCurrency}
+            onChange={(e) => setLocalFiatCurrency(e.target.value)}
+            className="w-full px-3 sm:px-4 py-2.5 sm:py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm sm:text-base bg-white"
+          >
+            {fiatCurrencies.map(curr => (
+              <option key={curr.code} value={curr.code}>
+                {curr.label}
+              </option>
+            ))}
+          </select>
+        </div>
 
-      {/* Modal */}
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-        <div className="bg-white rounded-lg shadow-2xl w-full max-w-2xl">
-          {/* Header */}
-          <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-6 py-4 rounded-t-lg flex items-center justify-between">
-            <h2 className="text-xl font-semibold">Currency Selection</h2>
-            <button
-              onClick={handleCancel}
-              className="hover:bg-blue-800 p-1 rounded transition-colors"
-              title="Close"
-            >
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
-          </div>
-
-          {/* Content */}
-          <div className="p-6 space-y-6">
-            {/* Two columns layout */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Fiat Currency Column */}
-              <div className="flex items-center gap-2">
-                <label className="text-sm font-medium text-slate-700">Display Currency:</label>
-                <select
-                  value={localFiatCurrency}
-                  onChange={(e) => setLocalFiatCurrency(e.target.value)}
-                  className="px-3 py-2 border-2 border-slate-300 rounded-lg focus:outline-none focus:border-blue-600 text-sm font-medium bg-slate-50"
-                >
-                  {fiatCurrencies.map(curr => (
-                    <option key={curr.code} value={curr.code}>
-                      {curr.label}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              {/* Cryptocurrency Column */}
-              <div className="flex items-center gap-2">
-                <label className="text-sm font-medium text-slate-700">Display Cryptocurrency:</label>
-                <select
-                  value={localCryptoCurrency}
-                  onChange={(e) => setLocalCryptoCurrency(e.target.value)}
-                  className="px-3 py-2 border-2 border-slate-300 rounded-lg focus:outline-none focus:border-blue-600 text-sm font-medium bg-slate-50"
-                >
-                  {cryptocurrencies.map(crypto => (
-                    <option key={crypto.code} value={crypto.code}>
-                      {crypto.label}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            </div>
-
-          </div>
-
-          {/* Footer */}
-          <div className="bg-slate-50 px-6 py-4 rounded-b-lg flex items-center justify-end gap-3 border-t border-slate-200">
-            <button
-              onClick={handleCancel}
-              className="px-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-md text-slate-700 hover:bg-slate-100"
-            >
-              Cancel
-            </button>
-            <button
-              onClick={handleApply}
-              className="px-3 py-2 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700"
-            >
-              Apply
-            </button>
-          </div>
+        {/* Cryptocurrency Section */}
+        <div className="space-y-2 sm:space-y-3">
+          <label className="text-sm sm:text-base font-medium text-slate-900">
+            Display Cryptocurrency
+          </label>
+          <select
+            value={localCryptoCurrency}
+            onChange={(e) => setLocalCryptoCurrency(e.target.value)}
+            className="w-full px-3 sm:px-4 py-2.5 sm:py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm sm:text-base bg-white"
+          >
+            {cryptocurrencies.map(crypto => (
+              <option key={crypto.code} value={crypto.code}>
+                {crypto.label}
+              </option>
+            ))}
+          </select>
         </div>
       </div>
-    </>
+    </ResponsiveModal>
   )
 }
