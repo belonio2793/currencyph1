@@ -145,7 +145,7 @@ export default function JobOfferForm({
           />
           {jobRate && (
             <span className="job-rate-info">
-              Job rate: ₱{jobRate.toFixed(2)}
+              Job rate: ₱{formatNumber(jobRate)}
             </span>
           )}
         </div>
