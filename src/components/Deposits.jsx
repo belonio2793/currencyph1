@@ -1295,7 +1295,7 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
                   <div className="grid grid-cols-2 gap-4 mb-4">
                     <div>
                       <p className="text-xs text-slate-600">Currency</p>
-                      <p className="font-semibold text-slate-900">{selectedCurrency}</p>
+                      <p className="font-semibold text-slate-900">{selectedCurrency.toUpperCase()}</p>
                     </div>
                     {selectedAddressMethod.network && (
                       <div>
