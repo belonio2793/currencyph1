@@ -1,4 +1,6 @@
 import React, { useState } from 'react'
+import ExpandableModal from './ExpandableModal'
+import { useDevice } from '../context/DeviceContext'
 
 export default function RatingModal({ ride, otherUserName, onClose, onSubmitRating, loading }) {
   const [rating, setRating] = useState(0)
