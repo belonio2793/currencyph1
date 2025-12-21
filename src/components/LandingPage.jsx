@@ -134,7 +134,7 @@ function SearchableCryptoSelect({ value, onChange, options, prices, label }) {
   )
 }
 
-export default function LandingPage({ userId, userEmail, globalCurrency = 'PHP' }) {
+export default function LandingPage({ userId, userEmail, globalCurrency = 'PHP', globalCryptocurrency = 'BTC' }) {
   const [geo, setGeo] = useState({ lat: null, lon: null, city: null, region: null, country: null, ip: null, source: null })
   const [geoAvailable, setGeoAvailable] = useState(null) // null=not asked yet, true=granted, false=denied/unavailable
 
