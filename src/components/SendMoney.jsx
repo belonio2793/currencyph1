@@ -241,39 +241,61 @@ export default function SendMoney({ userId }) {
                     </div>
                   ) : (
                     <div>
-                      <label className="block text-sm font-medium text-slate-700 mb-2">From Account</label>
-                      <select
-                        value={selectedSender}
-                        onChange={e => setSelectedSender(e.target.value)}
-                        className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent"
-                      >
-                        <option value="">Select an account</option>
+                      <label className="block text-sm font-medium text-slate-700 mb-4">From Account</label>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                         {wallets.map(wallet => (
-                          <option key={wallet.id} value={wallet.currency_code}>
-                            {getCurrencySymbol(wallet.currency_code)}{wallet.balance.toFixed(2)} ({wallet.currency_code}) - ID: {wallet.id}
-                          </option>
+                          <button
+                            key={wallet.id}
+                            type="button"
+                            onClick={() => setSelectedSender(wallet.currency_code)}
+                            className={`text-left bg-white border-2 rounded-lg p-4 transition-all hover:shadow-lg ${
+                              selectedSender === wallet.currency_code
+                                ? 'border-blue-600 ring-2 ring-blue-200 shadow-lg'
+                                : 'border-slate-200 hover:border-slate-300'
+                            }`}
+                          >
+                            {/* Header */}
+                            <div className="mb-3 flex items-start justify-between">
+                              <div>
+                                <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">
+                                  {wallet.currency_code}
+                                </p>
+                                <p className="text-xl font-light text-slate-900">
+                                  {getCurrencySymbol(wallet.currency_code)}
+                                </p>
+                              </div>
+                              {selectedSender === wallet.currency_code && (
+                                <span className="px-2 py-1 bg-blue-100 text-blue-700 text-xs font-semibold rounded-full">
+                                  Selected
+                                </span>
+                              )}
+                            </div>
+
+                            {/* Balance */}
+                            <div className="bg-slate-50 rounded-lg p-3 mb-3">
+                              <p className="text-xs text-slate-600 mb-1">Current Balance</p>
+                              <p className="text-lg font-light text-slate-900 font-mono">
+                                {formatNumber(wallet.balance || 0)}
+                              </p>
+                            </div>
+
+                            {/* Wallet ID */}
+                            <div className="bg-blue-50 rounded-lg p-2 mb-3 border border-blue-200">
+                              <p className="text-xs text-blue-700 font-medium mb-1">Wallet ID</p>
+                              <p className="text-xs font-mono text-slate-900 break-all">
+                                {wallet.id}
+                              </p>
+                            </div>
+
+                            {/* Meta Info */}
+                            <div className="text-xs text-slate-500 space-y-1 pt-2 border-t border-slate-200">
+                              <div>Account: {wallet.account_number || 'N/A'}</div>
+                              <div>Created: {new Date(wallet.created_at).toLocaleDateString()}</div>
+                            </div>
+                          </button>
                         ))}
-                      </select>
-                      {selectedSender && wallets.find(w => w.currency_code === selectedSender) && (
-                        <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mt-4">
-                          <p className="text-sm font-medium text-slate-700 mb-2">Wallet Details</p>
-                          <div className="space-y-1 text-sm">
-                            <div className="flex justify-between items-center">
-                              <span className="text-slate-600">Wallet ID</span>
-                              <span className="font-medium text-slate-900 break-all">{wallets.find(w => w.currency_code === selectedSender)?.id}</span>
-                            </div>
-                            <div className="flex justify-between items-center">
-                              <span className="text-slate-600">Currency</span>
-                              <span className="font-medium text-slate-900">{selectedSender}</span>
-                            </div>
-                            <div className="flex justify-between items-center">
-                              <span className="text-slate-600">Available Balance</span>
-                              <span className="font-medium text-slate-900">{getCurrencySymbol(selectedSender)}{wallets.find(w => w.currency_code === selectedSender)?.balance.toFixed(2)}</span>
-                            </div>
-                          </div>
-                        </div>
-                      )}
-                      <p className="text-xs text-slate-500 mt-2">
+                      </div>
+                      <p className="text-xs text-slate-500">
                         Showing {wallets.length} {wallets.length === 1 ? 'wallet' : 'wallets'} from your account
                       </p>
                     </div>
