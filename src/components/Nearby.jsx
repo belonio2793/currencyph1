@@ -889,10 +889,10 @@ export default function Nearby({ userId, setActiveTab, setCurrentListingSlug }) 
             {expandedLetter && citiesByLetter[expandedLetter] && (
               <div className="mt-4 sm:mt-6 animate-fadeIn">
                 <div className="mb-3 sm:mb-4 flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3">
-                  <h4 className="text-sm sm:text-base md:text-lg font-bold text-white">
-                    Cities Starting with <span className="bg-white/20 text-white px-2 py-1 rounded-md inline-block mt-1 sm:mt-0">{expandedLetter}</span>
+                  <h4 className="text-sm sm:text-base md:text-lg font-bold text-slate-900">
+                    Cities Starting with <span className="bg-blue-100 text-blue-700 px-2 py-1 rounded-md inline-block mt-1 sm:mt-0">{expandedLetter}</span>
                   </h4>
-                  <span className="bg-white/10 text-white px-2 py-1 rounded-full text-xs sm:text-sm font-semibold">
+                  <span className="bg-blue-50 text-blue-700 px-2 py-1 rounded-full text-xs sm:text-sm font-semibold">
                     {citiesByLetter[expandedLetter].length} cities
                   </span>
                 </div>
@@ -907,8 +907,8 @@ export default function Nearby({ userId, setActiveTab, setCurrentListingSlug }) 
                       }}
                       className={`px-2 sm:px-3 py-1.5 sm:py-2 rounded-md text-xs sm:text-sm font-semibold transition-all duration-200 text-left border-2 ${
                         selectedCity === city
-                          ? 'bg-white/20 text-white border-white/20 shadow'
-                          : 'bg-transparent text-white border-white/20 hover:border-white/40 hover:bg-white/5'
+                          ? 'bg-blue-100 text-blue-700 border-blue-300 shadow'
+                          : 'bg-white text-slate-700 border-slate-200 hover:border-blue-300 hover:bg-blue-50'
                       }`}
                     >
                       <span className="block">{city}</span>
