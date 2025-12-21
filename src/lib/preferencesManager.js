@@ -205,5 +205,59 @@ export const preferencesManager = {
       console.warn('Error loading quick access from DB:', e)
       return null
     }
+  },
+
+  // Currency preferences management
+  getCurrencyPreferences: (userId) => {
+    try {
+      const key = userId ? `currency_preferences_${userId}` : 'currency_preferences_guest'
+      const stored = localStorage.getItem(key)
+      if (stored) {
+        return JSON.parse(stored)
+      }
+      return {
+        fiat: 'PHP',
+        crypto: 'BTC'
+      }
+    } catch (e) {
+      console.warn('Failed to read currency preferences:', e)
+      return {
+        fiat: 'PHP',
+        crypto: 'BTC'
+      }
+    }
+  },
+
+  setCurrencyPreferences: async (userId, fiatCurrency, cryptoCurrency) => {
+    try {
+      const prefs = {
+        fiat: fiatCurrency,
+        crypto: cryptoCurrency,
+        updatedAt: new Date().toISOString()
+      }
+
+      const key = userId ? `currency_preferences_${userId}` : 'currency_preferences_guest'
+      localStorage.setItem(key, JSON.stringify(prefs))
+
+      // If logged in, also sync to database
+      if (userId && /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(userId)) {
+        const { error } = await supabase
+          .from('user_preferences')
+          .update({
+            other_preferences: {
+              displayCurrency: fiatCurrency,
+              displayCryptoCurrency: cryptoCurrency
+            },
+            updated_at: new Date().toISOString()
+          })
+          .eq('user_id', userId)
+
+        if (error) {
+          console.warn('Failed to sync currency preferences to DB:', error)
+        }
+      }
+    } catch (e) {
+      console.warn('Failed to save currency preferences:', e)
+    }
   }
 }
