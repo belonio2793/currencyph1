@@ -383,12 +383,12 @@ export async function getMultipleCryptoPrices(cryptoCodes, toCurrency = 'PHP') {
 export async function convertFiatToCrypto(fiatAmount, fiatCurrency, cryptoCode) {
   try {
     // First get crypto price in PHP
-    const cryptoPriceInPHP = await getCryptoPrice(cryptoCode)
+    const cryptoPriceInPHP = await getCryptoPrice(cryptoCode, 'PHP')
     if (!cryptoPriceInPHP) return null
 
     // Get exchange rate from provided fiat currency to PHP
     const phpAmount = await convertCurrencyToPhp(fiatAmount, fiatCurrency)
-    
+
     // Convert to crypto
     return phpAmount / cryptoPriceInPHP
   } catch (error) {
@@ -398,32 +398,47 @@ export async function convertFiatToCrypto(fiatAmount, fiatCurrency, cryptoCode) 
 }
 
 /**
- * Convert any fiat currency to PHP using Open Exchange Rates
+ * Convert any fiat currency to PHP using Open Exchange Rates (with caching)
  */
 async function convertCurrencyToPhp(amount, fromCurrency) {
   if (fromCurrency === 'PHP') return amount
 
   try {
+    const cacheKey = `fiat_${fromCurrency}_PHP`
+
+    // Check in-memory cache
+    if (isCacheValid(cacheKey)) {
+      const cached = rateCache.get(cacheKey)
+      console.log(`Using cached fiat rate: 1 ${fromCurrency} = ${cached.rate} PHP`)
+      return amount * cached.rate
+    }
+
     const apiKey = import.meta.env.VITE_OPEN_EXCHANGE_RATES_API
     if (!apiKey) {
       console.warn('Open Exchange Rates API key not configured')
-      return amount // Fallback: assume 1:1 (not accurate but prevents errors)
+      // Try to get from stale cache
+      const stale = rateCache.get(cacheKey)
+      return stale ? amount * stale.rate : amount
     }
 
-    const response = await fetch(
+    const response = await fetchWithRetry(
       `https://openexchangerates.org/api/latest.json?app_id=${apiKey}&base=${fromCurrency}&symbols=PHP`
     )
-    
-    if (!response.ok) {
-      console.warn(`Failed to fetch exchange rate for ${fromCurrency}`)
-      return amount
-    }
 
     const data = await response.json()
     const rate = data.rates?.PHP || 1
+
+    // Cache the result
+    rateCache.set(cacheKey, {
+      rate: rate,
+      timestamp: Date.now(),
+      source: 'openexchangerates'
+    })
+
     return amount * rate
   } catch (error) {
     console.warn(`Failed to convert ${fromCurrency} to PHP:`, error.message)
+    // Return amount as-is (better than erroring out)
     return amount
   }
 }
@@ -433,25 +448,31 @@ async function convertCurrencyToPhp(amount, fromCurrency) {
  */
 export async function getCryptoPriceInCurrency(cryptoCode, fiatCurrency = 'PHP') {
   try {
-    const priceInPHP = await getCryptoPrice(cryptoCode)
-    if (!priceInPHP || fiatCurrency === 'PHP') return priceInPHP
+    if (fiatCurrency === 'PHP') {
+      return await getCryptoPrice(cryptoCode, 'PHP')
+    }
 
-    // Get conversion rate from PHP to target currency
+    const priceInPHP = await getCryptoPrice(cryptoCode, 'PHP')
+    if (!priceInPHP) return null
+
+    // Convert PHP to target currency
     const apiKey = import.meta.env.VITE_OPEN_EXCHANGE_RATES_API
-    if (!apiKey) return priceInPHP
+    if (!apiKey) {
+      console.warn('Cannot convert to', fiatCurrency, '- API key not configured')
+      return priceInPHP // Return PHP price as fallback
+    }
 
-    const response = await fetch(
+    const response = await fetchWithRetry(
       `https://openexchangerates.org/api/latest.json?app_id=${apiKey}&base=PHP&symbols=${fiatCurrency}`
     )
-    
-    if (!response.ok) return priceInPHP
 
     const data = await response.json()
     const rate = data.rates?.[fiatCurrency] || 1
     return priceInPHP * rate
   } catch (error) {
     console.warn(`Failed to get ${cryptoCode} price in ${fiatCurrency}:`, error.message)
-    return null
+    // Try to get price in PHP as fallback
+    return await getCryptoPrice(cryptoCode, 'PHP')
   }
 }
 
