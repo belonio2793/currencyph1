@@ -413,20 +413,42 @@ async function processCryptoDeposit(
       depositAddress = newWallet.address
     }
 
-    // Store deposit
+    // Get crypto price in PHP to calculate received amount
+    let receivedAmount: number | null = null
+    let exchangeRate: number | null = null
+    let rateSource = 'coingecko'
+
+    const priceData = await getCryptoPriceInPHP(cryptoSymbol as string)
+    if (priceData) {
+      exchangeRate = priceData.price
+      receivedAmount = request.amount * exchangeRate
+      rateSource = priceData.source
+    }
+
+    // Store deposit with conversion details
+    const depositData: Record<string, any> = {
+      user_id: request.userId,
+      wallet_id: request.walletId,
+      amount: request.amount,
+      currency_code: cryptoSymbol as string,
+      deposit_method: 'crypto_direct',
+      status: 'pending',
+      payment_reference: paymentReference,
+      payment_address: depositAddress,
+      description: `Direct ${cryptoSymbol} transfer expected`
+    }
+
+    // Add conversion details if available
+    if (receivedAmount !== null && exchangeRate !== null) {
+      depositData.received_amount = receivedAmount
+      depositData.exchange_rate = exchangeRate
+      depositData.rate_source = rateSource
+      depositData.rate_fetched_at = new Date().toISOString()
+    }
+
     const { data: deposit, error: depositError } = await supabase
       .from('deposits')
-      .insert([{
-        user_id: request.userId,
-        wallet_id: request.walletId,
-        amount: request.amount,
-        currency_code: cryptoSymbol as string,
-        deposit_method: 'crypto_direct',
-        status: 'pending',
-        payment_reference: paymentReference,
-        payment_address: depositAddress,
-        description: `Direct ${cryptoSymbol} transfer expected`
-      }])
+      .insert([depositData])
       .select()
       .single()
 
@@ -441,9 +463,13 @@ async function processCryptoDeposit(
         chainId,
         cryptoSymbol,
         amount: request.amount,
-        memo: paymentReference
+        memo: paymentReference,
+        estimatedPhpValue: receivedAmount ? Math.floor(receivedAmount) : 'Unknown',
+        exchangeRate: exchangeRate || 'Unknown'
       },
-      message: `Send ${request.amount} ${cryptoSymbol} to provided address. Include memo for tracking.`
+      message: receivedAmount
+        ? `Send ${request.amount} ${cryptoSymbol} to provided address (≈ ${Math.floor(receivedAmount).toLocaleString()} PHP at current rate). Include memo for tracking.`
+        : `Send ${request.amount} ${cryptoSymbol} to provided address. Include memo for tracking.`
     }
   } catch (error) {
     console.error('Crypto deposit error:', error)
