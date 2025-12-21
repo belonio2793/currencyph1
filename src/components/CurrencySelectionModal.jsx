@@ -60,31 +60,6 @@ export default function CurrencySelectionModal({ isOpen, onClose, globalCurrency
     }
   }, [isOpen, globalCurrency, globalCryptocurrency])
 
-  // Convert balance to crypto whenever crypto selection changes
-  useEffect(() => {
-    const updateCryptoPreview = async () => {
-      if (userEmail && totalBalanceConverted && localCryptoCurrency) {
-        setLoadingPreview(true)
-        try {
-          const cryptoBalance = await convertFiatToCryptoDb(totalBalanceConverted, globalCurrency, localCryptoCurrency)
-          if (cryptoBalance !== null && cryptoBalance !== undefined) {
-            setPreviewCryptoBalance(cryptoBalance)
-          } else {
-            setPreviewCryptoBalance(null)
-          }
-        } catch (error) {
-          console.error('Failed to convert balance:', error)
-          setPreviewCryptoBalance(null)
-        }
-        setLoadingPreview(false)
-      } else {
-        setPreviewCryptoBalance(null)
-      }
-    }
-
-    updateCryptoPreview()
-  }, [localCryptoCurrency, globalCurrency, totalBalanceConverted, userEmail])
-
   const handleApply = () => {
     setGlobalCurrency(localFiatCurrency)
     setGlobalCryptocurrency(localCryptoCurrency)
