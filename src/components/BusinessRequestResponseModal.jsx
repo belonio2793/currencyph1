@@ -1,8 +1,10 @@
 import { useState } from 'react'
 import { businessRequestService } from '../lib/businessRequestService'
-import './BusinessRequestResponseModal.css'
+import ExpandableModal from './ExpandableModal'
+import { useDevice } from '../context/DeviceContext'
 
 export default function BusinessRequestResponseModal({ request, business, onClose, onSubmitted }) {
+  const { isMobile } = useDevice()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [formData, setFormData] = useState({
@@ -65,184 +67,183 @@ export default function BusinessRequestResponseModal({ request, business, onClos
     }
   }
 
+  const footer = (
+    <div className="flex gap-2 w-full">
+      <button
+        type="button"
+        onClick={onClose}
+        className="flex-1 px-4 py-2 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 font-medium"
+        disabled={loading}
+      >
+        Cancel
+      </button>
+      <button
+        type="submit"
+        form="response-form"
+        className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-slate-400 font-medium"
+        disabled={loading}
+      >
+        {loading ? 'Sending...' : 'Send Response'}
+      </button>
+    </div>
+  )
+
   return (
-    <div className="modal-overlay" onClick={onClose}>
-      <div className="modal-content business-response-modal" onClick={(e) => e.stopPropagation()}>
-        <div className="modal-header">
-          <div>
-            <h2>Respond to Application</h2>
-            <p className="text-slate-500">Send your response to {request.occupation} applicant</p>
-          </div>
-          <button onClick={onClose} className="modal-close">×</button>
+    <ExpandableModal
+      isOpen={true}
+      onClose={onClose}
+      title="Respond to Application"
+      icon="💬"
+      size="lg"
+      footer={footer}
+      defaultExpanded={!isMobile}
+    >
+      {error && (
+        <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded text-sm text-red-700 flex justify-between items-center">
+          <span>{error}</span>
+          <button onClick={() => setError('')} className="text-red-600 hover:text-red-800">×</button>
         </div>
+      )}
 
-        <div className="modal-body">
-          {error && (
-            <div className="error-message">
-              {error}
-              <button onClick={() => setError('')} className="close-error">×</button>
+      <form id="response-form" onSubmit={handleSubmit} className="space-y-6">
+        {/* Request Summary */}
+        <div className="space-y-3">
+          <h3 className="text-lg font-semibold text-slate-900">Application Summary</h3>
+          <div className="bg-slate-50 p-4 rounded-lg space-y-2 border border-slate-200">
+            <div>
+              <span className="text-sm font-medium text-slate-600">Position:</span>
+              <p className="text-slate-900 font-semibold">{request.occupation}</p>
             </div>
-          )}
-
-          <form onSubmit={handleSubmit} className="response-form">
-            {/* Request Summary */}
-            <div className="form-section">
-              <h3 className="section-title">Application Summary</h3>
-              <div className="info-box">
-                <div className="info-item">
-                  <span className="label">Position:</span>
-                  <span className="value">{request.occupation}</span>
-                </div>
-                <div className="info-item">
-                  <span className="label">Requested Salary:</span>
-                  <span className="value">
-                    {request.requested_salary 
-                      ? `${request.salary_currency} ${parseFloat(request.requested_salary).toFixed(2)}`
-                      : 'Not specified'}
-                  </span>
-                </div>
-                <div className="info-item">
-                  <span className="label">Skills:</span>
-                  <span className="value">
-                    {request.skills && request.skills.length > 0
-                      ? request.skills.join(', ')
-                      : 'No skills listed'}
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            {/* Response Type */}
-            <div className="form-section">
-              <h3 className="section-title">Response Type *</h3>
-              
-              <div className="response-type-options">
-                <label className="radio-option">
-                  <input
-                    type="radio"
-                    name="responseStatus"
-                    value="needs_interview"
-                    checked={formData.responseStatus === 'needs_interview'}
-                    onChange={handleInputChange}
-                    disabled={loading}
-                  />
-                  <span className="option-label">
-                    <span className="option-title">Schedule Interview</span>
-                    <span className="option-desc">Request further discussion and interviews</span>
-                  </span>
-                </label>
-
-                <label className="radio-option">
-                  <input
-                    type="radio"
-                    name="responseStatus"
-                    value="hire_request"
-                    checked={formData.responseStatus === 'hire_request'}
-                    onChange={handleInputChange}
-                    disabled={loading}
-                  />
-                  <span className="option-label">
-                    <span className="option-title">Make Job Offer</span>
-                    <span className="option-desc">Extend a formal job offer with position and salary</span>
-                  </span>
-                </label>
-
-                <label className="radio-option">
-                  <input
-                    type="radio"
-                    name="responseStatus"
-                    value="offer_rejected"
-                    checked={formData.responseStatus === 'offer_rejected'}
-                    onChange={handleInputChange}
-                    disabled={loading}
-                  />
-                  <span className="option-label">
-                    <span className="option-title">Decline Application</span>
-                    <span className="option-desc">Politely reject the application</span>
-                  </span>
-                </label>
-              </div>
-            </div>
-
-            {/* Conditional Fields Based on Response Type */}
-            {formData.responseStatus === 'hire_request' && (
-              <div className="form-section conditional-section">
-                <h3 className="section-title">Job Offer Details</h3>
-                
-                <div className="form-group">
-                  <label className="form-label">Position Title *</label>
-                  <input
-                    type="text"
-                    name="offeredPosition"
-                    value={formData.offeredPosition}
-                    onChange={handleInputChange}
-                    placeholder="e.g., Senior Sales Manager"
-                    className="form-input"
-                    disabled={loading}
-                  />
-                </div>
-
-                <div className="form-group">
-                  <label className="form-label">Offered Salary (Optional)</label>
-                  <input
-                    type="number"
-                    name="offeredSalary"
-                    value={formData.offeredSalary}
-                    onChange={handleInputChange}
-                    placeholder="Enter the offered salary amount"
-                    className="form-input"
-                    min="0"
-                    step="0.01"
-                    disabled={loading}
-                  />
-                </div>
-              </div>
-            )}
-
-            {/* Message */}
-            <div className="form-section">
-              <h3 className="section-title">Message to Applicant *</h3>
-              <textarea
-                name="responseMessage"
-                value={formData.responseMessage}
-                onChange={handleInputChange}
-                placeholder={
-                  formData.responseStatus === 'hire_request'
-                    ? 'Write your job offer message with details and expectations...'
-                    : formData.responseStatus === 'needs_interview'
-                    ? 'Introduce yourself and explain why you\'d like to interview them...'
-                    : 'Politely explain why you\'re declining the application...'
-                }
-                className="form-textarea"
-                rows="6"
-                disabled={loading}
-              />
-              <p className="text-slate-500 text-sm">
-                {formData.responseMessage.length} characters
+            <div>
+              <span className="text-sm font-medium text-slate-600">Requested Salary:</span>
+              <p className="text-slate-900">
+                {request.requested_salary 
+                  ? `${request.salary_currency} ${parseFloat(request.requested_salary).toFixed(2)}`
+                  : 'Not specified'}
               </p>
             </div>
-
-            {/* Buttons */}
-            <div className="form-actions">
-              <button
-                type="button"
-                onClick={onClose}
-                className="btn-cancel"
-                disabled={loading}
-              >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                className="btn-submit"
-                disabled={loading}
-              >
-                {loading ? 'Sending...' : 'Send Response'}
-              </button>
+            <div>
+              <span className="text-sm font-medium text-slate-600">Skills:</span>
+              <p className="text-slate-900">
+                {request.skills && request.skills.length > 0
+                  ? request.skills.join(', ')
+                  : 'No skills listed'}
+              </p>
             </div>
-          </form>
+          </div>
         </div>
-      </div>
-    </div>
+
+        {/* Response Type */}
+        <div className="space-y-4">
+          <h3 className="text-lg font-semibold text-slate-900">Response Type *</h3>
+          
+          <div className="space-y-3">
+            <label className="flex items-start gap-3 p-3 border border-slate-200 rounded-lg hover:bg-slate-50 cursor-pointer">
+              <input
+                type="radio"
+                name="responseStatus"
+                value="needs_interview"
+                checked={formData.responseStatus === 'needs_interview'}
+                onChange={handleInputChange}
+                disabled={loading}
+                className="mt-1"
+              />
+              <div>
+                <p className="font-semibold text-slate-900">Schedule Interview</p>
+                <p className="text-sm text-slate-600">Request further discussion and interviews</p>
+              </div>
+            </label>
+
+            <label className="flex items-start gap-3 p-3 border border-slate-200 rounded-lg hover:bg-slate-50 cursor-pointer">
+              <input
+                type="radio"
+                name="responseStatus"
+                value="hire_request"
+                checked={formData.responseStatus === 'hire_request'}
+                onChange={handleInputChange}
+                disabled={loading}
+                className="mt-1"
+              />
+              <div>
+                <p className="font-semibold text-slate-900">Make Job Offer</p>
+                <p className="text-sm text-slate-600">Extend a formal job offer with position and salary</p>
+              </div>
+            </label>
+
+            <label className="flex items-start gap-3 p-3 border border-slate-200 rounded-lg hover:bg-slate-50 cursor-pointer">
+              <input
+                type="radio"
+                name="responseStatus"
+                value="offer_rejected"
+                checked={formData.responseStatus === 'offer_rejected'}
+                onChange={handleInputChange}
+                disabled={loading}
+                className="mt-1"
+              />
+              <div>
+                <p className="font-semibold text-slate-900">Decline Application</p>
+                <p className="text-sm text-slate-600">Politely reject the application</p>
+              </div>
+            </label>
+          </div>
+        </div>
+
+        {/* Conditional Fields Based on Response Type */}
+        {formData.responseStatus === 'hire_request' && (
+          <div className="space-y-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+            <h3 className="font-semibold text-slate-900">Job Offer Details</h3>
+            
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-2">Position Title *</label>
+              <input
+                type="text"
+                name="offeredPosition"
+                value={formData.offeredPosition}
+                onChange={handleInputChange}
+                placeholder="e.g., Senior Sales Manager"
+                className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                disabled={loading}
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-2">Offered Salary (Optional)</label>
+              <input
+                type="number"
+                name="offeredSalary"
+                value={formData.offeredSalary}
+                onChange={handleInputChange}
+                placeholder="Enter the offered salary amount"
+                className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                min="0"
+                step="0.01"
+                disabled={loading}
+              />
+            </div>
+          </div>
+        )}
+
+        {/* Message */}
+        <div className="space-y-4">
+          <h3 className="text-lg font-semibold text-slate-900">Message to Applicant *</h3>
+          <textarea
+            name="responseMessage"
+            value={formData.responseMessage}
+            onChange={handleInputChange}
+            placeholder={
+              formData.responseStatus === 'hire_request'
+                ? 'Write your job offer message with details and expectations...'
+                : formData.responseStatus === 'needs_interview'
+                ? 'Introduce yourself and explain why you\'d like to interview them...'
+                : 'Politely explain why you\'re declining the application...'
+            }
+            className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            rows="6"
+            disabled={loading}
+          />
+          <p className="text-sm text-slate-500">{formData.responseMessage.length} characters</p>
+        </div>
+      </form>
+    </ExpandableModal>
   )
 }
