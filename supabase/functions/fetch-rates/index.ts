@@ -278,7 +278,7 @@ async function handle(req: Request): Promise<Response> {
 
   // Not fresh - fetch new from primary sources
   try {
-    console.log('[fetch-rates] Fetching fresh rates from APIs...')
+    console.log('[fetch-rates] Fetching fresh rates for 30 cryptocurrencies from APIs...')
     const [exchangeRates, cryptoPricesUSD, cryptoPricesPHP] = await Promise.all([
       fetchOpenExchangeRates(),
       fetchCoinGecko('usd'),
@@ -287,6 +287,7 @@ async function handle(req: Request): Promise<Response> {
 
     // Combine crypto prices (PHP takes priority)
     const cryptoPrices = { ...cryptoPricesUSD, ...cryptoPricesPHP }
+    console.log(`[fetch-rates] Processing ${Object.keys(cryptoPricesPHP || {}).length} cryptocurrency prices`)
 
     // If exchangeRates not available, try last cached (even if stale)
     if (!exchangeRates && !cryptoPrices) {
