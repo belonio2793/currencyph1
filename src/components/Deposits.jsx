@@ -929,45 +929,24 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
               </ol>
             </div>
 
-            {/* GCash QR Code */}
+            {/* GCash Reference Number */}
             {selectedMethod === 'gcash' && (
               <div className="mb-8 p-6 bg-emerald-50 border border-emerald-200 rounded-lg">
-                <p className="text-sm text-slate-600 mb-4 font-medium">Scan this QR code to pay via GCash:</p>
-                <div className="flex gap-4 items-start">
-                  <div className="flex-shrink-0">
-                    <button
-                      onClick={() => setShowQRModal(true)}
-                      className="cursor-pointer hover:opacity-80 transition transform hover:scale-105"
-                      title="Click to view larger QR code"
-                    >
-                      <img
-                        src="https://cdn.builder.io/api/v1/image/assets%2F22335ca288c7480ead446114856c497b%2F95af4345d27a4b60bdcb084fac1e7abe?format=webp&width=800"
-                        alt="GCash InstaPay QR Code"
-                        className="w-32 h-32 rounded-lg border border-emerald-300 shadow-md"
-                      />
-                    </button>
-                    <p className="text-xs text-slate-500 mt-2 text-center">Click to enlarge</p>
-                  </div>
-                  <div className="flex-1">
-                    <p className="text-sm text-slate-700 mb-4">
-                      Open your GCash app and scan this QR code or use the merchant details below to complete your payment.
-                    </p>
-                    <div className="bg-white p-3 rounded border border-emerald-200 mb-4">
-                      <p className="text-xs text-slate-600"><span className="font-semibold">Mobile No.:</span> 09308510351</p>
-                      <p className="text-xs text-slate-600 mt-2"><span className="font-semibold">User ID:</span> •••••••••••4ROQPN</p>
-                    </div>
-                    <div className="mb-4">
-                      <label className="block text-sm font-medium text-slate-700 mb-2">GCash Reference Number</label>
-                      <input
-                        type="text"
-                        value={gcashReferenceNumber}
-                        onChange={(e) => setGcashReferenceNumber(e.target.value)}
-                        placeholder="Enter your GCash transaction reference (e.g., GCR123456789)"
-                        className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 text-sm"
-                      />
-                      <p className="text-xs text-slate-500 mt-1">You'll find this in your GCash app after sending the payment</p>
-                    </div>
-                  </div>
+                <p className="text-sm text-slate-600 mb-4 font-medium">Complete your GCash payment using the merchant details:</p>
+                <div className="bg-white p-3 rounded border border-emerald-200 mb-4">
+                  <p className="text-xs text-slate-600"><span className="font-semibold">Mobile No.:</span> 09308510351</p>
+                  <p className="text-xs text-slate-600 mt-2"><span className="font-semibold">User ID:</span> •••••••••••4ROQPN</p>
+                </div>
+                <div className="mb-4">
+                  <label className="block text-sm font-medium text-slate-700 mb-2">GCash Reference Number</label>
+                  <input
+                    type="text"
+                    value={gcashReferenceNumber}
+                    onChange={(e) => setGcashReferenceNumber(e.target.value)}
+                    placeholder="Enter your GCash transaction reference (e.g., GCR123456789)"
+                    className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 text-sm"
+                  />
+                  <p className="text-xs text-slate-500 mt-1">You'll find this in your GCash app after sending the payment</p>
                 </div>
               </div>
             )}
