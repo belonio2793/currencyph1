@@ -183,7 +183,7 @@ export default function NetworkOrdersDashboard({ userId }) {
               Total Revenue
             </div>
             <div style={{ fontSize: '28px', fontWeight: '700', color: '#8b5cf6' }}>
-              ₱{stats.totalRevenue.toFixed(2)}
+              ₱{formatNumber(stats.totalRevenue)}
             </div>
           </div>
 
@@ -192,7 +192,7 @@ export default function NetworkOrdersDashboard({ userId }) {
               Avg Cost
             </div>
             <div style={{ fontSize: '28px', fontWeight: '700', color: '#ec4899' }}>
-              ₱{stats.averageCost.toFixed(2)}
+              ₱{formatNumber(stats.averageCost)}
             </div>
           </div>
         </div>
