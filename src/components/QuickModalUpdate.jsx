@@ -27,12 +27,12 @@
  *        isOpen={isOpen}
  *        onClose={onClose}
  *        title="Your Modal Title"
- *        icon="🎯"
+ *        icon="?"
  *        size="md"
  *        footer={footerContent}
  *        defaultExpanded={!isMobile}
  *      >
- *        {/* Move your modal content here */}
+ *        Content goes here
  *      </ExpandableModal>
  *    )
  * 
@@ -40,15 +40,18 @@
  * - isOpen: boolean - Controls modal visibility
  * - onClose: function - Called when modal closes
  * - title: string - Modal title
- * - icon: string - Optional emoji icon (e.g., "📝", "✓", "⚠️")
+ * - icon: string - Optional emoji icon (e.g., "? ✓ warning)
  * - size: string - "sm" | "md" | "lg" | "xl" | "fullscreen"
  * - footer: JSX - Button actions (optional)
  * - defaultExpanded: boolean - Start expanded on mobile
  * - showBadge: boolean - Show status badge
- * - badgeContent: string - Badge text (e.g., "✓ Selected")
+ * - badgeContent: string - Badge text (e.g., "Selected")
  */
 
-// Example Simple Modal
+import React, { useState } from 'react'
+import ExpandableModal from './ExpandableModal'
+import { useDevice } from '../context/DeviceContext'
+
 export function ExampleSimpleModal() {
   const [isOpen, setIsOpen] = useState(false)
   
@@ -75,7 +78,6 @@ export function ExampleSimpleModal() {
   )
 }
 
-// Example Form Modal
 export function ExampleFormModal() {
   const [isOpen, setIsOpen] = useState(false)
   const [formData, setFormData] = useState({ name: '' })
@@ -129,7 +131,6 @@ export function ExampleFormModal() {
   )
 }
 
-// Example Multi-Step Modal
 export function ExampleMultiStepModal() {
   const [isOpen, setIsOpen] = useState(false)
   const [step, setStep] = useState(1)
@@ -176,43 +177,6 @@ export function ExampleMultiStepModal() {
     </>
   )
 }
-
-/**
- * MIGRATION CHECKLIST FOR EACH MODAL:
- * 
- * - [ ] Add imports (ExpandableModal, useDevice)
- * - [ ] Add hook: const { isMobile } = useDevice()
- * - [ ] Create footer JSX
- * - [ ] Remove old modal wrapper <div>
- * - [ ] Wrap in ExpandableModal component
- * - [ ] Update props (title, icon, size, footer)
- * - [ ] Test on mobile (< 640px)
- * - [ ] Test on tablet (640px - 1024px)
- * - [ ] Test on desktop (> 1024px)
- * - [ ] Test collapse/expand (mobile)
- * - [ ] Verify close button works
- * - [ ] Verify footer buttons work
- */
-
-/**
- * FOOTER BUTTON PATTERNS:
- * 
- * Single button:
- * <button className="flex-1">Action</button>
- * 
- * Two buttons:
- * <div className="flex gap-2 w-full">
- *   <button className="flex-1">Cancel</button>
- *   <button className="flex-1">Confirm</button>
- * </div>
- * 
- * Three buttons:
- * <div className="flex gap-2 w-full">
- *   <button className="flex-1">Previous</button>
- *   <button className="flex-1">Next</button>
- *   <button className="flex-1">Skip</button>
- * </div>
- */
 
 export default {
   ExampleSimpleModal,
