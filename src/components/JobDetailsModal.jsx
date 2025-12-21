@@ -18,6 +18,7 @@ export default function JobDetailsModal({
   currentUserId,
   businessId
 }) {
+  const { isMobile } = useDevice()
   const [activeTab, setActiveTab] = useState('overview')
   const [offers, setOffers] = useState([])
   const [remarks, setRemarks] = useState([])
