@@ -360,8 +360,8 @@ export default function P2PLoanMarketplace({ userId, userEmail, onTabChange }) {
         ) : activeTab === 'browse' ? (
           /* Browse Loans Tab */
           <div>
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-2xl font-bold text-slate-900">Available Loan Requests</h2>
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+              <h2 className="text-xl sm:text-2xl font-bold text-slate-900">Available Loan Requests</h2>
               {userId && (
                 <button
                   onClick={handleRequestLoanClick}
