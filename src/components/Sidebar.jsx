@@ -55,6 +55,7 @@ function SidebarComponent({ activeTab, onTabChange, userEmail, onShowAuth, onSig
       label: 'Main',
       icon: '',
       items: [
+        { id: 'home', label: 'Home', auth: false },
         { id: 'nearby', label: 'Nearby', auth: true },
         { id: 'rides', label: 'Rides', auth: true }
       ]
