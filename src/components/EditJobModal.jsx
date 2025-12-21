@@ -336,14 +336,36 @@ export default function EditJobModal({
     return null
   }
 
-  return (
-    <div className="modal-overlay" onClick={onClose}>
-      <div className="edit-job-modal" onClick={e => e.stopPropagation()}>
-        <div className="modal-header">
-          <h2>{job.job_title || 'Edit Job Listing'}</h2>
-          <button className="close-btn" onClick={onClose}>×</button>
-        </div>
+  const footerContent = (
+    <div className="flex gap-2 w-full">
+      <button
+        type="button"
+        onClick={onClose}
+        className="flex-1 px-4 py-2 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 font-medium"
+      >
+        Cancel
+      </button>
+      <button
+        type="submit"
+        form="edit-job-form"
+        disabled={loading}
+        className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-slate-400 font-medium"
+      >
+        {loading ? 'Updating...' : 'Update Job'}
+      </button>
+    </div>
+  )
 
+  return (
+    <ExpandableModal
+      isOpen={true}
+      onClose={onClose}
+      title={job.job_title || 'Edit Job Listing'}
+      icon="💼"
+      size="lg"
+      footer={footerContent}
+      defaultExpanded={!isMobile}
+    >
         {error && (
           <div className="error-message">
             {error}
@@ -351,7 +373,7 @@ export default function EditJobModal({
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="edit-job-form">
+        <form id="edit-job-form" onSubmit={handleSubmit} className="edit-job-form">
           <div className="form-section">
             <h3>Job Details</h3>
 
@@ -941,7 +963,6 @@ export default function EditJobModal({
             </button>
           </div>
         </form>
-      </div>
-    </div>
+    </ExpandableModal>
   )
 }
