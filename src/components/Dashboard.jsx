@@ -124,7 +124,7 @@ export default function Dashboard({ userId, onNavigate }) {
                     {wallet.currency_code === 'PHP' ? '₱' : wallet.currency_code === 'EUR' ? '€' : wallet.currency_code === 'GBP' ? '£' : '$'}
                   </span>
                 </div>
-                <p className="text-3xl font-light text-slate-900">{wallet.balance.toFixed(2)}</p>
+                <p className="text-3xl font-light text-slate-900">{formatNumber(wallet.balance)}</p>
                 <p className="text-xs text-slate-500 mt-3">Available balance</p>
               </div>
             ))}
