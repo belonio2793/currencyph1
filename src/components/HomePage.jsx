@@ -295,19 +295,19 @@ export default function HomePage({ userId, userEmail, globalCurrency = 'PHP', se
           {/* Total Balance */}
           <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-6 border border-blue-200">
             <p className="text-sm text-blue-600 font-medium uppercase tracking-wider mb-1">Total Balance</p>
-            <p className="text-3xl font-light text-blue-900">{totalBalanceConverted != null ? totalBalanceConverted : getTotalBalance()} {globalCurrency}</p>
+            <p className="text-3xl font-light text-blue-900">{formatNumber(totalBalanceConverted != null ? totalBalanceConverted : getTotalBalance())} {globalCurrency}</p>
           </div>
 
           {/* Net (Balance - Debt) */}
           <div className={`rounded-xl p-6 border ${isNegativeNet ? 'bg-gradient-to-br from-rose-50 to-rose-100 border-rose-200' : 'bg-gradient-to-br from-emerald-50 to-emerald-100 border-emerald-200'}`}>
             <p className={`text-sm font-medium uppercase tracking-wider mb-1 ${isNegativeNet ? 'text-rose-600' : 'text-emerald-600'}`}>Net</p>
-            <p className={`text-3xl font-light ${isNegativeNet ? 'text-rose-900' : 'text-emerald-900'}`}>{netDisplay} {globalCurrency}</p>
+            <p className={`text-3xl font-light ${isNegativeNet ? 'text-rose-900' : 'text-emerald-900'}`}>{formatNumber(netDisplay)} {globalCurrency}</p>
           </div>
 
           {/* Total Debt */}
           <div className="bg-gradient-to-br from-red-50 to-red-100 rounded-xl p-6 border border-red-200">
             <p className="text-sm text-red-600 font-medium uppercase tracking-wider mb-1">Total Debt</p>
-            <p className="text-3xl font-light text-red-900">{totalDebtConverted != null ? totalDebtConverted : getTotalDebt()} {globalCurrency}</p>
+            <p className="text-3xl font-light text-red-900">{formatNumber(totalDebtConverted != null ? totalDebtConverted : getTotalDebt())} {globalCurrency}</p>
           </div>
         </div>
 
