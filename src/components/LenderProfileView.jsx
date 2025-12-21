@@ -65,7 +65,7 @@ export default function LenderProfileView({ userId, lenderId, onClose }) {
             ★
           </span>
         ))}
-        <span className="text-sm text-slate-600 ml-1">({rating.toFixed(1)})</span>
+        <span className="text-sm text-slate-600 ml-1">({formatNumber(rating.toFixed(1))})</span>
       </div>
     )
   }
