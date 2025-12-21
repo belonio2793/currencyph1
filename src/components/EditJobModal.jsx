@@ -38,6 +38,7 @@ export default function EditJobModal({
   userBusinesses = [],
   userId
 }) {
+  const { isMobile } = useDevice()
   const mapRef = useRef(null)
   const [formData, setFormData] = useState({
     job_title: '',
