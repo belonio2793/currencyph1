@@ -1155,14 +1155,36 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
               <div>
                 <h4 className="font-semibold text-slate-900 mb-4">Steps to Deposit</h4>
                 <ol className="space-y-3">
-                  {selectedAddressMethod.instructions.map((instruction, idx) => (
-                    <li key={idx} className="flex gap-3">
-                      <span className="flex-shrink-0 w-6 h-6 rounded-full bg-blue-100 text-blue-700 text-sm font-semibold flex items-center justify-center">
-                        {idx + 1}
-                      </span>
-                      <span className="text-slate-700">{instruction}</span>
-                    </li>
-                  ))}
+                  <li className="flex gap-3">
+                    <span className="flex-shrink-0 w-6 h-6 rounded-full bg-blue-100 text-blue-700 text-sm font-semibold flex items-center justify-center">
+                      1
+                    </span>
+                    <span className="text-slate-700">Open your cryptocurrency wallet</span>
+                  </li>
+                  <li className="flex gap-3">
+                    <span className="flex-shrink-0 w-6 h-6 rounded-full bg-blue-100 text-blue-700 text-sm font-semibold flex items-center justify-center">
+                      2
+                    </span>
+                    <span className="text-slate-700">Click "Send" and enter the deposit address below</span>
+                  </li>
+                  <li className="flex gap-3">
+                    <span className="flex-shrink-0 w-6 h-6 rounded-full bg-blue-100 text-blue-700 text-sm font-semibold flex items-center justify-center">
+                      3
+                    </span>
+                    <span className="text-slate-700">Enter the amount you wish to deposit</span>
+                  </li>
+                  <li className="flex gap-3">
+                    <span className="flex-shrink-0 w-6 h-6 rounded-full bg-blue-100 text-blue-700 text-sm font-semibold flex items-center justify-center">
+                      4
+                    </span>
+                    <span className="text-slate-700">Review the transaction details and confirm</span>
+                  </li>
+                  <li className="flex gap-3">
+                    <span className="flex-shrink-0 w-6 h-6 rounded-full bg-blue-100 text-blue-700 text-sm font-semibold flex items-center justify-center">
+                      5
+                    </span>
+                    <span className="text-slate-700">Save the transaction hash for your records</span>
+                  </li>
                 </ol>
               </div>
 
