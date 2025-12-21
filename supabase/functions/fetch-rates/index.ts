@@ -124,6 +124,67 @@ async function upsertCachedRates(exchangeRates, cryptoPrices, source = 'openexch
   }
 }
 
+// Map CoinGecko IDs to crypto codes for storage
+const coingeckoIdToCryptoCode = {
+  'bitcoin': 'BTC',
+  'ethereum': 'ETH',
+  'litecoin': 'LTC',
+  'dogecoin': 'DOGE',
+  'ripple': 'XRP',
+  'cardano': 'ADA',
+  'solana': 'SOL',
+  'avalanche-2': 'AVAX',
+  'matic-network': 'MATIC',
+  'polkadot': 'DOT',
+  'chainlink': 'LINK',
+  'uniswap': 'UNI',
+  'aave': 'AAVE',
+  'usd-coin': 'USDC',
+  'tether': 'USDT',
+  'binancecoin': 'BNB',
+  'stellar': 'XLM',
+  'tron': 'TRX',
+  'hedera-hashgraph': 'HBAR',
+  'the-open-network': 'TON',
+  'sui': 'SUI'
+}
+
+async function storeCryptoPricesInDatabase(cryptoPrices, toCurrency = 'php') {
+  try {
+    const toCurrencyUpper = toCurrency.toUpperCase()
+    const records = []
+
+    for (const [coingeckoId, priceData] of Object.entries(cryptoPrices)) {
+      const cryptoCode = coingeckoIdToCryptoCode[coingeckoId] || coingeckoId.toUpperCase()
+      const price = priceData[toCurrency] || priceData['php'] || priceData['usd']
+
+      if (price) {
+        records.push({
+          from_currency: cryptoCode,
+          to_currency: toCurrencyUpper,
+          rate: price.toString(),
+          source: 'coingecko',
+          expires_at: new Date(Date.now() + 3600000).toISOString() // 1 hour
+        })
+      }
+    }
+
+    if (records.length > 0) {
+      const { error } = await supabase
+        .from('crypto_rates')
+        .upsert(records, { onConflict: 'from_currency,to_currency' })
+
+      if (error) {
+        console.warn('Failed to store crypto prices in database:', error)
+      } else {
+        console.log(`Stored ${records.length} crypto rates in database`)
+      }
+    }
+  } catch (e) {
+    console.warn('storeCryptoPricesInDatabase failed:', e?.message || e)
+  }
+}
+
 // Main handler
 async function handle(req: Request): Promise<Response> {
   // CORS preflight
