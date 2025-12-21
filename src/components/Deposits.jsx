@@ -1116,34 +1116,68 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
                   </tr>
                 </thead>
                 <tbody>
-                  {deposits.slice(0, 5).map(deposit => (
-                    <tr key={deposit.id} className="border-b border-slate-100">
-                      <td className="py-3 px-4 font-semibold text-slate-900">
-                        {deposit.amount} {deposit.original_currency || deposit.currency_code}
-                      </td>
-                      <td className="py-3 px-4 text-slate-700">
-                        {deposit.converted_amount ? `${deposit.converted_amount} ${deposit.wallet_currency || deposit.currency_code}` : '—'}
-                      </td>
-                      <td className="py-3 px-4 text-slate-700">
-                        {DEPOSIT_METHODS[deposit.deposit_method]?.name || deposit.deposit_method}
-                      </td>
-                      <td className="py-3 px-4 text-xs text-slate-600 font-mono">
-                        {deposit.reference_number || '—'}
-                      </td>
-                      <td className="py-3 px-4">
-                        <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-                          deposit.status === 'approved' ? 'bg-emerald-100 text-emerald-700' :
-                          deposit.status === 'rejected' ? 'bg-red-100 text-red-700' :
-                          'bg-yellow-100 text-yellow-700'
-                        }`}>
-                          {deposit.status.charAt(0).toUpperCase() + deposit.status.slice(1)}
-                        </span>
-                      </td>
-                      <td className="py-3 px-4 text-slate-600 text-xs">
-                        {new Date(deposit.created_at).toLocaleDateString()}
-                      </td>
-                    </tr>
-                  ))}
+                  {deposits.slice(0, 5).map(deposit => {
+                    // Parse notes to get stored metadata
+                    let notesMeta = {}
+                    try {
+                      if (deposit.notes) {
+                        notesMeta = JSON.parse(deposit.notes)
+                      }
+                    } catch (e) {
+                      console.error('Failed to parse deposit notes:', e)
+                    }
+
+                    // Get original currency and converted amount from notes or columns
+                    const originalCurrency = notesMeta.original_currency || deposit.original_currency || deposit.currency_code
+                    const convertedAmount = notesMeta.converted_amount || deposit.converted_amount
+                    const walletCurrency = notesMeta.wallet_currency || deposit.wallet_currency || deposit.currency_code
+
+                    // Helper function to format numbers with proper decimal/thousand separators
+                    const formatAmount = (num) => {
+                      if (!num && num !== 0) return '—'
+                      const numValue = typeof num === 'string' ? parseFloat(num) : num
+                      if (isNaN(numValue)) return '—'
+                      return numValue.toLocaleString('en-US', {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2
+                      })
+                    }
+
+                    // Helper function to uppercase currency symbols
+                    const formatCurrency = (curr) => (curr ? curr.toUpperCase() : '—')
+
+                    // Get deposit method name
+                    const methodName = DEPOSIT_METHODS[deposit.deposit_method]?.name || formatCurrency(deposit.deposit_method)
+
+                    return (
+                      <tr key={deposit.id} className="border-b border-slate-100">
+                        <td className="py-3 px-4 font-semibold text-slate-900">
+                          {formatAmount(deposit.amount)} {formatCurrency(originalCurrency)}
+                        </td>
+                        <td className="py-3 px-4 text-slate-700">
+                          {convertedAmount ? `${formatAmount(convertedAmount)} ${formatCurrency(walletCurrency)}` : '—'}
+                        </td>
+                        <td className="py-3 px-4 text-slate-700">
+                          {methodName}
+                        </td>
+                        <td className="py-3 px-4 text-xs text-slate-600 font-mono">
+                          {deposit.reference_number || deposit.phone_number || '—'}
+                        </td>
+                        <td className="py-3 px-4">
+                          <span className={`px-3 py-1 rounded-full text-xs font-medium ${
+                            deposit.status === 'approved' ? 'bg-emerald-100 text-emerald-700' :
+                            deposit.status === 'rejected' ? 'bg-red-100 text-red-700' :
+                            'bg-yellow-100 text-yellow-700'
+                          }`}>
+                            {deposit.status.charAt(0).toUpperCase() + deposit.status.slice(1)}
+                          </span>
+                        </td>
+                        <td className="py-3 px-4 text-slate-600 text-xs">
+                          {new Date(deposit.created_at).toLocaleDateString()}
+                        </td>
+                      </tr>
+                    )
+                  })}
                 </tbody>
               </table>
             </div>
