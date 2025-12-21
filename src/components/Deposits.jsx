@@ -1111,12 +1111,10 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
                   <tr className="border-b border-slate-200">
                     <th className="text-left py-3 px-4 text-slate-600 font-medium">Amount</th>
                     <th className="text-left py-3 px-4 text-slate-600 font-medium">Converted Amount</th>
-                    <th className="text-left py-3 px-4 text-slate-600 font-medium">Method</th>
-                    <th className="text-left py-3 px-4 text-slate-600 font-medium">Wallet ID</th>
-                    <th className="text-left py-3 px-4 text-slate-600 font-medium">Account Number</th>
+                    <th className="text-left py-3 px-4 text-slate-600 font-medium">Currency</th>
                     <th className="text-left py-3 px-4 text-slate-600 font-medium">Reference</th>
                     <th className="text-left py-3 px-4 text-slate-600 font-medium">Status</th>
-                    <th className="text-left py-3 px-4 text-slate-600 font-medium">Date</th>
+                    <th className="text-left py-3 px-4 text-slate-600 font-medium">Action</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -1136,9 +1134,6 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
                     const convertedAmount = notesMeta.converted_amount || deposit.converted_amount
                     const walletCurrency = notesMeta.wallet_currency || deposit.wallet_currency || deposit.currency_code
 
-                    // Get wallet information for this deposit
-                    const depositWallet = wallets.find(w => w.id === deposit.wallet_id)
-
                     // Helper function to format numbers with proper decimal/thousand separators
                     const formatAmount = (num) => {
                       if (!num && num !== 0) return '—'
@@ -1153,25 +1148,16 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
                     // Helper function to uppercase currency symbols
                     const formatCurrency = (curr) => (curr ? curr.toUpperCase() : '—')
 
-                    // Get deposit method name
-                    const methodName = DEPOSIT_METHODS[deposit.deposit_method]?.name || formatCurrency(deposit.deposit_method)
-
                     return (
-                      <tr key={deposit.id} className="border-b border-slate-100">
+                      <tr key={deposit.id} className="border-b border-slate-100 hover:bg-slate-50 transition">
                         <td className="py-3 px-4 font-semibold text-slate-900">
                           {formatAmount(deposit.amount)} {formatCurrency(originalCurrency)}
                         </td>
                         <td className="py-3 px-4 text-slate-700">
-                          {convertedAmount ? `${formatAmount(convertedAmount)} ${formatCurrency(walletCurrency)}` : '—'}
+                          {convertedAmount ? formatAmount(convertedAmount) : '—'}
                         </td>
                         <td className="py-3 px-4 text-slate-700">
-                          {methodName}
-                        </td>
-                        <td className="py-3 px-4 text-xs text-slate-600 font-mono">
-                          {depositWallet?.id || deposit.wallet_id || '—'}
-                        </td>
-                        <td className="py-3 px-4 text-xs text-slate-600 font-mono">
-                          {depositWallet?.account_number || '—'}
+                          {formatCurrency(walletCurrency)}
                         </td>
                         <td className="py-3 px-4 text-xs text-slate-600 font-mono">
                           {deposit.reference_number || deposit.phone_number || '—'}
@@ -1179,14 +1165,23 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
                         <td className="py-3 px-4">
                           <span className={`px-3 py-1 rounded-full text-xs font-medium ${
                             deposit.status === 'approved' ? 'bg-emerald-100 text-emerald-700' :
+                            deposit.status === 'completed' ? 'bg-emerald-100 text-emerald-700' :
                             deposit.status === 'rejected' ? 'bg-red-100 text-red-700' :
                             'bg-yellow-100 text-yellow-700'
                           }`}>
                             {deposit.status.charAt(0).toUpperCase() + deposit.status.slice(1)}
                           </span>
                         </td>
-                        <td className="py-3 px-4 text-slate-600 text-xs">
-                          {new Date(deposit.created_at).toLocaleDateString()}
+                        <td className="py-3 px-4">
+                          <button
+                            onClick={() => {
+                              setSelectedDepositForDetails(deposit)
+                              setShowDepositDetailsModal(true)
+                            }}
+                            className="px-3 py-1 bg-blue-600 text-white text-xs font-medium rounded hover:bg-blue-700 transition"
+                          >
+                            Details
+                          </button>
                         </td>
                       </tr>
                     )
