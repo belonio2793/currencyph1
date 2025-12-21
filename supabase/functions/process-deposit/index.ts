@@ -77,6 +77,80 @@ function generateDepositReference(method: string): string {
   return `${method.toUpperCase()}-${timestamp}-${random}`
 }
 
+// Get crypto price in PHP using CoinGecko API
+async function getCryptoPriceInPHP(cryptoCode: string): Promise<{
+  price: number
+  source: string
+} | null> {
+  try {
+    const coingeckoId = coingeckoIds[cryptoCode] || cryptoCode.toLowerCase()
+    const response = await fetch(
+      `https://api.coingecko.com/api/v3/simple/price?ids=${coingeckoId}&vs_currencies=php`,
+      {
+        signal: AbortSignal.timeout(5000)
+      }
+    )
+
+    if (!response.ok) {
+      console.error(`CoinGecko API error: ${response.status}`)
+      return null
+    }
+
+    const data = (await response.json()) as Record<string, { php: number }>
+    const price = data[coingeckoId]?.php
+
+    if (price) {
+      return { price, source: 'coingecko' }
+    }
+    return null
+  } catch (error) {
+    console.error(`Failed to get crypto price from CoinGecko:`, error)
+    return null
+  }
+}
+
+// Convert fiat currency to PHP using Open Exchange Rates
+async function convertToPhp(amount: number, fromCurrency: string): Promise<{
+  convertedAmount: number
+  exchangeRate: number
+  source: string
+} | null> {
+  if (fromCurrency === 'PHP') {
+    return { convertedAmount: amount, exchangeRate: 1, source: 'identity' }
+  }
+
+  try {
+    if (!OPEN_EXCHANGE_RATES_API) {
+      console.warn('Open Exchange Rates API key not configured')
+      return null
+    }
+
+    const response = await fetch(
+      `https://openexchangerates.org/api/latest.json?app_id=${OPEN_EXCHANGE_RATES_API}&base=${fromCurrency}&symbols=PHP`,
+      {
+        signal: AbortSignal.timeout(5000)
+      }
+    )
+
+    if (!response.ok) {
+      console.error(`Open Exchange Rates API error: ${response.status}`)
+      return null
+    }
+
+    const data = (await response.json()) as Record<string, any>
+    const exchangeRate = data.rates?.PHP || 1
+
+    return {
+      convertedAmount: amount * exchangeRate,
+      exchangeRate,
+      source: 'openexchangerates'
+    }
+  } catch (error) {
+    console.error(`Failed to convert ${fromCurrency} to PHP:`, error)
+    return null
+  }
+}
+
 // Process Stripe deposit
 async function processStripeDeposit(
   request: DepositRequest
