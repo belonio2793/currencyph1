@@ -2,11 +2,11 @@
 -- Tracks all status changes with full audit trail
 CREATE TABLE IF NOT EXISTS deposit_status_history (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  deposit_id UUID NOT NULL REFERENCES deposits(id) ON DELETE CASCADE,
+  deposit_id UUID NOT NULL,
   user_id UUID NOT NULL,
   old_status TEXT,
   new_status TEXT NOT NULL,
-  changed_by UUID NOT NULL, -- Admin or system user who made the change
+  changed_by UUID NOT NULL,
   reason TEXT,
   notes JSONB,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -14,49 +14,47 @@ CREATE TABLE IF NOT EXISTS deposit_status_history (
 );
 
 -- Deposit Audit Log Table
--- Complete audit trail of deposit operations (approvals, rejections, reversals)
+-- Complete audit trail of deposit operations
 CREATE TABLE IF NOT EXISTS deposit_audit_log (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  deposit_id UUID NOT NULL REFERENCES deposits(id) ON DELETE CASCADE,
+  deposit_id UUID NOT NULL,
   user_id UUID NOT NULL,
   wallet_id UUID,
-  action TEXT NOT NULL, -- 'approve', 'reject', 'reverse', 'manual_adjust', 'sync_fix'
-  old_state JSONB, -- Previous deposit state (amount, status, balance_before)
-  new_state JSONB, -- New deposit state (amount, status, balance_after)
-  wallet_impact JSONB, -- { balance_before, balance_after, amount_changed }
-  admin_id UUID, -- The admin who performed the action
+  action TEXT NOT NULL,
+  old_state JSONB,
+  new_state JSONB,
+  wallet_impact JSONB,
+  admin_id UUID,
   admin_email TEXT,
-  idempotency_key TEXT UNIQUE, -- Prevent duplicate operations
-  status TEXT DEFAULT 'success', -- 'success', 'failed', 'partial_success', 'rolled_back'
+  idempotency_key TEXT UNIQUE,
+  status TEXT DEFAULT 'success',
   error_message TEXT,
-  network_sync_version INT DEFAULT 0, -- Version for network sync tracking
+  network_sync_version INT DEFAULT 0,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   completed_at TIMESTAMP
 );
 
 -- Deposit Reversal Registry
--- Tracks all reversals and their relationships
 CREATE TABLE IF NOT EXISTS deposit_reversal_registry (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  original_deposit_id UUID NOT NULL REFERENCES deposits(id) ON DELETE CASCADE,
-  reversal_deposit_id UUID REFERENCES deposits(id) ON DELETE SET NULL,
-  reason TEXT NOT NULL, -- 'manual_revert', 'admin_correction', 'network_sync_fix'
-  reversed_by UUID NOT NULL, -- Admin user
+  original_deposit_id UUID NOT NULL,
+  reversal_deposit_id UUID,
+  reason TEXT NOT NULL,
+  reversed_by UUID NOT NULL,
   original_balance NUMERIC,
   reversal_balance NUMERIC,
-  status TEXT DEFAULT 'active', -- 'active', 'superseded', 'cancelled'
+  status TEXT DEFAULT 'active',
   is_idempotent BOOLEAN DEFAULT TRUE,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   resolved_at TIMESTAMP
 );
 
 -- Deposit State Lock Table
--- Prevents concurrent modifications (optimistic locking)
 CREATE TABLE IF NOT EXISTS deposit_state_lock (
-  deposit_id UUID PRIMARY KEY REFERENCES deposits(id) ON DELETE CASCADE,
+  deposit_id UUID PRIMARY KEY,
   version INT DEFAULT 1,
-  locked_by UUID, -- Admin user who has the lock
+  locked_by UUID,
   locked_at TIMESTAMP,
   lock_expires_at TIMESTAMP,
   is_locked BOOLEAN DEFAULT FALSE,
@@ -64,19 +62,18 @@ CREATE TABLE IF NOT EXISTS deposit_state_lock (
 );
 
 -- Wallet Balance Reconciliation Log
--- Tracks balance changes for reconciliation
 CREATE TABLE IF NOT EXISTS wallet_balance_reconciliation (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  wallet_id UUID NOT NULL REFERENCES wallets(id) ON DELETE CASCADE,
+  wallet_id UUID NOT NULL,
   user_id UUID NOT NULL,
   balance_before NUMERIC,
   balance_after NUMERIC,
   transaction_count INT,
   discrepancy NUMERIC,
   reason TEXT,
-  reconciliation_type TEXT, -- 'deposit_approval', 'deposit_reversal', 'auto_sync'
+  reconciliation_type TEXT,
   admin_id UUID,
-  status TEXT DEFAULT 'completed', -- 'pending', 'completed', 'failed'
+  status TEXT DEFAULT 'completed',
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   completed_at TIMESTAMP
 );
@@ -100,7 +97,7 @@ ALTER TABLE deposit_reversal_registry ENABLE ROW LEVEL SECURITY;
 ALTER TABLE deposit_state_lock ENABLE ROW LEVEL SECURITY;
 ALTER TABLE wallet_balance_reconciliation ENABLE ROW LEVEL SECURITY;
 
--- RLS Policies - Admins and users can view their audit logs
+-- RLS Policies - Admins can view all, users can view their own
 CREATE POLICY deposit_status_history_select ON deposit_status_history
   FOR SELECT USING (
     auth.uid() = user_id OR
@@ -119,41 +116,20 @@ CREATE POLICY deposit_reversal_registry_select ON deposit_reversal_registry
     auth.jwt() ->> 'role' = 'admin'
   );
 
--- Add new columns to deposits table if they don't exist (check before altering)
-DO $$
-BEGIN
-  IF NOT EXISTS (
-    SELECT 1 FROM information_schema.columns
-    WHERE table_name = 'deposits' AND column_name = 'version'
-  ) THEN
-    ALTER TABLE deposits ADD COLUMN version INT DEFAULT 1;
-  END IF;
+CREATE POLICY deposit_state_lock_select ON deposit_state_lock
+  FOR SELECT USING (
+    auth.jwt() ->> 'role' = 'admin'
+  );
 
-  IF NOT EXISTS (
-    SELECT 1 FROM information_schema.columns
-    WHERE table_name = 'deposits' AND column_name = 'idempotency_key'
-  ) THEN
-    ALTER TABLE deposits ADD COLUMN idempotency_key TEXT UNIQUE;
-  END IF;
+CREATE POLICY wallet_reconciliation_select ON wallet_balance_reconciliation
+  FOR SELECT USING (
+    auth.uid() = user_id OR
+    auth.jwt() ->> 'role' = 'admin'
+  );
 
-  IF NOT EXISTS (
-    SELECT 1 FROM information_schema.columns
-    WHERE table_name = 'deposits' AND column_name = 'approved_by'
-  ) THEN
-    ALTER TABLE deposits ADD COLUMN approved_by UUID;
-  END IF;
-
-  IF NOT EXISTS (
-    SELECT 1 FROM information_schema.columns
-    WHERE table_name = 'deposits' AND column_name = 'approved_at'
-  ) THEN
-    ALTER TABLE deposits ADD COLUMN approved_at TIMESTAMP;
-  END IF;
-
-  IF NOT EXISTS (
-    SELECT 1 FROM information_schema.columns
-    WHERE table_name = 'deposits' AND column_name = 'reversal_reason'
-  ) THEN
-    ALTER TABLE deposits ADD COLUMN reversal_reason TEXT;
-  END IF;
-END $$;
+-- Add new columns to deposits table
+ALTER TABLE deposits ADD COLUMN IF NOT EXISTS version INT DEFAULT 1;
+ALTER TABLE deposits ADD COLUMN IF NOT EXISTS idempotency_key TEXT UNIQUE;
+ALTER TABLE deposits ADD COLUMN IF NOT EXISTS approved_by UUID;
+ALTER TABLE deposits ADD COLUMN IF NOT EXISTS approved_at TIMESTAMP;
+ALTER TABLE deposits ADD COLUMN IF NOT EXISTS reversal_reason TEXT;
