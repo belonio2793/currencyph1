@@ -82,7 +82,7 @@ export default function SendMoney({ userId }) {
       const rate = await currencyAPI.getExchangeRate(selectedSender, recipientCurrency)
       if (rate) {
         setExchangeRate(rate)
-        setReceiverAmount((parseFloat(amount) * rate).toFixed(2))
+        setReceiverAmount(parseFloat(amount) * rate)
       }
     } catch (err) {
       console.warn('Could not fetch exchange rate:', err)
