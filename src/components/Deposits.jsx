@@ -971,7 +971,7 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
                 <div className="space-y-3">
                   <div className="flex justify-between items-center">
                     <span className="text-slate-700">You Send:</span>
-                    <span className="font-semibold text-slate-900">{amount} {selectedCurrency}</span>
+                    <span className="font-semibold text-slate-900">{formatNumber(parseFloat(amount) || 0)} {selectedCurrency}</span>
                   </div>
                   {exchangeRates[selectedCurrency] && (
                     <div className="flex justify-between items-center text-sm text-slate-600">
