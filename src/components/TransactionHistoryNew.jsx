@@ -153,7 +153,7 @@ export default function TransactionHistory({ userId }) {
                   }`}>
                     {transaction.transaction_type.includes('sent') || transaction.transaction_type === 'bill_payment' ? '-' : '+'}
                     {transaction.currency_code === 'PHP' ? '₱' : transaction.currency_code === 'EUR' ? '€' : transaction.currency_code === 'GBP' ? '£' : '$'}
-                    {transaction.amount.toFixed(2)}
+                    {formatNumber(transaction.amount)}
                   </p>
                   <p className="text-xs text-slate-500">{transaction.currency_code}</p>
                 </div>
