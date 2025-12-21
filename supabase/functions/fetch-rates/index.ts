@@ -165,6 +165,7 @@ async function storeCryptoPricesInDatabase(cryptoPrices, toCurrency = 'php') {
   try {
     const toCurrencyUpper = toCurrency.toUpperCase()
     const records = []
+    const updatedAt = new Date().toISOString()
 
     for (const [coingeckoId, priceData] of Object.entries(cryptoPrices)) {
       const cryptoCode = coingeckoIdToCryptoCode[coingeckoId] || coingeckoId.toUpperCase()
@@ -176,6 +177,7 @@ async function storeCryptoPricesInDatabase(cryptoPrices, toCurrency = 'php') {
           to_currency: toCurrencyUpper,
           rate: price.toString(),
           source: 'coingecko',
+          updated_at: updatedAt,
           expires_at: new Date(Date.now() + 3600000).toISOString() // 1 hour
         })
       }
@@ -192,8 +194,47 @@ async function storeCryptoPricesInDatabase(cryptoPrices, toCurrency = 'php') {
         console.log(`Stored ${records.length} crypto rates in database`)
       }
     }
+
+    return records
   } catch (e) {
     console.warn('storeCryptoPricesInDatabase failed:', e?.message || e)
+    return []
+  }
+}
+
+// Get rate confirmations for user display
+async function getRateConfirmations(cryptoPrices, toCurrency = 'php') {
+  try {
+    const toCurrencyUpper = toCurrency.toUpperCase()
+    const confirmations = []
+    const now = new Date()
+
+    for (const [coingeckoId, priceData] of Object.entries(cryptoPrices)) {
+      const cryptoCode = coingeckoIdToCryptoCode[coingeckoId] || coingeckoId.toUpperCase()
+      const price = priceData[toCurrency] || priceData['php'] || priceData['usd']
+
+      if (price) {
+        confirmations.push({
+          from_currency: cryptoCode,
+          to_currency: toCurrencyUpper,
+          rate: price,
+          rate_formatted: `${price.toFixed(2)} ${toCurrencyUpper}`,
+          source: 'coingecko',
+          fetched_at: now.toISOString(),
+          timestamp: {
+            readable: `today at ${now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })} UTC`,
+            date: now.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }),
+            time: now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' })
+          },
+          confirmation_message: `${cryptoCode} rate confirmed at ${now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })} UTC`
+        })
+      }
+    }
+
+    return confirmations
+  } catch (e) {
+    console.warn('getRateConfirmations failed:', e?.message || e)
+    return []
   }
 }
 
