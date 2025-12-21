@@ -391,17 +391,17 @@ export default function OnlineUsers({ userId, userEmail }) {
                   <div
                     key={user.user_id}
                     onClick={() => setSelectedUser(user)}
-                    className={`p-4 border-b border-slate-100 cursor-pointer transition-colors hover:bg-slate-50 ${
+                    className={`p-3 sm:p-4 border-b border-slate-100 cursor-pointer transition-colors hover:bg-slate-50 ${
                       selectedUser?.user_id === user.user_id ? 'bg-blue-50' : ''
                     }`}
                   >
-                    <div className="flex items-start justify-between">
-                      <div className="flex-1">
-                        <div className="font-semibold text-slate-900">{profile?.full_name || 'User'}</div>
-                        <div className="text-xs text-slate-500 mt-1">{profile?.email || 'No email'}</div>
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="flex-1 min-w-0">
+                        <div className="font-semibold text-slate-900 text-sm sm:text-base truncate">{profile?.full_name || 'User'}</div>
+                        <div className="text-xs text-slate-500 mt-1 truncate">{profile?.email || 'No email'}</div>
                         <div className="text-xs text-slate-600 mt-2 flex items-center gap-1">
-                          <span className={`w-2 h-2 rounded-full ${isFriendUser ? 'bg-green-500' : 'bg-slate-300'}`} />
-                          {user.city || 'Location unknown'}
+                          <span className={`w-2 h-2 flex-shrink-0 rounded-full ${isFriendUser ? 'bg-green-500' : 'bg-slate-300'}`} />
+                          <span className="truncate">{user.city || 'Location unknown'}</span>
                         </div>
                       </div>
                       <button
@@ -410,7 +410,7 @@ export default function OnlineUsers({ userId, userEmail }) {
                           handleAddFriend(user.user_id)
                         }}
                         disabled={pendingRequests[user.user_id]}
-                        className={`ml-2 px-3 py-1 rounded text-xs font-medium transition-colors whitespace-nowrap ${
+                        className={`ml-2 flex-shrink-0 px-2 sm:px-3 py-1 rounded text-xs font-medium transition-colors whitespace-nowrap ${
                           isFriendUser
                             ? 'bg-green-100 text-green-700 hover:bg-green-200'
                             : 'bg-blue-100 text-blue-700 hover:bg-blue-200'
