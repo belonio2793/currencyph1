@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { MapContainer, TileLayer, Marker, Popup, Polyline } from 'react-leaflet'
 import L from 'leaflet'
 import { getLabelWithCheckpoints } from '../lib/shippingLabelService'
+import { formatNumber } from '../lib/currency'
 import './PackageCheckpointMap.css'
 
 // Fix default marker icons
