@@ -646,15 +646,7 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
           name: addresses.length > 1 ? `${selectedCurrency} (${addressData.network})` : selectedCurrency,
           icon: selectedCurrency,
           type: 'crypto',
-          description: `Send ${cryptoName} (${selectedCurrency}) directly to our wallet${addresses.length > 1 ? ` via ${addressData.network}` : ''}`,
-          instructions: [
-            `Open your ${cryptoName} wallet app`,
-            `Scan the QR code or copy the address below`,
-            `Enter the amount in ${selectedCurrency}`,
-            `Verify the recipient address and amount`,
-            `Confirm the transaction`,
-            `Your balance will be updated within 1-2 minutes`
-          ],
+          description: `Send ${cryptoName} directly to our wallet${addresses.length > 1 ? ` via ${addressData.network}` : ''}`,
           address: addressData.address,
           network: addressData.network,
           provider: addressData.provider,
