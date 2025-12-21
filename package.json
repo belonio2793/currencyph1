@@ -94,6 +94,7 @@
     "migrate-planning-ports": "node scripts/apply-migration-056.js",
     "apply-planning-migrations": "node scripts/apply-all-planning-migrations.js",
     "repair-deposits": "node scripts/repair-deposit-conversions.js",
+    "fix-incorrect-bch-deposit": "node scripts/fix-incorrect-bch-deposit.js",
     "bulletproof-schema": "bash scripts/bulletproof-schema-repair.sh"
   },
   "dependencies": {
