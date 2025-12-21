@@ -1241,7 +1241,7 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
               <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
                 <p className="font-semibold text-yellow-900 mb-2">Important:</p>
                 <ul className="text-sm text-yellow-800 space-y-1">
-                  <li>• Only send {selectedAddressMethod.name} ({selectedCurrency}) to this address</li>
+                  <li>• Only send {selectedAddressMethod.cryptoName} ({selectedAddressMethod.cryptoSymbol}) to this address</li>
                   {selectedAddressMethod.network && <li>• Network: {selectedAddressMethod.network}</li>}
                   <li>• Do not send other tokens or cryptocurrencies</li>
                   <li>• Transactions cannot be reversed</li>
