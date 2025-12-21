@@ -43,6 +43,32 @@ const GCASH_API_KEY = Deno.env.get('GCASH_API_KEY')
 const PAYMAYA_API_KEY = Deno.env.get('PAYMAYA_API_KEY')
 const WISE_API_KEY = Deno.env.get('WISE_API_KEY')
 const REMITLY_API_KEY = Deno.env.get('REMITLY_API_KEY')
+const OPEN_EXCHANGE_RATES_API = Deno.env.get('OPEN_EXCHANGE_RATES_API')
+
+// Crypto to CoinGecko ID mapping
+const coingeckoIds: Record<string, string> = {
+  'BTC': 'bitcoin',
+  'ETH': 'ethereum',
+  'USDT': 'tether',
+  'BNB': 'binancecoin',
+  'SOL': 'solana',
+  'XRP': 'ripple',
+  'ADA': 'cardano',
+  'DOGE': 'dogecoin',
+  'DOT': 'polkadot',
+  'BCH': 'bitcoin-cash',
+  'LTC': 'litecoin',
+  'USDC': 'usd-coin',
+  'LINK': 'chainlink',
+  'MATIC': 'matic-network',
+  'UNI': 'uniswap',
+  'AVAX': 'avalanche-2',
+  'TON': 'the-open-network',
+  'HBAR': 'hedera-hashgraph',
+  'SUI': 'sui',
+  'TRX': 'tron',
+  'XLM': 'stellar'
+}
 
 // Generate unique deposit reference
 function generateDepositReference(method: string): string {
