@@ -3,6 +3,7 @@ import { useDevice } from '../context/DeviceContext'
 import HeaderMap from './HeaderMap'
 import CurrencySelectionModal from './CurrencySelectionModal'
 import { convertFiatToCryptoDb, getCryptoRateWithTimestamp } from '../lib/cryptoRatesDb'
+import { formatNumber } from '../lib/currency'
 
 const currencyLabels = {
   'PHP': 'Philippine Peso',
