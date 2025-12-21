@@ -6,6 +6,8 @@ import { formatFieldValue } from '../lib/formatters'
 import JobRatings from './JobRatings'
 import JobRemarks from './JobRemarks'
 import JobOfferForm from './JobOfferForm'
+import ExpandableModal from './ExpandableModal'
+import { useDevice } from '../context/DeviceContext'
 import './JobDetailsModal.css'
 
 export default function JobDetailsModal({
