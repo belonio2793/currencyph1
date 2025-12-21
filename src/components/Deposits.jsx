@@ -976,7 +976,7 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
                   {exchangeRates[selectedCurrency] && (
                     <div className="flex justify-between items-center text-sm text-slate-600">
                       <span>Rate:</span>
-                      <span>1 {selectedCurrency} = {exchangeRates[selectedCurrency]?.toFixed(2) || 'N/A'} {selectedWalletData.currency_code}</span>
+                      <span>1 {selectedCurrency} = {formatNumber(exchangeRates[selectedCurrency]) || 'N/A'} {selectedWalletData.currency_code}</span>
                     </div>
                   )}
                   {calculateConvertedAmount() && selectedCurrency !== selectedWalletData.currency_code && (
