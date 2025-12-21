@@ -1,7 +1,12 @@
 /**
- * Cryptocurrency rates service using CoinGecko API
- * CoinGecko is free, reliable, and doesn't require authentication
+ * Cryptocurrency rates service with multiple fallback strategies
+ * - Primary: CoinGecko API
+ * - Fallback 1: Database cached rates
+ * - Fallback 2: Alternative API (when available)
+ * - Fallback 3: Return cached/stale data or null
  */
+
+import { supabase } from './supabaseClient'
 
 /**
  * Map cryptocurrency codes to CoinGecko IDs
@@ -32,11 +37,13 @@ const coingeckoIds = {
 }
 
 /**
- * Cache for exchange rates with expiry
- * Format: { rate, timestamp }
+ * In-memory cache for exchange rates with expiry
+ * Format: { rate, timestamp, source }
  */
 const rateCache = new Map()
 const CACHE_DURATION = 60000 // 1 minute
+const MAX_RETRIES = 3
+const RETRY_DELAY_MS = 500 // Initial delay, increases exponentially
 
 /**
  * Get the CoinGecko ID for a cryptocurrency
@@ -46,12 +53,93 @@ function getCoingeckoId(cryptoCode) {
 }
 
 /**
- * Check if cache is still valid
+ * Check if in-memory cache is still valid
  */
 function isCacheValid(key) {
   const cached = rateCache.get(key)
   if (!cached) return false
   return Date.now() - cached.timestamp < CACHE_DURATION
+}
+
+/**
+ * Retry logic with exponential backoff
+ */
+async function fetchWithRetry(url, options = {}, maxRetries = MAX_RETRIES) {
+  let lastError
+
+  for (let attempt = 0; attempt <= maxRetries; attempt++) {
+    try {
+      const response = await Promise.race([
+        fetch(url, options),
+        new Promise((_, reject) =>
+          setTimeout(() => reject(new Error('Fetch timeout')), 10000)
+        )
+      ])
+
+      if (response.ok) {
+        return response
+      }
+
+      // Don't retry on 4xx client errors
+      if (response.status >= 400 && response.status < 500) {
+        throw new Error(`Client error: ${response.status}`)
+      }
+
+      lastError = new Error(`HTTP ${response.status}`)
+    } catch (err) {
+      lastError = err
+
+      if (attempt < maxRetries) {
+        const delay = RETRY_DELAY_MS * Math.pow(2, attempt) + Math.random() * 1000
+        await new Promise(resolve => setTimeout(resolve, delay))
+      }
+    }
+  }
+
+  throw lastError
+}
+
+/**
+ * Get cached rate from database
+ */
+async function getCachedRateFromDatabase(cryptoCode, toCurrency = 'PHP') {
+  try {
+    const { data, error } = await supabase
+      .from('crypto_rates_valid')
+      .select('rate, source, updated_at')
+      .eq('from_currency', cryptoCode)
+      .eq('to_currency', toCurrency)
+      .single()
+
+    if (error) {
+      console.warn(`No cached rate in database for ${cryptoCode}/${toCurrency}`)
+      return null
+    }
+
+    return { rate: parseFloat(data.rate), source: 'database', cachedAt: data.updated_at }
+  } catch (err) {
+    console.warn(`Failed to fetch cached rate from database:`, err.message)
+    return null
+  }
+}
+
+/**
+ * Store rate in database for future use
+ */
+async function storeRateInDatabase(cryptoCode, toCurrency, rate, source) {
+  try {
+    await supabase
+      .from('crypto_rates')
+      .upsert({
+        from_currency: cryptoCode,
+        to_currency: toCurrency,
+        rate: rate.toString(),
+        source: source,
+        expires_at: new Date(Date.now() + 3600000).toISOString() // 1 hour
+      }, { onConflict: 'from_currency,to_currency' })
+  } catch (err) {
+    console.warn(`Failed to store rate in database:`, err.message)
+  }
 }
 
 /**
