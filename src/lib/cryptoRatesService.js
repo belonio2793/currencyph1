@@ -317,16 +317,17 @@ async function convertUSDtoPhp(usdAmount) {
 }
 
 /**
- * Get multiple cryptocurrency prices in one request
+ * Get multiple cryptocurrency prices in one request (more efficient)
  */
-export async function getMultipleCryptoPrices(cryptoCodes) {
+export async function getMultipleCryptoPrices(cryptoCodes, toCurrency = 'PHP') {
   try {
     const coingeckoIds = cryptoCodes
       .map(code => getCoingeckoId(code))
       .join(',')
-    
-    const response = await fetch(
-      `https://api.coingecko.com/api/v3/simple/price?ids=${coingeckoIds}&vs_currencies=php&precision=8`
+
+    // Try primary API
+    const response = await fetchWithRetry(
+      `https://api.coingecko.com/api/v3/simple/price?ids=${coingeckoIds}&vs_currencies=${toCurrency.toLowerCase()}&precision=8`
     )
 
     if (!response.ok) {
@@ -335,23 +336,44 @@ export async function getMultipleCryptoPrices(cryptoCodes) {
 
     const data = await response.json()
     const prices = {}
+    const toCurrencyLower = toCurrency.toLowerCase()
 
     cryptoCodes.forEach(code => {
       const coingeckoId = getCoingeckoId(code)
-      const price = data[coingeckoId]?.php
+      const price = data[coingeckoId]?.[toCurrencyLower]
       if (price) {
         prices[code] = price
-        rateCache.set(coingeckoId, {
+
+        // Cache individually
+        const cacheKey = `${code}_${toCurrency}`
+        rateCache.set(cacheKey, {
           rate: price,
-          timestamp: Date.now()
+          timestamp: Date.now(),
+          source: 'api'
         })
+
+        // Store in database asynchronously
+        storeRateInDatabase(code, toCurrency, price, 'coingecko').catch(e =>
+          console.warn(`Failed to cache ${code} in DB:`, e.message)
+        )
       }
     })
 
     return prices
   } catch (error) {
     console.warn('Failed to fetch multiple crypto prices:', error.message)
-    return {}
+
+    // Fallback: try to get from cache
+    const prices = {}
+    cryptoCodes.forEach(code => {
+      const cacheKey = `${code}_${toCurrency}`
+      const cached = rateCache.get(cacheKey)
+      if (cached) {
+        prices[code] = cached.rate
+      }
+    })
+
+    return prices
   }
 }
 
