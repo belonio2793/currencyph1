@@ -767,6 +767,15 @@ export default function LandingPage({ userId, userEmail, globalCurrency = 'PHP',
             <h2 className="text-5xl font-light text-slate-900">
               {getTotalBalance()} {globalCurrency}
             </h2>
+            <p className="text-slate-600 text-sm mt-2">
+              {loadingCrypto ? (
+                <span className="italic text-slate-400">loading {globalCryptocurrency}...</span>
+              ) : cryptoBalance !== null ? (
+                <>{cryptoBalance.toFixed(8)} {globalCryptocurrency}</>
+              ) : (
+                <span className="italic text-slate-400">crypto unavailable</span>
+              )}
+            </p>
           </div>
 
           {/* Side by Side Forms */}
