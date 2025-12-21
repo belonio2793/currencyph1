@@ -873,8 +873,8 @@ export default function Nearby({ userId, setActiveTab, setCurrentListingSlug }) 
                       }}
                       className={`py-1 sm:py-2 rounded-md font-bold text-xs sm:text-sm md:text-base transition-all duration-200 flex items-center justify-center ${
                         expandedLetter === letter
-                          ? 'bg-white/25 text-white shadow-lg'
-                          : 'bg-white/5 text-white hover:bg-white/10'
+                          ? 'bg-blue-600 text-white shadow-lg'
+                          : 'bg-slate-200 text-slate-700 hover:bg-slate-300'
                       } ${!hasCities ? 'opacity-60' : ''}`}
                       title={`Cities starting with ${letter}`}
                     >
