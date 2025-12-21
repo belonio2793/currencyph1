@@ -373,7 +373,7 @@ export default function P2PLoanMarketplace({ userId, userEmail, onTabChange }) {
             </div>
 
             {/* Filters */}
-            <div className="bg-white border border-slate-200 rounded-lg p-4 mb-6">
+            <div className="bg-white border border-slate-200 rounded-lg p-4 sm:p-6 mb-6">
               <div className="grid grid-cols-1 md:grid-cols-6 gap-3">
                 <div className="md:col-span-2">
                   <label className="block text-xs font-medium text-slate-600 mb-1">Search</label>
