@@ -499,61 +499,52 @@ export default function EmployeesModal({ businessId, userId, onClose, currentUse
     }
   }
 
+  const footerContent = (
+    <button
+      onClick={onClose}
+      className="w-full px-4 py-2 bg-slate-600 text-white rounded-lg hover:bg-slate-700 font-medium transition-colors"
+    >
+      Close
+    </button>
+  )
+
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg shadow-2xl w-full max-w-7xl max-h-[95vh] overflow-y-auto">
-        {/* Header */}
-        <div className="sticky top-0 bg-white border-b border-slate-200 p-6 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <div className="flex items-center justify-center w-12 h-12 rounded-lg bg-purple-100">
-              <svg className="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.856-1.487M15 10h.01M13 16h2v2h-2z" />
-              </svg>
-            </div>
-            <div>
-              <h2 className="text-2xl font-bold text-slate-900">Employees & Payroll</h2>
-              <p className="text-slate-600 text-sm">Manage employees, attendance, payroll, and benefits</p>
-            </div>
-          </div>
-          <button
-            onClick={onClose}
-            className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-lg transition-colors"
-            aria-label="Close modal"
-          >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
+    <ExpandableModal
+      isOpen={true}
+      onClose={onClose}
+      title="Employees & Payroll"
+      icon="👥"
+      size="lg"
+      footer={footerContent}
+      defaultExpanded={!isMobile}
+    >
+      {/* Tab Navigation */}
+      <div className="mb-6 border-b border-slate-200 -mx-4 sm:-mx-6">
+        <div className="flex gap-1 overflow-x-auto px-4 sm:px-6">
+          {[
+            { id: 'employees', label: 'Employees' },
+            { id: 'attendance', label: 'Attendance' },
+            { id: 'medical', label: 'Medical' },
+            { id: 'benefits', label: 'Benefits' },
+            { id: 'performance', label: 'Performance' },
+            { id: 'payroll', label: 'Payroll' }
+          ].map(tab => (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className={`px-4 py-3 text-sm font-medium border-b-2 whitespace-nowrap transition-colors ${
+                activeTab === tab.id
+                  ? 'text-purple-600 border-purple-600'
+                  : 'text-slate-600 border-transparent hover:text-slate-900'
+              }`}
+            >
+              {tab.label}
+            </button>
+          ))}
         </div>
+      </div>
 
-        {/* Tab Navigation */}
-        <div className="sticky top-16 bg-white border-b border-slate-200 px-6">
-          <div className="flex gap-1 overflow-x-auto">
-            {[
-              { id: 'employees', label: 'Employees' },
-              { id: 'attendance', label: 'Attendance' },
-              { id: 'medical', label: 'Medical' },
-              { id: 'benefits', label: 'Benefits' },
-              { id: 'performance', label: 'Performance' },
-              { id: 'payroll', label: 'Payroll' }
-            ].map(tab => (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                className={`px-4 py-3 text-sm font-medium border-b-2 whitespace-nowrap transition-colors ${
-                  activeTab === tab.id
-                    ? 'text-purple-600 border-purple-600'
-                    : 'text-slate-600 border-transparent hover:text-slate-900'
-                }`}
-              >
-                {tab.label}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Content */}
-        <div className="p-8">
+      {/* Content */}
           {/* Employees Tab */}
           {activeTab === 'employees' && (
             <div>
@@ -1433,16 +1424,6 @@ export default function EmployeesModal({ businessId, userId, onClose, currentUse
               )}
             </div>
           )}
-        </div>
-
-        {/* Footer */}
-        <div className="sticky bottom-0 bg-white border-t border-slate-200 p-6 flex gap-3 justify-end">
-          <button onClick={onClose} className="px-6 py-2 bg-slate-200 text-slate-700 rounded-lg hover:bg-slate-300 font-medium">
-            Close
-          </button>
-        </div>
-      </div>
-
       {/* Employee Chat Modal */}
       {showChatModal && selectedEmployeeForChat && (
         <EmployeeChatModal
@@ -1458,6 +1439,6 @@ export default function EmployeesModal({ businessId, userId, onClose, currentUse
           }}
         />
       )}
-    </div>
+    </ExpandableModal>
   )
 }
