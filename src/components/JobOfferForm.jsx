@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { formatNumber } from '../lib/currency'
 import './JobOfferForm.css'
 
 export default function JobOfferForm({
