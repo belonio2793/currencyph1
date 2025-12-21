@@ -8,6 +8,7 @@ import ExpandableModal from './ExpandableModal'
 import { useDevice } from '../context/DeviceContext'
 
 export default function EmployeesModal({ businessId, userId, onClose, currentUserName = 'You' }) {
+  const { isMobile } = useDevice()
   const [activeTab, setActiveTab] = useState('employees')
   const [employees, setEmployees] = useState([])
   const [loading, setLoading] = useState(true)
