@@ -104,6 +104,33 @@ export default function HomePage({ userId, userEmail, globalCurrency = 'PHP', se
     }
   }, [globalCurrency])
 
+  // Convert balances to cryptocurrency for dual display
+  useEffect(() => {
+    const convertToCrypto = async () => {
+      if (!totalBalanceConverted || !globalCryptocurrency || !globalCurrency || !userEmail) {
+        setCryptoBalance(null)
+        setCryptoDebt(null)
+        return
+      }
+
+      setLoadingCrypto(true)
+      try {
+        const balanceCrypto = await convertFiatToCryptoDb(totalBalanceConverted, globalCurrency, globalCryptocurrency)
+        const debtCrypto = totalDebtConverted ? await convertFiatToCryptoDb(totalDebtConverted, globalCurrency, globalCryptocurrency) : null
+
+        setCryptoBalance(balanceCrypto)
+        setCryptoDebt(debtCrypto)
+      } catch (error) {
+        console.error('Failed to convert balances to crypto:', error)
+        setCryptoBalance(null)
+        setCryptoDebt(null)
+      }
+      setLoadingCrypto(false)
+    }
+
+    convertToCrypto()
+  }, [totalBalanceConverted, totalDebtConverted, globalCryptocurrency, globalCurrency, userEmail])
+
   const convertTotals = useCallback(async (w = wallets, l = loans) => {
     try {
       // Collect unique currencies that need conversion
