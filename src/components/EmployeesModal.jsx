@@ -4,6 +4,8 @@ import { EmployeeManagementService } from '../lib/employeeManagementService'
 import { employeeMessagingService } from '../lib/employeeMessagingService'
 import EmployeeChatModal from './EmployeeChatModal'
 import EmployeeAttendancePanel from './EmployeeAttendancePanel'
+import ExpandableModal from './ExpandableModal'
+import { useDevice } from '../context/DeviceContext'
 
 export default function EmployeesModal({ businessId, userId, onClose, currentUserName = 'You' }) {
   const [activeTab, setActiveTab] = useState('employees')
