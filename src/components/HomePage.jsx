@@ -326,7 +326,18 @@ export default function HomePage({ userId, userEmail, globalCurrency = 'PHP', se
           {/* Total Balance */}
           <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-4 sm:p-6 border border-blue-200">
             <p className="text-xs sm:text-sm text-blue-600 font-medium uppercase tracking-wider mb-2">Total Balance</p>
-            <p className="text-2xl sm:text-3xl font-light text-blue-900">{formatNumber(totalBalanceConverted != null ? totalBalanceConverted : getTotalBalance())} {globalCurrency}</p>
+            <p className="text-lg sm:text-2xl font-light text-blue-900">
+              {formatNumber(totalBalanceConverted != null ? totalBalanceConverted : getTotalBalance())} {globalCurrency}
+            </p>
+            <p className="text-xs sm:text-sm font-light text-blue-700 mt-1">
+              {loadingCrypto ? (
+                <span className="italic text-blue-500">loading {globalCryptocurrency}...</span>
+              ) : cryptoBalance !== null ? (
+                <>{cryptoBalance.toFixed(8)} {globalCryptocurrency}</>
+              ) : (
+                <span className="italic text-blue-500">crypto unavailable</span>
+              )}
+            </p>
           </div>
 
           {/* Net (Balance - Debt) */}
