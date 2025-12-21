@@ -274,9 +274,15 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
 
       // Map to { 'BTC': { address: '...', network: '...', provider: 'internal' }, ... }
       // For multiple networks, store as array
+      // Filter out entries where address is null or 'PENDING'
       const addressMap = {}
       if (houseWallets && houseWallets.length > 0) {
         houseWallets.forEach(wallet => {
+          // Skip entries without valid addresses
+          if (!wallet.address || wallet.address === 'PENDING' || wallet.address === null) {
+            return
+          }
+
           if (!addressMap[wallet.currency]) {
             addressMap[wallet.currency] = []
           }
