@@ -1,14 +1,10 @@
 import React, { useState, useEffect } from 'react'
 import ResponsiveModal from './ResponsiveModal'
 import ResponsiveButton from './ResponsiveButton'
-import { convertFiatToCryptoDb } from '../lib/cryptoRatesDb'
-import { formatNumber } from '../lib/currency'
 
-export default function CurrencySelectionModal({ isOpen, onClose, globalCurrency, setGlobalCurrency, globalCryptocurrency, setGlobalCryptocurrency, totalBalanceConverted, userEmail }) {
+export default function CurrencySelectionModal({ isOpen, onClose, globalCurrency, setGlobalCurrency, globalCryptocurrency, setGlobalCryptocurrency }) {
   const [localFiatCurrency, setLocalFiatCurrency] = useState(globalCurrency)
   const [localCryptoCurrency, setLocalCryptoCurrency] = useState(globalCryptocurrency)
-  const [previewCryptoBalance, setPreviewCryptoBalance] = useState(null)
-  const [loadingPreview, setLoadingPreview] = useState(false)
 
   const fiatCurrencies = [
     { code: 'PHP', label: 'PHP - Philippine Peso' },
