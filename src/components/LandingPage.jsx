@@ -4,6 +4,7 @@ import { supabase } from '../lib/supabaseClient'
 import Rates from './Rates'
 import { reverseGeocode } from '../lib/nominatimService.js'
 import { formatNumber } from '../lib/currency'
+import { convertFiatToCryptoDb } from '../lib/cryptoRatesDb'
 
 // Searchable Select Component
 function SearchableSelect({ value, onChange, options, placeholder, label }) {
