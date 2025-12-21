@@ -1,11 +1,14 @@
 import React, { useState, useEffect } from 'react'
 import ResponsiveModal from './ResponsiveModal'
 import ResponsiveButton from './ResponsiveButton'
-import { getResponsiveFontSize } from '../lib/responsiveUtils'
+import { convertFiatToCryptoDb } from '../lib/cryptoRatesDb'
+import { formatNumber } from '../lib/currency'
 
-export default function CurrencySelectionModal({ isOpen, onClose, globalCurrency, setGlobalCurrency, globalCryptocurrency, setGlobalCryptocurrency }) {
+export default function CurrencySelectionModal({ isOpen, onClose, globalCurrency, setGlobalCurrency, globalCryptocurrency, setGlobalCryptocurrency, totalBalanceConverted, userEmail }) {
   const [localFiatCurrency, setLocalFiatCurrency] = useState(globalCurrency)
   const [localCryptoCurrency, setLocalCryptoCurrency] = useState(globalCryptocurrency)
+  const [previewCryptoBalance, setPreviewCryptoBalance] = useState(null)
+  const [loadingPreview, setLoadingPreview] = useState(false)
 
   const fiatCurrencies = [
     { code: 'PHP', label: 'PHP - Philippine Peso' },
@@ -61,6 +64,31 @@ export default function CurrencySelectionModal({ isOpen, onClose, globalCurrency
     }
   }, [isOpen, globalCurrency, globalCryptocurrency])
 
+  // Convert balance to crypto whenever crypto selection changes
+  useEffect(() => {
+    const updateCryptoPreview = async () => {
+      if (userEmail && totalBalanceConverted && localCryptoCurrency) {
+        setLoadingPreview(true)
+        try {
+          const cryptoBalance = await convertFiatToCryptoDb(totalBalanceConverted, globalCurrency, localCryptoCurrency)
+          if (cryptoBalance !== null && cryptoBalance !== undefined) {
+            setPreviewCryptoBalance(cryptoBalance)
+          } else {
+            setPreviewCryptoBalance(null)
+          }
+        } catch (error) {
+          console.error('Failed to convert balance:', error)
+          setPreviewCryptoBalance(null)
+        }
+        setLoadingPreview(false)
+      } else {
+        setPreviewCryptoBalance(null)
+      }
+    }
+
+    updateCryptoPreview()
+  }, [localCryptoCurrency, globalCurrency, totalBalanceConverted, userEmail])
+
   const handleApply = () => {
     setGlobalCurrency(localFiatCurrency)
     setGlobalCryptocurrency(localCryptoCurrency)
@@ -109,8 +137,8 @@ export default function CurrencySelectionModal({ isOpen, onClose, globalCurrency
       <div className="space-y-4 sm:space-y-6">
         {/* Currently Selected Currency Info */}
         <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 sm:p-5">
-          <h3 className="text-sm font-semibold text-blue-900 mb-2">Currently Selected</h3>
-          <div className="text-sm text-blue-800 space-y-1">
+          <h3 className="text-sm font-semibold text-blue-900 mb-3">Currently Selected</h3>
+          <div className="text-sm text-blue-800 space-y-2">
             <p><span className="font-medium">Display Currency:</span> <span className="inline-flex items-center gap-2">
               {getFiatCurrencyLabel(globalCurrency)}
               {globalCurrency === 'PHP' && <span className="text-xs bg-green-100 text-green-800 px-2 py-0.5 rounded font-medium">Default</span>}
@@ -118,6 +146,29 @@ export default function CurrencySelectionModal({ isOpen, onClose, globalCurrency
             <p><span className="font-medium">Display Cryptocurrency:</span> {getCryptoCurrencyLabel(globalCryptocurrency)}</p>
           </div>
         </div>
+
+        {/* Balance Reconciliation Section */}
+        {userEmail && totalBalanceConverted !== undefined && totalBalanceConverted > 0 && (
+          <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 sm:p-5">
+            <h3 className="text-sm font-semibold text-amber-900 mb-3">Balance Reconciliation</h3>
+            <div className="space-y-3">
+              <div>
+                <p className="text-xs text-amber-700 font-medium mb-1">Current Balance ({globalCurrency})</p>
+                <p className="text-lg font-semibold text-amber-900">{formatNumber(totalBalanceConverted)} {globalCurrency}</p>
+              </div>
+              <div className="border-t border-amber-200 pt-3">
+                <p className="text-xs text-amber-700 font-medium mb-1">Preview in {localCryptoCurrency}</p>
+                {loadingPreview ? (
+                  <p className="text-sm text-amber-600 italic">Converting...</p>
+                ) : previewCryptoBalance !== null ? (
+                  <p className="text-lg font-semibold text-amber-900">{previewCryptoBalance.toFixed(8)} {localCryptoCurrency}</p>
+                ) : (
+                  <p className="text-sm text-amber-600 italic">Unable to load conversion rate</p>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Fiat Currency Section */}
         <div className="space-y-2 sm:space-y-3">
@@ -175,6 +226,9 @@ export default function CurrencySelectionModal({ isOpen, onClose, globalCurrency
               </option>
             ))}
           </select>
+          <p className="text-xs text-slate-500 mt-2">
+            Only one cryptocurrency can be selected at a time. Your balance will be reconciled to the selected currency.
+          </p>
         </div>
 
         {/* Info Message */}
