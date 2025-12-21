@@ -70,6 +70,59 @@ export class DepositConversionService {
   }
 
   /**
+   * Get conversion details with rate confirmation for user display
+   * Includes timestamp, source, and formatted rate information
+   * @param {object} deposit - Deposit record
+   * @param {object} wallet - Wallet record
+   * @returns {Promise<object>} Conversion with confirmation or null
+   */
+  async getConversionWithConfirmation(deposit, wallet) {
+    if (deposit.currency_code === wallet.currency_code) {
+      return null
+    }
+
+    try {
+      // Get rate confirmation with timestamp
+      const rateConfirmation = await getLatestRateWithConfirmation(
+        deposit.currency_code,
+        wallet.currency_code
+      )
+
+      if (!rateConfirmation) {
+        console.warn(`No rate confirmation available for ${deposit.currency_code}/${wallet.currency_code}`)
+        return null
+      }
+
+      const convertedAmount = deposit.amount * rateConfirmation.rate
+      const confirmationMessage = buildRateConfirmationMessage(rateConfirmation)
+
+      return {
+        fromCurrency: deposit.currency_code,
+        toCurrency: wallet.currency_code,
+        originalAmount: deposit.amount,
+        exchangeRate: rateConfirmation.rate,
+        convertedAmount: convertedAmount,
+        rateSource: rateConfirmation.source,
+        rateUpdatedAt: rateConfirmation.updated_at,
+        timestamp: new Date().toISOString(),
+        // New confirmation fields for user display
+        confirmation: {
+          rate_formatted: rateConfirmation.display.rate_formatted,
+          converted_amount_formatted: `${convertedAmount.toFixed(2)} ${wallet.currency_code}`,
+          timestamp_readable: rateConfirmation.timestamp.readable,
+          minutes_ago: rateConfirmation.timestamp.minutes_ago,
+          is_fresh: rateConfirmation.timestamp.is_current,
+          confirmation_message: confirmationMessage.full_message,
+          rate_source: rateConfirmation.source
+        }
+      }
+    } catch (error) {
+      console.error('Failed to get conversion with confirmation:', error)
+      return null
+    }
+  }
+
+  /**
    * Confirm a conversion for a deposit
    * @param {string} depositId - Deposit ID
    * @param {object} conversion - Conversion details
