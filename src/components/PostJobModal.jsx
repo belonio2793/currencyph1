@@ -2,6 +2,8 @@ import { useState, useRef, useEffect } from 'react'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet'
+import { useDevice } from '../context/DeviceContext'
+import ExpandableModal from './ExpandableModal'
 import { PHILIPPINES_CITIES, searchCities } from '../data/philippinesCities'
 import './PostJobModal.css'
 
@@ -218,22 +220,48 @@ export default function PostJobModal({
     }
   }
 
+  const { isMobile } = useDevice()
+
+  const modalFooter = (
+    <div className="flex gap-2 w-full">
+      <button
+        type="button"
+        onClick={onClose}
+        className="flex-1 px-4 py-2 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors font-medium"
+      >
+        Cancel
+      </button>
+      <button
+        type="submit"
+        form="post-job-form"
+        className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium disabled:opacity-50"
+        disabled={loading}
+      >
+        {loading ? 'Posting...' : 'Post Job'}
+      </button>
+    </div>
+  )
+
   return (
-    <div className="modal-overlay" onClick={onClose}>
-      <div className="post-job-modal" onClick={e => e.stopPropagation()}>
-        <div className="modal-header">
-          <h2>Post a New Job</h2>
-          <button className="close-btn" onClick={onClose}>×</button>
-        </div>
+    <ExpandableModal
+      isOpen={true}
+      onClose={onClose}
+      title="Post a New Job"
+      icon="💼"
+      size={isMobile ? 'fullscreen' : 'xl'}
+      footer={modalFooter}
+      defaultExpanded={!isMobile}
+    >
+      <div>
 
         {error && (
-          <div className="error-message">
-            {error}
-            <button onClick={() => setError('')}>×</button>
+          <div className="p-3 bg-red-50 border border-red-200 text-red-700 rounded-lg text-sm mb-4 flex items-center justify-between">
+            <span>{error}</span>
+            <button onClick={() => setError('')} className="text-red-700 hover:text-red-900">×</button>
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="post-job-form">
+        <form onSubmit={handleSubmit} className="post-job-form space-y-6" id="post-job-form">
           <div className="form-section">
             <h3>Job Details</h3>
 
@@ -683,24 +711,8 @@ export default function PostJobModal({
             </div>
           </div>
 
-          <div className="form-actions">
-            <button
-              type="button"
-              onClick={onClose}
-              className="btn-cancel"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              className="btn-submit"
-              disabled={loading}
-            >
-              {loading ? 'Posting...' : 'Post Job'}
-            </button>
-          </div>
         </form>
       </div>
-    </div>
+    </ExpandableModal>
   )
 }
