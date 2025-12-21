@@ -282,8 +282,8 @@ export default function P2PLoanMarketplace({ userId, userEmail, onTabChange }) {
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white">
       {error && (
-        <div className="max-w-6xl mx-auto px-6 py-4">
-          <div className="p-3 bg-red-50 border border-red-200 rounded text-sm text-red-700">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+          <div className="p-4 sm:p-5 bg-red-50 border border-red-200 rounded-lg text-sm text-red-700">
             {error}
           </div>
         </div>
@@ -291,7 +291,7 @@ export default function P2PLoanMarketplace({ userId, userEmail, onTabChange }) {
 
       {/* Navigation Tabs */}
       <div className="bg-white border-b border-slate-200 sticky top-0 z-10">
-        <div className="max-w-6xl mx-auto px-6">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex gap-6">
             <button
               onClick={() => setActiveTab('browse')}
@@ -352,7 +352,7 @@ export default function P2PLoanMarketplace({ userId, userEmail, onTabChange }) {
       </div>
 
       {/* Content */}
-      <div className="max-w-6xl mx-auto px-6 py-10">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10 lg:py-12">
         {loading ? (
           <div className="text-center py-12">
             <p className="text-slate-600">Loading...</p>
