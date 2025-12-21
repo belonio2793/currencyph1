@@ -816,26 +816,48 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
               </div>
 
               {/* Conversion Display */}
-              {amount && selectedWallet && selectedCurrency !== selectedWalletData?.currency_code && (
-                <div className={`border rounded-lg p-4 ${ratesLoading || !calculateConvertedAmount() ? 'bg-amber-50 border-amber-200' : 'bg-blue-50 border-blue-200'}`}>
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm text-slate-600">Conversion Rate</p>
-                      <p className="text-xs text-slate-500 mt-1">
-                        {ratesLoading ? 'Loading rates...' : !exchangeRates[selectedCurrency] || !exchangeRates[selectedWalletData?.currency_code] ? '⚠️ Rates unavailable' :
-                          activeType === 'cryptocurrency'
-                            ? `1 ${selectedCurrency} = ${exchangeRates[selectedCurrency].toLocaleString(undefined, { maximumFractionDigits: 2 })} ${selectedWalletData?.currency_code}`
-                            : `1 ${selectedCurrency} = ${(exchangeRates[selectedWalletData?.currency_code] / exchangeRates[selectedCurrency]).toFixed(6)} ${selectedWalletData?.currency_code}`
-                        }
+              {amount && selectedWallet && (activeType === 'cryptocurrency' || selectedCurrency !== selectedWalletData?.currency_code) && (
+                <div className={`border rounded-lg p-6 ${ratesLoading || !calculateConvertedAmount() ? 'bg-amber-50 border-amber-200' : 'bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200'}`}>
+                  {activeType === 'cryptocurrency' ? (
+                    <>
+                      <h3 className="text-lg font-semibold text-slate-900 mb-4">
+                        Convert {selectedCurrency} <span className="text-indigo-600">{selectedCurrency}</span> to Philippine Peso <span className="text-indigo-600">PHP</span>
+                      </h3>
+                      <p className="text-sm text-slate-600 mb-4">
+                        {ratesLoading ? 'Loading rates...' : !exchangeRates[selectedCurrency] ? 'Rate unavailable' : `${amount} ${selectedCurrency} = ${(parseFloat(amount) * exchangeRates[selectedCurrency]).toLocaleString(undefined, { maximumFractionDigits: 2 })} PHP as of ${new Date().toLocaleString(undefined, { month: 'short', day: 'numeric' })}`}
                       </p>
+                      <div className="flex gap-4 items-center justify-between">
+                        <div>
+                          <p className="text-xs text-slate-600 mb-1">Amount in {selectedCurrency}</p>
+                          <p className="text-3xl font-bold text-slate-900">{parseFloat(amount) || 0}</p>
+                        </div>
+                        <div className="text-slate-400 text-xl">↔</div>
+                        <div className="text-right">
+                          <p className="text-xs text-slate-600 mb-1">You receive in PHP</p>
+                          <p className={`text-3xl font-bold ${calculateConvertedAmount() ? 'text-indigo-600' : 'text-amber-600'}`}>
+                            {ratesLoading ? '...' : calculateConvertedAmount() ? calculateConvertedAmount().toLocaleString(undefined, { maximumFractionDigits: 2 }) : (parseFloat(amount) || 0).toLocaleString(undefined, { maximumFractionDigits: 2 })}
+                          </p>
+                        </div>
+                      </div>
+                    </>
+                  ) : (
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-sm text-slate-600">Conversion Rate</p>
+                        <p className="text-xs text-slate-500 mt-1">
+                          {ratesLoading ? 'Loading rates...' : !exchangeRates[selectedCurrency] || !exchangeRates[selectedWalletData?.currency_code] ? 'Rates unavailable' :
+                            `1 ${selectedCurrency} = ${(exchangeRates[selectedWalletData?.currency_code] / exchangeRates[selectedCurrency]).toFixed(6)} ${selectedWalletData?.currency_code}`
+                          }
+                        </p>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-sm text-slate-600">You will receive</p>
+                        <p className={`text-2xl font-bold ${calculateConvertedAmount() ? 'text-blue-600' : 'text-amber-600'}`}>
+                          {ratesLoading ? 'Calculating...' : `${(calculateConvertedAmount() || parseFloat(amount)).toLocaleString(undefined, { maximumFractionDigits: 2 })} ${selectedWalletData?.currency_code}`}
+                        </p>
+                      </div>
                     </div>
-                    <div className="text-right">
-                      <p className="text-sm text-slate-600">You will receive</p>
-                      <p className={`text-2xl font-bold ${calculateConvertedAmount() ? 'text-blue-600' : 'text-amber-600'}`}>
-                        {ratesLoading ? 'Calculating...' : `${(calculateConvertedAmount() || parseFloat(amount)).toLocaleString(undefined, { maximumFractionDigits: 2 })} ${selectedWalletData?.currency_code}`}
-                      </p>
-                    </div>
-                  </div>
+                  )}
                 </div>
               )}
 
