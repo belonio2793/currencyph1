@@ -299,12 +299,15 @@ async function handle(req: Request): Promise<Response> {
       console.warn('[fetch-rates] Both APIs failed, falling back to cache')
       const last = await getCachedLatest()
       if (last) {
+        const staleConfirmations = await getRateConfirmations(last.crypto_prices || {}, 'php')
         return jsonResponse({
           exchangeRates: last.exchange_rates || {},
           cryptoPrices: last.crypto_prices || {},
           cached: true,
           fetched_at: last.fetched_at,
-          warning: 'Using stale cached data'
+          rate_confirmations: staleConfirmations.slice(0, 10),
+          total_confirmations: staleConfirmations.length,
+          warning: 'Using stale cached data - APIs currently unavailable'
         })
       }
       // fallback to empty
