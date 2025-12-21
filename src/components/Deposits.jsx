@@ -844,9 +844,19 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
 
               {/* Select Deposit Method / Network */}
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-3">
-                  {activeType === 'cryptocurrency' ? 'Blockchain Network' : 'Payment Method'}
-                </label>
+                <div className="flex items-center justify-between mb-3">
+                  <label className="block text-sm font-medium text-slate-700">
+                    {activeType === 'cryptocurrency' ? 'Blockchain Network' : 'Payment Method'}
+                  </label>
+                  {activeType === 'cryptocurrency' && !exchangeRates[selectedCurrency] && (
+                    <button
+                      onClick={fetchExchangeRates}
+                      className="text-xs text-blue-600 hover:text-blue-700 font-medium"
+                    >
+                      Retry Rate
+                    </button>
+                  )}
+                </div>
                 {availableMethods.length > 0 ? (
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                     {availableMethods.map(method => (
