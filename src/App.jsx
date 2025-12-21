@@ -1,5 +1,4 @@
 import React, { useState, useEffect, Suspense, lazy } from 'react'
-import React, { useState, useEffect, lazy, Suspense } from 'react'
 import { supabase } from './lib/supabaseClient'
 import { currencyAPI } from './lib/payments'
 import backgroundSync from './lib/backgroundSync'
