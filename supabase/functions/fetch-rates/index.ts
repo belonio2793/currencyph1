@@ -125,6 +125,7 @@ async function upsertCachedRates(exchangeRates, cryptoPrices, source = 'openexch
 }
 
 // Map CoinGecko IDs to crypto codes for storage
+// All 30 cryptocurrencies from /deposits
 const coingeckoIdToCryptoCode = {
   'bitcoin': 'BTC',
   'ethereum': 'ETH',
@@ -134,7 +135,6 @@ const coingeckoIdToCryptoCode = {
   'cardano': 'ADA',
   'solana': 'SOL',
   'avalanche-2': 'AVAX',
-  'matic-network': 'MATIC',
   'polkadot': 'DOT',
   'chainlink': 'LINK',
   'uniswap': 'UNI',
@@ -146,7 +146,17 @@ const coingeckoIdToCryptoCode = {
   'tron': 'TRX',
   'hedera-hashgraph': 'HBAR',
   'the-open-network': 'TON',
-  'sui': 'SUI'
+  'sui': 'SUI',
+  'bitcoin-cash': 'BCH',
+  'shiba-inu': 'SHIB',
+  'paypal-usd': 'PYUSD',
+  'world-coin': 'WLD',
+  'tether-gold': 'XAUT',
+  'pepe': 'PEPE',
+  'hyperliquid': 'HYPE',
+  'asterzk': 'ASTER',
+  'ethena': 'ENA',
+  'sky': 'SKY'
 }
 
 async function storeCryptoPricesInDatabase(cryptoPrices, toCurrency = 'php') {
