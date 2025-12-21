@@ -2155,9 +2155,9 @@ export default function MyBusiness({ userId }) {
         {showRegistrationForm && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
             <div className="bg-white rounded-2xl shadow-lg border border-slate-200 overflow-hidden w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-              <div className="bg-gradient-to-r from-blue-600 to-blue-700 px-8 py-6">
-                <h2 className="text-2xl font-semibold text-white mb-1">{formMode === 'create' ? 'Create New Business' : 'Add Existing Business'}</h2>
-                <p className="text-blue-100 text-sm">{formMode === 'create' ? 'Register a new business' : 'Link an existing business'}</p>
+              <div className="px-8 py-6 border-b border-slate-200">
+                <h2 className="text-2xl font-semibold text-slate-900 mb-1">{formMode === 'create' ? 'Create New Business' : 'Add Existing Business'}</h2>
+                <p className="text-slate-600 text-sm">{formMode === 'create' ? 'Register a new business' : 'Link an existing business'}</p>
               </div>
               <div className="p-8 space-y-6">
                 <div>
