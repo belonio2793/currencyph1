@@ -2,6 +2,22 @@ import React, { useState, useEffect } from 'react'
 import ResponsiveModal from './ResponsiveModal'
 import ResponsiveButton from './ResponsiveButton'
 
+/**
+ * CurrencySelectionModal Component
+ *
+ * Handles dual currency selection for the application.
+ * Users must select:
+ * 1. One fiat currency (PHP, USD, EUR, etc.) - used for converting and displaying balance in any fiat currency
+ * 2. One cryptocurrency (BTC, ETH, DOGE, etc.) - always displayed alongside the fiat balance
+ *
+ * Both selections are persisted to localStorage and used throughout the app for:
+ * - Converting balances from their native currency to the selected fiat currency
+ * - Displaying balances in dual format: "X.XX FIAT + Y.YYYYYY CRYPTO"
+ * - Real-time rate conversions when either selection changes
+ *
+ * The "Currently Selected" section displays the active selections and helps users
+ * understand what currencies are currently being used for all balance displays.
+ */
 export default function CurrencySelectionModal({ isOpen, onClose, globalCurrency, setGlobalCurrency, globalCryptocurrency, setGlobalCryptocurrency }) {
   const [localFiatCurrency, setLocalFiatCurrency] = useState(globalCurrency)
   const [localCryptoCurrency, setLocalCryptoCurrency] = useState(globalCryptocurrency)
