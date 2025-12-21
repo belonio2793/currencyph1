@@ -10,30 +10,39 @@ import { supabase } from './supabaseClient'
 
 /**
  * Map cryptocurrency codes to CoinGecko IDs
+ * Includes all 30 cryptocurrencies from /deposits
  */
 const coingeckoIds = {
   'BTC': 'bitcoin',
   'ETH': 'ethereum',
   'USDT': 'tether',
   'BNB': 'binancecoin',
-  'SOL': 'solana',
   'XRP': 'ripple',
-  'ADA': 'cardano',
-  'DOGE': 'dogecoin',
-  'DOT': 'polkadot',
-  'BCH': 'bitcoin-cash',
-  'LTC': 'litecoin',
   'USDC': 'usd-coin',
-  'LINK': 'chainlink',
-  'MATIC': 'matic-network',
-  'UNI': 'uniswap',
-  'AVAX': 'avalanche-2',
-  'TON': 'the-open-network',
-  'HBAR': 'hedera-hashgraph',
-  'SUI': 'sui',
+  'SOL': 'solana',
   'TRX': 'tron',
+  'DOGE': 'dogecoin',
+  'ADA': 'cardano',
+  'BCH': 'bitcoin-cash',
+  'LINK': 'chainlink',
   'XLM': 'stellar',
-  'AED': 'aed'
+  'HYPE': 'hyperliquid',
+  'LTC': 'litecoin',
+  'SUI': 'sui',
+  'AVAX': 'avalanche-2',
+  'HBAR': 'hedera-hashgraph',
+  'SHIB': 'shiba-inu',
+  'PYUSD': 'paypal-usd',
+  'WLD': 'world-coin',
+  'TON': 'the-open-network',
+  'UNI': 'uniswap',
+  'DOT': 'polkadot',
+  'AAVE': 'aave',
+  'XAUT': 'tether-gold',
+  'PEPE': 'pepe',
+  'ASTER': 'asterzk',
+  'ENA': 'ethena',
+  'SKY': 'sky'
 }
 
 /**
