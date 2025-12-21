@@ -2,8 +2,11 @@ import React, { useState } from 'react'
 import { supabase } from '../lib/supabaseClient'
 import { currencyAPI } from '../lib/payments'
 import { formatNumber } from '../lib/currency'
+import ExpandableModal from './ExpandableModal'
+import { useDevice } from '../context/DeviceContext'
 
 export default function LoanPaymentModal({ loan, userId, onClose, onSuccess, wallets }) {
+  const { isMobile } = useDevice()
   const [paymentAmount, setPaymentAmount] = useState('')
   const [paymentMethod, setPaymentMethod] = useState('wallet')
   const [selectedWallet, setSelectedWallet] = useState(wallets && wallets.length > 0 ? wallets[0].id : '')
