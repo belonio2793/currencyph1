@@ -263,12 +263,17 @@ async function handle(req: Request): Promise<Response> {
       const age = Date.now() - new Date(cached.fetched_at).getTime()
       if (age < CACHED_TTL_MS) {
         console.log('[fetch-rates] Returning fresh cached rates, age:', Math.round(age / 1000), 'seconds')
+        // Build confirmations from cached crypto prices
+        const cachedConfirmations = await getRateConfirmations(cached.crypto_prices || {}, 'php')
         return jsonResponse({
           exchangeRates: cached.exchange_rates || {},
           cryptoPrices: cached.crypto_prices || {},
           cached: true,
           fetched_at: cached.fetched_at,
-          age: Math.round(age / 1000)
+          age: Math.round(age / 1000),
+          rate_confirmations: cachedConfirmations.slice(0, 10),
+          total_confirmations: cachedConfirmations.length,
+          cryptocurrencies_processed: Object.keys(cached.crypto_prices || {}).length
         })
       }
     }
