@@ -38,7 +38,7 @@ export async function handler(req: Request): Promise<Response> {
     // Get the deposit details
     const { data: deposit, error: depositError } = await supabase
       .from('deposits')
-      .select('id, user_id, wallet_id, amount, currency_code, status')
+      .select('id, user_id, wallet_id, amount, currency_code, status, received_amount, exchange_rate')
       .eq('id', depositId)
       .single()
 
