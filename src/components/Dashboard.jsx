@@ -16,6 +16,28 @@ export default function Dashboard({ userId, onNavigate, globalCurrency = 'PHP', 
     loadData()
   }, [userId])
 
+  // Convert balance to cryptocurrency for dual display
+  useEffect(() => {
+    const convertToCrypto = async () => {
+      if (!totalBalance || !globalCryptocurrency || !globalCurrency || !userEmail) {
+        setCryptoBalance(null)
+        return
+      }
+
+      setLoadingCrypto(true)
+      try {
+        const crypto = await convertFiatToCryptoDb(totalBalance, globalCurrency, globalCryptocurrency)
+        setCryptoBalance(crypto)
+      } catch (error) {
+        console.error('Failed to convert balance to crypto:', error)
+        setCryptoBalance(null)
+      }
+      setLoadingCrypto(false)
+    }
+
+    convertToCrypto()
+  }, [totalBalance, globalCurrency, globalCryptocurrency, userEmail])
+
   const loadData = async () => {
     try {
       // Skip for guest-local or invalid user IDs
