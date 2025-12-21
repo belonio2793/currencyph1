@@ -98,10 +98,10 @@ function NavbarComponent({ activeTab, onTabChange, globalCurrency, setGlobalCurr
                     <>
                       {typeof totalBalanceConverted !== 'undefined' ? (
                         <span className={`font-medium text-slate-900`}>
-                          {Number(totalBalanceConverted || 0).toFixed(2)} {globalCurrency}
+                          {formatNumber(totalBalanceConverted)} {globalCurrency}
                         </span>
                       ) : (
-                        <span className="font-medium text-slate-900">{Number(totalBalancePHP || 0).toFixed(2)} PHP</span>
+                        <span className="font-medium text-slate-900">{formatNumber(totalBalancePHP)} PHP</span>
                       )}
                     </>
                   ) : (
