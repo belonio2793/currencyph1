@@ -507,7 +507,7 @@ export default function Rates() {
         </div>
 
         {/* Right Column - Favorites and Info */}
-        <div className="space-y-6">
+        <div className="lg:col-span-1 space-y-6">
           {/* Favorites Card */}
           <div className="bg-white rounded-2xl shadow-lg p-6 border border-slate-200">
             <h3 className="text-lg font-semibold text-slate-900 mb-4">Favorite Rates</h3>
