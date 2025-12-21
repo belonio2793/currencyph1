@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { currencyAPI } from '../lib/payments'
+import { formatNumber } from '../lib/currency'
 
 export default function BillPayments({ userId }) {
   const [bills, setBills] = useState([])
@@ -274,7 +275,7 @@ export default function BillPayments({ userId }) {
                 >
                   {wallets.map(w => (
                     <option key={w.id} value={w.currency_code}>
-                      {w.currency_code} - Balance: {w.balance.toFixed(2)}
+                      {w.currency_code} - Balance: {formatNumber(w.balance)}
                     </option>
                   ))}
                 </select>
