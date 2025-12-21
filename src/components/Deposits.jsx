@@ -927,7 +927,7 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
         {step === 'confirm' && activeMethodData && selectedWalletData && (
           <div className="bg-white rounded-xl shadow-lg border border-slate-200 p-8 mb-6">
             <h2 className="text-2xl font-semibold text-slate-900 mb-6">
-              {amount} {selectedCurrency} via {activeMethodData.name}
+              {amount} {selectedCurrency.toUpperCase()} via {activeMethodData.name}
             </h2>
 
             {/* Deposit Summary */}
