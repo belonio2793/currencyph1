@@ -90,7 +90,7 @@ function SearchableCryptoSelect({ value, onChange, options, prices, label }) {
           onClick={() => setIsOpen(!isOpen)}
           className="w-full px-4 py-3 border-2 border-slate-300 rounded-lg focus:outline-none focus:border-orange-600 text-sm font-medium bg-white text-left flex justify-between items-center"
         >
-          <span>{value} - {prices[value]?.toFixed(2) || '0.00'}</span>
+          <span>{value} - {formatNumber(prices[value]) || '0.00'}</span>
           <span className="text-slate-500">▼</span>
         </button>
 
