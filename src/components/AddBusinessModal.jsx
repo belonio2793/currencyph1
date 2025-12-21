@@ -2,6 +2,8 @@ import React, { useEffect, useState, useRef } from 'react'
 import { nearbyUtils } from '../lib/nearbyUtils'
 import { useGeolocation } from '../lib/useGeolocation'
 import { supabase } from '../lib/supabaseClient'
+import { useDevice } from '../context/DeviceContext'
+import ExpandableModal from './ExpandableModal'
 import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
@@ -365,78 +367,128 @@ export default function AddBusinessModal({ userId, onClose, onSubmitted }) {
     ) : null
   }
 
-  if (pending) {
-    return (
-      <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
-        <div className="bg-white rounded-xl shadow-xl w-full max-w-2xl">
-          <div className="flex items-center justify-between border-b p-4">
-            <h3 className="text-lg font-semibold">Submission Complete</h3>
-            <button onClick={onClose} className="text-slate-500 hover:text-slate-700">✕</button>
-          </div>
+  const { isMobile } = useDevice()
 
-          <div className="p-4">
-            <div className="space-y-4">
-              <div className="p-3 bg-emerald-50 border border-emerald-200 rounded text-emerald-700 text-sm">
-                Submission created! Your business is now pending review. Pay the approval fee to finalize review.
-              </div>
-              {pending.image_urls && pending.image_urls.length > 0 && (
-                <div>
-                  <p className="text-sm font-medium text-slate-700 mb-2">Submitted Photos ({pending.image_urls.length})</p>
-                  <div className="grid grid-cols-2 gap-2 max-h-40 overflow-y-auto">
-                    {pending.image_urls.map((url, idx) => (
-                      <div key={idx} className="w-full h-20 bg-slate-100 rounded overflow-hidden">
-                        <img src={url} alt={`Photo ${idx + 1}`} className="w-full h-full object-cover" />
-                      </div>
-                    ))}
+  if (pending) {
+    const pendingFooter = (
+      <div className="flex gap-2 w-full">
+        <button
+          onClick={onClose}
+          className="flex-1 px-4 py-2 border rounded hover:bg-slate-50 font-medium"
+        >
+          Close
+        </button>
+        <button
+          onClick={handlePayFee}
+          disabled={paying}
+          className="flex-1 px-4 py-2 bg-blue-600 text-white rounded disabled:opacity-50 hover:bg-blue-700 font-medium"
+        >
+          {paying ? 'Processing...' : 'Pay now'}
+        </button>
+      </div>
+    )
+
+    return (
+      <ExpandableModal
+        isOpen={true}
+        onClose={onClose}
+        title="Submission Complete"
+        icon="✓"
+        size={isMobile ? 'fullscreen' : 'md'}
+        footer={pendingFooter}
+        defaultExpanded={!isMobile}
+      >
+        <div className="space-y-4">
+          <div className="p-3 bg-emerald-50 border border-emerald-200 rounded text-emerald-700 text-sm">
+            Submission created! Your business is now pending review. Pay the approval fee to finalize review.
+          </div>
+          {pending.image_urls && pending.image_urls.length > 0 && (
+            <div>
+              <p className="text-sm font-medium text-slate-700 mb-2">Submitted Photos ({pending.image_urls.length})</p>
+              <div className="grid grid-cols-2 gap-2 max-h-40 overflow-y-auto">
+                {pending.image_urls.map((url, idx) => (
+                  <div key={idx} className="w-full h-20 bg-slate-100 rounded overflow-hidden">
+                    <img src={url} alt={`Photo ${idx + 1}`} className="w-full h-full object-cover" />
                   </div>
-                </div>
-              )}
-              <div className="grid grid-cols-2 gap-4 border-t pt-4">
-                <div>
-                  <div className="text-sm text-slate-700">Approval fee</div>
-                  <div className="text-base font-semibold">₱{APPROVAL_FEE.toLocaleString()}</div>
-                </div>
-                <div>
-                  <div className="text-sm text-slate-700">Coordinates</div>
-                  <div className="text-sm text-slate-600">{pending.latitude && pending.longitude ? `${pending.latitude}, ${pending.longitude}` : 'Not set'}</div>
-                </div>
+                ))}
               </div>
-              <div className="flex justify-end gap-2 mt-4">
-                <button onClick={onClose} className="px-4 py-2 border rounded hover:bg-slate-50">Close</button>
-                <button onClick={handlePayFee} disabled={paying} className="px-4 py-2 bg-blue-600 text-white rounded disabled:opacity-50 hover:bg-blue-700">
-                  {paying ? 'Processing...' : 'Pay now'}
-                </button>
-              </div>
+            </div>
+          )}
+          <div className="grid grid-cols-2 gap-4 border-t pt-4">
+            <div>
+              <div className="text-sm text-slate-700">Approval fee</div>
+              <div className="text-base font-semibold">₱{APPROVAL_FEE.toLocaleString()}</div>
+            </div>
+            <div>
+              <div className="text-sm text-slate-700">Coordinates</div>
+              <div className="text-sm text-slate-600">{pending.latitude && pending.longitude ? `${pending.latitude}, ${pending.longitude}` : 'Not set'}</div>
             </div>
           </div>
         </div>
-      </div>
+      </ExpandableModal>
     )
   }
 
+  const businessFooter = (
+    <div className="flex justify-between gap-2 w-full flex-wrap">
+      {currentPage === 2 && (
+        <button
+          type="button"
+          onClick={handlePrevPage}
+          disabled={submitting || uploading}
+          className="flex-1 min-w-[100px] px-4 py-2 border rounded hover:bg-slate-50 disabled:opacity-50 font-medium"
+        >
+          ← Back
+        </button>
+      )}
+      <button
+        type="button"
+        onClick={onClose}
+        disabled={submitting || uploading}
+        className="flex-1 min-w-[100px] px-4 py-2 border rounded hover:bg-slate-50 disabled:opacity-50 font-medium"
+      >
+        Cancel
+      </button>
+      {currentPage === 1 && (
+        <button
+          type="button"
+          onClick={handleNextPage}
+          className="flex-1 min-w-[100px] px-4 py-2 bg-blue-600 text-white rounded disabled:opacity-50 hover:bg-blue-700 font-medium"
+        >
+          Next: Add Photos
+        </button>
+      )}
+      {currentPage === 2 && (
+        <button
+          type="submit"
+          form="add-business-form"
+          disabled={submitting || uploading}
+          className="flex-1 min-w-[100px] px-4 py-2 bg-blue-600 text-white rounded disabled:opacity-50 hover:bg-blue-700 font-medium"
+        >
+          {uploading ? 'Uploading...' : submitting ? 'Submitting...' : 'Submit for review'}
+        </button>
+      )}
+    </div>
+  )
+
   return (
-    <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-        <div className="flex items-center justify-between border-b p-4 sticky top-0 bg-white">
-          <h3 className="text-lg font-semibold">Add your business</h3>
-          <button onClick={onClose} className="text-slate-500 hover:text-slate-700">✕</button>
-        </div>
-
-        <div className="p-4">
-          <p className="text-sm text-slate-600 mb-4">
-            {currentPage === 1 
-              ? 'Basic business information' 
-              : 'Add photos for your business'}
-          </p>
-          <div className="text-xs text-slate-500 mb-4">
-            Page {currentPage} of 2
-          </div>
-
+    <ExpandableModal
+      isOpen={true}
+      onClose={onClose}
+      title="Add your business"
+      icon="🏪"
+      size={isMobile ? 'fullscreen' : 'lg'}
+      footer={businessFooter}
+      badgeContent={`Page ${currentPage} of 2`}
+      showBadge={true}
+      defaultExpanded={!isMobile}
+    >
+      <div>
           {error && (
-            <div className="mb-3 p-3 bg-red-50 text-red-700 border border-red-200 rounded text-sm">{error}</div>
+            <div className="mb-4 p-3 bg-red-50 text-red-700 border border-red-200 rounded text-sm">{error}</div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-4" id="add-business-form">
             {currentPage === 1 ? (
               <>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -618,22 +670,6 @@ export default function AddBusinessModal({ userId, onClose, onSubmitted }) {
                   </div>
                 </div>
 
-                <div className="flex justify-end gap-2 mt-6">
-                  <button 
-                    type="button" 
-                    onClick={onClose} 
-                    className="px-4 py-2 border rounded hover:bg-slate-50"
-                  >
-                    Cancel
-                  </button>
-                  <button 
-                    type="button" 
-                    onClick={handleNextPage}
-                    className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-                  >
-                    Next: Add Photos
-                  </button>
-                </div>
               </>
             ) : (
               <>
@@ -706,36 +742,9 @@ export default function AddBusinessModal({ userId, onClose, onSubmitted }) {
                   )}
                 </div>
 
-                <div className="flex justify-between gap-2 mt-6">
-                  <button 
-                    type="button" 
-                    onClick={handlePrevPage}
-                    disabled={submitting || uploading}
-                    className="px-4 py-2 border rounded hover:bg-slate-50 disabled:opacity-50"
-                  >
-                    ← Back
-                  </button>
-                  <div className="flex gap-2">
-                    <button 
-                      type="button" 
-                      onClick={onClose}
-                      disabled={submitting || uploading}
-                      className="px-4 py-2 border rounded hover:bg-slate-50 disabled:opacity-50"
-                    >
-                      Cancel
-                    </button>
-                    <button 
-                      type="submit"
-                      disabled={submitting || uploading}
-                      className="px-4 py-2 bg-blue-600 text-white rounded disabled:opacity-50 hover:bg-blue-700"
-                    >
-                      {uploading ? 'Uploading...' : submitting ? 'Submitting...' : 'Submit for review'}
-                    </button>
-                  </div>
-                </div>
 
                 {(uploading || submitting) && (
-                  <div className="mt-3 p-3 bg-blue-50 border border-blue-200 rounded text-blue-700 text-sm">
+                  <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded text-blue-700 text-sm">
                     {uploading && 'Uploading images to cloud...'}
                     {submitting && !uploading && 'Processing your submission...'}
                   </div>
@@ -743,8 +752,7 @@ export default function AddBusinessModal({ userId, onClose, onSubmitted }) {
               </>
             )}
           </form>
-        </div>
       </div>
-    </div>
+    </ExpandableModal>
   )
 }
