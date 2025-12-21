@@ -1224,27 +1224,17 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
                     )}
                   </div>
 
-                  <div className="flex gap-4 items-start mb-4">
-                    <div className="flex-shrink-0">
-                      <svg width="120" height="120" viewBox="0 0 120 120">
-                        <rect width="120" height="120" fill="white" rx="8" />
-                        <text x="50%" y="50%" dominantBaseline="middle" textAnchor="middle" fontSize="10" fill="#1e1b4b">
-                          [QR Code]
-                        </text>
-                      </svg>
-                    </div>
-                    <div className="flex-1">
-                      <p className="text-xs font-medium text-slate-600 mb-2">Copy the address or scan the QR code:</p>
-                      <p className="font-mono text-xs bg-white p-3 rounded border border-slate-300 break-all text-slate-800 mb-2">
-                        {selectedAddressMethod.address}
-                      </p>
-                      <button
-                        onClick={() => copyToClipboard(selectedAddressMethod.address)}
-                        className="text-sm text-purple-600 hover:text-purple-700 font-medium"
-                      >
-                        Copy Address
-                      </button>
-                    </div>
+                  <div className="mb-4">
+                    <p className="text-xs font-medium text-slate-600 mb-2">Copy the address below:</p>
+                    <p className="font-mono text-xs bg-white p-3 rounded border border-slate-300 break-all text-slate-800 mb-2">
+                      {selectedAddressMethod.address}
+                    </p>
+                    <button
+                      onClick={() => copyToClipboard(selectedAddressMethod.address)}
+                      className="text-sm text-purple-600 hover:text-purple-700 font-medium"
+                    >
+                      Copy Address
+                    </button>
                   </div>
 
                 </div>
