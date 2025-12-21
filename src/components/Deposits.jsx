@@ -1267,48 +1267,6 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
         </div>
       )}
 
-      {/* QR Code Modal */}
-      {showQRModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50" onClick={() => setShowQRModal(false)}>
-          <div className="bg-white rounded-xl shadow-2xl max-w-3xl w-full p-8" onClick={(e) => e.stopPropagation()}>
-            <div className="flex items-center justify-between mb-6">
-              <h3 className="text-2xl font-semibold text-slate-900">GCash Payment QR Code</h3>
-              <button
-                onClick={() => setShowQRModal(false)}
-                className="text-slate-500 hover:text-slate-700 text-3xl leading-none"
-              >
-                ×
-              </button>
-            </div>
-
-            <div className="flex flex-col items-center gap-6">
-              <img
-                src="https://cdn.builder.io/api/v1/image/assets%2F22335ca288c7480ead446114856c497b%2F95af4345d27a4b60bdcb084fac1e7abe?format=webp&width=800"
-                alt="GCash InstaPay QR Code - Large"
-                className="w-full max-w-md rounded-lg border-4 border-emerald-300 shadow-lg"
-              />
-
-              <div className="w-full bg-emerald-50 p-6 rounded-lg border border-emerald-200">
-                <p className="text-center text-sm text-slate-700 mb-4">
-                  Scan this QR code with your GCash app to complete your payment
-                </p>
-                <div className="bg-white p-4 rounded border border-emerald-200 text-center">
-                  <p className="text-sm font-semibold text-slate-900 mb-2">Merchant Details</p>
-                  <p className="text-xs text-slate-600"><span className="font-semibold">Mobile No.:</span> 09308510351</p>
-                  <p className="text-xs text-slate-600 mt-2"><span className="font-semibold">User ID:</span> •••••••••••4ROQPN</p>
-                </div>
-              </div>
-
-              <button
-                onClick={() => setShowQRModal(false)}
-                className="w-full px-6 py-3 bg-slate-900 text-white rounded-lg font-medium hover:bg-slate-800 transition"
-              >
-                Close
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   )
 }
