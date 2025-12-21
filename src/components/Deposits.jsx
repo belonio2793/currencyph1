@@ -171,6 +171,8 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
   const [activeType, setActiveType] = useState('currency') // 'currency' or 'cryptocurrency'
   const [showCryptoAddressModal, setShowCryptoAddressModal] = useState(false)
   const [selectedAddressMethod, setSelectedAddressMethod] = useState(null)
+  const [showDepositDetailsModal, setShowDepositDetailsModal] = useState(false)
+  const [selectedDepositForDetails, setSelectedDepositForDetails] = useState(null)
 
   useEffect(() => {
     loadInitialData()
