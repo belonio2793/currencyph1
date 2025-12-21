@@ -36,13 +36,12 @@ const currencyLabels = {
 function NavbarComponent({ activeTab, onTabChange, globalCurrency, setGlobalCurrency, globalCryptocurrency, setGlobalCryptocurrency, userEmail, userId, totalBalancePHP, totalBalanceConverted, totalDebtConverted, totalNet, onShowAuth, onSignOut }) {
   const { isMobile, isTablet } = useDevice()
   const [showCurrencyModal, setShowCurrencyModal] = useState(false)
-  const [displayType, setDisplayType] = useState('fiat') // 'fiat' or 'crypto'
   const [cryptoBalance, setCryptoBalance] = useState(null)
   const [loadingCrypto, setLoadingCrypto] = useState(false)
 
-  // Fetch crypto balance when displayType changes to 'crypto'
+  // Always fetch crypto balance for dual display
   useEffect(() => {
-    if (displayType === 'crypto' && userEmail && totalBalanceConverted && globalCryptocurrency) {
+    if (userEmail && totalBalanceConverted && globalCryptocurrency && globalCurrency) {
       setLoadingCrypto(true)
       convertFiatToCryptoDb(totalBalanceConverted, globalCurrency, globalCryptocurrency)
         .then(balance => {
@@ -55,7 +54,7 @@ function NavbarComponent({ activeTab, onTabChange, globalCurrency, setGlobalCurr
           setLoadingCrypto(false)
         })
     }
-  }, [displayType, totalBalanceConverted, globalCurrency, globalCryptocurrency, userEmail])
+  }, [totalBalanceConverted, globalCurrency, globalCryptocurrency, userEmail])
 
 
   return (
