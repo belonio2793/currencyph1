@@ -170,8 +170,6 @@ function NavbarComponent({ activeTab, onTabChange, globalCurrency, setGlobalCurr
         setGlobalCurrency={setGlobalCurrency}
         globalCryptocurrency={globalCryptocurrency}
         setGlobalCryptocurrency={setGlobalCryptocurrency}
-        totalBalanceConverted={totalBalanceConverted}
-        userEmail={userEmail}
       />
     </nav>
   )
