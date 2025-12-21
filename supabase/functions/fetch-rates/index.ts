@@ -226,37 +226,47 @@ async function handle(req: Request): Promise<Response> {
   // Not fresh - fetch new from primary sources
   try {
     console.log('[fetch-rates] Fetching fresh rates from APIs...')
-    const [exchangeRates, cryptoPrices] = await Promise.all([
+    const [exchangeRates, cryptoPricesUSD, cryptoPricesPHP] = await Promise.all([
       fetchOpenExchangeRates(),
-      fetchCoinGecko()
+      fetchCoinGecko('usd'),
+      fetchCoinGecko('php')
     ])
 
+    // Combine crypto prices (PHP takes priority)
+    const cryptoPrices = { ...cryptoPricesUSD, ...cryptoPricesPHP }
+
     // If exchangeRates not available, try last cached (even if stale)
-    if (!exchangeRates) {
-      console.warn('[fetch-rates] OpenExchangeRates failed, falling back to cache')
+    if (!exchangeRates && !cryptoPrices) {
+      console.warn('[fetch-rates] Both APIs failed, falling back to cache')
       const last = await getCachedLatest()
       if (last) {
         return jsonResponse({
           exchangeRates: last.exchange_rates || {},
           cryptoPrices: last.crypto_prices || {},
           cached: true,
-          fetched_at: last.fetched_at
+          fetched_at: last.fetched_at,
+          warning: 'Using stale cached data'
         })
       }
       // fallback to empty
-      await upsertCachedRates({}, cryptoPrices || {}, 'fallback')
+      await upsertCachedRates({}, {}, 'fallback')
       return jsonResponse({
         exchangeRates: {},
-        cryptoPrices: cryptoPrices || {},
-        cached: false
-      })
+        cryptoPrices: {},
+        cached: false,
+        error: 'All APIs failed and no cached data available'
+      }, 500)
     }
 
     // Store and return
     console.log('[fetch-rates] Successfully fetched rates, storing cache')
-    await upsertCachedRates(exchangeRates, cryptoPrices || {}, 'openexchangerates')
+    await Promise.all([
+      upsertCachedRates(exchangeRates || {}, cryptoPrices || {}, 'mixed'),
+      storeCryptoPricesInDatabase(cryptoPricesPHP || {}, 'php')
+    ])
+
     return jsonResponse({
-      exchangeRates,
+      exchangeRates: exchangeRates || {},
       cryptoPrices: cryptoPrices || {},
       cached: false,
       fetched_at: new Date().toISOString()
