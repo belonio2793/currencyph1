@@ -570,12 +570,12 @@ export default function IntegratedMarketplace({ userId, setActiveTab, setCurrent
                   }}>
                     {priceRange.min > 0 || priceRange.max > 0 ? (
                       <>
-                        {priceRange.min > 0 && `≈ $${(priceRange.min * exchangeRate).toFixed(2)}`}
+                        {priceRange.min > 0 && `≈ $${formatNumber(priceRange.min * exchangeRate)}`}
                         {priceRange.min > 0 && priceRange.max > 0 && ' - '}
-                        {priceRange.max > 0 && `$${(priceRange.max * exchangeRate).toFixed(2)} USD`}
+                        {priceRange.max > 0 && `$${formatNumber(priceRange.max * exchangeRate)} USD`}
                       </>
                     ) : (
-                      `≈ $0.00 - $${(100000 * exchangeRate).toFixed(2)} USD`
+                      `≈ $0.00 - $${formatNumber(100000 * exchangeRate)} USD`
                     )}
                   </div>
                 )}
@@ -680,7 +680,7 @@ export default function IntegratedMarketplace({ userId, setActiveTab, setCurrent
                               </div>
                               {exchangeRate && (
                                 <div style={{ fontSize: '12px', color: '#667eea', marginTop: '4px' }}>
-                                  ≈ ${(product.price * exchangeRate).toFixed(2)} USD
+                                  ≈ ${formatNumber(product.price * exchangeRate)} USD
                                 </div>
                               )}
                             </div>
@@ -777,7 +777,7 @@ export default function IntegratedMarketplace({ userId, setActiveTab, setCurrent
                 <p className="stat-value">₱{sellerStats.totalValue.toLocaleString('en-PH', { maximumFractionDigits: 0 })}</p>
                 {exchangeRate && (
                   <div style={{ fontSize: '12px', color: '#667eea', marginTop: '4px' }}>
-                    ≈ ${(sellerStats.totalValue * exchangeRate).toFixed(2)} USD
+                    ≈ ${formatNumber(sellerStats.totalValue * exchangeRate)} USD
                   </div>
                 )}
               </div>
@@ -1139,7 +1139,7 @@ export default function IntegratedMarketplace({ userId, setActiveTab, setCurrent
                         <div className="price">₱{product.price.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
                         {exchangeRate && (
                           <div style={{ fontSize: '11px', color: '#667eea' }}>
-                            ≈ ${(product.price * exchangeRate).toFixed(2)} USD
+                            ≈ ${formatNumber(product.price * exchangeRate)} USD
                           </div>
                         )}
                         {product.unit_of_measurement && (
