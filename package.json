@@ -10,6 +10,7 @@
     "setup-crypto-deposits": "node scripts/setup-crypto-deposits.js",
     "populate-crypto-deposits": "node scripts/populate-crypto-deposit-addresses.js",
     "test-crypto-deposits": "node scripts/test-crypto-deposits.js",
+    "update-crypto-rates": "node scripts/update-crypto-rates-in-db.js",
     "deploy": "node scripts/deploy.js",
     "deploy:bash": "bash scripts/deploy.sh",
     "deploy:fly": "node scripts/deploy.js --fly",
