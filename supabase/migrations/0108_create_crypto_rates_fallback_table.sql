@@ -18,16 +18,16 @@ CREATE TABLE IF NOT EXISTS public.crypto_rates (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   
   -- Currency identification
-  from_currency VARCHAR(20) NOT NULL,  -- e.g., 'BTC', 'ETH', 'SOL'
-  to_currency VARCHAR(20) NOT NULL,    -- e.g., 'PHP', 'USD', 'EUR'
+  from_currency VARCHAR(20) NOT NULL,
+  to_currency VARCHAR(20) NOT NULL,
   
   -- Rate information
-  rate NUMERIC(36, 18) NOT NULL,       -- Exchange rate (high precision for crypto)
-  source VARCHAR(50) NOT NULL,         -- 'coingecko', 'alternative', 'cached', etc.
+  rate NUMERIC(36, 18) NOT NULL,
+  source VARCHAR(50) NOT NULL,
   
   -- Metadata
-  api_response_time_ms INT,            -- Response time from API
-  confidence_score DECIMAL(3, 2) DEFAULT 1.00, -- 0-1 score for reliability
+  api_response_time_ms INT,
+  confidence_score DECIMAL(3, 2) DEFAULT 1.00,
   
   -- Timestamps
   created_at TIMESTAMPTZ DEFAULT NOW(),
@@ -57,10 +57,8 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
--- Drop existing trigger if exists
 DROP TRIGGER IF EXISTS trigger_crypto_rates_updated_at ON public.crypto_rates;
 
--- Create trigger
 CREATE TRIGGER trigger_crypto_rates_updated_at
 BEFORE UPDATE ON public.crypto_rates
 FOR EACH ROW
