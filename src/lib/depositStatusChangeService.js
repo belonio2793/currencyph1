@@ -415,7 +415,7 @@ export class DepositStatusChangeService {
   }
 
   /**
-   * Update wallet balance with audit trail
+   * Update wallet balance with audit trail and conversion tracking
    */
   async _updateWalletBalance(walletId, impact, depositId, adminId) {
     // Update wallet balance
@@ -431,18 +431,40 @@ export class DepositStatusChangeService {
       throw new Error(`Failed to update wallet balance: ${balanceError.message}`)
     }
 
+    // Update deposit with conversion details if applicable
+    if (impact.conversion) {
+      const { error: depositUpdateError } = await this.supabase
+        .from('deposits')
+        .update({
+          received_amount: impact.conversion.originalAmount,
+          received_currency: impact.conversion.fromCurrency,
+          exchange_rate: impact.conversion.exchangeRate,
+          converted_amount: impact.conversion.convertedAmount,
+          conversion_status: 'confirmed'
+        })
+        .eq('id', depositId)
+
+      if (depositUpdateError) {
+        console.warn('[DepositStatusChangeService] Failed to update deposit conversion data:', depositUpdateError)
+      }
+    }
+
     // Record wallet transaction
+    const transactionDescription = impact.conversion
+      ? `Deposit approved: ${impact.conversion.originalAmount} ${impact.conversion.fromCurrency} → ${impact.conversion.convertedAmount} ${impact.wallet_currency}`
+      : `Deposit approved: ${impact.amount_changed}`
+
     const { error: txError } = await this.supabase
       .from('wallet_transactions')
       .insert([{
         wallet_id: walletId,
+        user_id: adminId, // Will be the user who approved it
         type: impact.operation === 'credit' ? 'deposit' : 'deposit_reversal',
-        amount: impact.amount_changed,
+        amount: Math.abs(impact.amount_changed),
         balance_before: impact.balance_before,
         balance_after: impact.balance_after,
-        description: impact.operation === 'credit'
-          ? `Deposit approved: ${impact.amount_changed}`
-          : `Deposit reversed: ${-impact.amount_changed}`,
+        currency_code: impact.wallet_currency,
+        description: transactionDescription,
         reference_id: depositId
       }])
 
@@ -459,11 +481,34 @@ export class DepositStatusChangeService {
         balance_after: impact.balance_after,
         reconciliation_type: impact.operation === 'credit' ? 'deposit_approval' : 'deposit_reversal',
         admin_id: adminId,
-        reason: `Deposit ${impact.operation}`,
+        reason: `Deposit ${impact.operation}${impact.conversion ? ' with conversion' : ''}`,
         status: 'completed',
         completed_at: new Date().toISOString()
       }])
       .catch(() => null)
+  }
+
+  /**
+   * Record conversion in audit trail
+   */
+  async _recordConversionAudit(depositId, userId, action, conversion) {
+    try {
+      await this.supabase
+        .from('deposit_conversion_audit')
+        .insert([{
+          deposit_id: depositId,
+          user_id: userId,
+          action: action,
+          received_amount: conversion.originalAmount,
+          received_currency: conversion.fromCurrency,
+          exchange_rate: conversion.exchangeRate,
+          converted_amount: conversion.convertedAmount,
+          wallet_currency: conversion.toCurrency,
+          notes: `Rate source: ${conversion.rateSource}, Updated: ${conversion.rateUpdatedAt}`
+        }])
+    } catch (error) {
+      console.error('[DepositStatusChangeService] Failed to record conversion audit:', error)
+    }
   }
 
   /**
