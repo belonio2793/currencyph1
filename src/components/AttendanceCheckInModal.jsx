@@ -1,7 +1,9 @@
 import { useState } from 'react'
-import './AttendanceCheckInModal.css'
+import ExpandableModal from './ExpandableModal'
+import { useDevice } from '../context/DeviceContext'
 
 export default function AttendanceCheckInModal({ onClose, onSubmit, isLoading }) {
+  const { isMobile } = useDevice()
   const [location, setLocation] = useState('')
   const [notes, setNotes] = useState('')
   const [useCurrentLocation, setUseCurrentLocation] = useState(false)
@@ -47,81 +49,94 @@ export default function AttendanceCheckInModal({ onClose, onSubmit, isLoading })
     })
   }
 
+  const footer = (
+    <div className="flex gap-2 w-full">
+      <button
+        type="button"
+        onClick={onClose}
+        disabled={isLoading}
+        className="flex-1 px-4 py-2 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 font-medium disabled:opacity-50"
+      >
+        Cancel
+      </button>
+      <button
+        type="submit"
+        form="attendance-checkin-form"
+        disabled={isLoading || gettingLocation}
+        className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium disabled:opacity-50"
+      >
+        {isLoading ? 'Checking In...' : 'Check In'}
+      </button>
+    </div>
+  )
+
   return (
-    <div className="attendance-modal-overlay" onClick={onClose}>
-      <div className="attendance-modal-content" onClick={(e) => e.stopPropagation()}>
-        <div className="modal-header">
-          <h3>Check In</h3>
-          <button className="modal-close" onClick={onClose}>×</button>
-        </div>
-
-        <form onSubmit={handleSubmit} className="check-in-form">
-          <div className="form-group">
-            <label htmlFor="location">Location *</label>
-            <div className="location-input-group">
-              <input
-                type="text"
-                id="location"
-                value={location}
-                onChange={(e) => setLocation(e.target.value)}
-                placeholder="Your location (address or coordinates)"
-                disabled={isLoading}
-              />
-              <button
-                type="button"
-                className="btn-get-location"
-                onClick={handleGetCurrentLocation}
-                disabled={isLoading || gettingLocation}
-              >
-                {gettingLocation ? 'Getting location...' : '[GPS]'}
-              </button>
-            </div>
-            {useCurrentLocation && (
-              <small className="location-note">Current location detected</small>
-            )}
+    <ExpandableModal
+      isOpen={true}
+      onClose={onClose}
+      title="Check In"
+      icon="📍"
+      size={isMobile ? 'fullscreen' : 'sm'}
+      footer={footer}
+      defaultExpanded={!isMobile}
+    >
+      <form onSubmit={handleSubmit} id="attendance-checkin-form" className="space-y-4">
+        {error && (
+          <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
+            {error}
           </div>
+        )}
 
-          <div className="form-group">
-            <label htmlFor="notes">Notes (Optional)</label>
-            <textarea
-              id="notes"
-              value={notes}
-              onChange={(e) => setNotes(e.target.value)}
-              placeholder="Any additional notes about your check-in"
-              rows="3"
+        {/* Location Input */}
+        <div>
+          <label className="block text-sm font-medium text-slate-700 mb-2">
+            Location *
+          </label>
+          <div className="flex gap-2">
+            <input
+              type="text"
+              value={location}
+              onChange={(e) => setLocation(e.target.value)}
+              placeholder="Your location (address or coordinates)"
               disabled={isLoading}
+              className="flex-1 px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:border-blue-500 disabled:opacity-50 text-sm"
             />
-          </div>
-
-          {error && (
-            <div className="form-error">
-              {error}
-            </div>
-          )}
-
-          <div className="current-time">
-            <small>Check-in time: {new Date().toLocaleTimeString()}</small>
-          </div>
-
-          <div className="modal-actions">
             <button
               type="button"
-              className="btn-cancel"
-              onClick={onClose}
-              disabled={isLoading}
+              onClick={handleGetCurrentLocation}
+              disabled={isLoading || gettingLocation}
+              className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg font-medium transition-colors disabled:opacity-50 text-sm whitespace-nowrap"
             >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              className="btn-submit"
-              disabled={isLoading || !location.trim()}
-            >
-              {isLoading ? 'Processing...' : 'Check In'}
+              {gettingLocation ? '📍...' : '📍 GPS'}
             </button>
           </div>
-        </form>
-      </div>
-    </div>
+          {useCurrentLocation && (
+            <p className="text-xs text-emerald-600 mt-1">✓ Current location detected</p>
+          )}
+        </div>
+
+        {/* Notes */}
+        <div>
+          <label className="block text-sm font-medium text-slate-700 mb-2">
+            Additional Notes (Optional)
+          </label>
+          <textarea
+            value={notes}
+            onChange={(e) => setNotes(e.target.value)}
+            placeholder="Add any additional notes about your check-in..."
+            disabled={isLoading}
+            className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:border-blue-500 disabled:opacity-50 text-sm resize-none"
+            rows={3}
+          />
+        </div>
+
+        {/* Check-in Summary */}
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+          <p className="text-xs text-blue-900">
+            <strong>Check-in Time:</strong> {new Date().toLocaleTimeString()}
+          </p>
+        </div>
+      </form>
+    </ExpandableModal>
   )
 }
