@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { p2pLoanService } from '../lib/p2pLoanService'
 import { tokenAPI } from '../lib/supabaseClient'
+import { formatNumber } from '../lib/currency'
 
 const REPAYMENT_SCHEDULES = [
   { value: 'lump_sum', label: 'One Time Lump Sum' },
