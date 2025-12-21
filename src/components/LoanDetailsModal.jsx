@@ -7,6 +7,7 @@ import ExpandableModal from './ExpandableModal'
 import { useDevice } from '../context/DeviceContext'
 
 export default function LoanDetailsModal({ loan, userId, onClose, onSubmitOffer }) {
+  const { isMobile } = useDevice()
   const [borrowerInfo, setBorrowerInfo] = useState(null)
   const [borrowerRating, setBorrowerRating] = useState(null)
   const [borrowerRatings, setBorrowerRatings] = useState([])
