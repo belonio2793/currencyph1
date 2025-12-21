@@ -5,6 +5,8 @@ import 'leaflet/dist/leaflet.css'
 import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet'
 import { jobsService } from '../lib/jobsService'
 import { PHILIPPINES_CITIES, searchCities } from '../data/philippinesCities'
+import ExpandableModal from './ExpandableModal'
+import { useDevice } from '../context/DeviceContext'
 import './EditJobModal.css'
 
 delete L.Icon.Default.prototype._getIconUrl
