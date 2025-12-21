@@ -302,21 +302,21 @@ export default function SubmitLoanOfferModal({ userId, loanRequest, onClose, onS
             <div className="flex justify-between text-sm">
               <span className="text-slate-700">Interest ({formData.interestRate}%):</span>
               <span className="font-semibold text-slate-900">
-                {calculateInterestAmount().toFixed(2)} {loanRequest.currency_code}
+                {formatNumber(calculateInterestAmount())} {loanRequest.currency_code}
               </span>
             </div>
             {formData.usePlatformFacilitation && (
               <div className="flex justify-between text-sm">
                 <span className="text-slate-700">Platform Fee (10%):</span>
                 <span className="font-semibold text-slate-900">
-                  {calculatePlatformFee().toFixed(2)} {loanRequest.currency_code}
+                  {formatNumber(calculatePlatformFee())} {loanRequest.currency_code}
                 </span>
               </div>
             )}
 
             <div className="flex justify-between text-base border-t pt-2">
               <span className="font-bold text-slate-900">Total to Repay:</span>
-              <span className="font-bold text-blue-600">{calculateTotalRepay().toFixed(2)} {loanRequest.currency_code}</span>
+              <span className="font-bold text-blue-600">{formatNumber(calculateTotalRepay())} {loanRequest.currency_code}</span>
             </div>
           </div>
 
