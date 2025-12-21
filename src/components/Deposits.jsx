@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react'
 import { supabase } from '../lib/supabaseClient'
 import CurrencyCryptoToggle from './FiatCryptoToggle'
 import { currencyAPI } from '../lib/currencyAPI'
-import { getCryptoPrice } from '../lib/cryptoRatesService'
+import { getCryptoPrice, getMultipleCryptoPrices } from '../lib/cryptoRatesService'
 import { coinsPhApi } from '../lib/coinsPhApi'
 
 // Currency symbols
