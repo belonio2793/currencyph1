@@ -234,14 +234,14 @@ export default function OnlineUsers({ userId, userEmail }) {
   return (
     <div className="w-full h-full flex flex-col bg-slate-50">
       {/* Header */}
-      <div className="bg-white border-b border-slate-200 p-4">
-        <h2 className="text-xl font-semibold text-slate-900 mb-4">Users Online ({filteredUsers.length})</h2>
+      <div className="bg-white border-b border-slate-200 px-4 py-4 sm:p-6">
+        <h2 className="text-lg sm:text-xl font-semibold text-slate-900 mb-4">Users Online ({filteredUsers.length})</h2>
 
         {/* Filter Buttons */}
-        <div className="flex gap-2">
+        <div className="flex gap-2 flex-wrap">
           <button
             onClick={() => setFilter('all')}
-            className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+            className={`px-3 sm:px-4 py-2 rounded-lg font-medium transition-colors text-sm sm:text-base ${
               filter === 'all'
                 ? 'bg-blue-600 text-white'
                 : 'bg-white border border-slate-200 text-slate-700 hover:bg-slate-50'
@@ -251,7 +251,7 @@ export default function OnlineUsers({ userId, userEmail }) {
           </button>
           <button
             onClick={() => setFilter('friends')}
-            className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+            className={`px-3 sm:px-4 py-2 rounded-lg font-medium transition-colors text-sm sm:text-base ${
               filter === 'friends'
                 ? 'bg-green-600 text-white'
                 : 'bg-white border border-slate-200 text-slate-700 hover:bg-slate-50'
@@ -263,9 +263,9 @@ export default function OnlineUsers({ userId, userEmail }) {
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 overflow-hidden flex gap-4 p-4">
+      <div className="flex-1 overflow-hidden flex flex-col lg:flex-row gap-4 p-4 sm:p-6">
         {/* Map */}
-        <div className="flex-1 min-h-[500px] bg-white rounded-lg shadow overflow-hidden relative">
+        <div className="w-full lg:flex-1 min-h-[300px] sm:min-h-[400px] lg:min-h-[500px] bg-white rounded-lg shadow overflow-hidden relative">
           {loading ? (
             loadError ? (
               <div className="h-full flex items-center justify-center bg-slate-100 p-6">
@@ -352,7 +352,7 @@ export default function OnlineUsers({ userId, userEmail }) {
         </div>
 
         {/* Users List */}
-        <div className="w-80 min-h-[500px] bg-white rounded-lg shadow overflow-y-auto flex flex-col">
+        <div className="w-full lg:w-80 min-h-[300px] sm:min-h-[400px] lg:min-h-[500px] bg-white rounded-lg shadow overflow-y-auto flex flex-col">
           {loading ? (
             loadError ? (
               <div className="flex-1 flex items-center justify-center p-4">
