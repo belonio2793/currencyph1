@@ -60,23 +60,23 @@ export default function PaymentModal({ ride, onClose, onCompletePayment, loading
             <div className="space-y-2">
               <div className="flex justify-between items-center">
                 <span className="text-slate-600">Base Fare</span>
-                <span className="font-medium text-slate-900">₱{basePrice.toFixed(2)}</span>
+                <span className="font-medium text-slate-900">₱{formatNumber(basePrice)}</span>
               </div>
               {ride.actual_distance_km && (
                 <div className="flex justify-between items-center text-sm">
                   <span className="text-slate-600">Distance ({ride.actual_distance_km} km)</span>
-                  <span className="font-medium text-slate-900">₱{(ride.actual_distance_km * 8).toFixed(2)}</span>
+                  <span className="font-medium text-slate-900">₱{formatNumber(ride.actual_distance_km * 8)}</span>
                 </div>
               )}
               {ride.actual_duration_minutes && (
                 <div className="flex justify-between items-center text-sm">
                   <span className="text-slate-600">Duration ({ride.actual_duration_minutes} min)</span>
-                  <span className="font-medium text-slate-900">₱{(ride.actual_duration_minutes * 0.5).toFixed(2)}</span>
+                  <span className="font-medium text-slate-900">₱{formatNumber(ride.actual_duration_minutes * 0.5)}</span>
                 </div>
               )}
               <div className="border-t border-slate-300 pt-2 flex justify-between items-center font-bold text-lg">
                 <span className="text-slate-900">Subtotal</span>
-                <span className="text-green-600">₱{basePrice.toFixed(2)}</span>
+                <span className="text-green-600">₱{formatNumber(basePrice)}</span>
               </div>
             </div>
           </div>
@@ -166,7 +166,7 @@ export default function PaymentModal({ ride, onClose, onCompletePayment, loading
           <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg p-4 border border-green-300">
             <div className="flex justify-between items-baseline">
               <span className="text-slate-700 font-medium">Total Amount to Pay</span>
-              <span className="text-3xl font-bold text-green-600">₱{totalAmount.toFixed(2)}</span>
+              <span className="text-3xl font-bold text-green-600">₱{formatNumber(totalAmount)}</span>
             </div>
           </div>
 
@@ -196,7 +196,7 @@ export default function PaymentModal({ ride, onClose, onCompletePayment, loading
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
-            {loading ? 'Processing...' : `Pay ₱${totalAmount.toFixed(2)}`}
+            {loading ? 'Processing...' : `Pay ₱${formatNumber(totalAmount)}`}
           </button>
           <button
             onClick={onClose}
