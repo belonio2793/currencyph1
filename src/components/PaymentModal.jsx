@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { formatNumber } from '../lib/currency'
+import ResponsiveButton from './ResponsiveButton'
 
 export default function PaymentModal({ ride, onClose, onCompletePayment, loading }) {
   const [selectedPayment, setSelectedPayment] = useState('wallet')
@@ -32,20 +33,20 @@ export default function PaymentModal({ ride, onClose, onCompletePayment, loading
   ]
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-      <div className="bg-white rounded-lg shadow-2xl max-w-md w-full max-h-[90vh] overflow-y-auto">
+    <div className="modal-responsive overlay-responsive">
+      <div className="modal-content-responsive max-w-md">
         {/* Header */}
-        <div className="bg-gradient-to-r from-green-600 to-green-700 text-white p-6">
-          <div className="flex items-start justify-between">
+        <div className="bg-gradient-to-r from-green-600 to-green-700 text-white p-4 sm:p-6">
+          <div className="flex items-start justify-between gap-4">
             <div>
-              <h2 className="text-2xl font-bold">Payment</h2>
-              <p className="text-sm opacity-80 mt-1">Ride completed successfully</p>
+              <h2 className="text-xl sm:text-2xl font-bold">Payment</h2>
+              <p className="text-xs sm:text-sm opacity-80 mt-1">Ride completed successfully</p>
             </div>
             <button
               onClick={onClose}
-              className="p-1 hover:bg-white/20 rounded-lg transition-colors"
+              className="p-2 hover:bg-white/20 rounded-lg transition-colors flex-shrink-0"
             >
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
@@ -53,69 +54,52 @@ export default function PaymentModal({ ride, onClose, onCompletePayment, loading
         </div>
 
         {/* Content */}
-        <div className="p-6 space-y-6">
+        <div className="modal-body-responsive">
           {/* Price Breakdown */}
-          <div className="bg-slate-50 rounded-lg p-4 border border-slate-200 space-y-3">
-            <h3 className="font-semibold text-slate-900 mb-4">Fare Details</h3>
-            <div className="space-y-2">
+          <div className="bg-slate-50 rounded-lg p-3 sm:p-4 border border-slate-200 space-y-2 sm:space-y-3">
+            <h3 className="font-semibold text-sm sm:text-base text-slate-900 mb-3">Fare Details</h3>
+            <div className="space-y-1.5 sm:space-y-2 text-sm">
               <div className="flex justify-between items-center">
                 <span className="text-slate-600">Base Fare</span>
                 <span className="font-medium text-slate-900">₱{formatNumber(basePrice)}</span>
               </div>
               {ride.actual_distance_km && (
-                <div className="flex justify-between items-center text-sm">
+                <div className="flex justify-between items-center text-xs sm:text-sm">
                   <span className="text-slate-600">Distance ({ride.actual_distance_km} km)</span>
                   <span className="font-medium text-slate-900">₱{formatNumber(ride.actual_distance_km * 8)}</span>
                 </div>
               )}
               {ride.actual_duration_minutes && (
-                <div className="flex justify-between items-center text-sm">
+                <div className="flex justify-between items-center text-xs sm:text-sm">
                   <span className="text-slate-600">Duration ({ride.actual_duration_minutes} min)</span>
                   <span className="font-medium text-slate-900">₱{formatNumber(ride.actual_duration_minutes * 0.5)}</span>
                 </div>
               )}
-              <div className="border-t border-slate-300 pt-2 flex justify-between items-center font-bold text-lg">
-                <span className="text-slate-900">Subtotal</span>
-                <span className="text-green-600">₱{formatNumber(basePrice)}</span>
+              <div className="border-t border-slate-300 pt-1.5 sm:pt-2 flex justify-between items-center font-bold">
+                <span className="text-slate-900 text-sm sm:text-base">Subtotal</span>
+                <span className="text-green-600 text-base sm:text-lg">₱{formatNumber(basePrice)}</span>
               </div>
             </div>
           </div>
 
           {/* Tip Section */}
-          <div className="bg-gradient-to-br from-blue-50 to-white rounded-lg p-4 border border-blue-200 space-y-3">
-            <h3 className="font-semibold text-slate-900">Add a Tip</h3>
-            <p className="text-sm text-slate-600">Help your driver get rewarded for great service</p>
-            <div className="grid grid-cols-3 gap-2">
-              <button
-                onClick={() => handleTip(50)}
-                className={`py-2 rounded-lg font-semibold transition-colors text-sm ${
-                  tipAmount === 50
-                    ? 'bg-blue-600 text-white'
-                    : 'bg-white border border-slate-300 text-slate-900 hover:border-blue-500'
-                }`}
-              >
-                ₱50
-              </button>
-              <button
-                onClick={() => handleTip(100)}
-                className={`py-2 rounded-lg font-semibold transition-colors text-sm ${
-                  tipAmount === 100
-                    ? 'bg-blue-600 text-white'
-                    : 'bg-white border border-slate-300 text-slate-900 hover:border-blue-500'
-                }`}
-              >
-                ₱100
-              </button>
-              <button
-                onClick={() => handleTip(200)}
-                className={`py-2 rounded-lg font-semibold transition-colors text-sm ${
-                  tipAmount === 200
-                    ? 'bg-blue-600 text-white'
-                    : 'bg-white border border-slate-300 text-slate-900 hover:border-blue-500'
-                }`}
-              >
-                ₱200
-              </button>
+          <div className="bg-gradient-to-br from-blue-50 to-white rounded-lg p-3 sm:p-4 border border-blue-200 space-y-2 sm:space-y-3">
+            <h3 className="font-semibold text-sm sm:text-base text-slate-900">Add a Tip</h3>
+            <p className="text-xs sm:text-sm text-slate-600">Help your driver get rewarded for great service</p>
+            <div className="grid grid-cols-3 gap-2 sm:gap-3">
+              {[50, 100, 200].map(amount => (
+                <button
+                  key={amount}
+                  onClick={() => handleTip(amount)}
+                  className={`py-2 sm:py-3 rounded-lg font-semibold transition-colors text-xs sm:text-sm min-h-10 sm:min-h-11 ${
+                    tipAmount === amount
+                      ? 'bg-blue-600 text-white'
+                      : 'bg-white border border-slate-300 text-slate-900 hover:border-blue-500'
+                  }`}
+                >
+                  ₱{amount}
+                </button>
+              ))}
             </div>
             <div>
               <input
@@ -126,19 +110,19 @@ export default function PaymentModal({ ride, onClose, onCompletePayment, loading
                   setCustomTip(e.target.value)
                   setTipAmount(0)
                 }}
-                className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm"
+                className="form-input-responsive"
               />
             </div>
           </div>
 
           {/* Payment Method Selection */}
-          <div className="space-y-3">
-            <h3 className="font-semibold text-slate-900">Payment Method</h3>
-            <div className="space-y-2">
+          <div className="space-y-2 sm:space-y-3">
+            <h3 className="font-semibold text-sm sm:text-base text-slate-900">Payment Method</h3>
+            <div className="space-y-2 sm:space-y-3">
               {paymentMethods.map(method => (
                 <label
                   key={method.id}
-                  className={`flex items-center p-3 border-2 rounded-lg cursor-pointer transition-colors ${
+                  className={`flex items-center p-3 sm:p-4 border-2 rounded-lg cursor-pointer transition-colors min-h-11 sm:min-h-12 ${
                     selectedPayment === method.id
                       ? 'border-blue-600 bg-blue-50'
                       : 'border-slate-300 bg-white hover:border-blue-300'
@@ -149,61 +133,39 @@ export default function PaymentModal({ ride, onClose, onCompletePayment, loading
                     name="payment"
                     value={method.id}
                     checked={selectedPayment === method.id}
-                    onChange={(e) => setSelectedPayment(e.target.value)}
+                    onChange={() => setSelectedPayment(method.id)}
                     disabled={!method.available}
-                    className="w-4 h-4"
+                    className="w-4 h-4 sm:w-5 sm:h-5 accent-blue-600 cursor-pointer"
                   />
-                  <span className="ml-3 font-medium text-slate-900">{method.name}</span>
-                  {!method.available && (
-                    <span className="ml-auto text-xs text-slate-500">Coming Soon</span>
-                  )}
+                  <span className="ml-3 font-medium text-slate-900 text-sm sm:text-base">{method.name}</span>
                 </label>
               ))}
             </div>
           </div>
 
           {/* Total Amount */}
-          <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg p-4 border border-green-300">
-            <div className="flex justify-between items-baseline">
-              <span className="text-slate-700 font-medium">Total Amount to Pay</span>
-              <span className="text-3xl font-bold text-green-600">₱{formatNumber(totalAmount)}</span>
-            </div>
-          </div>
-
-          {/* Promo Code */}
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-slate-900">Promo Code (Optional)</label>
-            <div className="flex gap-2">
-              <input
-                type="text"
-                placeholder="Enter promo code"
-                className="flex-1 px-3 py-2 border border-slate-300 rounded-lg text-sm"
-              />
-              <button className="px-4 py-2 bg-slate-200 text-slate-700 rounded-lg hover:bg-slate-300 font-medium transition-colors text-sm">
-                Apply
-              </button>
+          <div className="bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-200 rounded-lg p-3 sm:p-4 mt-3 sm:mt-4">
+            <div className="flex items-center justify-between">
+              <span className="font-semibold text-slate-900 text-sm sm:text-base">Total Amount</span>
+              <span className="text-xl sm:text-2xl font-bold text-green-600">₱{formatNumber(totalAmount)}</span>
             </div>
           </div>
         </div>
 
-        {/* Footer */}
-        <div className="bg-slate-50 border-t border-slate-200 p-4 space-y-3">
-          <button
-            onClick={handlePayment}
-            disabled={loading}
-            className="w-full px-4 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 font-bold transition-colors disabled:bg-slate-400 flex items-center justify-center gap-2"
-          >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            {loading ? 'Processing...' : `Pay ₱${formatNumber(totalAmount)}`}
-          </button>
-          <button
-            onClick={onClose}
-            className="w-full px-4 py-2 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-100 font-medium transition-colors"
-          >
+        {/* Footer Actions */}
+        <div className="modal-footer-responsive">
+          <ResponsiveButton variant="secondary" onClick={onClose} fullWidth>
             Cancel
-          </button>
+          </ResponsiveButton>
+          <ResponsiveButton
+            variant="primary"
+            onClick={handlePayment}
+            loading={loading}
+            disabled={loading}
+            fullWidth
+          >
+            {loading ? 'Processing...' : 'Complete Payment'}
+          </ResponsiveButton>
         </div>
       </div>
     </div>
