@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react'
+import { useDevice } from '../context/DeviceContext'
+import ExpandableModal from './ExpandableModal'
 
 export default function RideDetailsModal({ ride, driver, onClose, onCancelRide, onUpdateStatus, loading }) {
   const [elapsedTime, setElapsedTime] = useState(0)
