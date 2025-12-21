@@ -203,16 +203,6 @@ export default function CurrencySelectionModal({ isOpen, onClose, globalCurrency
               </option>
             ))}
           </select>
-          <p className="text-xs text-slate-500 mt-2">
-            Only one cryptocurrency can be selected at a time. Your balance will be reconciled to the selected currency.
-          </p>
-        </div>
-
-        {/* Info Message */}
-        <div className="bg-slate-50 border border-slate-200 rounded-lg p-3 sm:p-4">
-          <p className="text-xs sm:text-sm text-slate-600">
-            <span className="font-medium">💡 Tip:</span> Your currency selection will be saved and applied to all monetary values across the application.
-          </p>
         </div>
       </div>
     </ResponsiveModal>
