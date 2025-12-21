@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabaseClient'
+import ExpandableModal from './ExpandableModal'
+import { useDevice } from '../context/DeviceContext'
 import { convertUSDToLocalCurrency, formatPriceWithCurrency, getCurrencySymbol } from '../lib/currencyManager'
 
 export default function ChipPurchaseModal({ open, onClose, userId, onPurchaseComplete }) {
+  const { isMobile } = useDevice()
   const [packages, setPackages] = useState([])
   const [loading, setLoading] = useState(false)
   const [processing, setProcessing] = useState(false)
@@ -61,8 +64,6 @@ export default function ChipPurchaseModal({ open, onClose, userId, onPurchaseCom
   }
 
   async function handlePurchase(packageId) {
-    console.log('Purchase clicked:', { packageId, userId, isGuestLocal, packages: packages.length })
-
     if (!packageId || !userId) {
       setError('Missing purchase information')
       return
@@ -73,7 +74,6 @@ export default function ChipPurchaseModal({ open, onClose, userId, onPurchaseCom
 
     try {
       const pkg = packages.find(p => p.id === packageId)
-      console.log('Found package:', pkg)
       if (!pkg) throw new Error('Package not found')
 
       const chipAmount = BigInt(pkg.chip_amount || 0)
@@ -145,8 +145,6 @@ export default function ChipPurchaseModal({ open, onClose, userId, onPurchaseCom
     }
   }
 
-  if (!open) return null
-
   const currency = DEFAULT_CURRENCY
 
   const formatChips = (chips) => {
@@ -175,137 +173,113 @@ export default function ChipPurchaseModal({ open, onClose, userId, onPurchaseCom
     return null
   }
 
-  const getPackageCardBg = (pkg) => {
-    if (!pkg) return 'border-slate-600 border'
-    if (pkg.is_flash_sale === true) return 'border-red-500 border-2'
-    return 'border-slate-600 border'
-  }
+  const footer = (
+    <button
+      onClick={onClose}
+      disabled={processing}
+      className="w-full px-4 py-2 bg-slate-600 hover:bg-slate-700 text-white font-medium rounded-lg transition disabled:opacity-50"
+    >
+      Close
+    </button>
+  )
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm">
-      <div className="bg-slate-900 rounded-2xl shadow-2xl max-w-6xl w-full border border-slate-700 overflow-hidden max-h-[90vh] flex flex-col">
+    <ExpandableModal
+      isOpen={open}
+      onClose={onClose}
+      title="Buy Poker Chips"
+      icon="🎰"
+      size={isMobile ? 'fullscreen' : 'xl'}
+      footer={footer}
+      badgeContent={`${formatChips(userChips)} chips`}
+      showBadge={true}
+      defaultExpanded={!isMobile}
+    >
+      {error && (
+        <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
+          ⚠️ {error}
+        </div>
+      )}
 
-        {/* Header */}
-        <div className="bg-cyan-600 p-8 text-white sticky top-0 z-10">
-          <div className="flex items-center justify-between">
-            <div>
-              <h2 className="text-3xl font-bold">Buy Poker Chips 🎰</h2>
-            </div>
-            <div className="text-right">
-              <div className="text-sm text-cyan-100">Your Chips</div>
-              <div className="text-3xl font-bold text-white">{formatChips(userChips)}</div>
-            </div>
+      {loading ? (
+        <div className="flex justify-center items-center py-12">
+          <div className="text-center space-y-3">
+            <div className="w-8 h-8 border-4 border-blue-400 border-t-white rounded-full animate-spin mx-auto"></div>
+            <p className="text-slate-600">Loading chip packages...</p>
           </div>
         </div>
+      ) : packages.length === 0 ? (
+        <div className="flex justify-center items-center py-12">
+          <p className="text-slate-600">No chip packages available at the moment</p>
+        </div>
+      ) : (
+        <div className={`grid ${isMobile ? 'grid-cols-1' : 'grid-cols-2 lg:grid-cols-3'} gap-4`}>
+          {packages.map((pkg) => {
+            if (!pkg || !pkg.id) return null
 
-        {/* Content */}
-        <div className="flex-1 overflow-y-auto p-8">
-          {error && (
-            <div className="mb-6 p-4 bg-red-900/50 border border-red-600 rounded-lg text-red-200 text-sm flex items-start gap-3">
-              <span className="text-xl mt-0.5">⚠️</span>
-              <div>{error}</div>
-            </div>
-          )}
+            const chipAmount = Number(pkg.chip_amount) || 0
+            const bonusChips = Number(pkg.bonus_chips) || 0
+            const totalChips = chipAmount + bonusChips
+            const label = getPackageLabel(pkg)
+            const labelColor = getPackageLabelColor(pkg)
+            const isFlashSale = pkg.is_flash_sale === true
 
-          {loading ? (
-            <div className="flex justify-center items-center py-24">
-              <div className="w-12 h-12 border-4 border-cyan-400 border-t-white rounded-full animate-spin"></div>
-            </div>
-          ) : packages.length === 0 ? (
-            <div className="flex justify-center items-center py-24">
-              <div className="text-center">
-                <div className="text-slate-400 text-lg">No chip packages available</div>
-              </div>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 auto-rows-max">
-              {packages.map((pkg) => {
-                if (!pkg || !pkg.id) return null
-
-                const usdPrice = Number(pkg.usd_price) || 0
-                const chipAmount = Number(pkg.chip_amount) || 0
-                const bonusChips = Number(pkg.bonus_chips) || 0
-                const localPrice = convertUSDToLocalCurrency(usdPrice, currency)
-                const totalChips = chipAmount + bonusChips
-                const label = getPackageLabel(pkg)
-                const labelColor = getPackageLabelColor(pkg)
-
-                return (
-                  <div
-                    key={pkg.id}
-                    className={`relative rounded-xl overflow-hidden transition transform hover:scale-105 ${getPackageCardBg(pkg)} ${
-                      pkg.is_flash_sale === true ? 'shadow-2xl shadow-red-500/30' : 'shadow-lg'
-                    }`}
-                  >
-                    {/* Flash Sale Highlight */}
-                    {pkg.is_flash_sale && (
-                      <div className="absolute inset-0 border-2 border-red-500 rounded-xl pointer-events-none"></div>
-                    )}
-
-                    {/* Label Badge */}
-                    {label && labelColor && (
-                      <div className={`absolute top-0 left-0 right-0 ${labelColor} text-white text-center py-2 text-xs font-bold tracking-wider`}>
-                        {label}
-                      </div>
-                    )}
-
-                    {/* Card Content */}
-                    <div className={`bg-slate-800 p-6 ${label ? 'pt-14' : ''} flex flex-col items-center`}>
-
-                      {/* Chip Amount */}
-                      <div className="text-center mb-3">
-                        <div className="text-2xl font-bold text-white">
-                          {totalChips.toLocaleString()}
-                        </div>
-                        <div className="text-xs text-slate-400 mt-1">CHIPS</div>
-                      </div>
-
-                      {/* Bonus Badge */}
-                      {bonusChips > 0 && (
-                        <div className="mb-3 px-3 py-1 bg-amber-900/50 border border-amber-600 rounded-full">
-                          <div className="text-xs text-amber-300 font-semibold">
-                            +{bonusChips.toLocaleString()} BONUS
-                          </div>
-                        </div>
-                      )}
-
-                      {/* Divider */}
-                      <div className="w-full h-px bg-slate-600 my-4"></div>
-
-                      {/* Buy Button */}
-                      <button
-                        onClick={() => handlePurchase(pkg.id)}
-                        disabled={processing}
-                        className="w-full py-3 font-bold rounded-lg transition transform active:scale-95 bg-emerald-600 hover:bg-emerald-700 text-white shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
-                      >
-                        {processing ? (
-                          <span className="flex items-center justify-center gap-2">
-                            <span className="inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
-                            PROCESSING
-                          </span>
-                        ) : (
-                          '🛒 BUY NOW'
-                        )}
-                      </button>
-                    </div>
+            return (
+              <div
+                key={pkg.id}
+                className={`relative rounded-lg overflow-hidden border-2 transition transform hover:scale-105 ${
+                  isFlashSale 
+                    ? 'border-red-500 bg-red-50' 
+                    : 'border-slate-200 bg-slate-50 hover:border-blue-400'
+                }`}
+              >
+                {/* Label Badge */}
+                {label && labelColor && (
+                  <div className={`${labelColor} text-white text-center py-1 text-xs font-bold tracking-wider`}>
+                    {label}
                   </div>
-                )
-              })}
-            </div>
-          )}
-        </div>
+                )}
 
-        {/* Footer Action */}
-        <div className="border-t border-slate-700 bg-slate-900/50 p-6 sticky bottom-0">
-          <button
-            onClick={onClose}
-            disabled={processing}
-            className="w-full px-6 py-3 bg-slate-700 hover:bg-slate-600 text-white font-semibold rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            Close
-          </button>
+                {/* Card Content */}
+                <div className="p-4 space-y-3">
+                  {/* Chip Amount */}
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-slate-900">
+                      {totalChips.toLocaleString()}
+                    </div>
+                    <div className="text-xs text-slate-600 mt-1">CHIPS</div>
+                  </div>
+
+                  {/* Bonus Badge */}
+                  {bonusChips > 0 && (
+                    <div className="px-2 py-1 bg-amber-100 border border-amber-300 rounded text-center">
+                      <div className="text-xs text-amber-900 font-semibold">
+                        ✨ +{bonusChips.toLocaleString()} BONUS
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Buy Button */}
+                  <button
+                    onClick={() => handlePurchase(pkg.id)}
+                    disabled={processing}
+                    className="w-full py-2 font-semibold rounded-lg transition active:scale-95 bg-emerald-600 hover:bg-emerald-700 text-white disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+                  >
+                    {processing ? (
+                      <span className="flex items-center justify-center gap-1">
+                        <span className="inline-block w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+                        Processing
+                      </span>
+                    ) : (
+                      '🛒 BUY NOW'
+                    )}
+                  </button>
+                </div>
+              </div>
+            )
+          })}
         </div>
-      </div>
-    </div>
+      )}
+    </ExpandableModal>
   )
 }
