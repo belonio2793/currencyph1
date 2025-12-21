@@ -4,6 +4,7 @@ import CurrencyCryptoToggle from './FiatCryptoToggle'
 import { currencyAPI } from '../lib/currencyAPI'
 import { getCryptoPrice, getMultipleCryptoPrices } from '../lib/cryptoRatesService'
 import { coinsPhApi } from '../lib/coinsPhApi'
+import { formatNumber } from '../lib/currency'
 
 // Currency symbols
 const CURRENCY_SYMBOLS = {
@@ -77,7 +78,7 @@ function WalletDropdown({ wallets, selectedWallet, onChange }) {
           {selectedWalletData ? (
             <div>
               <div className="text-slate-900 font-medium">
-                {selectedWalletData.currency_name} • Balance: {selectedWalletData.balance.toFixed(2)}
+                {selectedWalletData.currency_name} • Balance: {formatNumber(selectedWalletData.balance)}
               </div>
               <div className="text-xs text-slate-500 mt-1">
                 <span className="text-blue-600">Wallet ID:</span>{' '}
@@ -120,7 +121,7 @@ function WalletDropdown({ wallets, selectedWallet, onChange }) {
                   }`}
                 >
                   <div className="text-slate-900 font-medium">
-                    {w.currency_name} • Balance: {w.balance.toFixed(2)}
+                    {w.currency_name} • Balance: {formatNumber(w.balance)}
                   </div>
                   <div className="text-sm text-slate-500 mt-1">
                     <span className="text-blue-600 text-xs">Wallet ID:</span>{' '}
