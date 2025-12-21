@@ -1,0 +1,113 @@
+-- ============================================================================
+-- MIGRATION: Create crypto_rates table for fallback storage
+-- ============================================================================
+--
+-- This table stores cryptocurrency rates fetched from external APIs
+-- Used as a fallback when external APIs are unavailable
+-- Also serves as a cache to reduce API calls
+--
+-- ============================================================================
+
+BEGIN;
+
+-- Create crypto_rates table
+CREATE TABLE IF NOT EXISTS public.crypto_rates (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  
+  -- Currency identification
+  from_currency VARCHAR(20) NOT NULL,  -- e.g., 'BTC', 'ETH', 'SOL'
+  to_currency VARCHAR(20) NOT NULL,    -- e.g., 'PHP', 'USD', 'EUR'
+  
+  -- Rate information
+  rate NUMERIC(36, 18) NOT NULL,       -- Exchange rate (high precision for crypto)
+  source VARCHAR(50) NOT NULL,         -- 'coingecko', 'alternative', 'cached', etc.
+  
+  -- Metadata
+  api_response_time_ms INT,            -- Response time from API
+  confidence_score DECIMAL(3, 2) DEFAULT 1.00, -- 0-1 score for reliability
+  
+  -- Timestamps
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW(),
+  expires_at TIMESTAMPTZ DEFAULT NOW() + INTERVAL '1 hour',  -- Cache expiry
+  
+  -- Uniqueness constraint
+  UNIQUE (from_currency, to_currency)
+);
+
+-- Create indexes for fast lookups
+CREATE INDEX IF NOT EXISTS idx_crypto_rates_from_to 
+ON public.crypto_rates(from_currency, to_currency);
+
+CREATE INDEX IF NOT EXISTS idx_crypto_rates_updated_at 
+ON public.crypto_rates(updated_at DESC);
+
+CREATE INDEX IF NOT EXISTS idx_crypto_rates_expires_at 
+ON public.crypto_rates(expires_at DESC)
+WHERE expires_at > NOW();
+
+-- Create trigger to update updated_at timestamp
+CREATE OR REPLACE FUNCTION update_crypto_rates_updated_at()
+RETURNS TRIGGER AS $$
+BEGIN
+  NEW.updated_at = NOW();
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+DROP TRIGGER IF EXISTS trigger_crypto_rates_updated_at ON public.crypto_rates;
+
+CREATE TRIGGER trigger_crypto_rates_updated_at
+BEFORE UPDATE ON public.crypto_rates
+FOR EACH ROW
+EXECUTE FUNCTION update_crypto_rates_updated_at();
+
+-- Allow RLS for this table (but we'll make it public readable)
+ALTER TABLE public.crypto_rates ENABLE ROW LEVEL SECURITY;
+
+-- Public read policy (rates are public data)
+CREATE POLICY "Allow public read of crypto_rates" ON public.crypto_rates
+  FOR SELECT
+  USING (true);
+
+-- Service role can insert/update (for edge functions)
+CREATE POLICY "Allow service role full access to crypto_rates" ON public.crypto_rates
+  FOR ALL
+  USING (auth.role() = 'service_role')
+  WITH CHECK (auth.role() = 'service_role');
+
+-- Create view for valid (non-expired) rates
+CREATE OR REPLACE VIEW crypto_rates_valid AS
+SELECT *
+FROM public.crypto_rates
+WHERE expires_at > NOW()
+ORDER BY updated_at DESC;
+
+-- Create view for latest rates per currency pair
+CREATE OR REPLACE VIEW crypto_rates_latest AS
+SELECT DISTINCT ON (from_currency, to_currency)
+  from_currency,
+  to_currency,
+  rate,
+  source,
+  updated_at,
+  expires_at
+FROM public.crypto_rates
+WHERE expires_at > NOW()
+ORDER BY from_currency, to_currency, updated_at DESC;
+
+-- Cleanup function (can be called periodically to remove expired entries)
+CREATE OR REPLACE FUNCTION cleanup_expired_crypto_rates()
+RETURNS TABLE(deleted_count INT) AS $$
+DECLARE
+  v_deleted_count INT;
+BEGIN
+  DELETE FROM public.crypto_rates
+  WHERE expires_at < NOW() - INTERVAL '7 days';
+  
+  GET DIAGNOSTICS v_deleted_count = ROW_COUNT;
+  RETURN QUERY SELECT v_deleted_count;
+END;
+$$ LANGUAGE plpgsql;
+
+COMMIT;
