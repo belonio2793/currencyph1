@@ -1,12 +1,13 @@
 import React, { useState } from 'react'
+import ExpandableModal from './ExpandableModal'
+import { useDevice } from '../context/DeviceContext'
 
 export default function RakeModal({ open, onClose, startingBalance, endingBalance, userId, tableId, currencyCode, onRakeProcessed }) {
+  const { isMobile } = useDevice()
   const [rakePercent, setRakePercent] = useState(10)
   const [tipPercent, setTipPercent] = useState(10)
   const [processing, setProcessing] = useState(false)
   const [error, setError] = useState(null)
-
-  if (!open) return null
 
   const netProfit = endingBalance - startingBalance
   const isWinner = netProfit > 0
@@ -74,179 +75,126 @@ export default function RakeModal({ open, onClose, startingBalance, endingBalanc
     }
   }
 
+  const footer = (
+    <div className="flex gap-2 w-full">
+      <button
+        type="button"
+        onClick={onClose}
+        disabled={processing}
+        className="flex-1 px-4 py-2 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors font-medium disabled:opacity-50"
+      >
+        Cancel
+      </button>
+      <button
+        onClick={handleConfirm}
+        disabled={processing}
+        className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+      >
+        {processing ? 'Processing...' : 'Confirm'}
+      </button>
+    </div>
+  )
+
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
-      <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-xl shadow-2xl max-w-md w-full border border-slate-700 overflow-hidden">
-        {/* Header */}
-        <div className="bg-gradient-to-r from-emerald-600 to-teal-600 p-6 text-white">
-          <h2 className="text-2xl font-bold">Session Complete 🎉</h2>
-          <p className="text-sm text-emerald-100 mt-1">Review your chip results and set house rake</p>
+    <ExpandableModal
+      isOpen={open}
+      onClose={onClose}
+      title="Game Summary & Rake"
+      icon="💰"
+      size={isMobile ? 'fullscreen' : 'sm'}
+      footer={footer}
+      defaultExpanded={!isMobile}
+    >
+      {error && (
+        <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
+          {error}
+        </div>
+      )}
+
+      <div className="space-y-4">
+        {/* Game Results */}
+        <div className="bg-slate-50 border border-slate-200 rounded-lg p-4">
+          <h3 className="font-semibold text-slate-900 mb-3">Game Results</h3>
+          <div className="space-y-2 text-sm">
+            <div className="flex justify-between">
+              <span className="text-slate-600">Starting Balance:</span>
+              <span className="font-medium text-slate-900">{formatChips(startingBalance)} {currencyCode}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-slate-600">Ending Balance:</span>
+              <span className="font-medium text-slate-900">{formatChips(endingBalance)} {currencyCode}</span>
+            </div>
+            <div className="border-t border-slate-300 my-2"></div>
+            <div className="flex justify-between">
+              <span className="font-medium text-slate-900">
+                {isWinner ? 'Profit:' : 'Loss:'}
+              </span>
+              <span className={`font-semibold ${isWinner ? 'text-green-600' : 'text-red-600'}`}>
+                {isWinner ? '+' : ''}{formatChips(netProfit)} {currencyCode}
+              </span>
+            </div>
+          </div>
         </div>
 
-        {/* Content */}
-        <div className="p-6 space-y-6">
-          {error && (
-            <div className="p-3 bg-red-900/50 border border-red-600 rounded-lg text-red-200 text-sm">
-              {error}
+        {/* Rake and Tip Calculation */}
+        {isWinner && (
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+            <h3 className="font-semibold text-slate-900 mb-3">Rake & Tip</h3>
+            <div className="space-y-3">
+              <div>
+                <div className="flex justify-between mb-1">
+                  <label className="text-sm text-slate-700 font-medium">Rake Percentage</label>
+                  <span className="text-sm font-semibold text-blue-600">{rakePercent}%</span>
+                </div>
+                <input
+                  type="range"
+                  min="0"
+                  max="50"
+                  value={rakePercent}
+                  onChange={(e) => setRakePercent(parseInt(e.target.value))}
+                  disabled={processing}
+                  className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer disabled:opacity-50"
+                />
+                <div className="text-xs text-slate-600 mt-1">
+                  {formatChips(rakeChips)} {currencyCode}
+                </div>
+              </div>
+
+              <div>
+                <div className="flex justify-between mb-1">
+                  <label className="text-sm text-slate-700 font-medium">Tip (% of Rake)</label>
+                  <span className="text-sm font-semibold text-blue-600">{tipPercent}%</span>
+                </div>
+                <input
+                  type="range"
+                  min="0"
+                  max="100"
+                  value={tipPercent}
+                  onChange={(e) => setTipPercent(parseInt(e.target.value))}
+                  disabled={processing}
+                  className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer disabled:opacity-50"
+                />
+                <div className="text-xs text-slate-600 mt-1">
+                  {formatChips(tipChips)} {currencyCode}
+                </div>
+              </div>
             </div>
+          </div>
+        )}
+
+        {/* Final Summary */}
+        <div className={`rounded-lg p-4 ${isWinner ? 'bg-green-50 border border-green-200' : 'bg-slate-50 border border-slate-200'}`}>
+          <h3 className="font-semibold mb-2">Final Balance</h3>
+          <div className="text-2xl font-bold">
+            {formatChips(finalBalance)} {currencyCode}
+          </div>
+          {isWinner && totalDeduction > 0 && (
+            <p className="text-xs text-slate-600 mt-2">
+              After {formatChips(totalDeduction)} {currencyCode} in rake and tips
+            </p>
           )}
-
-          {/* Balance Summary */}
-          <div className="space-y-4">
-            <div className="bg-slate-700/50 rounded-lg p-4 space-y-3">
-              <div className="flex items-center justify-between">
-                <span className="text-slate-300 text-sm">Starting Chips</span>
-                <span className="text-white font-mono font-semibold">
-                  {formatChips(startingBalance)} PLAY CHIPS
-                </span>
-              </div>
-              
-              <div className="border-t border-slate-600"></div>
-              
-              <div className="flex items-center justify-between">
-                <span className="text-slate-300 text-sm">Ending Chips</span>
-                <span className="text-white font-mono font-semibold">
-                  {formatChips(endingBalance)} PLAY CHIPS
-                </span>
-              </div>
-              
-              <div className="border-t border-slate-600"></div>
-              
-              <div className="flex items-center justify-between">
-                <span className={`text-sm font-semibold ${isWinner ? 'text-emerald-400' : 'text-red-400'}`}>
-                  Net Result
-                </span>
-                <span className={`font-mono font-bold ${isWinner ? 'text-emerald-400' : 'text-red-400'}`}>
-                  {isWinner ? '+' : ''}{formatChips(netProfit)} PLAY CHIPS
-                </span>
-              </div>
-            </div>
-
-            {/* House Rake & Tip Section */}
-            {isWinner && (
-              <div className="bg-slate-700/50 rounded-lg p-4 space-y-5">
-                {/* Rake Slider */}
-                <div>
-                  <div className="flex items-center justify-between mb-3">
-                    <label className="text-slate-300 font-semibold text-sm">House Rake %</label>
-                    <span className="text-slate-400 font-mono text-sm">{rakePercent}%</span>
-                  </div>
-
-                  <div className="space-y-2">
-                    <input
-                      type="range"
-                      min="0"
-                      max="50"
-                      step="1"
-                      value={rakePercent}
-                      onChange={(e) => setRakePercent(Number(e.target.value))}
-                      disabled={processing}
-                      className="w-full h-2 bg-slate-600 rounded-lg appearance-none cursor-pointer accent-emerald-500"
-                    />
-                    <div className="flex items-center justify-between text-xs">
-                      <span className="text-slate-400">0%</span>
-                      <span className="text-emerald-400 font-semibold">{rakePercent}%</span>
-                      <span className="text-slate-400">50%</span>
-                    </div>
-                  </div>
-
-                  <p className="text-xs text-slate-400 mt-2 leading-relaxed">
-                    {rakePercent > 0
-                      ? `House takes ${formatChips(rakeChips)} PLAY CHIPS from your ${formatChips(netProfit)} PLAY CHIPS profit`
-                      : 'No house rake'}
-                  </p>
-                </div>
-
-                {/* Tip Slider */}
-                <div className="border-t border-slate-600 pt-5">
-                  <div className="flex items-center justify-between mb-3">
-                    <label className="text-slate-300 font-semibold text-sm">Tip to House %</label>
-                    <span className="text-amber-400 font-mono text-sm">{tipPercent}%</span>
-                  </div>
-
-                  <div className="space-y-2">
-                    <input
-                      type="range"
-                      min="0"
-                      max="100"
-                      step="1"
-                      value={tipPercent}
-                      onChange={(e) => setTipPercent(Number(e.target.value))}
-                      disabled={processing}
-                      className="w-full h-2 bg-slate-600 rounded-lg appearance-none cursor-pointer accent-amber-500"
-                    />
-                    <div className="flex items-center justify-between text-xs">
-                      <span className="text-slate-400">0%</span>
-                      <span className="text-amber-400 font-semibold">{tipPercent}%</span>
-                      <span className="text-slate-400">100%</span>
-                    </div>
-                  </div>
-
-                  <p className="text-xs text-slate-400 mt-2 leading-relaxed">
-                    {tipPercent > 0
-                      ? `Tip ${formatChips(tipChips)} PLAY CHIPS to the house`
-                      : 'No tip'}
-                  </p>
-                </div>
-              </div>
-            )}
-
-            {!isWinner && (
-              <div className="bg-slate-700/50 rounded-lg p-4">
-                <p className="text-slate-300 text-sm">
-                  No rake on losing sessions. Your chips are returned to inventory. Better luck next time! 🍀
-                </p>
-              </div>
-            )}
-
-            {/* Summary */}
-            <div className={`${isWinner ? 'bg-emerald-900/30 border-emerald-700' : 'bg-slate-700/30 border-slate-600'} border rounded-lg p-4`}>
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <span className={isWinner ? 'text-emerald-200' : 'text-slate-300'}>
-                    Chips returned to inventory
-                  </span>
-                  <span className={`font-mono font-bold text-xl ${isWinner ? 'text-emerald-100' : 'text-slate-200'}`}>
-                    {formatChips(finalBalance)} PLAY CHIPS
-                  </span>
-                </div>
-                {isWinner && rakeChips + tipChips > 0 && (
-                  <div className="text-xs text-slate-400 text-right">
-                    (Rake: {formatChips(rakeChips)} + Tip: {formatChips(tipChips)} = {formatChips(rakeChips + tipChips)} PLAY CHIPS to house)
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-
-          {/* Action Buttons */}
-          <div className="flex items-center gap-3 pt-2">
-            <button
-              onClick={onClose}
-              disabled={processing}
-              className="flex-1 px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white font-semibold rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              Cancel
-            </button>
-            <button
-              onClick={handleConfirm}
-              disabled={processing}
-              className="flex-1 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-            >
-              {processing ? (
-                <>
-                  <span className="inline-block w-4 h-4 border-2 border-emerald-300 border-t-white rounded-full animate-spin"></span>
-                  Processing...
-                </>
-              ) : (
-                <>
-                  ✓ Confirm & End Session
-                </>
-              )}
-            </button>
-          </div>
         </div>
       </div>
-    </div>
+    </ExpandableModal>
   )
 }
