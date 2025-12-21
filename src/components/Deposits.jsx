@@ -1236,6 +1236,153 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
         </div>
       )}
 
+      {/* Deposit Details Modal */}
+      {showDepositDetailsModal && selectedDepositForDetails && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50" onClick={() => setShowDepositDetailsModal(false)}>
+          <div className="bg-white rounded-xl shadow-2xl max-w-2xl w-full p-8" onClick={(e) => e.stopPropagation()}>
+            {(() => {
+              const deposit = selectedDepositForDetails
+              let notesMeta = {}
+              try {
+                if (deposit.notes) {
+                  notesMeta = JSON.parse(deposit.notes)
+                }
+              } catch (e) {
+                console.warn('Failed to parse deposit notes')
+              }
+
+              const originalCurrency = notesMeta.original_currency || deposit.original_currency || deposit.currency_code
+              const convertedAmount = notesMeta.converted_amount || deposit.converted_amount
+              const walletCurrency = notesMeta.wallet_currency || deposit.wallet_currency || deposit.currency_code
+              const depositWallet = wallets.find(w => w.id === deposit.wallet_id)
+              const exchangeRate = convertedAmount && deposit.amount ? (convertedAmount / deposit.amount).toFixed(8) : null
+              const methodName = DEPOSIT_METHODS[deposit.deposit_method]?.name || deposit.deposit_method.toUpperCase()
+              const createdDate = new Date(deposit.created_at)
+              const completedDate = deposit.completed_at ? new Date(deposit.completed_at) : null
+
+              return (
+                <>
+                  <div className="flex items-center justify-between mb-6">
+                    <h3 className="text-2xl font-semibold text-slate-900">Deposit Details</h3>
+                    <button
+                      onClick={() => setShowDepositDetailsModal(false)}
+                      className="text-slate-500 hover:text-slate-700 text-3xl leading-none"
+                    >
+                      ×
+                    </button>
+                  </div>
+
+                  <div className="space-y-6">
+                    {/* Transaction Status */}
+                    <div className="bg-gradient-to-r from-slate-50 to-slate-100 rounded-lg p-4 border border-slate-200">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-xs text-slate-600 uppercase tracking-wide mb-1">Status</p>
+                          <p className="text-lg font-semibold text-slate-900">{deposit.status.toUpperCase()}</p>
+                        </div>
+                        <span className={`px-4 py-2 rounded-full text-sm font-medium ${
+                          deposit.status === 'approved' || deposit.status === 'completed' ? 'bg-emerald-100 text-emerald-700' :
+                          deposit.status === 'rejected' ? 'bg-red-100 text-red-700' :
+                          'bg-yellow-100 text-yellow-700'
+                        }`}>
+                          {deposit.status.charAt(0).toUpperCase() + deposit.status.slice(1)}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Amount Information */}
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <p className="text-xs text-slate-600 uppercase tracking-wide mb-2">Original Amount</p>
+                        <p className="text-2xl font-bold text-slate-900">{deposit.amount.toLocaleString('en-US', { minimumFractionDigits: 8, maximumFractionDigits: 8 })}</p>
+                        <p className="text-sm text-slate-600 mt-1">{originalCurrency.toUpperCase()}</p>
+                      </div>
+                      <div>
+                        <p className="text-xs text-slate-600 uppercase tracking-wide mb-2">Received Amount</p>
+                        <p className="text-2xl font-bold text-emerald-600">{convertedAmount ? convertedAmount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '—'}</p>
+                        <p className="text-sm text-slate-600 mt-1">{walletCurrency.toUpperCase()}</p>
+                      </div>
+                    </div>
+
+                    {/* Exchange Rate */}
+                    {exchangeRate && (
+                      <div className="border-l-4 border-blue-500 bg-blue-50 p-4 rounded">
+                        <p className="text-xs text-slate-600 uppercase tracking-wide mb-1">Exchange Rate</p>
+                        <p className="text-xl font-semibold text-slate-900">1 {originalCurrency.toUpperCase()} = {exchangeRate} {walletCurrency.toUpperCase()}</p>
+                      </div>
+                    )}
+
+                    {/* Deposit Method & Reference */}
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <p className="text-xs text-slate-600 uppercase tracking-wide mb-2">Deposit Method</p>
+                        <p className="text-base font-semibold text-slate-900">{methodName}</p>
+                      </div>
+                      <div>
+                        <p className="text-xs text-slate-600 uppercase tracking-wide mb-2">Reference Number</p>
+                        <p className="text-base font-mono text-slate-900 break-all">{deposit.reference_number || deposit.phone_number || '—'}</p>
+                      </div>
+                    </div>
+
+                    {/* Wallet Information */}
+                    <div className="bg-slate-50 rounded-lg p-4 border border-slate-200">
+                      <p className="text-xs text-slate-600 uppercase tracking-wide mb-3 font-semibold">Deposited To Wallet</p>
+                      <div className="space-y-2">
+                        <div>
+                          <p className="text-xs text-slate-600">Wallet Currency</p>
+                          <p className="text-sm font-semibold text-slate-900">{depositWallet?.currency_name || walletCurrency}</p>
+                        </div>
+                        <div>
+                          <p className="text-xs text-slate-600">Wallet ID</p>
+                          <p className="text-xs font-mono text-slate-900 break-all">{depositWallet?.id || deposit.wallet_id}</p>
+                        </div>
+                        {depositWallet?.account_number && (
+                          <div>
+                            <p className="text-xs text-slate-600">Account Number</p>
+                            <p className="text-xs font-mono text-slate-900">{depositWallet.account_number}</p>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Timestamps */}
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <p className="text-xs text-slate-600 uppercase tracking-wide mb-2">Created At</p>
+                        <p className="text-sm font-semibold text-slate-900">{createdDate.toLocaleString()}</p>
+                      </div>
+                      {completedDate && (
+                        <div>
+                          <p className="text-xs text-slate-600 uppercase tracking-wide mb-2">Completed At</p>
+                          <p className="text-sm font-semibold text-slate-900">{completedDate.toLocaleString()}</p>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Description */}
+                    {deposit.description && (
+                      <div>
+                        <p className="text-xs text-slate-600 uppercase tracking-wide mb-2">Description</p>
+                        <p className="text-sm text-slate-700 bg-slate-50 p-3 rounded border border-slate-200">{deposit.description}</p>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="flex gap-3 mt-6">
+                    <button
+                      onClick={() => setShowDepositDetailsModal(false)}
+                      className="flex-1 px-4 py-3 bg-slate-200 text-slate-900 rounded-lg font-medium hover:bg-slate-300 transition"
+                    >
+                      Close
+                    </button>
+                  </div>
+                </>
+              )
+            })()}
+          </div>
+        </div>
+      )}
+
       {/* Crypto Deposit Instructions Modal */}
       {showCryptoAddressModal && selectedAddressMethod && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50" onClick={() => setShowCryptoAddressModal(false)}>
