@@ -314,7 +314,7 @@ export default function SearchableSelect({
           placeholder={placeholder}
           disabled={disabled}
           autoComplete="off"
-          className={`w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all ${
+          className={`w-full px-3 sm:px-4 py-2.5 sm:py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all min-h-10 sm:min-h-11 text-sm sm:text-base ${
             disabled ? 'bg-slate-100 text-slate-500 cursor-not-allowed' : 'bg-white'
           } ${isOpen ? 'border-blue-500' : ''}`}
         />
@@ -323,10 +323,10 @@ export default function SearchableSelect({
         {clearable && (inputValue || value) && !disabled && (
           <button
             onClick={handleClear}
-            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors"
+            className="absolute right-9 sm:right-10 top-1/2 transform -translate-y-1/2 p-1 text-slate-400 hover:text-slate-600 transition-colors"
             aria-label="Clear selection"
           >
-            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+            <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="currentColor" viewBox="0 0 20 20">
               <path
                 fillRule="evenodd"
                 d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
@@ -338,7 +338,7 @@ export default function SearchableSelect({
 
         {/* Dropdown Arrow */}
         <svg
-          className={`absolute right-10 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400 transition-transform pointer-events-none ${
+          className={`absolute right-2.5 sm:right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 text-slate-400 transition-transform pointer-events-none ${
             isOpen ? 'rotate-180' : ''
           }`}
           fill="none"
@@ -351,7 +351,7 @@ export default function SearchableSelect({
 
       {/* Dropdown Menu */}
       {isOpen && (
-        <div className="absolute z-50 w-full mt-2 bg-white border border-slate-300 rounded-lg shadow-lg max-h-80 overflow-y-auto">
+        <div className="absolute z-50 w-full mt-2 bg-white border border-slate-300 rounded-lg shadow-lg max-h-72 sm:max-h-96 overflow-y-auto">
           {filteredOptions.length > 0 ? (
             filteredOptions.map((option, index) =>
               renderOption ? renderOption(option, index, handleSelectOption) : renderOptionItem(option, index)
