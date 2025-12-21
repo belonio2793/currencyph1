@@ -72,8 +72,30 @@ export default function App() {
   })
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
-  const [globalCurrency, setGlobalCurrency] = useState('PHP')
-  const [globalCryptocurrency, setGlobalCryptocurrency] = useState('BTC')
+  const [globalCurrency, setGlobalCurrency] = useState(() => {
+    try {
+      const stored = localStorage.getItem('currency_preferences_guest')
+      if (stored) {
+        const prefs = JSON.parse(stored)
+        return prefs.fiat || 'PHP'
+      }
+    } catch (e) {
+      console.warn('Failed to load currency preference:', e)
+    }
+    return 'PHP'
+  })
+  const [globalCryptocurrency, setGlobalCryptocurrency] = useState(() => {
+    try {
+      const stored = localStorage.getItem('currency_preferences_guest')
+      if (stored) {
+        const prefs = JSON.parse(stored)
+        return prefs.crypto || 'BTC'
+      }
+    } catch (e) {
+      console.warn('Failed to load crypto currency preference:', e)
+    }
+    return 'BTC'
+  })
   const [showAuth, setShowAuth] = useState(false)
   const [authInitialTab, setAuthInitialTab] = useState('login')
   const [currentBusinessId, setCurrentBusinessId] = useState(null)
