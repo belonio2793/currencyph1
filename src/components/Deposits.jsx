@@ -553,6 +553,14 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
       // All deposits start as pending - status will update based on verification
       const depositStatus = 'pending'
 
+      // Determine the deposit method
+      // For crypto: use the selected currency (e.g., 'btc', 'eth', 'sol')
+      // For fiat: use the selected method (e.g., 'gcash', 'stripe')
+      let depositMethodValue = selectedMethod
+      if (activeType === 'cryptocurrency' && selectedCurrency) {
+        depositMethodValue = selectedCurrency.toLowerCase()
+      }
+
       // Create deposit record with conversion info
       const { data: deposit, error: err } = await supabase
         .from('deposits')
@@ -561,15 +569,17 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
           wallet_id: targetWalletId,
           amount: parseFloat(amount),
           currency_code: targetWalletData.currency_code,
-          deposit_method: selectedMethod,
+          deposit_method: depositMethodValue,
           phone_number: selectedMethod === 'gcash' ? gcashReferenceNumber.trim() : null,
           status: depositStatus,
-          description: `${selectedMethod} deposit of ${amount} ${selectedCurrency}${convertedAmount ? ` (≈ ${convertedAmount} ${targetWalletData.currency_code} at ${(convertedAmount / parseFloat(amount)).toFixed(6)})` : ''}`,
+          description: `${activeType === 'cryptocurrency' ? selectedCurrency : selectedMethod} deposit of ${amount} ${selectedCurrency}${convertedAmount ? ` (≈ ${convertedAmount} ${targetWalletData.currency_code} at ${(convertedAmount / parseFloat(amount)).toFixed(6)})` : ''}`,
           notes: JSON.stringify({
             original_currency: selectedCurrency,
+            deposit_type: activeType,
             converted_amount: convertedAmount,
             conversion_rate: convertedAmount ? (convertedAmount / parseFloat(amount)).toFixed(6) : null,
-            wallet_currency: targetWalletData.currency_code
+            wallet_currency: targetWalletData.currency_code,
+            network: activeMethodData?.network || null
           })
         }])
         .select()
@@ -577,6 +587,8 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
 
       if (err) {
         console.error('Deposit insert error details:', err)
+        console.error('Error code:', err?.code)
+        console.error('Error hint:', err?.hint)
         throw new Error(err.message || JSON.stringify(err))
       }
 
