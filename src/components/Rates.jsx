@@ -299,9 +299,11 @@ export default function Rates() {
   const toCurrency = rates.find(r => r.code === selectedTo)
 
   return (
-    <div className="space-y-6">
-      {/* Main Grid */}
-      <div className="grid grid-cols-3 gap-6">
+    <div className="w-full min-h-screen bg-gradient-to-b from-slate-50 to-white">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10 lg:py-12">
+        <div className="space-y-6 sm:space-y-8">
+          {/* Main Grid */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
         {/* Left Column - Converter */}
         <div className="col-span-2 space-y-6">
           {/* Converter Card */}
@@ -596,6 +598,8 @@ export default function Rates() {
               </div>
             </div>
           </div>
+        </div>
+      </div>
         </div>
       </div>
     </div>
