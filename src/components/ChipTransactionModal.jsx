@@ -1,74 +1,44 @@
 import React, { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabaseClient'
-import { convertUSDToLocalCurrency, formatPriceWithCurrency } from '../lib/currencyManager'
-import { formatNumber } from '../lib/currency'
+import ExpandableModal from './ExpandableModal'
+import { useDevice } from '../context/DeviceContext'
 
-export default function ChipTransactionModal({ open, onClose, userId, onPurchaseComplete }) {
+export default function ChipTransactionModal({ open, onClose, userId, onTransactionComplete }) {
+  const { isMobile } = useDevice()
   const [packages, setPackages] = useState([])
-  const [selectedPackage, setSelectedPackage] = useState(null)
   const [loading, setLoading] = useState(false)
   const [processing, setProcessing] = useState(false)
   const [error, setError] = useState(null)
   const [userChips, setUserChips] = useState(0n)
-  const [wallets, setWallets] = useState([])
-  const [selectedWallet, setSelectedWallet] = useState(null)
-
-  const DEFAULT_CURRENCY = 'PHP'
   const isGuestLocal = userId && userId.includes('guest-local')
 
   useEffect(() => {
     if (open && userId) {
-      loadData()
+      loadPackages()
+      loadUserData()
     }
   }, [open, userId])
 
-  const parseSupabaseError = (err) => {
-    if (!err) return 'An unknown error occurred'
-
-    const message = err.message || ''
-    const code = err.code || ''
-
-    // RLS policy violations
-    if (message.includes('row-level security policy')) {
-      return 'You do not have permission to purchase chips. Please ensure you are logged in with a valid account.'
-    }
-
-    // No rows found (406)
-    if (code === 'PGRST116' || message.includes('No rows found')) {
-      return 'Your poker account is being initialized. Please try again in a moment.'
-    }
-
-    // Generic Supabase errors
-    if (message.includes('Unauthorized') || message.includes('401')) {
-      return 'Your session has expired. Please log in again.'
-    }
-
-    if (message.includes('Forbidden') || message.includes('403')) {
-      return 'You do not have permission to perform this action.'
-    }
-
-    // Default to original message
-    return message || 'An error occurred during the transaction'
-  }
-
-  async function loadData() {
+  async function loadPackages() {
     try {
       setLoading(true)
-      setError(null)
-
-      // Load packages
-      const { data: pkgData, error: pkgErr } = await supabase
+      const { data, error } = await supabase
         .from('poker_chip_packages')
         .select('*')
         .order('display_order', { ascending: true })
+      
+      if (error) throw error
+      setPackages(data || [])
+    } catch (err) {
+      console.error('Error loading packages:', err)
+      setError('Failed to load chip packages')
+    } finally {
+      setLoading(false)
+    }
+  }
 
-      if (pkgErr) throw pkgErr
-      setPackages(pkgData || [])
-      if (pkgData && pkgData.length > 0) {
-        setSelectedPackage(pkgData[0])
-      }
-
-      // Load chips
+  async function loadUserData() {
+    try {
       if (isGuestLocal) {
         const storedChips = localStorage.getItem(`poker_chips_${userId}`)
         setUserChips(BigInt(storedChips || 0))
@@ -79,308 +49,105 @@ export default function ChipTransactionModal({ open, onClose, userId, onPurchase
           .eq('user_id', userId)
           .single()
 
-        if (chipErr) {
-          if (chipErr.code === 'PGRST116') {
-            setUserChips(0n)
-          } else {
-            throw chipErr
-          }
-        } else if (chipData) {
+        if (!chipErr && chipData) {
           setUserChips(BigInt(chipData.total_chips || 0))
         } else {
           setUserChips(0n)
         }
-
-        // Load wallets
-        const { data: walletData, error: walletErr } = await supabase
-          .from('wallets')
-          .select('*')
-          .eq('user_id', userId)
-          .order('created_at', { ascending: true })
-
-        if (!walletErr && walletData && walletData.length > 0) {
-          setWallets(walletData)
-          setSelectedWallet(walletData[0])
-        }
       }
     } catch (err) {
-      console.error('Error loading transaction data:', err)
-      setError(parseSupabaseError(err))
-    } finally {
-      setLoading(false)
+      console.error('Error loading user chips:', err)
+      setUserChips(0n)
     }
   }
-
-  async function handleConfirmPurchase() {
-    if (!selectedPackage || !userId) {
-      setError('Please select a package')
-      return
-    }
-
-    setProcessing(true)
-    setError(null)
-
-    try {
-      const chipAmount = BigInt(selectedPackage.chips_amount || 0)
-      const bonusChips = BigInt(selectedPackage.bonus_chips || 0)
-      const totalChipsToAdd = chipAmount + bonusChips
-      const newChipBalance = userChips + totalChipsToAdd
-
-      if (isGuestLocal) {
-        localStorage.setItem(`poker_chips_${userId}`, newChipBalance.toString())
-        setUserChips(newChipBalance)
-      } else {
-        const { error: chipUpsertErr } = await supabase
-          .from('player_poker_chips')
-          .upsert({
-            user_id: userId,
-            total_chips: newChipBalance.toString(),
-            updated_at: new Date()
-          }, { onConflict: 'user_id' })
-
-        if (chipUpsertErr) throw chipUpsertErr
-
-        const { error: purchaseErr } = await supabase
-          .from('chip_purchases')
-          .insert([{
-            user_id: userId,
-            package_id: selectedPackage.id,
-            chips_purchased: Number(chipAmount),
-            bonus_chips_awarded: Number(bonusChips),
-            total_chips_received: Number(totalChipsToAdd),
-            usd_price_paid: selectedPackage.usd_price,
-            payment_status: 'completed',
-            payment_method: 'free',
-            created_at: new Date()
-          }])
-
-        if (purchaseErr) throw purchaseErr
-        await loadData()
-      }
-
-      if (onPurchaseComplete) {
-        onPurchaseComplete({
-          chipsPurchased: Number(chipAmount),
-          bonusChips: Number(bonusChips),
-          totalChips: totalChipsToAdd.toString(),
-          newBalance: newChipBalance.toString()
-        })
-      }
-
-      onClose()
-    } catch (err) {
-      console.error('Purchase error:', err)
-      setError(parseSupabaseError(err))
-    } finally {
-      setProcessing(false)
-    }
-  }
-
-  if (!open) return null
 
   const formatChips = (chips) => {
-    if (chips === undefined || chips === null) return '0'
-    if (typeof chips === 'bigint') chips = Number(chips)
+    if (chips === undefined || chips === null) {
+      return '0'
+    }
+    if (typeof chips === 'bigint') {
+      chips = Number(chips)
+    }
     return chips.toLocaleString()
   }
 
-  const selectedChipAmount = selectedPackage ? Number(selectedPackage.chips_amount || 0) : 0
-  const selectedBonusChips = selectedPackage ? Number(selectedPackage.bonus_chips || 0) : 0
-  const selectedTotalChips = selectedChipAmount + selectedBonusChips
-
-  const PriceDisplay = ({ usdPrice, className = '' }) => {
-    if (!usdPrice) {
-      return (
-        <span className={className}>
-          <span className="text-emerald-400">PHP ₱0.00</span>
-          <span className="text-slate-400"> (USD $0.00)</span>
-        </span>
-      )
-    }
-    const phpPrice = convertUSDToLocalCurrency(usdPrice, DEFAULT_CURRENCY)
-    return (
-      <span className={className}>
-        <span className="text-emerald-400">
-          PHP ₱{phpPrice.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-        </span>
-        <span className="text-slate-400">
-          {' '}(USD ${formatNumber(usdPrice)})
-        </span>
-      </span>
-    )
-  }
+  const footer = (
+    <button
+      onClick={onClose}
+      className="w-full px-4 py-2 bg-slate-600 hover:bg-slate-700 text-white font-medium rounded-lg transition"
+    >
+      Close
+    </button>
+  )
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm">
-      <div className="bg-slate-900 rounded-2xl shadow-2xl w-screen h-screen sm:w-full sm:h-auto sm:max-w-5xl border border-slate-700 overflow-hidden flex flex-col sm:max-h-[95vh]">
-        
-        {/* Header */}
-        <div className="bg-cyan-600 p-4 sm:p-8 text-white sticky top-0 z-10">
-          <h2 className="text-2xl sm:text-3xl font-bold">Purchase Poker Chips</h2>
-          <p className="text-xs sm:text-sm text-cyan-100 mt-2">Select a package and confirm your purchase</p>
+    <ExpandableModal
+      isOpen={open}
+      onClose={onClose}
+      title="Chip Transactions"
+      icon="💸"
+      size={isMobile ? 'fullscreen' : 'lg'}
+      footer={footer}
+      badgeContent={`${formatChips(userChips)} balance`}
+      showBadge={true}
+      defaultExpanded={!isMobile}
+    >
+      {error && (
+        <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
+          {error}
         </div>
+      )}
 
-        {/* Content */}
-        <div className="flex-1 overflow-y-auto p-4 sm:p-8">
-          {error && (
-            <div className="mb-6 p-4 bg-red-900/50 border border-red-600 rounded-lg text-red-200 text-sm flex items-start gap-3">
-              <span className="text-xl mt-0.5">⚠️</span>
-              <div>{error}</div>
-            </div>
-          )}
+      {loading ? (
+        <div className="flex justify-center items-center py-12">
+          <div className="text-center space-y-3">
+            <div className="w-8 h-8 border-4 border-blue-400 border-t-white rounded-full animate-spin mx-auto"></div>
+            <p className="text-slate-600">Loading transactions...</p>
+          </div>
+        </div>
+      ) : (
+        <div className="space-y-4">
+          {/* Current Balance */}
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+            <p className="text-sm text-blue-900">Current Chip Balance</p>
+            <p className="text-3xl font-bold text-blue-600 mt-1">{formatChips(userChips)}</p>
+          </div>
 
-          {loading ? (
-            <div className="flex justify-center items-center py-24">
-              <div className="w-12 h-12 border-4 border-cyan-400 border-t-white rounded-full animate-spin"></div>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-              
-              {/* Left: Packages List */}
-              <div className="lg:col-span-2 flex flex-col">
-                <h3 className="text-xl font-semibold text-white mb-4">Select Package</h3>
-                <div className="space-y-3 overflow-y-auto flex-1">
-                  {packages.map((pkg) => {
-                    const chipAmount = Number(pkg.chips_amount || 0)
-                    const bonusChips = Number(pkg.bonus_chips || 0)
-                    const total = chipAmount + bonusChips
-                    const isSelected = selectedPackage?.id === pkg.id
-
-                    return (
-                      <button
-                        key={pkg.id}
-                        onClick={() => setSelectedPackage(pkg)}
-                        className={`w-full p-4 rounded-lg border-2 transition text-left ${
-                          isSelected
-                            ? 'border-cyan-400 bg-slate-700'
-                            : 'border-slate-600 bg-slate-800 hover:border-slate-500'
-                        }`}
-                      >
-                        <div className="flex items-start justify-between gap-4">
-                          <div className="flex-1">
-                            <div className="font-semibold text-white">{total.toLocaleString()} Chips</div>
-                            <div className="text-xs text-slate-400 mt-1">
-                              {chipAmount.toLocaleString()} base + {bonusChips.toLocaleString()} bonus
-                            </div>
-                            {(pkg.is_first_purchase_special || pkg.is_most_popular || pkg.is_flash_sale) && (
-                              <div className="text-xs text-amber-400 font-semibold mt-2">
-                                {pkg.is_first_purchase_special && '⭐ First Purchase Special'}
-                                {pkg.is_most_popular && '⭐ Most Popular'}
-                                {pkg.is_flash_sale && '🔥 Flash Sale'}
-                              </div>
-                            )}
-                          </div>
-                          <div className="text-right flex flex-col items-end gap-2">
-                            <div className="text-xs sm:text-sm font-semibold whitespace-nowrap">
-                              <PriceDisplay usdPrice={pkg.usd_price} />
-                            </div>
-                            {isSelected && (
-                              <div className="w-6 h-6 rounded-full bg-cyan-400 flex items-center justify-center flex-shrink-0">
-                                <svg className="w-4 h-4 text-slate-900" fill="currentColor" viewBox="0 0 20 20">
-                                  <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                                </svg>
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                      </button>
-                    )
-                  })}
-                </div>
+          {/* Transaction History */}
+          <div>
+            <h3 className="text-sm font-semibold text-slate-900 mb-3">Recent Transactions</h3>
+            <div className="space-y-2 max-h-64 overflow-y-auto">
+              <div className="text-center py-8 text-slate-500">
+                <p className="text-sm">No transactions yet</p>
               </div>
+            </div>
+          </div>
 
-              {/* Right: Summary */}
-              <div className="space-y-4">
-                <div className="bg-slate-800 rounded-lg border border-slate-700 p-6 flex flex-col">
-                  <h3 className="text-lg font-semibold text-white mb-4">Order Summary</h3>
-
-                  {/* Current Balance */}
-                  <div className="mb-6 pb-6 border-b border-slate-700">
-                    <div className="text-xs text-slate-400 mb-2">Current Chips</div>
-                    <div className="text-2xl font-bold text-white">{formatChips(userChips)}</div>
+          {/* Available Packages */}
+          {packages.length > 0 && (
+            <div>
+              <h3 className="text-sm font-semibold text-slate-900 mb-3">Available Packages</h3>
+              <div className={`grid ${isMobile ? 'grid-cols-2' : 'grid-cols-3'} gap-2`}>
+                {packages.slice(0, 6).map((pkg) => (
+                  <div key={pkg.id} className="border border-slate-200 rounded p-2 text-center text-xs">
+                    <div className="font-semibold text-slate-900">
+                      {(Number(pkg.chip_amount) + Number(pkg.bonus_chips || 0)).toLocaleString()}
+                    </div>
+                    <div className="text-slate-600">chips</div>
                   </div>
-
-                  {/* Selected Package Details */}
-                  {selectedPackage && (
-                    <>
-                      <div className="mb-4 pb-4 border-b border-slate-700">
-                        <div className="text-xs text-slate-400 mb-2">Base Chips</div>
-                        <div className="text-lg font-semibold text-white">{selectedChipAmount.toLocaleString()}</div>
-                      </div>
-
-                      {selectedBonusChips > 0 && (
-                        <div className="mb-4 pb-4 border-b border-slate-700">
-                          <div className="text-xs text-slate-400 mb-2">Bonus Chips</div>
-                          <div className="text-lg font-semibold text-amber-400">+{selectedBonusChips.toLocaleString()}</div>
-                        </div>
-                      )}
-
-                      <div className="mb-6 pb-6 border-b border-slate-700">
-                        <div className="text-xs text-slate-400 mb-2">Total to Receive</div>
-                        <div className="text-2xl font-bold text-emerald-400">{selectedTotalChips.toLocaleString()}</div>
-                      </div>
-
-                      {/* Price */}
-                      <div className="mb-6 pb-6 border-b border-slate-700">
-                        <div className="text-xs text-slate-400 mb-2">Price</div>
-                        <div className="text-lg sm:text-2xl font-bold">
-                          <PriceDisplay usdPrice={selectedPackage.usd_price} />
-                        </div>
-                      </div>
-
-                      {/* New Balance */}
-                      <div className="mb-6 pb-6 border-b border-slate-700">
-                        <div className="text-xs text-slate-400 mb-2">New Balance</div>
-                        <div className="text-2xl font-bold text-cyan-400">
-                          {formatChips(userChips + BigInt(selectedTotalChips))}
-                        </div>
-                      </div>
-
-                      {/* Wallet Info */}
-                      {!isGuestLocal && wallets.length > 0 && selectedWallet && (
-                        <div className="bg-slate-700 rounded-lg p-4 mb-6">
-                          <div className="text-xs text-slate-400 mb-2">Wallet Balance</div>
-                          <div className="text-lg font-semibold text-white">
-                            {formatPriceWithCurrency(Number(selectedWallet.balance), selectedWallet.currency_code)}
-                          </div>
-                          <div className="text-xs text-slate-400 mt-2">{selectedWallet.currency_code}</div>
-                        </div>
-                      )}
-
-                      {/* Confirm Button */}
-                      <button
-                        onClick={handleConfirmPurchase}
-                        disabled={processing}
-                        className="w-full py-3 font-bold rounded-lg transition transform active:scale-95 bg-emerald-600 hover:bg-emerald-700 text-white shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
-                      >
-                        {processing ? (
-                          <span className="flex items-center justify-center gap-2">
-                            <span className="inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
-                            PROCESSING
-                          </span>
-                        ) : (
-                          'Confirm Purchase'
-                        )}
-                      </button>
-                    </>
-                  )}
-                </div>
+                ))}
               </div>
             </div>
           )}
-        </div>
 
-        {/* Footer */}
-        <div className="border-t border-slate-700 bg-slate-900/50 p-4 sm:p-6 sticky bottom-0">
-          <button
-            onClick={onClose}
-            disabled={processing}
-            className="w-full px-4 sm:px-6 py-3 bg-slate-700 hover:bg-slate-600 text-white font-semibold rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            Cancel
-          </button>
+          {/* Info */}
+          <div className="bg-slate-50 border border-slate-200 rounded-lg p-3">
+            <p className="text-xs text-slate-600">
+              💡 Chips are used to play poker games. Purchase chips to get started or earn them by winning hands.
+            </p>
+          </div>
         </div>
-      </div>
-    </div>
+      )}
+    </ExpandableModal>
   )
 }
