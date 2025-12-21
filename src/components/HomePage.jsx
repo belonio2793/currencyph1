@@ -343,7 +343,16 @@ export default function HomePage({ userId, userEmail, globalCurrency = 'PHP', se
           {/* Net (Balance - Debt) */}
           <div className={`rounded-xl p-4 sm:p-6 border ${isNegativeNet ? 'bg-gradient-to-br from-rose-50 to-rose-100 border-rose-200' : 'bg-gradient-to-br from-emerald-50 to-emerald-100 border-emerald-200'}`}>
             <p className={`text-xs sm:text-sm font-medium uppercase tracking-wider mb-2 ${isNegativeNet ? 'text-rose-600' : 'text-emerald-600'}`}>Net</p>
-            <p className={`text-2xl sm:text-3xl font-light ${isNegativeNet ? 'text-rose-900' : 'text-emerald-900'}`}>{formatNumber(netDisplay)} {globalCurrency}</p>
+            <p className={`text-lg sm:text-2xl font-light ${isNegativeNet ? 'text-rose-900' : 'text-emerald-900'}`}>{formatNumber(netDisplay)} {globalCurrency}</p>
+            <p className={`text-xs sm:text-sm font-light mt-1 ${isNegativeNet ? 'text-rose-700' : 'text-emerald-700'}`}>
+              {loadingCrypto ? (
+                <span className="italic">{isNegativeNet ? 'text-rose-500' : 'text-emerald-500'}>loading {globalCryptocurrency}...</span>
+              ) : cryptoBalance !== null && cryptoDebt !== null ? (
+                <>{(cryptoBalance - cryptoDebt).toFixed(8)} {globalCryptocurrency}</>
+              ) : (
+                <span className="italic">{isNegativeNet ? 'text-rose-500' : 'text-emerald-500'}>crypto unavailable</span>
+              )}
+            </p>
           </div>
 
           {/* Total Debt */}
