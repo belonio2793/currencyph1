@@ -346,11 +346,11 @@ export default function HomePage({ userId, userEmail, globalCurrency = 'PHP', se
             <p className={`text-lg sm:text-2xl font-light ${isNegativeNet ? 'text-rose-900' : 'text-emerald-900'}`}>{formatNumber(netDisplay)} {globalCurrency}</p>
             <p className={`text-xs sm:text-sm font-light mt-1 ${isNegativeNet ? 'text-rose-700' : 'text-emerald-700'}`}>
               {loadingCrypto ? (
-                <span className="italic">{isNegativeNet ? 'text-rose-500' : 'text-emerald-500'}>loading {globalCryptocurrency}...</span>
+                <span className={`italic ${isNegativeNet ? 'text-rose-500' : 'text-emerald-500'}`}>loading {globalCryptocurrency}...</span>
               ) : cryptoBalance !== null && cryptoDebt !== null ? (
                 <>{(cryptoBalance - cryptoDebt).toFixed(8)} {globalCryptocurrency}</>
               ) : (
-                <span className="italic">{isNegativeNet ? 'text-rose-500' : 'text-emerald-500'}>crypto unavailable</span>
+                <span className={`italic ${isNegativeNet ? 'text-rose-500' : 'text-emerald-500'}`}>crypto unavailable</span>
               )}
             </p>
           </div>
