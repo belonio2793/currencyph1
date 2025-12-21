@@ -1,8 +1,10 @@
 import { useState } from 'react'
 import { businessRequestService } from '../lib/businessRequestService'
-import './BusinessRequestModal.css'
+import ExpandableModal from './ExpandableModal'
+import { useDevice } from '../context/DeviceContext'
 
 export default function BusinessRequestModal({ business, userId, onClose, onSubmitted }) {
+  const { isMobile } = useDevice()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [formData, setFormData] = useState({
@@ -89,218 +91,214 @@ export default function BusinessRequestModal({ business, userId, onClose, onSubm
     }
   }
 
+  const footer = (
+    <div className="flex gap-2 w-full">
+      <button
+        type="button"
+        onClick={onClose}
+        className="flex-1 px-4 py-2 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 font-medium"
+        disabled={loading}
+      >
+        Cancel
+      </button>
+      <button
+        type="submit"
+        form="business-request-form"
+        className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-slate-400 font-medium"
+        disabled={loading}
+      >
+        {loading ? 'Submitting...' : 'Submit Application'}
+      </button>
+    </div>
+  )
+
   return (
-    <div className="modal-overlay" onClick={onClose}>
-      <div className="modal-content business-request-modal" onClick={(e) => e.stopPropagation()}>
-        <div className="modal-header">
-          <div>
-            <h2>Apply to {business.business_name}</h2>
-            <p className="text-slate-500">Submit your application and resume</p>
+    <ExpandableModal
+      isOpen={true}
+      onClose={onClose}
+      title={`Apply to ${business.business_name}`}
+      icon="📋"
+      size="lg"
+      footer={footer}
+      defaultExpanded={!isMobile}
+    >
+      {error && (
+        <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded text-sm text-red-700 flex justify-between items-center">
+          <span>{error}</span>
+          <button onClick={() => setError('')} className="text-red-600 hover:text-red-800">×</button>
+        </div>
+      )}
+
+      <form id="business-request-form" onSubmit={handleSubmit} className="space-y-6">
+        {/* Business Info */}
+        <div className="space-y-3">
+          <h3 className="text-lg font-semibold text-slate-900">Business Information</h3>
+          <div className="bg-slate-50 p-4 rounded-lg space-y-2 border border-slate-200">
+            <div>
+              <span className="text-sm font-medium text-slate-600">Business Name:</span>
+              <p className="text-slate-900 font-semibold">{business.business_name}</p>
+            </div>
+            {business.currency_registration_id && (
+              <div>
+                <span className="text-sm font-medium text-slate-600">Registration ID:</span>
+                <p className="text-slate-900">{business.currency_registration_id}</p>
+              </div>
+            )}
+            {business.city_of_registration && (
+              <div>
+                <span className="text-sm font-medium text-slate-600">Location:</span>
+                <p className="text-slate-900">{business.city_of_registration}</p>
+              </div>
+            )}
           </div>
-          <button onClick={onClose} className="modal-close">X</button>
         </div>
 
-        <div className="modal-body">
-          {error && (
-            <div className="error-message">
-              {error}
-              <button onClick={() => setError('')} className="close-error">X</button>
-            </div>
-          )}
+        {/* Position & Salary */}
+        <div className="space-y-4">
+          <h3 className="text-lg font-semibold text-slate-900">Position & Salary</h3>
+          
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-2">Occupation / Position *</label>
+            <input
+              type="text"
+              name="occupation"
+              value={formData.occupation}
+              onChange={handleInputChange}
+              placeholder="e.g., Sales Manager, Software Developer, etc."
+              className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              disabled={loading}
+            />
+          </div>
 
-          <form onSubmit={handleSubmit} className="request-form">
-            {/* Business Info */}
-            <div className="form-section">
-              <h3 className="section-title">Business Information</h3>
-              <div className="info-box">
-                <div className="info-item">
-                  <span className="label">Business Name:</span>
-                  <span className="value">{business.business_name}</span>
-                </div>
-                {business.currency_registration_id && (
-                  <div className="info-item">
-                    <span className="label">Registration ID:</span>
-                    <span className="value">{business.currency_registration_id}</span>
-                  </div>
-                )}
-                {business.city_of_registration && (
-                  <div className="info-item">
-                    <span className="label">Location:</span>
-                    <span className="value">{business.city_of_registration}</span>
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {/* Position & Salary */}
-            <div className="form-section">
-              <h3 className="section-title">Position & Salary</h3>
-              
-              <div className="form-group">
-                <label className="form-label">Occupation / Position *</label>
-                <input
-                  type="text"
-                  name="occupation"
-                  value={formData.occupation}
-                  onChange={handleInputChange}
-                  placeholder="e.g., Sales Manager, Software Developer, etc."
-                  className="form-input"
-                  disabled={loading}
-                />
-              </div>
-
-              <div className="form-row">
-                <div className="form-group">
-                  <label className="form-label">Requested Salary</label>
-                  <input
-                    type="number"
-                    name="requestedSalary"
-                    value={formData.requestedSalary}
-                    onChange={handleInputChange}
-                    placeholder="Enter your expected salary"
-                    className="form-input"
-                    min="0"
-                    step="0.01"
-                    disabled={loading}
-                  />
-                </div>
-                <div className="form-group">
-                  <label className="form-label">Currency</label>
-                  <select
-                    name="salaryCurrency"
-                    value={formData.salaryCurrency}
-                    onChange={handleInputChange}
-                    className="form-input"
-                    disabled={loading}
-                  >
-                    <option value="PHP">PHP</option>
-                    <option value="USD">USD</option>
-                    <option value="EUR">EUR</option>
-                  </select>
-                </div>
-              </div>
-            </div>
-
-            {/* Skills */}
-            <div className="form-section">
-              <h3 className="section-title">Skills *</h3>
-              <div className="skills-input-group">
-                <div className="form-row">
-                  <input
-                    type="text"
-                    value={formData.skillInput}
-                    onChange={(e) => setFormData(prev => ({ ...prev, skillInput: e.target.value }))}
-                    onKeyPress={(e) => {
-                      if (e.key === 'Enter') {
-                        e.preventDefault()
-                        handleAddSkill()
-                      }
-                    }}
-                    placeholder="e.g., Project Management, Python, etc."
-                    className="form-input flex-1"
-                    disabled={loading}
-                  />
-                  <button
-                    type="button"
-                    onClick={handleAddSkill}
-                    className="btn-add-skill"
-                    disabled={loading || !formData.skillInput.trim()}
-                  >
-                    + Add Skill
-                  </button>
-                </div>
-              </div>
-
-              {formData.skills.length > 0 && (
-                <div className="skills-list">
-                  {formData.skills.map((skill) => (
-                    <div key={skill} className="skill-tag">
-                      <span>{skill}</span>
-                      <button
-                        type="button"
-                        onClick={() => handleRemoveSkill(skill)}
-                        className="remove-skill"
-                        disabled={loading}
-                      >
-                        ×
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              )}
-              {formData.skills.length === 0 && (
-                <p className="text-slate-500 text-sm">No skills added yet. Add at least one skill.</p>
-              )}
-            </div>
-
-            {/* Resume */}
-            <div className="form-section">
-              <h3 className="section-title">Resume / Professional Bio *</h3>
-              <textarea
-                name="resumeText"
-                value={formData.resumeText}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-2">Requested Salary</label>
+              <input
+                type="number"
+                name="requestedSalary"
+                value={formData.requestedSalary}
                 onChange={handleInputChange}
-                placeholder="Write a brief professional summary, work experience, education, and achievements..."
-                className="form-textarea"
-                rows="8"
-                disabled={loading}
-              />
-              <p className="text-slate-500 text-sm">
-                {formData.resumeText.length} characters
-              </p>
-            </div>
-
-            {/* Availability */}
-            <div className="form-section">
-              <h3 className="section-title">Availability</h3>
-              <div className="form-group">
-                <label className="form-label">Available Start Date</label>
-                <input
-                  type="date"
-                  name="availabilityDate"
-                  value={formData.availabilityDate}
-                  onChange={handleInputChange}
-                  className="form-input"
-                  disabled={loading}
-                />
-              </div>
-            </div>
-
-            {/* Message */}
-            <div className="form-section">
-              <h3 className="section-title">Message to Business Owner</h3>
-              <textarea
-                name="message"
-                value={formData.message}
-                onChange={handleInputChange}
-                placeholder="Add any additional message or cover letter..."
-                className="form-textarea"
-                rows="4"
+                placeholder="Enter your expected salary"
+                className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                min="0"
+                step="0.01"
                 disabled={loading}
               />
             </div>
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-2">Currency</label>
+              <select
+                name="salaryCurrency"
+                value={formData.salaryCurrency}
+                onChange={handleInputChange}
+                className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                disabled={loading}
+              >
+                <option value="PHP">PHP</option>
+                <option value="USD">USD</option>
+                <option value="EUR">EUR</option>
+              </select>
+            </div>
+          </div>
+        </div>
 
-            {/* Buttons */}
-            <div className="form-actions">
+        {/* Skills */}
+        <div className="space-y-4">
+          <h3 className="text-lg font-semibold text-slate-900">Skills *</h3>
+          <div className="space-y-3">
+            <div className="flex gap-2">
+              <input
+                type="text"
+                value={formData.skillInput}
+                onChange={(e) => setFormData(prev => ({ ...prev, skillInput: e.target.value }))}
+                onKeyPress={(e) => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault()
+                    handleAddSkill()
+                  }
+                }}
+                placeholder="e.g., Project Management, Python, etc."
+                className="flex-1 px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                disabled={loading}
+              />
               <button
                 type="button"
-                onClick={onClose}
-                className="btn-cancel"
-                disabled={loading}
+                onClick={handleAddSkill}
+                className="px-4 py-2 bg-blue-100 text-blue-600 rounded-lg hover:bg-blue-200 font-medium disabled:opacity-50"
+                disabled={loading || !formData.skillInput.trim()}
               >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                className="btn-submit"
-                disabled={loading}
-              >
-                {loading ? 'Submitting...' : 'Submit Application'}
+                + Add
               </button>
             </div>
-          </form>
+
+            {formData.skills.length > 0 && (
+              <div className="flex flex-wrap gap-2">
+                {formData.skills.map((skill) => (
+                  <div key={skill} className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm font-medium flex items-center gap-2">
+                    <span>{skill}</span>
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveSkill(skill)}
+                      className="text-blue-600 hover:text-blue-800 font-bold"
+                      disabled={loading}
+                    >
+                      ×
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+            {formData.skills.length === 0 && (
+              <p className="text-sm text-slate-500">No skills added yet. Add at least one skill.</p>
+            )}
+          </div>
         </div>
-      </div>
-    </div>
+
+        {/* Resume */}
+        <div className="space-y-4">
+          <h3 className="text-lg font-semibold text-slate-900">Resume / Professional Bio *</h3>
+          <textarea
+            name="resumeText"
+            value={formData.resumeText}
+            onChange={handleInputChange}
+            placeholder="Write a brief professional summary, work experience, education, and achievements..."
+            className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            rows="6"
+            disabled={loading}
+          />
+          <p className="text-sm text-slate-500">{formData.resumeText.length} characters</p>
+        </div>
+
+        {/* Availability */}
+        <div className="space-y-4">
+          <h3 className="text-lg font-semibold text-slate-900">Availability</h3>
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-2">Available Start Date</label>
+            <input
+              type="date"
+              name="availabilityDate"
+              value={formData.availabilityDate}
+              onChange={handleInputChange}
+              className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              disabled={loading}
+            />
+          </div>
+        </div>
+
+        {/* Message */}
+        <div className="space-y-4">
+          <h3 className="text-lg font-semibold text-slate-900">Message to Business Owner</h3>
+          <textarea
+            name="message"
+            value={formData.message}
+            onChange={handleInputChange}
+            placeholder="Add any additional message or cover letter..."
+            className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            rows="4"
+            disabled={loading}
+          />
+        </div>
+      </form>
+    </ExpandableModal>
   )
 }
