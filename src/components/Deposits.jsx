@@ -223,17 +223,31 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
           }
         })
 
-        // Fetch rates for all crypto currencies
-        for (const cryptoCode of cryptoCurrenciesToFetch) {
+        // Fetch rates for all crypto currencies with a timeout
+        const ratePromises = Array.from(cryptoCurrenciesToFetch).map(async (cryptoCode) => {
           try {
-            const price = await getCryptoPrice(cryptoCode)
+            // Set a timeout of 5 seconds per currency to avoid hanging
+            const pricePromise = getCryptoPrice(cryptoCode)
+            const timeoutPromise = new Promise((_, reject) =>
+              setTimeout(() => reject(new Error('Timeout')), 5000)
+            )
+
+            const price = await Promise.race([pricePromise, timeoutPromise])
             if (price) {
-              rates[cryptoCode] = price
+              return { cryptoCode, price }
             }
           } catch (e) {
             console.warn(`Failed to fetch rate for ${cryptoCode}:`, e.message)
           }
-        }
+          return null
+        })
+
+        const results = await Promise.all(ratePromises)
+        results.forEach(result => {
+          if (result) {
+            rates[result.cryptoCode] = result.price
+          }
+        })
 
         // Ensure PHP rate is set to 1 for conversion calculations
         rates['PHP'] = 1
@@ -243,6 +257,7 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
       setRatesLoading(false)
     } catch (err) {
       console.error('Error fetching exchange rates:', err)
+      setExchangeRates({ PHP: 1 })
       setRatesLoading(false)
     }
   }
