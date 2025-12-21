@@ -823,25 +823,24 @@ export default function Nearby({ userId, setActiveTab, setCurrentListingSlug }) 
       {viewMode === 'listings' && (
       <>
       {/* Header Section */}
-      <div className="bg-gradient-to-r from-blue-600 to-blue-800 dark:from-blue-700 dark:to-blue-900 text-white py-4 sm:py-6 px-4 sm:px-6">
+      <div className="px-4 sm:px-6 py-6 sm:py-8 border-b border-slate-200">
         <div className="max-w-6xl mx-auto">
-          <h1 className="text-xl sm:text-2xl md:text-3xl font-bold mb-1 sm:mb-2 text-white">Explore Philippines</h1>
-          <p className="text-white text-sm sm:text-base md:text-lg mb-4 sm:mb-6">Discover the best attractions, restaurants & hotels across all Philippine cities</p>
+          <h1 className="text-xl sm:text-2xl md:text-3xl font-bold mb-1 sm:mb-2 text-slate-900">Explore Philippines</h1>
 
-          <div className="mb-6 sm:mb-8">
+          <div className="mt-6 sm:mt-8">
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-3 sm:mb-4 gap-3">
-              <h3 className="text-lg sm:text-xl md:text-2xl font-bold text-white">Browse by City</h3>
+              <h3 className="text-lg sm:text-xl md:text-2xl font-bold text-slate-900">Browse by City</h3>
               <button
                 onClick={() => setShowAddBusiness(true)}
-                className="px-3 sm:px-4 py-1.5 sm:py-2 bg-white/20 hover:bg-white/30 text-white rounded-lg text-xs sm:text-sm font-medium whitespace-nowrap"
+                className="px-3 sm:px-4 py-1.5 sm:py-2 bg-blue-100 hover:bg-blue-200 text-blue-700 rounded-lg text-xs sm:text-sm font-medium whitespace-nowrap"
               >
                 + Add your business
               </button>
             </div>
-            <p className="text-white text-xs sm:text-sm mb-3 sm:mb-4">Select a letter to see all cities starting with that letter</p>
+            <p className="text-slate-600 text-xs sm:text-sm mb-3 sm:mb-4">Select a letter to see all cities starting with that letter</p>
 
             {/* Prominent A-Z Alphabet Selector - Responsive Grid */}
-            <div className="bg-transparent rounded-xl p-1 sm:p-2 w-full">
+            <div className="bg-slate-50 rounded-xl p-1 sm:p-2 w-full">
               <div className="grid grid-cols-6 sm:grid-cols-8 md:grid-cols-14 gap-0.5 sm:gap-1">
                 {/* All Button */}
                 <button
@@ -852,8 +851,8 @@ export default function Nearby({ userId, setActiveTab, setCurrentListingSlug }) 
                   }}
                   className={`py-1 sm:py-2 rounded-md font-bold text-xs sm:text-sm md:text-base transition-all duration-200 whitespace-nowrap ${
                     expandedLetter === null && selectedCity === null
-                      ? 'bg-white/20 text-white shadow-lg'
-                      : 'bg-white/5 text-white hover:bg-white/10'
+                      ? 'bg-blue-600 text-white shadow-lg'
+                      : 'bg-slate-200 text-slate-700 hover:bg-slate-300'
                   }`}
                 >
                   All
