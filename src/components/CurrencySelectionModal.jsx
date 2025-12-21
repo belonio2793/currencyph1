@@ -147,29 +147,6 @@ export default function CurrencySelectionModal({ isOpen, onClose, globalCurrency
           </div>
         </div>
 
-        {/* Balance Reconciliation Section */}
-        {userEmail && totalBalanceConverted !== undefined && totalBalanceConverted > 0 && (
-          <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 sm:p-5">
-            <h3 className="text-sm font-semibold text-amber-900 mb-3">Balance Reconciliation</h3>
-            <div className="space-y-3">
-              <div>
-                <p className="text-xs text-amber-700 font-medium mb-1">Current Balance ({globalCurrency})</p>
-                <p className="text-lg font-semibold text-amber-900">{formatNumber(totalBalanceConverted)} {globalCurrency}</p>
-              </div>
-              <div className="border-t border-amber-200 pt-3">
-                <p className="text-xs text-amber-700 font-medium mb-1">Preview in {localCryptoCurrency}</p>
-                {loadingPreview ? (
-                  <p className="text-sm text-amber-600 italic">Converting...</p>
-                ) : previewCryptoBalance !== null ? (
-                  <p className="text-lg font-semibold text-amber-900">{previewCryptoBalance.toFixed(8)} {localCryptoCurrency}</p>
-                ) : (
-                  <p className="text-sm text-amber-600 italic">Unable to load conversion rate</p>
-                )}
-              </div>
-            </div>
-          </div>
-        )}
-
         {/* Fiat Currency Section */}
         <div className="space-y-2 sm:space-y-3">
           <div className="flex items-center justify-between">
