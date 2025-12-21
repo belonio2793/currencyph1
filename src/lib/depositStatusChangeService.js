@@ -288,12 +288,19 @@ export class DepositStatusChangeService {
   }
 
   /**
-   * Calculate wallet impact of the status change
+   * Calculate wallet impact of the status change with currency conversion
+   * @param {string} walletId - Wallet ID
+   * @param {number} amount - Deposit amount
+   * @param {string} operation - 'credit' or 'debit'
+   * @param {string} depositCurrency - Currency of the deposit
+   * @param {string} depositId - Deposit ID (for audit trail)
+   * @returns {Promise<object>} - Wallet impact with conversion details
    */
-  async _calculateWalletImpact(walletId, amount, operation) {
+  async _calculateWalletImpact(walletId, amount, operation, depositCurrency = null, depositId = null) {
+    // Fetch wallet with currency info
     const { data: wallet, error } = await this.supabase
       .from('wallets')
-      .select('id, balance')
+      .select('id, balance, currency_code')
       .eq('id', walletId)
       .single()
 
@@ -301,24 +308,95 @@ export class DepositStatusChangeService {
       throw new Error(`Wallet not found: ${walletId}`)
     }
 
+    const walletCurrency = wallet.currency_code
     const balanceBefore = parseFloat(wallet.balance)
     const amountChange = parseFloat(amount)
+
+    // Handle currency validation and conversion
+    let finalAmount = amountChange
+    let conversionData = null
+
+    if (depositCurrency && depositCurrency !== walletCurrency) {
+      // Currency mismatch - need to convert
+      conversionData = await this._convertCurrency(
+        depositCurrency,
+        walletCurrency,
+        amountChange,
+        depositId
+      )
+
+      if (!conversionData) {
+        throw new Error(
+          `Cannot convert ${depositCurrency} to ${walletCurrency}. No exchange rate available.`
+        )
+      }
+
+      finalAmount = conversionData.convertedAmount
+    }
+
     const balanceAfter = operation === 'credit'
-      ? balanceBefore + amountChange
-      : balanceBefore - amountChange
+      ? balanceBefore + finalAmount
+      : balanceBefore - finalAmount
 
     if (operation === 'debit' && balanceAfter < 0) {
       throw new Error(
-        `Insufficient balance. Current: ${balanceBefore}, Required: ${amountChange}`
+        `Insufficient balance. Current: ${balanceBefore}, Required: ${finalAmount}`
       )
     }
 
     return {
       balance_before: balanceBefore,
       balance_after: balanceAfter,
-      amount_changed: operation === 'credit' ? amountChange : -amountChange,
+      amount_changed: operation === 'credit' ? finalAmount : -finalAmount,
       operation,
-      wallet_id: walletId
+      wallet_id: walletId,
+      wallet_currency: walletCurrency,
+      deposit_currency: depositCurrency,
+      conversion: conversionData
+    }
+  }
+
+  /**
+   * Convert currency amount using exchange rates
+   * @param {string} fromCurrency - Source currency code
+   * @param {string} toCurrency - Target currency code
+   * @param {number} amount - Amount in source currency
+   * @param {string} depositId - Deposit ID for audit trail
+   * @returns {Promise<object>} - Conversion details or null if rate unavailable
+   */
+  async _convertCurrency(fromCurrency, toCurrency, amount, depositId = null) {
+    try {
+      // Get latest exchange rate from crypto_rates table
+      const { data: rateData, error: rateError } = await this.supabase
+        .from('crypto_rates_valid')
+        .select('rate, source, updated_at')
+        .eq('from_currency', fromCurrency)
+        .eq('to_currency', toCurrency)
+        .order('updated_at', { ascending: false })
+        .limit(1)
+        .single()
+
+      if (rateError || !rateData) {
+        console.warn(`No exchange rate found for ${fromCurrency}/${toCurrency}`)
+        return null
+      }
+
+      const exchangeRate = parseFloat(rateData.rate)
+      const convertedAmount = amount * exchangeRate
+
+      return {
+        fromCurrency,
+        toCurrency,
+        originalAmount: amount,
+        exchangeRate: exchangeRate,
+        convertedAmount: convertedAmount,
+        rateSource: rateData.source,
+        rateUpdatedAt: rateData.updated_at,
+        timestamp: new Date().toISOString()
+      }
+    } catch (error) {
+      console.error(`Currency conversion failed for ${fromCurrency}->${toCurrency}:`, error)
+      return null
     }
   }
 
