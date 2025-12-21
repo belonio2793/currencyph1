@@ -1024,7 +1024,7 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
               <ul className="text-sm text-yellow-800 space-y-1">
                 {selectedMethodData?.type === 'crypto' && (
                   <>
-                    <li>• Only send {selectedMethodData.name} ({selectedCurrency}) to this address</li>
+                    <li>• Only send {selectedMethodData.cryptoName} ({selectedMethodData.cryptoSymbol}) to this address</li>
                     {selectedMethodData.network && <li>• Network: {selectedMethodData.network}</li>}
                     <li>• Do not send other tokens or cryptocurrencies</li>
                     <li>• Transactions cannot be reversed</li>
