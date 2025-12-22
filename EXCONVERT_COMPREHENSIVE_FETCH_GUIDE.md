@@ -2,7 +2,7 @@
 
 ## Overview
 
-This system fetches **all ~163 fiat currencies to each other** from ExConvert API and stores them in your SQL database. Users then fetch rates from the database, not from APIs on page load.
+This system fetches **all ~163 fiat currencies + all 31 supported cryptocurrencies** from ExConvert API and stores them in your SQL database. Users then fetch rates from the database, not from APIs on page load.
 
 ## Architecture
 
@@ -22,16 +22,18 @@ Frontend (reads from DB via edge function)
 
 ### First Time Setup
 
-The script will fetch all 163 currencies and convert them to each other:
+The script will fetch all fiat currencies to each other + all cryptocurrencies:
 
 ```bash
 npm run fetch-all-exconvert-rates
 ```
 
 This will:
-- Fetch ~26,500 currency pairs
-- Take approximately **60-90 minutes** depending on network
-- Show progress every currency processed
+- **Fiat pairs**: ~26,500 (163 × 162)
+- **Crypto pairs**: ~2,300 (31 cryptos to 15 major fiats + 30 other cryptos)
+- **Total pairs**: ~28,800
+- Take approximately **2-3 hours** depending on network
+- Show progress for each stage (fiat + crypto)
 - Store results in `pairs` and `crypto_rates` tables
 
 ### Expected Output
@@ -40,21 +42,34 @@ This will:
 🚀 Starting Comprehensive ExConvert Rate Fetch
 
 📊 Configuration:
-   Currencies: 163
-   Total pairs to fetch: 26406
-   Estimated time: ~66 minutes (at 150ms per request)
+   Fiat currencies: 163
+   Cryptocurrencies: 31
+   Total symbols: 194
+   Total pairs to fetch: 37,442
+   Estimated time: ~94 minutes (at 150ms per request)
 
-⏳ Progress: 1/163 currencies (162 success, 0 failed, 15.3s)
-⏳ Progress: 2/163 currencies (324 success, 0 failed, 30.6s)
+📊 Stage 1: Fetching fiat currency pairs...
+
+⏳ Fiat progress: 20/163 (3080 pairs, 154.2s)
+⏳ Fiat progress: 40/163 (6160 pairs, 308.5s)
 ...
+
+📊 Stage 2: Fetching cryptocurrency pairs...
+
+⏳ Crypto progress: 1/31 (46 pairs, 2345.1s)
+⏳ Crypto progress: 2/31 (92 pairs, 2456.3s)
+...
+
 ✨ Fetch Complete!
 
 📈 Results:
-   Total time: 65.42 minutes
-   Successful fetches: 26345
-   Failed fetches: 61
-   Success rate: 99.8%
-   Stored in database: 26345
+   Total time: 94.25 minutes
+   Fiat pairs fetched: 26300
+   Crypto pairs fetched: 2290
+   Successful fetches: 28590
+   Failed fetches: 210
+   Success rate: 99.3%
+   Stored in database: 28590
 ```
 
 ## Configuration
