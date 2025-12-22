@@ -44,6 +44,7 @@ export default function Rates() {
 
       const pairsData = pairsRes.data || []
       console.log(`✅ Loaded ${pairsData.length} rate pairs from pairs table`)
+      console.log('Sample pairs data:', pairsData.slice(0, 5))
 
       // 2. Extract all unique currencies and cryptocurrencies from pairs
       const uniqueCodes = new Set()
@@ -54,6 +55,7 @@ export default function Rates() {
 
       const codesArray = Array.from(uniqueCodes)
       console.log(`📊 Found ${codesArray.length} unique currency codes in pairs table`)
+      console.log('All unique codes:', codesArray.sort())
 
       // 3. Fetch metadata for all currencies and cryptocurrencies in pairs
       let allMetadata = {}
