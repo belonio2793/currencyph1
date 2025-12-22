@@ -125,7 +125,15 @@ export default function Wallet({ userId, globalCurrency = 'PHP' }) {
         }
       }
 
-      setWallets(filteredWallets.length > 0 ? filteredWallets : allWallets)
+      // Use all wallets for display (filtering by preferences is cosmetic)
+      // The tab selection will show relevant wallets based on user's selection
+      // This ensures crypto wallets are visible even if not in preferences
+      console.debug('Final wallets to display:', {
+        count: allWallets.length,
+        filtered: filteredWallets.length,
+        using: allWallets.length > 0 ? 'allWallets' : 'filteredWallets'
+      })
+      setWallets(allWallets.length > 0 ? allWallets : filteredWallets)
     } catch (err) {
       console.error('Error loading wallets:', err)
       setError('Failed to load wallets')
