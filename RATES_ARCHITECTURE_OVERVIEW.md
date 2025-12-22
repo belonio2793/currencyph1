@@ -152,13 +152,7 @@ FROM pairs WHERE from_currency = 'BTC';
 
 ## What to Do Next
 
-### 1. Deploy Migration
-```bash
-supabase db push
-```
-This applies migration 0116 and adds the missing trigger.
-
-### 2. Deploy Edge Function
+### 1. Deploy Edge Function (No Migrations Needed)
 ```bash
 supabase functions deploy fetch-rates
 ```
