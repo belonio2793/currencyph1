@@ -252,7 +252,7 @@ export default function AdminDepositManager() {
                             </span>
                           </td>
                           <td className="px-6 py-4 text-sm text-slate-600">
-                            {new Date(deposit.created_at).toLocaleDateString()}
+                            {formatDateOnly(deposit.created_at)}
                           </td>
                           <td className="px-6 py-4 text-center">
                             <button
@@ -319,7 +319,7 @@ export default function AdminDepositManager() {
                 <div>
                   <div className="text-slate-600">Created</div>
                   <div className="text-slate-900 text-xs">
-                    {new Date(selectedDeposit.created_at).toLocaleString()}
+                    {formatFullDateTime(selectedDeposit.created_at)}
                   </div>
                 </div>
               </div>
@@ -420,7 +420,7 @@ export default function AdminDepositManager() {
                           {record.old_status} → {record.new_status}
                         </div>
                         <div className="text-slate-600 text-xs mt-1">
-                          {new Date(record.created_at).toLocaleString()}
+                          {formatFullDateTime(record.created_at)}
                         </div>
                         {record.reason && <div className="text-slate-600 mt-1">{record.reason}</div>}
                       </div>
@@ -445,7 +445,7 @@ export default function AdminDepositManager() {
                           </span>
                         </div>
                         <div className="text-slate-600 text-xs mt-1">
-                          By: {record.admin_email} | {new Date(record.created_at).toLocaleString()}
+                          By: {record.admin_email} | {formatFullDateTime(record.created_at)}
                         </div>
                         {record.wallet_impact && (
                           <div className="mt-2 text-slate-700 text-xs">
