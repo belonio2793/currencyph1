@@ -32,95 +32,141 @@ export default function Rates() {
       setLoading(true)
       setError(null)
 
-      // 1. Fetch all pairs from pairs table
-      const pairsRes = await supabase
-        .from('pairs')
-        .select('from_currency,to_currency,rate,source_table,updated_at')
+      // 1. Fetch all pairs from pairs table with pagination
+      console.log('📥 Starting to fetch all pairs from public.pairs table...')
+      const pageSize = 1000
+      let allPairs = []
+      let offset = 0
+      let hasMore = true
 
-      if (pairsRes.error) {
-        console.error('❌ pairs query failed:', pairsRes.error)
-        throw new Error(`Failed to load rates: ${pairsRes.error.message}`)
+      while (hasMore) {
+        const pairsRes = await supabase
+          .from('pairs')
+          .select('from_currency,to_currency,rate,source_table,updated_at')
+          .range(offset, offset + pageSize - 1)
+
+        if (pairsRes.error) {
+          console.error('❌ pairs query failed:', pairsRes.error)
+          throw new Error(`Failed to load rates: ${pairsRes.error.message}`)
+        }
+
+        const pageData = pairsRes.data || []
+        if (pageData.length === 0) {
+          hasMore = false
+        } else {
+          allPairs.push(...pageData)
+          console.log(`📥 Loaded page at offset ${offset}: ${pageData.length} pairs (total: ${allPairs.length})`)
+          offset += pageSize
+
+          // Small delay to avoid rate limiting
+          await new Promise(resolve => setTimeout(resolve, 10))
+        }
       }
 
-      const pairsData = pairsRes.data || []
-      console.log(`✅ Loaded ${pairsData.length} rate pairs from pairs table`)
-      console.log('Sample pairs data:', pairsData.slice(0, 5))
+      console.log(`✅ Loaded ${allPairs.length} total rate pairs from pairs table`)
 
       // 2. Extract all unique currencies and cryptocurrencies from pairs
       const uniqueCodes = new Set()
-      pairsData.forEach(pair => {
+      let timestamps = []
+
+      allPairs.forEach(pair => {
         if (pair.from_currency) uniqueCodes.add(pair.from_currency)
         if (pair.to_currency) uniqueCodes.add(pair.to_currency)
+        if (pair.updated_at) timestamps.push(new Date(pair.updated_at))
       })
 
       const codesArray = Array.from(uniqueCodes)
       console.log(`📊 Found ${codesArray.length} unique currency codes in pairs table`)
-      console.log('All unique codes:', codesArray.sort())
 
-      // 3. Fetch metadata for all currencies and cryptocurrencies in pairs
+      // 3. Fetch metadata for all currencies and cryptocurrencies
       let allMetadata = {}
-      if (codesArray.length > 0) {
-        const [currenciesRes, cryptosRes] = await Promise.all([
-          supabase
-            .from('currencies')
-            .select('code,name,type,symbol,decimals,is_default,active'),
-          supabase
-            .from('cryptocurrencies')
-            .select('code,name,coingecko_id')
-        ])
+      const [currenciesRes, cryptosRes] = await Promise.all([
+        supabase
+          .from('currencies')
+          .select('code,name,type,symbol,decimals,is_default,active'),
+        supabase
+          .from('cryptocurrencies')
+          .select('code,name,coingecko_id')
+      ])
 
-        if (currenciesRes.data) {
-          currenciesRes.data.forEach(c => {
-            allMetadata[c.code] = { ...c, type: 'currency' }
-          })
-        }
+      if (currenciesRes.data) {
+        currenciesRes.data.forEach(c => {
+          allMetadata[c.code] = { ...c, type: 'currency' }
+        })
+      }
 
-        if (cryptosRes.data) {
-          cryptosRes.data.forEach(c => {
-            allMetadata[c.code] = { ...c, type: 'cryptocurrency' }
-          })
-        }
+      if (cryptosRes.data) {
+        cryptosRes.data.forEach(c => {
+          allMetadata[c.code] = { ...c, type: 'cryptocurrency' }
+        })
       }
 
       setCurrencies(allMetadata)
       console.log(`📋 Loaded metadata for ${Object.keys(allMetadata).length} currencies/cryptos`)
 
-      // 4. Build rates list with all unique currencies from pairs
+      // 4. Build deduplicated rates list
       const ratesByCode = {}
 
-      // Add all unique codes with their rates and metadata
-      uniqueCodes.forEach(code => {
-        const metadata = allMetadata[code] || {
-          code: code,
-          name: code,
-          type: 'currency',
-          symbol: '',
-          decimals: 2
+      // Process all pairs to find the best rate for each unique code
+      allPairs.forEach(pair => {
+        // Track from_currency
+        if (pair.from_currency && !ratesByCode[pair.from_currency]) {
+          const metadata = allMetadata[pair.from_currency] || {
+            code: pair.from_currency,
+            name: pair.from_currency,
+            type: 'currency',
+            symbol: '',
+            decimals: 2
+          }
+
+          ratesByCode[pair.from_currency] = {
+            code: pair.from_currency,
+            rate: null,
+            metadata: metadata,
+            source: pair.source_table || 'pairs',
+            updatedAt: pair.updated_at || new Date().toISOString()
+          }
         }
 
-        // Find the first pair that references this code to get rate info
-        const relatedPair = pairsData.find(p => p.from_currency === code || p.to_currency === code)
-        const rate = relatedPair ? Number(relatedPair.rate) : null
+        // Track to_currency
+        if (pair.to_currency && !ratesByCode[pair.to_currency]) {
+          const metadata = allMetadata[pair.to_currency] || {
+            code: pair.to_currency,
+            name: pair.to_currency,
+            type: 'currency',
+            symbol: '',
+            decimals: 2
+          }
 
-        ratesByCode[code] = {
-          code: code,
-          rate: isFinite(rate) && rate > 0 ? rate : null,
-          metadata: metadata,
-          source: relatedPair?.source_table || 'pairs',
-          updatedAt: relatedPair?.updated_at || new Date().toISOString()
+          ratesByCode[pair.to_currency] = {
+            code: pair.to_currency,
+            rate: null,
+            metadata: metadata,
+            source: pair.source_table || 'pairs',
+            updatedAt: pair.updated_at || new Date().toISOString()
+          }
+        }
+
+        // Try to extract rate if available
+        if (pair.rate && isFinite(Number(pair.rate)) && Number(pair.rate) > 0) {
+          if (pair.from_currency === 'PHP' && pair.to_currency && !ratesByCode[pair.to_currency].rate) {
+            ratesByCode[pair.to_currency].rate = Number(pair.rate)
+            ratesByCode[pair.to_currency].updatedAt = pair.updated_at || new Date().toISOString()
+          } else if (pair.to_currency === 'PHP' && pair.from_currency && !ratesByCode[pair.from_currency].rate) {
+            const invertedRate = 1 / Number(pair.rate)
+            if (isFinite(invertedRate) && invertedRate > 0) {
+              ratesByCode[pair.from_currency].rate = invertedRate
+              ratesByCode[pair.from_currency].updatedAt = pair.updated_at || new Date().toISOString()
+            }
+          }
         }
       })
 
       // 5. Get the most recent timestamp
       let mostRecentTimestamp = new Date()
-      if (pairsData.length > 0) {
-        const timestamps = pairsData
-          .filter(p => p.updated_at)
-          .map(p => new Date(p.updated_at))
-          .sort((a, b) => b - a)
-        if (timestamps.length > 0) {
-          mostRecentTimestamp = timestamps[0]
-        }
+      if (timestamps.length > 0) {
+        timestamps.sort((a, b) => b - a)
+        mostRecentTimestamp = timestamps[0]
       }
 
       // 6. Sort: rates with values first, then without
@@ -136,7 +182,7 @@ export default function Rates() {
 
       setRates(validRates)
       setLastUpdated(mostRecentTimestamp)
-      console.log(`✅ Final rates list: ${validRates.length} items (${ratesWithValues.length} with values)`)
+      console.log(`✅ Final rates list: ${validRates.length} unique items (${ratesWithValues.length} with rates)`)
     } catch (err) {
       const errorMsg = err?.message || String(err) || 'Unknown error'
       console.error('Error loading rates:', errorMsg, err)
