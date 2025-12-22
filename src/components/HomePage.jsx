@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo, useCallback } from 'react'
+import { supabase } from '../lib/supabaseClient'
 import { currencyAPI } from '../lib/payments'
 import { apiCache } from '../lib/apiCache'
 import { quickAccessManager } from '../lib/quickAccessManager'
