@@ -1,43 +1,113 @@
 import React, { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabaseClient'
+import { pokerPaymentService } from '../lib/pokerPaymentService'
 import ExpandableModal from './ExpandableModal'
 import { useDevice } from '../context/DeviceContext'
 
 export default function ChipTransactionModal({ open, onClose, userId, onPurchaseComplete }) {
   const { isMobile } = useDevice()
-  const [packages, setPackages] = useState([])
+  const [products, setProducts] = useState([])
+  const [productPrices, setProductPrices] = useState({})
+  const [chipPackages, setChipPackages] = useState({})
   const [loading, setLoading] = useState(false)
   const [processing, setProcessing] = useState(false)
   const [error, setError] = useState(null)
   const [userChips, setUserChips] = useState(0n)
   const [userWallets, setUserWallets] = useState([])
   const [selectedWalletId, setSelectedWalletId] = useState(null)
-  const [processingPackageId, setProcessingPackageId] = useState(null)
+  const [processingProductId, setProcessingProductId] = useState(null)
+  const [showPaymentMethods, setShowPaymentMethods] = useState({})
   const isGuestLocal = userId && userId.includes('guest-local')
 
   useEffect(() => {
     if (open && userId) {
-      loadPackages()
+      loadPokerProducts()
       loadUserData()
-      loadUserWallets()
+      if (!isGuestLocal) {
+        loadUserWallets()
+      }
     }
   }, [open, userId])
 
-  async function loadPackages() {
+  async function loadPokerProducts() {
     try {
       setLoading(true)
+      
+      // Get payment products for poker chips
+      const products = await pokerPaymentService.getPokerChipProducts()
+      setProducts(products || [])
+
+      // Load prices for each product
+      const pricesMap = {}
+      const packagesMap = {}
+      
+      for (const product of products) {
+        try {
+          const price = await pokerPaymentService.getProductPrices(product.id)
+          if (price) {
+            pricesMap[product.id] = price
+          }
+          
+          // Extract chip package data from product metadata
+          if (product.metadata) {
+            packagesMap[product.id] = product.metadata
+          }
+        } catch (err) {
+          console.warn(`Error loading price for product ${product.id}:`, err)
+        }
+      }
+      
+      setProductPrices(pricesMap)
+      setChipPackages(packagesMap)
+
+      // If no payment products exist, fall back to poker_chip_packages
+      if (products.length === 0) {
+        console.log('No payment products found, loading fallback chip packages...')
+        await loadFallbackChipPackages()
+      }
+    } catch (err) {
+      console.error('Error loading poker products:', err)
+      // Fall back to regular chip packages
+      await loadFallbackChipPackages()
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  async function loadFallbackChipPackages() {
+    try {
       const { data, error } = await supabase
         .from('poker_chip_packages')
         .select('*')
         .order('display_order', { ascending: true })
       
       if (error) throw error
-      setPackages(data || [])
+      // Convert to product format
+      const fallbackProducts = (data || []).map(pkg => ({
+        id: pkg.id,
+        name: pkg.name,
+        description: `${pkg.chip_amount.toLocaleString()} chips${pkg.bonus_chips > 0 ? ` + ${pkg.bonus_chips.toLocaleString()} bonus` : ''}`,
+        metadata: {
+          chip_amount: pkg.chip_amount,
+          bonus_chips: pkg.bonus_chips,
+          total_chips: pkg.chip_amount + pkg.bonus_chips,
+          is_first_purchase_special: pkg.is_first_purchase_special,
+          is_most_popular: pkg.is_most_popular,
+          is_flash_sale: pkg.is_flash_sale
+        }
+      }))
+      
+      setProducts(fallbackProducts)
+      
+      // Create price map from chip packages
+      const pricesMap = {}
+      data.forEach(pkg => {
+        pricesMap[pkg.id] = { amount: pkg.usd_price, currency: 'USD' }
+      })
+      setProductPrices(pricesMap)
     } catch (err) {
-      console.error('Error loading packages:', err)
+      console.error('Error loading fallback chip packages:', err)
       setError('Failed to load chip packages')
-    } finally {
-      setLoading(false)
     }
   }
 
@@ -89,28 +159,35 @@ export default function ChipTransactionModal({ open, onClose, userId, onPurchase
     }
   }
 
-  async function handlePurchase(packageId) {
-    if (!packageId || !userId) {
+  async function handlePurchase(productId, paymentMethod = 'wallet_balance') {
+    if (!productId || !userId) {
       setError('Missing purchase information')
       return
     }
 
-    if (!isGuestLocal && !selectedWalletId) {
+    if (!isGuestLocal && paymentMethod === 'wallet_balance' && !selectedWalletId) {
       setError('Please select a wallet to pay with')
       return
     }
 
-    setProcessingPackageId(packageId)
+    setProcessingProductId(productId)
     setError(null)
 
     try {
-      const pkg = packages.find(p => p.id === packageId)
-      if (!pkg) throw new Error('Package not found')
+      const product = products.find(p => p.id === productId)
+      if (!product) throw new Error('Product not found')
 
-      const chipAmount = BigInt(pkg.chip_amount || 0)
-      const bonusChips = BigInt(pkg.bonus_chips || 0)
+      const chipData = chipPackages[productId] || product.metadata
+      if (!chipData) throw new Error('Chip package data not found')
+
+      const price = productPrices[productId]
+      if (!price) throw new Error('Price not found for product')
+
+      const chipAmount = BigInt(chipData.chip_amount || 0)
+      const bonusChips = BigInt(chipData.bonus_chips || 0)
       const totalChipsToAdd = chipAmount + bonusChips
       const newChipBalance = userChips + totalChipsToAdd
+      const usdPrice = Number(price.amount || 0)
 
       if (isGuestLocal) {
         // For guest users, just add chips locally
@@ -128,39 +205,36 @@ export default function ChipTransactionModal({ open, onClose, userId, onPurchase
         }
 
         onClose()
-      } else {
-        // For authenticated users, process payment and record transaction
+      } else if (paymentMethod === 'wallet_balance') {
+        // Process wallet payment
         const selectedWallet = userWallets.find(w => w.id === selectedWalletId)
         if (!selectedWallet) {
           throw new Error('Selected wallet not found')
         }
 
         const walletBalance = Number(selectedWallet.balance || 0)
-        const usdPrice = Number(pkg.usd_price || 0)
 
         if (walletBalance < usdPrice) {
           setError(`Insufficient balance. You need $${usdPrice.toFixed(2)} but have $${walletBalance.toFixed(2)}`)
-          setProcessingPackageId(null)
+          setProcessingProductId(null)
           return
         }
 
-        // Record the wallet transaction (debit)
-        const { data: txData, error: txErr } = await supabase.rpc('record_wallet_transaction', {
-          p_user_id: userId,
-          p_wallet_id: selectedWalletId,
-          p_transaction_type: 'purchase',
-          p_amount: usdPrice,
-          p_currency_code: selectedWallet.currency_code,
-          p_description: `Poker chip purchase: ${pkg.name}`,
-          p_reference_id: packageId
-        })
+        // Process wallet payment through payment system
+        const result = await pokerPaymentService.processWalletPayment(
+          userId,
+          productId,
+          chipData,
+          selectedWalletId,
+          usdPrice
+        )
 
-        if (txErr) {
-          throw new Error(`Failed to process payment: ${txErr.message}`)
+        if (!result) {
+          throw new Error('Failed to process payment')
         }
 
         // Update player chips
-        const { data: chipData, error: chipErr } = await supabase
+        const { error: chipErr } = await supabase
           .from('player_poker_chips')
           .upsert({
             user_id: userId,
@@ -170,12 +244,13 @@ export default function ChipTransactionModal({ open, onClose, userId, onPurchase
 
         if (chipErr) throw chipErr
 
-        // Record purchase in chip_purchases table
+        // Record chip purchase
         const { error: purchaseErr } = await supabase
           .from('chip_purchases')
           .insert([{
             user_id: userId,
-            package_id: packageId,
+            package_id: productId,
+            product_id: productId,
             wallet_id: selectedWalletId,
             chips_purchased: Number(chipAmount),
             bonus_chips_awarded: Number(bonusChips),
@@ -183,7 +258,8 @@ export default function ChipTransactionModal({ open, onClose, userId, onPurchase
             usd_price_paid: usdPrice,
             payment_status: 'completed',
             payment_method: 'wallet',
-            transaction_id: txData,
+            payment_id: result.payment?.id,
+            transaction_id: result.transaction,
             created_at: new Date()
           }])
 
@@ -199,17 +275,42 @@ export default function ChipTransactionModal({ open, onClose, userId, onPurchase
             bonusChips: Number(bonusChips),
             totalChips: totalChipsToAdd.toString(),
             newBalance: newChipBalance.toString(),
-            costDeducted: `$${usdPrice.toFixed(2)} from wallet`
+            costDeducted: `$${usdPrice.toFixed(2)} from wallet`,
+            paymentId: result.payment?.id
           })
         }
 
         onClose()
+      } else {
+        // Non-wallet payment methods - show payment link or checkout
+        try {
+          const paymentLink = await pokerPaymentService.getOrCreatePaymentLink(productId)
+          
+          // Open payment link in new window
+          const paymentUrl = `${window.location.origin}/payment/${paymentLink.slug}`
+          window.open(paymentUrl, '_blank')
+          
+          if (onPurchaseComplete) {
+            onPurchaseComplete({
+              chipsPurchased: Number(chipAmount),
+              bonusChips: Number(bonusChips),
+              totalChips: totalChipsToAdd.toString(),
+              newBalance: newChipBalance.toString(),
+              costDeducted: `$${usdPrice.toFixed(2)} (payment pending)`,
+              status: 'pending'
+            })
+          }
+
+          onClose()
+        } catch (err) {
+          throw new Error(`Failed to initiate payment: ${err.message}`)
+        }
       }
     } catch (err) {
       console.error('Purchase error:', err)
       setError(err.message || 'An error occurred during purchase')
     } finally {
-      setProcessingPackageId(null)
+      setProcessingProductId(null)
     }
   }
 
@@ -308,7 +409,7 @@ export default function ChipTransactionModal({ open, onClose, userId, onPurchase
           )}
 
           {/* Chip Packages Grid */}
-          {packages.length === 0 ? (
+          {products.length === 0 ? (
             <div className="flex justify-center items-center py-12">
               <p className="text-slate-600">No chip packages available at the moment</p>
             </div>
@@ -316,20 +417,24 @@ export default function ChipTransactionModal({ open, onClose, userId, onPurchase
             <div>
               <h3 className="text-sm font-semibold text-slate-900 mb-3">Available Packages</h3>
               <div className={`grid ${isMobile ? 'grid-cols-1' : 'grid-cols-2 lg:grid-cols-3'} gap-4`}>
-                {packages.map((pkg) => {
-                  if (!pkg || !pkg.id) return null
+                {products.map((product) => {
+                  if (!product || !product.id) return null
 
-                  const chipAmount = Number(pkg.chip_amount || 0)
-                  const bonusChips = Number(pkg.bonus_chips || 0)
+                  const chipData = chipPackages[product.id] || product.metadata
+                  const chipAmount = Number(chipData?.chip_amount || 0)
+                  const bonusChips = Number(chipData?.bonus_chips || 0)
                   const totalChips = chipAmount + bonusChips
-                  const label = getPackageLabel(pkg)
-                  const labelColor = getPackageLabelColor(pkg)
-                  const isFlashSale = pkg.is_flash_sale === true
-                  const isProcessing = processingPackageId === pkg.id
+                  const price = productPrices[product.id]
+                  const usdPrice = Number(price?.amount || 0)
+                  
+                  const label = getPackageLabel(chipData)
+                  const labelColor = getPackageLabelColor(chipData)
+                  const isFlashSale = chipData?.is_flash_sale === true
+                  const isProcessing = processingProductId === product.id
 
                   return (
                     <div
-                      key={pkg.id}
+                      key={product.id}
                       className={`relative rounded-lg overflow-hidden border-2 transition transform ${
                         isProcessing
                           ? 'opacity-50 cursor-not-allowed'
@@ -358,11 +463,13 @@ export default function ChipTransactionModal({ open, onClose, userId, onPurchase
                         </div>
 
                         {/* Price */}
-                        <div className="text-center">
-                          <div className="text-lg font-semibold text-emerald-600">
-                            ${Number(pkg.usd_price || 0).toFixed(2)}
+                        {usdPrice > 0 && (
+                          <div className="text-center">
+                            <div className="text-lg font-semibold text-emerald-600">
+                              ${usdPrice.toFixed(2)}
+                            </div>
                           </div>
-                        </div>
+                        )}
 
                         {/* Bonus Badge */}
                         {bonusChips > 0 && (
@@ -374,20 +481,58 @@ export default function ChipTransactionModal({ open, onClose, userId, onPurchase
                         )}
 
                         {/* Buy Button */}
-                        <button
-                          onClick={() => handlePurchase(pkg.id)}
-                          disabled={isProcessing || processing || isGuestLocal === false && !selectedWalletId}
-                          className="w-full py-2 font-semibold rounded-lg transition active:scale-95 bg-emerald-600 hover:bg-emerald-700 text-white disabled:opacity-50 disabled:cursor-not-allowed text-sm"
-                        >
-                          {isProcessing ? (
-                            <span className="flex items-center justify-center gap-1">
-                              <span className="inline-block w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
-                              Processing
-                            </span>
-                          ) : (
-                            '🛒 BUY NOW'
-                          )}
-                        </button>
+                        {!isGuestLocal && userWallets.length > 0 ? (
+                          <button
+                            onClick={() => handlePurchase(product.id, 'wallet_balance')}
+                            disabled={isProcessing || processing || !selectedWalletId}
+                            className="w-full py-2 font-semibold rounded-lg transition active:scale-95 bg-emerald-600 hover:bg-emerald-700 text-white disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+                          >
+                            {isProcessing ? (
+                              <span className="flex items-center justify-center gap-1">
+                                <span className="inline-block w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+                                Processing
+                              </span>
+                            ) : (
+                              '🛒 BUY NOW'
+                            )}
+                          </button>
+                        ) : (
+                          <div className="space-y-2">
+                            {!isGuestLocal && (
+                              <button
+                                onClick={() => handlePurchase(product.id, 'bank_transfer')}
+                                disabled={isProcessing || processing}
+                                className="w-full py-2 font-semibold rounded-lg transition active:scale-95 bg-blue-600 hover:bg-blue-700 text-white disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+                                title="Pay via bank transfer, credit card, e-wallet, or crypto"
+                              >
+                                {isProcessing ? (
+                                  <span className="flex items-center justify-center gap-1">
+                                    <span className="inline-block w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+                                    Processing
+                                  </span>
+                                ) : (
+                                  '💳 OTHER PAYMENT'
+                                )}
+                              </button>
+                            )}
+                            {isGuestLocal && (
+                              <button
+                                onClick={() => handlePurchase(product.id, 'guest')}
+                                disabled={isProcessing || processing}
+                                className="w-full py-2 font-semibold rounded-lg transition active:scale-95 bg-emerald-600 hover:bg-emerald-700 text-white disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+                              >
+                                {isProcessing ? (
+                                  <span className="flex items-center justify-center gap-1">
+                                    <span className="inline-block w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+                                    Adding
+                                  </span>
+                                ) : (
+                                  '🎁 ADD CHIPS'
+                                )}
+                              </button>
+                            )}
+                          </div>
+                        )}
                       </div>
                     </div>
                   )
