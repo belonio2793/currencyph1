@@ -174,18 +174,7 @@ export default function Rates() {
       }
 
       setRates(validRates)
-
-      // Get the most recent update timestamp from the data
-      const allTimestamps = [
-        ...(currencyPairsRes.data?.map(p => p.updated_at).filter(Boolean) || []),
-        ...(cryptocurrencyPairsRes.data?.map(p => p.updated_at).filter(Boolean) || [])
-      ]
-
-      const latestTimestamp = allTimestamps
-        .map(ts => new Date(ts).getTime())
-        .reduce((max, current) => Math.max(max, current), 0)
-
-      setLastUpdated(latestTimestamp > 0 ? new Date(latestTimestamp) : new Date())
+      setLastUpdated(new Date())
     } catch (err) {
       console.error('Error loading rates:', err)
       setError('Failed to load exchange rates. Please try again.')
