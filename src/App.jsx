@@ -68,7 +68,7 @@ export default function App() {
   const [userEmail, setUserEmail] = useState(null)
   const [activeTab, setActiveTab] = useState(() => {
     const path = window.location.pathname
-    if (path.startsWith('/payment/') || path.startsWith('/invoice/')) return 'checkout'
+    if (path.startsWith('/payment/') || path.startsWith('/invoice/')) return 'payment-checkout'
     if (path === '/payments') return 'payments'
     return 'home'
   })
