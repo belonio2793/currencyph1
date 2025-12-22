@@ -62,12 +62,12 @@ export default function Wallet({ userId, globalCurrency = 'PHP' }) {
       const hasPHP = filteredWallets.some(w => w.currency_code === 'PHP')
       if (!hasPHP) {
         const phpWallet = allWallets.find(w => w.currency_code === 'PHP')
-        if (phpWallet) {
+        if (phpWallet && !filteredWallets.some(fw => fw.id === phpWallet.id)) {
           filteredWallets.unshift(phpWallet)
         }
       }
 
-      setWallets(filteredWallets)
+      setWallets(filteredWallets.length > 0 ? filteredWallets : allWallets)
     } catch (err) {
       console.error('Error loading wallets:', err)
       setError('Failed to load wallets')
