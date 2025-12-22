@@ -38,15 +38,11 @@ export default function Rates() {
           .select('code,name,type,symbol,decimals,is_default,active')
           .eq('active', true),
         supabase
-          .from('pairs')
-          .select('from_currency,to_currency,rate,updated_at')
-          .eq('from_currency', 'PHP')
-          .eq('source_table', 'currency_rates'),
+          .from('currency_rates')
+          .select('from_currency,to_currency,rate,updated_at'),
         supabase
-          .from('pairs')
-          .select('from_currency,to_currency,rate,updated_at')
-          .eq('source_table', 'cryptocurrency_rates')
-          .or('from_currency.eq.PHP,to_currency.eq.PHP'),
+          .from('cryptocurrency_rates')
+          .select('from_currency,to_currency,rate,updated_at'),
         supabase
           .from('cryptocurrencies')
           .select('code,name,coingecko_id')
