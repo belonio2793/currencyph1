@@ -125,10 +125,21 @@ export default function Wallet({ userId, globalCurrency = 'PHP' }) {
     setTimeout(() => setCopied(null), 2000)
   }
 
-  // Separate wallets into fiat and crypto based on currency code
-  const fiats = ['PHP', 'USD', 'EUR', 'GBP', 'JPY', 'CNY', 'AUD', 'CAD', 'SGD', 'HKD', 'INR', 'MYR', 'THB', 'VND', 'IDR', 'KRW']
-  const fiatWallets = wallets.filter(w => fiats.includes(w.currency_code?.toUpperCase()))
-  const cryptoWallets = wallets.filter(w => !fiats.includes(w.currency_code?.toUpperCase()))
+  // Separate wallets by type using currency_type from database
+  const fiatWallets = wallets.filter(w => w.currency_type === 'fiat')
+  const cryptoWallets = wallets.filter(w => w.currency_type === 'crypto')
+  const wireWallets = wallets.filter(w => w.currency_type === 'wire')
+
+  // Helper function to filter wallets based on active tab
+  const getFilteredWallets = () => {
+    if (activeType === 'all') return wallets
+    if (activeType === 'currency') return fiatWallets
+    if (activeType === 'cryptocurrency') return cryptoWallets
+    if (activeType === 'wire') return wireWallets
+    return wallets
+  }
+
+  const displayWallets = getFilteredWallets()
 
   if (loading) {
     return (
