@@ -338,7 +338,7 @@ export default function ReceiveMoney({ userId, globalCurrency = 'PHP' }) {
               <div className="space-y-6">
                 <div className="text-center">
                   <div className="inline-block w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mb-4">
-                    <span className="text-3xl">✓</span>
+                    <span className="text-3xl">OK</span>
                   </div>
                   <h3 className="text-2xl font-semibold text-slate-900 mb-2">Receive Link Created</h3>
                   <p className="text-slate-600">Share this with the sender</p>
