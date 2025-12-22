@@ -1289,13 +1289,25 @@ export default function ReceiveMoney({ userId, globalCurrency = 'PHP' }) {
                         </button>
                         <button
                           type="submit"
-                          disabled={submitting}
-                          className="flex-1 bg-emerald-600 text-white py-3 rounded-lg hover:bg-emerald-700 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+                          disabled={submitting || generatingPayment}
+                          className={`flex-1 text-white py-3 rounded-lg font-medium disabled:opacity-50 disabled:cursor-not-allowed text-sm transition-colors ${
+                            isRequestMode && requestMode === 'custom_payment'
+                              ? 'bg-green-600 hover:bg-green-700'
+                              : 'bg-emerald-600 hover:bg-emerald-700'
+                          }`}
                         >
-                          {submitting ? 'Creating...' : (
+                          {submitting || generatingPayment ? 'Creating...' : (
                             <>
-                              Create Payment Request
-                              {selectedGuestProfile && sendChatMessage && ' + Send Chat'}
+                              {isRequestMode && requestMode === 'custom_payment' ? (
+                                <>
+                                  Generate Payment Link
+                                </>
+                              ) : (
+                                <>
+                                  Create Payment Request
+                                  {selectedGuestProfile && sendChatMessage && ' + Send Chat'}
+                                </>
+                              )}
                             </>
                           )}
                         </button>
