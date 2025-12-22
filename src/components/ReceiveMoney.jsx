@@ -875,6 +875,27 @@ export default function ReceiveMoney({ userId, globalCurrency = 'PHP' }) {
                         </div>
                       )}
 
+                      {/* Optional Chat Message Setting */}
+                      {selectedGuestProfile && (
+                        <div className="bg-gradient-to-br from-indigo-50 to-blue-50 border border-indigo-200 rounded-lg p-4 space-y-3">
+                          <label className="flex items-start gap-3 cursor-pointer">
+                            <input
+                              type="checkbox"
+                              checked={sendChatMessage}
+                              onChange={(e) => setSendChatMessage(e.target.checked)}
+                              className="w-5 h-5 mt-0.5 text-blue-600 border-slate-300 rounded focus:ring-2 focus:ring-blue-500"
+                            />
+                            <div className="flex-1">
+                              <p className="text-sm font-medium text-slate-900">Send payment request via chat</p>
+                              <p className="text-xs text-slate-600 mt-1">
+                                Notify {selectedGuestProfile.full_name || selectedGuestProfile.email} about this payment request
+                                {recipientOnlineStatus ? ' (Currently online)' : recipientOnlineStatus === false ? ' (Offline)' : ''}
+                              </p>
+                            </div>
+                          </label>
+                        </div>
+                      )}
+
                       <div className="flex space-x-4">
                         <button
                           type="button"
