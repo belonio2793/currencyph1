@@ -50,6 +50,8 @@ export default function ReceiveMoney({ userId, globalCurrency = 'PHP' }) {
   const [transferRecord, setTransferRecord] = useState(null)
   const [copyFeedback, setCopyFeedback] = useState('')
   const [deposits, setDeposits] = useState([])
+  const [sendChatMessage, setSendChatMessage] = useState(true) // Optional setting for step 3
+  const [recipientOnlineStatus, setRecipientOnlineStatus] = useState(null)
 
   const searchInputRef = useRef(null)
 
