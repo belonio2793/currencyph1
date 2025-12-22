@@ -40,6 +40,13 @@ const WORLD_CURRENCIES = [
   'YER', 'ZAR', 'ZMW', 'ZWL'
 ]
 
+// All 31 supported cryptocurrencies on ExConvert
+const CRYPTO_CURRENCIES = [
+  'BTC', 'ETH', 'LTC', 'DOGE', 'XRP', 'ADA', 'SOL', 'AVAX', 'DOT', 'LINK',
+  'UNI', 'AAVE', 'USDC', 'BNB', 'XLM', 'TRX', 'HBAR', 'BCH', 'SHIB', 'OP',
+  'NEAR', 'ICP', 'FIL', 'APT', 'ATOM', 'AUCTION', 'AVA', 'AXS', 'BAKE', 'BAND', 'BHD'
+]
+
 async function fetchSingleRate(fromCurrency, toCurrency) {
   try {
     const url = `https://api.exconvert.com/convert?access_key=${EXCONVERT_KEY}&from=${fromCurrency}&to=${toCurrency}&amount=1`
