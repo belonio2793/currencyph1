@@ -51,11 +51,11 @@ const WORLD_CURRENCIES = [
   'YER', 'ZAR', 'ZMW', 'ZWL'
 ]
 
-// All 30 cryptocurrencies (by symbol for easier API queries)
+// All 31 cryptocurrencies supported by ExConvert
 const CRYPTO_SYMBOLS = [
   'BTC', 'ETH', 'LTC', 'DOGE', 'XRP', 'ADA', 'SOL', 'AVAX', 'DOT', 'LINK',
-  'UNI', 'AAVE', 'USDC', 'USDT', 'BNB', 'XLM', 'TRX', 'HBAR', 'TON', 'SUI',
-  'BCH', 'SHIB', 'PYUSD', 'WLD', 'XAUT', 'PEPE', 'HYPE', 'ASTER', 'ENA', 'SKY'
+  'UNI', 'AAVE', 'USDC', 'BNB', 'XLM', 'TRX', 'HBAR', 'BCH', 'SHIB', 'OP',
+  'NEAR', 'ICP', 'FIL', 'APT', 'ATOM', 'AUCTION', 'AVA', 'AXS', 'BAKE', 'BAND', 'BHD'
 ]
 
 async function fetchExConvertRates(fromCurrency: string, toCurrencies: string[]) {
