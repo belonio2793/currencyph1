@@ -245,17 +245,25 @@ export default function Rates() {
       const fromRate = rates.find(r => r.code === selectedFrom)
       const toRate = rates.find(r => r.code === selectedTo)
 
-      if (fromRate && toRate && isFinite(fromRate.rate) && fromRate.rate > 0 && isFinite(toRate.rate) && toRate.rate > 0) {
-        const convertedAmount = (numAmount * toRate.rate) / fromRate.rate
-        const toDecimals = toRate.metadata?.decimals || 2
+      // Check if rates are valid (not 0.00 or invalid)
+      const fromRateValid = fromRate && isFinite(fromRate.rate) && fromRate.rate > 0
+      const toRateValid = toRate && isFinite(toRate.rate) && toRate.rate > 0
+
+      if (!fromRateValid || !toRateValid) {
         setResult({
-          amount: convertedAmount.toFixed(toDecimals),
-          decimals: toDecimals,
-          rate: toRate.rate / fromRate.rate
+          error: 'Service unavailable',
+          message: 'Exchange rate service is temporarily unavailable. Please try again in a few moments.'
         })
-      } else {
-        setResult(null)
+        return
       }
+
+      const convertedAmount = (numAmount * toRate.rate) / fromRate.rate
+      const toDecimals = toRate.metadata?.decimals || 2
+      setResult({
+        amount: convertedAmount.toFixed(toDecimals),
+        decimals: toDecimals,
+        rate: toRate.rate / fromRate.rate
+      })
     } else {
       setResult(null)
     }
