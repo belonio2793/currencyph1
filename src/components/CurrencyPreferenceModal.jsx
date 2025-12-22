@@ -21,8 +21,8 @@ const CURRENCIES = [
   { code: 'VND', name: 'Vietnamese Dong', symbol: '₫', type: 'currency' },
   { code: 'IDR', name: 'Indonesian Rupiah', symbol: 'Rp', type: 'currency' },
   // Cryptocurrencies
-  { code: 'BTC', name: 'Bitcoin', symbol: '₿', type: 'cryptocurrency' },
-  { code: 'ETH', name: 'Ethereum', symbol: 'Ξ', type: 'cryptocurrency' },
+  { code: 'BTC', name: 'Bitcoin', symbol: 'BTC', type: 'cryptocurrency' },
+  { code: 'ETH', name: 'Ethereum', symbol: 'ETH', type: 'cryptocurrency' },
   { code: 'USDT', name: 'Tether', symbol: '₮', type: 'cryptocurrency' },
   { code: 'USDC', name: 'USD Coin', symbol: 'ⓤ', type: 'cryptocurrency' },
   { code: 'BNB', name: 'Binance Coin', symbol: 'Ⓑ', type: 'cryptocurrency' },
