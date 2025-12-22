@@ -147,16 +147,22 @@ export default function ReceiveMoney({ userId, globalCurrency = 'PHP' }) {
 
   const fetchConversionRate = async (from, to) => {
     setConversionLoading(true)
+    setConversionError('')
     try {
       const rate = await currencyAPI.getExchangeRate(from, to)
-      if (rate) {
+      if (rate && rate > 0) {
         setConversionRate(rate)
         if (amount) {
           setConvertedAmount(parseFloat(amount) * rate)
         }
+        setConversionError('')
+      } else {
+        console.warn(`Conversion rate from ${from} to ${to} not available`)
+        setConversionError('Service temporarily unavailable - conversion rate could not be loaded')
       }
     } catch (err) {
       console.warn('Error fetching conversion rate:', err)
+      setConversionError('Failed to fetch conversion rate - please try again')
     } finally {
       setConversionLoading(false)
     }
@@ -164,21 +170,25 @@ export default function ReceiveMoney({ userId, globalCurrency = 'PHP' }) {
 
   const fetchCryptoConversionRate = async (from, to) => {
     setCryptoConversionLoading(true)
+    setConversionError('')
     try {
       // Try to get crypto rate
       const rate = await currencyAPI.getExchangeRate(from, to)
-      if (rate) {
+      if (rate && rate > 0) {
         setCryptoConversionRate(rate)
         setConversionRate(rate)
         if (amount) {
           setConvertedAmount(parseFloat(amount) * rate)
         }
+        setConversionError('')
       } else {
         // If rate not available, show conversion as pending
         console.warn(`Conversion rate from ${from} to ${to} not available`)
+        setConversionError('Service temporarily unavailable - conversion rate could not be loaded')
       }
     } catch (err) {
       console.warn('Error fetching crypto conversion rate:', err)
+      setConversionError('Failed to fetch conversion rate - please try again')
     } finally {
       setCryptoConversionLoading(false)
     }
