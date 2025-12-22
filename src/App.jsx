@@ -133,10 +133,15 @@ export default function App() {
             setUserId(session.user.id)
             setUserEmail(session.user.email)
 
-            // Ensure user profile and wallets exist (non-blocking)
+            // Ensure user profile and wallets exist
             if (!session.user.id.includes('guest-local')) {
-              currencyAPI.getOrCreateUser(session.user.email, session.user.user_metadata?.full_name || 'User', session.user.id).catch(() => {})
-              currencyAPI.ensureUserWallets(session.user.id).catch(() => {})
+              currencyAPI.getOrCreateUser(session.user.email, session.user.user_metadata?.full_name || 'User', session.user.id)
+                .then(() => console.log('User profile created/verified for:', session.user.id))
+                .catch((err) => console.error('Failed to create user profile:', err?.message))
+
+              currencyAPI.ensureUserWallets(session.user.id)
+                .then((result) => console.log('Wallets ensured for user:', session.user.id, 'created:', result?.length || 0))
+                .catch((err) => console.error('Failed to ensure wallets:', err?.message))
             }
 
             // Presence disabled due to network errors in edge/offline environments
