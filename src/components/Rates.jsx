@@ -215,6 +215,9 @@ export default function Rates() {
   const filteredRates = useMemo(() => {
     let filtered = rates
 
+    // Filter out currencies without rate values
+    filtered = filtered.filter(r => r.rate !== null && isFinite(r.rate) && r.rate > 0)
+
     if (typeFilter !== 'all') {
       filtered = filtered.filter(r => r.metadata?.type === typeFilter)
     }
