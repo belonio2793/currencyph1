@@ -681,6 +681,43 @@ export default function ReceiveMoney({ userId, globalCurrency = 'PHP' }) {
                         </div>
                       )}
 
+                      {/* Custom Payment Form */}
+                      {isRequestMode && requestMode === 'custom_payment' && (
+                        <div className="space-y-4">
+                          <div>
+                            <label className="block text-sm font-medium text-slate-700 mb-2">Payment Description</label>
+                            <input
+                              type="text"
+                              value={customPaymentDescription}
+                              onChange={e => setCustomPaymentDescription(e.target.value)}
+                              placeholder="e.g., Invoice #123, Service payment"
+                              className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-600 focus:border-transparent"
+                            />
+                          </div>
+
+                          <div>
+                            <label className="block text-sm font-medium text-slate-700 mb-2">Guest Email (Optional)</label>
+                            <input
+                              type="email"
+                              value={customPaymentEmail}
+                              onChange={e => setCustomPaymentEmail(e.target.value)}
+                              placeholder="guest@example.com"
+                              className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-600 focus:border-transparent"
+                            />
+                            <p className="text-xs text-slate-500 mt-1">Leave blank for anonymous checkout</p>
+                          </div>
+
+                          <button
+                            type="button"
+                            onClick={() => setStep(2)}
+                            disabled={!amount || loading}
+                            className="w-full bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                          >
+                            Next: Select Payment Method
+                          </button>
+                        </div>
+                      )}
+
                       {/* Recipient Selection */}
                       {!isRequestMode && (
                         <div>
