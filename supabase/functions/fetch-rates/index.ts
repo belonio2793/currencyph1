@@ -106,44 +106,39 @@ async function fetchExConvertRates(fromCurrency: string, toCurrencies: string[])
   }
 }
 
-async function fetchAllExConvertRates() {
-  const allRates: Record<string, Record<string, number>> = {}
+async function fetchAllRatesFromDatabase() {
+  try {
+    console.log('[Database] Fetching all pairs from database...')
 
-  console.log('[ExConvert] Starting comprehensive fetch of all fiat currencies')
-  console.log('[ExConvert] Total currencies to fetch:', WORLD_CURRENCIES.length)
-  console.log('[ExConvert] Total API requests:', WORLD_CURRENCIES.length * (WORLD_CURRENCIES.length - 1))
+    const { data, error } = await supabase
+      .from('pairs')
+      .select('from_currency,to_currency,rate')
+      .limit(100000)
 
-  let totalFetched = 0
-  let requestCount = 0
-  const startTime = Date.now()
-
-  // Fetch everything-to-everything for all fiat currencies
-  for (let i = 0; i < WORLD_CURRENCIES.length; i++) {
-    const fromCurrency = WORLD_CURRENCIES[i]
-    const targetCurrencies = WORLD_CURRENCIES.filter((c, idx) => idx !== i)
-
-    // Batch fetch to avoid overwhelming the system
-    const rates = await fetchExConvertRates(fromCurrency, targetCurrencies)
-    if (rates) {
-      allRates[fromCurrency] = rates
-      totalFetched += Object.keys(rates).length
+    if (error) {
+      console.warn('[Database] Error fetching pairs:', error)
+      return null
     }
 
-    requestCount += targetCurrencies.length
-
-    // Progress logging
-    if ((i + 1) % 10 === 0) {
-      const elapsed = ((Date.now() - startTime) / 1000).toFixed(1)
-      const avgTime = (elapsed / (i + 1)).toFixed(2)
-      console.log(`[ExConvert] Progress: ${i + 1}/${WORLD_CURRENCIES.length} (${totalFetched} rates, ${elapsed}s, avg ${avgTime}s/currency)`)
+    if (!data || data.length === 0) {
+      console.log('[Database] No pairs found in database')
+      return null
     }
+
+    const allRates: Record<string, Record<string, number>> = {}
+    for (const row of data) {
+      if (!allRates[row.from_currency]) {
+        allRates[row.from_currency] = {}
+      }
+      allRates[row.from_currency][row.to_currency] = parseFloat(row.rate)
+    }
+
+    console.log(`[Database] Loaded ${data.length} rates from database`)
+    return Object.keys(allRates).length > 0 ? allRates : null
+  } catch (e) {
+    console.warn('[Database] Failed to fetch rates:', e?.message || e)
+    return null
   }
-
-  const totalTime = ((Date.now() - startTime) / 1000).toFixed(1)
-  console.log(`[ExConvert] Completed all fiat currencies in ${totalTime}s`)
-  console.log(`[ExConvert] Total rates fetched: ${totalFetched}`)
-
-  return Object.keys(allRates).length > 0 ? allRates : null
 }
 
 async function fetchOpenExchangeRates() {
