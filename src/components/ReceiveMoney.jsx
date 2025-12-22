@@ -247,17 +247,10 @@ export default function ReceiveMoney({ userId, globalCurrency = 'PHP' }) {
 
       if (userId && !userId.includes('guest')) {
         try {
-          const { data: userWallets, error: walletsError } = await supabase
-            .from('wallets')
-            .select('*')
-            .eq('user_id', userId)
-            .order('created_at', { ascending: false })
-
-          if (!walletsError && userWallets) {
+          const userWallets = await walletService.getUserWalletsWithDetails(userId)
+          if (userWallets && userWallets.length > 0) {
             setWallets(userWallets)
-            if (userWallets.length > 0) {
-              setSelectedWallet(userWallets[0].id)
-            }
+            setSelectedWallet(userWallets[0].id)
           }
         } catch (err) {
           console.warn('Error loading wallets:', err)
