@@ -780,46 +780,77 @@ export default function ReceiveMoney({ userId, globalCurrency = 'PHP' }) {
 
                   {/* Step 2: Payment Method */}
                   {step === 2 && (
-                    <div className="space-y-4">
+                    <div className="space-y-6">
                       <h3 className="text-lg font-medium text-slate-900">How will the payment be sent?</h3>
 
-                      <div className="mb-6">
-                        <FiatCryptoToggle active={activeType} onChange={setActiveType} />
+                      <div className="flex gap-4">
+                        <button
+                          type="button"
+                          onClick={() => setActiveType('fiat')}
+                          className={`flex-1 px-4 py-3 rounded-lg border-2 transition-all font-medium ${
+                            activeType === 'fiat'
+                              ? 'border-blue-600 bg-blue-50 text-blue-700'
+                              : 'border-slate-200 text-slate-700 hover:border-slate-300'
+                          }`}
+                        >
+                          💰 Fiat & Mobile
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setActiveType('crypto')}
+                          className={`flex-1 px-4 py-3 rounded-lg border-2 transition-all font-medium ${
+                            activeType === 'crypto'
+                              ? 'border-orange-600 bg-orange-50 text-orange-700'
+                              : 'border-slate-200 text-slate-700 hover:border-slate-300'
+                          }`}
+                        >
+                          ₿ Cryptocurrency
+                        </button>
                       </div>
 
-                      <div className="grid grid-cols-1 gap-3">
-                        {activeType === 'fiat' && availableMethods.fiat.map(method => (
+                      {/* Fiat Payment Methods */}
+                      {activeType === 'fiat' && (
+                        <div className="space-y-3">
+                          <p className="text-sm text-slate-600 font-medium">Select a fiat payment method</p>
+                          {availableMethods.fiat.map(method => (
+                            <button
+                              key={method.id}
+                              type="button"
+                              onClick={() => setSelectedMethod(method.id)}
+                              className={`w-full p-4 rounded-lg border-2 transition-all text-left ${
+                                selectedMethod === method.id
+                                  ? 'border-blue-600 bg-blue-50 shadow-md'
+                                  : 'border-slate-200 hover:border-slate-300'
+                              }`}
+                            >
+                              <div className="font-semibold text-slate-900">{method.name}</div>
+                              <div className="text-sm text-slate-600 mt-1">{method.description}</div>
+                            </button>
+                          ))}
+                        </div>
+                      )}
+
+                      {/* Crypto Payment Method */}
+                      {activeType === 'crypto' && (
+                        <div className="space-y-4">
+                          <div className="bg-orange-50 border border-orange-200 rounded-lg p-4">
+                            <p className="text-sm font-medium text-orange-900 mb-2">Cryptocurrency Transfer</p>
+                            <p className="text-sm text-orange-800">Send cryptocurrency directly from any wallet. Supports {availableCryptos.length}+ cryptocurrencies.</p>
+                          </div>
                           <button
-                            key={method.id}
                             type="button"
-                            onClick={() => setSelectedMethod(method.id)}
-                            className={`p-4 rounded-lg border-2 transition-all text-left ${
-                              selectedMethod === method.id
-                                ? 'border-blue-600 bg-blue-50'
+                            onClick={() => setSelectedMethod('crypto')}
+                            className={`w-full p-4 rounded-lg border-2 transition-all text-left ${
+                              selectedMethod === 'crypto'
+                                ? 'border-orange-600 bg-orange-50 shadow-md'
                                 : 'border-slate-200 hover:border-slate-300'
                             }`}
                           >
-                            <div className="font-medium text-slate-900">{method.name}</div>
-                            <div className="text-sm text-slate-600 mt-1">{method.description}</div>
+                            <div className="font-semibold text-slate-900">₿ Direct Cryptocurrency</div>
+                            <div className="text-sm text-slate-600 mt-1">Send any supported cryptocurrency</div>
                           </button>
-                        ))}
-
-                        {activeType === 'crypto' && availableMethods.crypto.map(method => (
-                          <button
-                            key={method.id}
-                            type="button"
-                            onClick={() => setSelectedMethod(method.id)}
-                            className={`p-4 rounded-lg border-2 transition-all text-left ${
-                              selectedMethod === method.id
-                                ? 'border-blue-600 bg-blue-50'
-                                : 'border-slate-200 hover:border-slate-300'
-                            }`}
-                          >
-                            <div className="font-medium text-slate-900">{method.name}</div>
-                            <div className="text-sm text-slate-600 mt-1">{method.description}</div>
-                          </button>
-                        ))}
-                      </div>
+                        </div>
+                      )}
 
                       {/* Crypto Selection with Enhanced Display */}
                       {selectedMethod === 'crypto' && (
