@@ -346,12 +346,14 @@ export default function WalletDisplayCustomizer({ userId, onClose, onUpdate }) {
 
       {/* Action Buttons */}
       <div className="flex gap-4 justify-end">
-        <button
-          onClick={handleReset}
-          className="px-6 py-3 text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors text-base font-medium"
-        >
-          Reset to PHP Only
-        </button>
+        {selectedCurrencies.length > 1 && (
+          <button
+            onClick={handleReset}
+            className="px-6 py-3 text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors text-base font-medium"
+          >
+            Reset to PHP Only
+          </button>
+        )}
 
         {onClose && (
           <button
