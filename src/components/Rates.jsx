@@ -118,7 +118,7 @@ export default function Rates() {
             rate: normalizedRate,
             metadata: metadata,
             source: 'currency_rates',
-            updatedAt: new Date().toISOString()
+            updatedAt: pair.updated_at || new Date().toISOString()
           }
         }
       })
