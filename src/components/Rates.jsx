@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from 'react'
 import { supabase } from '../lib/supabaseClient'
+import { preferencesManager } from '../lib/preferencesManager'
 import CurrencyCryptoToggle from './FiatCryptoToggle'
 
 export default function Rates() {
@@ -20,6 +21,8 @@ export default function Rates() {
   const [sortBy, setSortBy] = useState('code')
   const [sortDirection, setSortDirection] = useState('asc')
   const [favorites, setFavorites] = useState(['PHP', 'USD', 'EUR', 'BTC', 'ETH'])
+  const [trackedCurrencies, setTrackedCurrencies] = useState(preferencesManager.getDefaultTrackedCurrencies())
+  const [customizationOpen, setCustomizationOpen] = useState(false)
 
   useEffect(() => {
     loadData()
