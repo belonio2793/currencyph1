@@ -620,6 +620,7 @@ export default function ReceiveMoney({ userId, globalCurrency = 'PHP' }) {
                           onClick={() => {
                             setIsRequestMode(false)
                             setSelectedGuestProfile(null)
+                            setRequestMode('recipient')
                           }}
                           className={`flex-1 px-4 py-3 rounded-lg border-2 transition-all ${
                             !isRequestMode
@@ -634,6 +635,7 @@ export default function ReceiveMoney({ userId, globalCurrency = 'PHP' }) {
                           onClick={() => {
                             setIsRequestMode(true)
                             setSelectedWallet(null)
+                            setRequestMode('recipient')
                           }}
                           className={`flex-1 px-4 py-3 rounded-lg border-2 transition-all ${
                             isRequestMode
@@ -644,6 +646,40 @@ export default function ReceiveMoney({ userId, globalCurrency = 'PHP' }) {
                           Request Money
                         </button>
                       </div>
+
+                      {/* Request Money Submode Selection */}
+                      {isRequestMode && (
+                        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 space-y-3">
+                          <p className="text-sm font-medium text-slate-700">Choose request type:</p>
+                          <div className="grid grid-cols-2 gap-2">
+                            <button
+                              type="button"
+                              onClick={() => setRequestMode('recipient')}
+                              className={`p-3 rounded-lg border-2 transition-all text-center ${
+                                requestMode === 'recipient'
+                                  ? 'border-blue-600 bg-white text-blue-700 font-medium'
+                                  : 'border-slate-200 text-slate-700 hover:border-slate-300'
+                              }`}
+                            >
+                              👤 To Specific User
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setRequestMode('custom_payment')
+                                setSelectedGuestProfile(null)
+                              }}
+                              className={`p-3 rounded-lg border-2 transition-all text-center ${
+                                requestMode === 'custom_payment'
+                                  ? 'border-green-600 bg-white text-green-700 font-medium'
+                                  : 'border-slate-200 text-slate-700 hover:border-slate-300'
+                              }`}
+                            >
+                              🔗 Generate Payment Link
+                            </button>
+                          </div>
+                        </div>
+                      )}
 
                       {/* Recipient Selection */}
                       {!isRequestMode && (
