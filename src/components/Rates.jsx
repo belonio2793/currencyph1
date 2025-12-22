@@ -85,8 +85,9 @@ export default function Rates() {
       setCurrencies({ ...currencyMetadata, ...cryptoMetadata })
 
       const ratesByCode = {}
+      const allPairsByCode = {} // Store all pairs for cross-rate calculation
 
-      // Process all rate pairs
+      // First pass: Process all rate pairs to normalize to PHP
       pairsData.forEach(pair => {
         let targetCode = null
         let normalizedRate = null
@@ -120,9 +121,15 @@ export default function Rates() {
             updatedAt: pair.updated_at || new Date().toISOString()
           }
         }
+
+        // Store all pairs for potential cross-rate calculation
+        if (!allPairsByCode[pair.from_currency]) {
+          allPairsByCode[pair.from_currency] = []
+        }
+        allPairsByCode[pair.from_currency].push(pair)
       })
 
-      // Add all currencies/cryptos from pairs that don't have a PHP pair yet
+      // Add all currencies/cryptos from pairs
       uniqueCodes.forEach(code => {
         if (!ratesByCode[code]) {
           const currMeta = currencyMetadata[code]
