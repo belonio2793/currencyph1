@@ -11,7 +11,7 @@ const supabase = createClient(
 const chipPackages = [
   {
     name: '280K Chips',
-    chips_amount: 280000,
+    chip_amount: 280000,
     bonus_chips: 0,
     usd_price: 4.99,
     display_order: 1,
@@ -21,7 +21,7 @@ const chipPackages = [
   },
   {
     name: '1M Chips',
-    chips_amount: 1000000,
+    chip_amount: 1000000,
     bonus_chips: 100000,
     usd_price: 4.99,
     display_order: 2,
@@ -31,7 +31,7 @@ const chipPackages = [
   },
   {
     name: '560K Chips',
-    chips_amount: 560000,
+    chip_amount: 560000,
     bonus_chips: 0,
     usd_price: 9.99,
     display_order: 3,
@@ -41,7 +41,7 @@ const chipPackages = [
   },
   {
     name: '1.3M Chips',
-    chips_amount: 1300000,
+    chip_amount: 1300000,
     bonus_chips: 200000,
     usd_price: 19.99,
     display_order: 4,
@@ -51,7 +51,7 @@ const chipPackages = [
   },
   {
     name: '3M Chips',
-    chips_amount: 3000000,
+    chip_amount: 3000000,
     bonus_chips: 500000,
     usd_price: 34.99,
     display_order: 5,
@@ -61,7 +61,7 @@ const chipPackages = [
   },
   {
     name: '5M Chips',
-    chips_amount: 5000000,
+    chip_amount: 5000000,
     bonus_chips: 1000000,
     usd_price: 49.99,
     display_order: 6,
@@ -71,7 +71,7 @@ const chipPackages = [
   },
   {
     name: '9M Chips',
-    chips_amount: 9000000,
+    chip_amount: 9000000,
     bonus_chips: 2000000,
     usd_price: 74.99,
     display_order: 7,
@@ -81,7 +81,7 @@ const chipPackages = [
   },
   {
     name: '14M Chips',
-    chips_amount: 14000000,
+    chip_amount: 14000000,
     bonus_chips: 5000000,
     usd_price: 99.99,
     display_order: 8,
@@ -91,7 +91,7 @@ const chipPackages = [
   },
   {
     name: '20M Chips - Flash Sale',
-    chips_amount: 20000000,
+    chip_amount: 20000000,
     bonus_chips: 10000000,
     usd_price: 149.99,
     display_order: 9,

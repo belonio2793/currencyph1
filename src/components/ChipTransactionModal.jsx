@@ -130,7 +130,7 @@ export default function ChipTransactionModal({ open, onClose, userId, onTransact
               <div className={`grid ${isMobile ? 'grid-cols-2' : 'grid-cols-3'} gap-2`}>
                 {packages.slice(0, 6).map((pkg) => {
                   if (!pkg || !pkg.id) return null
-                  const chipAmount = Number(pkg.chips_amount || 0)
+                  const chipAmount = Number(pkg.chip_amount || 0)
                   const bonusAmount = Number(pkg.bonus_chips || 0)
                   const totalChips = chipAmount + bonusAmount
                   return (

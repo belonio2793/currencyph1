@@ -76,7 +76,7 @@ export default function ChipPurchaseModal({ open, onClose, userId, onPurchaseCom
       const pkg = packages.find(p => p.id === packageId)
       if (!pkg) throw new Error('Package not found')
 
-      const chipAmount = BigInt(pkg.chips_amount || 0)
+      const chipAmount = BigInt(pkg.chip_amount || 0)
       const bonusChips = BigInt(pkg.bonus_chips || 0)
       const totalChipsToAdd = chipAmount + bonusChips
       const newChipBalance = userChips + totalChipsToAdd
@@ -217,7 +217,7 @@ export default function ChipPurchaseModal({ open, onClose, userId, onPurchaseCom
           {packages.map((pkg) => {
             if (!pkg || !pkg.id) return null
 
-            const chipAmount = Number(pkg.chips_amount) || 0
+            const chipAmount = Number(pkg.chip_amount) || 0
             const bonusChips = Number(pkg.bonus_chips) || 0
             const totalChips = chipAmount + bonusChips
             const label = getPackageLabel(pkg)
