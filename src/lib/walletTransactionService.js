@@ -22,15 +22,37 @@ export const walletTransactionService = {
   // Fetch all transactions for a user across all wallets
   async getUserTransactions(userId, limit = 100) {
     try {
+      // First, get all wallet IDs for this user
+      const { data: userWallets, error: walletsError } = await supabase
+        .from('wallets')
+        .select('id')
+        .eq('user_id', userId)
+
+      if (walletsError) throw walletsError
+      if (!userWallets || userWallets.length === 0) {
+        return []
+      }
+
+      const walletIds = userWallets.map(w => w.id)
+
+      // Then fetch transactions for all those wallets
       const { data, error } = await supabase
         .from('wallet_transactions')
-        .select('*')
-        .eq('user_id', userId)
+        .select('*, wallets(user_id, currency_code)')
+        .in('wallet_id', walletIds)
         .order('created_at', { ascending: false })
         .limit(limit)
 
       if (error) throw error
-      return data || []
+
+      // Flatten the data and ensure user_id is set
+      const enrichedData = (data || []).map(tx => ({
+        ...tx,
+        user_id: tx.wallets?.user_id || userId,
+        currency_code: tx.currency_code || tx.wallets?.currency_code
+      }))
+
+      return enrichedData
     } catch (err) {
       console.warn('Failed to fetch user transactions:', err)
       return []
