@@ -56,3 +56,11 @@ slug = "process-sync-job"
 [functions.scheduling]
 # Run every minute to process queued jobs (short per-run work)
 cron = "* * * * *"
+
+# Cron Job Configuration for Exchange Rates and Cryptocurrency Rates Sync
+[[functions]]
+slug = "fetch-rates"
+
+[functions.scheduling]
+# Run every hour at minute 0
+cron = "0 * * * *"
