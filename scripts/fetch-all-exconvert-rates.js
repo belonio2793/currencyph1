@@ -131,18 +131,26 @@ async function storeRatesInDatabase(rates) {
 }
 
 async function fetchAllRates() {
+  const allCurrencies = [...WORLD_CURRENCIES, ...CRYPTO_CURRENCIES]
+  const totalPairs = allCurrencies.length * (allCurrencies.length - 1)
+
   console.log('\n🚀 Starting Comprehensive ExConvert Rate Fetch\n')
   console.log(`📊 Configuration:`)
-  console.log(`   Currencies: ${WORLD_CURRENCIES.length}`)
-  console.log(`   Total pairs to fetch: ${WORLD_CURRENCIES.length * (WORLD_CURRENCIES.length - 1)}`)
-  console.log(`   Estimated time: ${Math.round(WORLD_CURRENCIES.length * (WORLD_CURRENCIES.length - 1) * 0.15 / 60)} minutes (at 150ms per request)\n`)
+  console.log(`   Fiat currencies: ${WORLD_CURRENCIES.length}`)
+  console.log(`   Cryptocurrencies: ${CRYPTO_CURRENCIES.length}`)
+  console.log(`   Total symbols: ${allCurrencies.length}`)
+  console.log(`   Total pairs to fetch: ${totalPairs.toLocaleString()}`)
+  console.log(`   Estimated time: ${Math.round(totalPairs * 0.15 / 60)} minutes (at 150ms per request)\n`)
 
   const startTime = Date.now()
   const rates = []
   let successCount = 0
   let failureCount = 0
+  let fiatCount = 0
+  let cryptoCount = 0
 
-  // Fetch all rates
+  // Fetch all fiat-to-fiat rates
+  console.log('📊 Stage 1: Fetching fiat currency pairs...\n')
   for (let i = 0; i < WORLD_CURRENCIES.length; i++) {
     const fromCurrency = WORLD_CURRENCIES[i]
 
@@ -159,6 +167,60 @@ async function fetchAllRates() {
           rate: rate
         })
         successCount++
+        fiatCount++
+      } else {
+        failureCount++
+      }
+
+      await new Promise(resolve => setTimeout(resolve, 150))
+    }
+
+    if ((i + 1) % 20 === 0) {
+      const elapsed = ((Date.now() - startTime) / 1000).toFixed(1)
+      console.log(`⏳ Fiat progress: ${i + 1}/${WORLD_CURRENCIES.length} (${successCount} pairs, ${elapsed}s)`)
+    }
+  }
+
+  // Fetch crypto-to-fiat and crypto-to-crypto rates
+  console.log(`\n📊 Stage 2: Fetching cryptocurrency pairs...\n`)
+  for (let i = 0; i < CRYPTO_CURRENCIES.length; i++) {
+    const fromCrypto = CRYPTO_CURRENCIES[i]
+
+    // Crypto to all major fiats
+    const majorFiats = ['USD', 'EUR', 'GBP', 'JPY', 'PHP', 'SGD', 'HKD', 'CAD', 'AUD', 'NZD', 'CHF', 'CNY', 'INR', 'BRL', 'MXN']
+
+    for (const toFiat of majorFiats) {
+      const rate = await fetchSingleRate(fromCrypto, toFiat)
+
+      if (rate !== null) {
+        rates.push({
+          from_currency: fromCrypto,
+          to_currency: toFiat,
+          rate: rate
+        })
+        successCount++
+        cryptoCount++
+      } else {
+        failureCount++
+      }
+
+      await new Promise(resolve => setTimeout(resolve, 150))
+    }
+
+    // Crypto to other cryptos
+    for (const toCrypto of CRYPTO_CURRENCIES) {
+      if (fromCrypto === toCrypto) continue
+
+      const rate = await fetchSingleRate(fromCrypto, toCrypto)
+
+      if (rate !== null) {
+        rates.push({
+          from_currency: fromCrypto,
+          to_currency: toCrypto,
+          rate: rate
+        })
+        successCount++
+        cryptoCount++
       } else {
         failureCount++
       }
@@ -167,8 +229,7 @@ async function fetchAllRates() {
     }
 
     const elapsed = ((Date.now() - startTime) / 1000).toFixed(1)
-    const pairsProcessed = i + 1
-    console.log(`⏳ Progress: ${pairsProcessed}/${WORLD_CURRENCIES.length} currencies (${successCount} success, ${failureCount} failed, ${elapsed}s)`)
+    console.log(`⏳ Crypto progress: ${i + 1}/${CRYPTO_CURRENCIES.length} (${cryptoCount} pairs, ${elapsed}s)`)
   }
 
   const stored = await storeRatesInDatabase(rates)
@@ -177,6 +238,8 @@ async function fetchAllRates() {
   console.log(`\n✨ Fetch Complete!\n`)
   console.log(`📈 Results:`)
   console.log(`   Total time: ${totalTime} minutes`)
+  console.log(`   Fiat pairs fetched: ${fiatCount}`)
+  console.log(`   Crypto pairs fetched: ${cryptoCount}`)
   console.log(`   Successful fetches: ${successCount}`)
   console.log(`   Failed fetches: ${failureCount}`)
   console.log(`   Success rate: ${((successCount / (successCount + failureCount)) * 100).toFixed(1)}%`)
