@@ -403,6 +403,145 @@ export const receiveMoneyService = {
       // Don't throw - function can work without database persistence
       return linkData
     }
+  },
+
+  /**
+   * Get user profile by user_id (non-sensitive fields only)
+   */
+  async getUserProfile(userId) {
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('id, user_id, full_name, phone_number, profile_picture_url, bio, created_at')
+        .eq('user_id', userId)
+        .single()
+
+      if (error) {
+        console.warn('Error fetching user profile:', error)
+        return null
+      }
+
+      return data
+    } catch (error) {
+      console.error('Error in getUserProfile:', error)
+      return null
+    }
+  },
+
+  /**
+   * Record a wallet transaction for audit trail
+   */
+  async recordWalletTransaction(transactionData) {
+    try {
+      const {
+        wallet_id,
+        user_id,
+        type, // 'deposit', 'transfer', 'withdrawal', 'exchange'
+        amount,
+        currency,
+        description,
+        related_deposit_id,
+        metadata = {}
+      } = transactionData
+
+      // Get current wallet balance
+      const { data: wallet, error: walletError } = await supabase
+        .from('wallets')
+        .select('balance')
+        .eq('id', wallet_id)
+        .single()
+
+      if (walletError) {
+        throw new Error(`Wallet not found: ${walletError.message}`)
+      }
+
+      const balanceBefore = parseFloat(wallet.balance) || 0
+      const balanceAfter = type === 'deposit' ? balanceBefore + parseFloat(amount) : balanceBefore - parseFloat(amount)
+
+      const transaction = {
+        wallet_id,
+        user_id,
+        type,
+        amount: parseFloat(amount),
+        currency,
+        balance_before: balanceBefore,
+        balance_after: balanceAfter,
+        description,
+        metadata: {
+          ...metadata,
+          related_deposit_id,
+          recorded_at: new Date().toISOString()
+        },
+        created_at: new Date().toISOString()
+      }
+
+      const { data: txRecord, error: txError } = await supabase
+        .from('wallet_transactions')
+        .insert([transaction])
+        .select()
+        .single()
+
+      if (txError) {
+        console.warn('Error creating transaction record:', txError)
+        return null
+      }
+
+      return txRecord
+    } catch (error) {
+      console.error('Error recording wallet transaction:', error)
+      throw error
+    }
+  },
+
+  /**
+   * Approve a pending deposit and credit the wallet
+   */
+  async approveDeposit(depositId, receivedAmount = null) {
+    try {
+      // Get the deposit record
+      const { data: deposit, error: depositError } = await supabase
+        .from('deposits')
+        .select('*')
+        .eq('id', depositId)
+        .single()
+
+      if (depositError) {
+        throw new Error(`Deposit not found: ${depositError.message}`)
+      }
+
+      // Update deposit status to approved
+      const finalAmount = receivedAmount || deposit.received_amount || deposit.amount
+      const { data: updatedDeposit, error: updateError } = await supabase
+        .from('deposits')
+        .update({
+          status: 'approved',
+          received_amount: finalAmount,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', depositId)
+        .select()
+        .single()
+
+      if (updateError) {
+        throw new Error(`Failed to update deposit: ${updateError.message}`)
+      }
+
+      // Credit the wallet if wallet_id exists
+      if (deposit.wallet_id) {
+        const creditResult = await this.creditWallet(
+          deposit.wallet_id,
+          finalAmount,
+          deposit.currency_code || 'PHP',
+          depositId
+        )
+        return { deposit: updatedDeposit, wallet: creditResult.wallet, transaction: creditResult.transaction }
+      }
+
+      return { deposit: updatedDeposit, wallet: null, transaction: null }
+    } catch (error) {
+      console.error('Error approving deposit:', error)
+      throw error
+    }
   }
 }
 
