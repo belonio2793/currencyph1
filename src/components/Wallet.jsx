@@ -6,6 +6,7 @@ import { getWalletDisplayPreferences } from '../lib/walletPreferences'
 import TransactionsList from './Wallets/TransactionsList'
 import { currencyAPI } from '../lib/payments'
 import FiatCryptoToggle from './FiatCryptoToggle'
+import { walletService } from '../lib/walletService'
 
 export default function Wallet({ userId, globalCurrency = 'PHP' }) {
   const [wallets, setWallets] = useState([])
