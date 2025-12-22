@@ -175,8 +175,10 @@ export default function ReceiveMoney({ userId, globalCurrency = 'PHP' }) {
 
     setSubmitting(true)
     try {
+      const linkId = `receive_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+
       const linkData = {
-        id: `receive_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+        id: linkId,
         user_id: userId || null,
         guest_email: isGuest ? guestEmail : null,
         wallet_id: selectedWallet,
@@ -189,8 +191,17 @@ export default function ReceiveMoney({ userId, globalCurrency = 'PHP' }) {
         created_at: new Date().toISOString()
       }
 
+      // Create receive link record in database
+      await receiveMoneyService.createReceiveLink(linkData)
+
+      // If amount specified and it's crypto, pre-calculate PHP equivalent
+      if (amount && selectedMethod === 'crypto') {
+        const phpAmount = await receiveMoneyService.convertCryptoToPhp(amount, selectedCryptoNetwork)
+        linkData.expected_php_amount = phpAmount
+      }
+
       setReceiveLink(linkData)
-      setSuccess('Receive link created!')
+      setSuccess('Receive link created! Share it with the sender.')
 
       setTimeout(() => {
         setAmount('')
@@ -200,9 +211,10 @@ export default function ReceiveMoney({ userId, globalCurrency = 'PHP' }) {
         setReceiveLink(null)
         setSuccess('')
         setStep(1)
-      }, 3000)
+      }, 4000)
     } catch (err) {
-      setError('Failed to create receive link: ' + err.message)
+      console.error('Error creating receive link:', err)
+      setError('Failed to create receive link: ' + (err.message || 'Unknown error'))
     } finally {
       setSubmitting(false)
     }
