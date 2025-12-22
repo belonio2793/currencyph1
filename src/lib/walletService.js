@@ -123,15 +123,10 @@ export const walletService = {
       const wallets = walletData.map(w => {
         const currencyInfo = currencyMap[w.currency_code]
 
-        // Infer type from currency code if currency not found
-        let currencyType = currencyInfo?.type || 'fiat'
+        // Use wallet's type column directly (set via database trigger)
+        // Fall back to currency info if type is missing, then default to fiat
+        let currencyType = w.type || currencyInfo?.type || 'fiat'
         let currencyName = currencyInfo?.name || w.currency_code || 'Unknown'
-
-        if (!currencyInfo && w.currency_code) {
-          // Expanded list of all known crypto currencies
-          const cryptoCodes = ['BTC', 'ETH', 'XRP', 'ADA', 'SOL', 'DOGE', 'MATIC', 'LINK', 'LTC', 'BCH', 'USDT', 'USDC', 'BUSD', 'SHIB', 'AVAX', 'DOT', 'USDC', 'PYUSD', 'WLD', 'XAUT', 'PEPE', 'HYPE', 'ASTER', 'ENA', 'SKY', 'TON', 'SUI', 'BNB', 'XLM', 'TRX', 'HBAR']
-          currencyType = cryptoCodes.includes(w.currency_code?.toUpperCase()) ? 'crypto' : 'fiat'
-        }
 
         return {
           id: w.id,
