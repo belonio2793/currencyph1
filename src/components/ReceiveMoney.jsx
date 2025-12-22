@@ -81,58 +81,72 @@ export default function ReceiveMoney({ userId, globalCurrency = 'PHP' }) {
   const loadData = async () => {
     try {
       setLoading(true)
-      if (userId && !userId.includes('guest')) {
-        // Load user's wallets
-        const { data: userWallets, error: walletsError } = await supabase
-          .from('wallets')
-          .select('*')
-          .eq('user_id', userId)
-          .order('created_at', { ascending: false })
+      setError('')
 
-        if (!walletsError && userWallets) {
-          setWallets(userWallets)
-          if (userWallets.length > 0) {
-            setSelectedWallet(userWallets[0].id)
+      // Load user's wallets if authenticated
+      if (userId && !userId.includes('guest')) {
+        try {
+          const { data: userWallets, error: walletsError } = await supabase
+            .from('wallets')
+            .select('*')
+            .eq('user_id', userId)
+            .order('created_at', { ascending: false })
+
+          if (!walletsError && userWallets) {
+            setWallets(userWallets)
+            if (userWallets.length > 0) {
+              setSelectedWallet(userWallets[0].id)
+            }
           }
+        } catch (err) {
+          console.warn('Error loading wallets:', err)
         }
 
         // Load recent deposits
-        const { data: userDeposits } = await supabase
-          .from('deposits')
-          .select('*')
-          .eq('user_id', userId)
-          .order('created_at', { ascending: false })
-          .limit(10)
+        try {
+          const { data: userDeposits, error: depositsError } = await supabase
+            .from('deposits')
+            .select('*')
+            .eq('user_id', userId)
+            .order('created_at', { ascending: false })
+            .limit(10)
 
-        if (userDeposits) {
-          setDeposits(userDeposits)
+          if (!depositsError && userDeposits) {
+            setDeposits(userDeposits)
+          }
+        } catch (err) {
+          console.warn('Error loading deposits:', err)
         }
       }
 
-      // Organize crypto addresses by currency
+      // Organize crypto addresses by currency (synchronous, shouldn't block)
       const addressesByCode = {}
-      CRYPTOCURRENCY_DEPOSITS.forEach(deposit => {
-        const code = deposit.currency.split('(')[1]?.replace(')', '') || deposit.currency.split(' ')[0]
-        if (!addressesByCode[code]) {
-          addressesByCode[code] = []
-        }
-        addressesByCode[code].push({
-          currency: deposit.currency,
-          network: deposit.network,
-          address: deposit.address,
-          metadata: deposit.metadata || {}
+      try {
+        CRYPTOCURRENCY_DEPOSITS.forEach(deposit => {
+          const code = deposit.currency.split('(')[1]?.replace(')', '') || deposit.currency.split(' ')[0]
+          if (!addressesByCode[code]) {
+            addressesByCode[code] = []
+          }
+          addressesByCode[code].push({
+            currency: deposit.currency,
+            network: deposit.network,
+            address: deposit.address,
+            metadata: deposit.metadata || {}
+          })
         })
-      })
-      setCryptoAddresses(addressesByCode)
+        setCryptoAddresses(addressesByCode)
 
-      // Set first crypto option as default
-      const firstCryptoCode = Object.keys(addressesByCode)[0]
-      if (firstCryptoCode) {
-        setSelectedCryptoNetwork(firstCryptoCode)
+        // Set first crypto option as default
+        const firstCryptoCode = Object.keys(addressesByCode)[0]
+        if (firstCryptoCode) {
+          setSelectedCryptoNetwork(firstCryptoCode)
+        }
+      } catch (err) {
+        console.warn('Error organizing crypto addresses:', err)
       }
     } catch (err) {
       console.error('Error loading data:', err)
-      setError('Failed to load data')
+      setError('Some data could not be loaded, but you can still use the page')
     } finally {
       setLoading(false)
     }
