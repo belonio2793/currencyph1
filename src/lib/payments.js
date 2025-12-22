@@ -390,6 +390,7 @@ export const currencyAPI = {
       throw new Error('Invalid parameters for sendMoney')
     }
 
+    // Get recipient user
     const { data: recipientUser, error: recipientError } = await supabase
       .from('users')
       .select('*')
@@ -398,77 +399,52 @@ export const currencyAPI = {
 
     if (recipientError) throw new Error('Recipient not found')
 
-    const recipientAmount = senderAmount * exchangeRate
-    const fee = senderAmount * 0.01
-    const totalDebit = senderAmount + fee
-
+    // Ensure wallets exist for both users
     const senderWallet = await this.getWallet(senderId, senderCurrency)
-    if (!senderWallet || senderWallet.balance < totalDebit) {
-      throw new Error('Insufficient balance')
-    }
+    if (!senderWallet) throw new Error('Sender wallet not found')
 
     let recipientWallet = await this.getWallet(recipientUser.id, recipientCurrency)
     if (!recipientWallet) {
       recipientWallet = await this.createWallet(recipientUser.id, recipientCurrency)
     }
 
-    const refNumber = `TRN-${Date.now()}`
-
     try {
-      // Debit sender with fee
-      await supabase.rpc('record_wallet_transaction', {
-        p_user_id: senderId,
-        p_wallet_id: senderWallet.id,
-        p_transaction_type: 'transfer_out',
-        p_amount: senderAmount,
-        p_currency_code: senderCurrency,
-        p_description: `Transfer to ${recipientEmail} (${recipientCurrency})`,
-        p_reference_id: refNumber
+      // Use atomic transfer function with fee handling and house syndication
+      // This function atomically:
+      // 1. Debits sender wallet (transfer amount + 1% fee)
+      // 2. Credits recipient wallet (converted amount)
+      // 3. Syndicates fee to platform house wallet
+      // 4. Records all transactions in wallet_transactions (immutable ledger)
+      const { data, error } = await supabase.rpc('execute_transfer_atomic', {
+        p_from_user_id: senderId,
+        p_to_user_id: recipientUser.id,
+        p_from_wallet_id: senderWallet.id,
+        p_to_wallet_id: recipientWallet.id,
+        p_from_currency: senderCurrency,
+        p_to_currency: recipientCurrency,
+        p_from_amount: parseFloat(senderAmount),
+        p_exchange_rate: parseFloat(exchangeRate),
+        p_fee_percentage: 1.0,
+        p_description: `Transfer to ${recipientEmail} (${recipientCurrency})`
       })
 
-      // Debit fee
-      await supabase.rpc('record_wallet_transaction', {
-        p_user_id: senderId,
-        p_wallet_id: senderWallet.id,
-        p_transaction_type: 'rake',
-        p_amount: fee,
-        p_currency_code: senderCurrency,
-        p_description: `Transfer fee`,
-        p_reference_id: refNumber
-      })
+      if (error) {
+        console.error('Transfer RPC error:', error)
+        throw new Error(error.message || 'Transfer failed')
+      }
 
-      // Credit recipient
-      await supabase.rpc('record_wallet_transaction', {
-        p_user_id: recipientUser.id,
-        p_wallet_id: recipientWallet.id,
-        p_transaction_type: 'transfer_in',
-        p_amount: recipientAmount,
-        p_currency_code: recipientCurrency,
-        p_description: `Received from ${recipientEmail}`,
-        p_reference_id: refNumber
-      })
+      if (!data || !data.success) {
+        throw new Error(data?.error_message || 'Transfer failed')
+      }
 
-      // Record transfer if transfers table exists
-      const { data: transfer } = await supabase
-        .from('transfers')
-        .insert([
-          {
-            sender_id: senderId,
-            recipient_id: recipientUser.id,
-            sender_currency: senderCurrency,
-            recipient_currency: recipientCurrency,
-            sender_amount: senderAmount,
-            recipient_amount: recipientAmount,
-            exchange_rate: exchangeRate,
-            fee,
-            status: 'completed',
-            reference_number: refNumber
-          }
-        ])
-        .select()
-        .single()
-
-      return transfer || { reference_number: refNumber, sender_amount: senderAmount, recipient_amount: recipientAmount }
+      return {
+        transfer_id: data.transfer_id,
+        reference_number: data.reference_number,
+        sender_amount: senderAmount,
+        recipient_amount: (senderAmount * exchangeRate).toFixed(2),
+        fee_amount: data.fee_amount,
+        status: 'completed'
+      }
     } catch (err) {
       console.error('Send money error:', err)
       throw err
