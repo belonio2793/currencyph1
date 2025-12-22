@@ -304,6 +304,56 @@ export default function ReceiveMoney({ userId, globalCurrency = 'PHP' }) {
     }
   }
 
+  const handleGenerateCustomPayment = async (e) => {
+    e.preventDefault()
+    setError('')
+    setSuccess('')
+
+    if (!userId) {
+      setError('You must be logged in to generate payment links')
+      return
+    }
+
+    if (!amount || parseFloat(amount) <= 0) {
+      setError('Please enter a valid amount')
+      return
+    }
+
+    if (!selectedMethod) {
+      setError('Please select a payment method')
+      return
+    }
+
+    if (selectedMethod === 'crypto' && !selectedCryptoNetwork) {
+      setError('Please select a cryptocurrency')
+      return
+    }
+
+    setGeneratingPayment(true)
+    try {
+      const result = await customPaymentService.generatePaymentLink({
+        from_user_id: userId,
+        to_email: customPaymentEmail || null,
+        amount: parseFloat(amount),
+        currency: selectedCurrency,
+        payment_method: selectedMethod,
+        crypto_network: selectedCryptoNetwork || null,
+        description: customPaymentDescription || `Payment request for ${getCurrencySymbol(selectedCurrency)}${formatNumber(amount)}`
+      })
+
+      if (result.success) {
+        setCustomPaymentLink(result)
+        setStep(3) // Show finalization/success screen
+        setSuccess('Custom payment link generated successfully!')
+      }
+    } catch (err) {
+      console.error('Error generating payment link:', err)
+      setError(`Failed to generate payment link: ${err.message}`)
+    } finally {
+      setGeneratingPayment(false)
+    }
+  }
+
   const handleCreateTransfer = async (e) => {
     e.preventDefault()
     setError('')
