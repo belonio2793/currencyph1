@@ -109,10 +109,11 @@ async function fetchWithRetry(url, options = {}, maxRetries = MAX_RETRIES) {
 }
 
 /**
- * Get cached rate from database
+ * Get cached rate from database (checks crypto_rates_valid view first, then pairs)
  */
 async function getCachedRateFromDatabase(cryptoCode, toCurrency = 'PHP') {
   try {
+    // First try crypto_rates_valid view (non-expired rates with metadata)
     const { data, error } = await supabase
       .from('crypto_rates_valid')
       .select('rate, source, updated_at')
@@ -120,12 +121,24 @@ async function getCachedRateFromDatabase(cryptoCode, toCurrency = 'PHP') {
       .eq('to_currency', toCurrency)
       .single()
 
-    if (error) {
-      console.warn(`No cached rate in database for ${cryptoCode}/${toCurrency}`)
-      return null
+    if (!error && data) {
+      return { rate: parseFloat(data.rate), source: 'crypto_rates_valid', cachedAt: data.updated_at }
     }
 
-    return { rate: parseFloat(data.rate), source: 'database', cachedAt: data.updated_at }
+    // Fallback to public.pairs table
+    const { data: pairData, error: pairError } = await supabase
+      .from('pairs')
+      .select('rate, updated_at')
+      .eq('from_currency', cryptoCode)
+      .eq('to_currency', toCurrency)
+      .single()
+
+    if (!pairError && pairData && typeof pairData.rate === 'number' && isFinite(pairData.rate) && pairData.rate > 0) {
+      return { rate: parseFloat(pairData.rate), source: 'pairs', cachedAt: pairData.updated_at }
+    }
+
+    console.debug(`No cached rate found in database for ${cryptoCode}/${toCurrency}`)
+    return null
   } catch (err) {
     console.warn(`Failed to fetch cached rate from database:`, err.message)
     return null
