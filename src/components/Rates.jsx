@@ -269,6 +269,30 @@ export default function Rates() {
     setTypeFilter(type)
   }
 
+  const toggleCurrencyTracking = (code) => {
+    const newTracked = { ...trackedCurrencies }
+    if (trackedCurrencies.fiat.includes(code)) {
+      newTracked.fiat = newTracked.fiat.filter(c => c !== code)
+    } else if (trackedCurrencies.crypto.includes(code)) {
+      newTracked.crypto = newTracked.crypto.filter(c => c !== code)
+    } else {
+      const defaultCryptos = preferencesManager.getDefaultTrackedCurrencies().crypto
+      if (defaultCryptos.includes(code)) {
+        newTracked.crypto = [...newTracked.crypto, code]
+      } else {
+        newTracked.fiat = [...newTracked.fiat, code]
+      }
+    }
+    setTrackedCurrencies(newTracked)
+    preferencesManager.setRatesCurrencyPreferences(null, newTracked.fiat, newTracked.crypto)
+  }
+
+  const resetToDefaults = () => {
+    const defaults = preferencesManager.getDefaultTrackedCurrencies()
+    setTrackedCurrencies(defaults)
+    preferencesManager.setRatesCurrencyPreferences(null, defaults.fiat, defaults.crypto)
+  }
+
   const formatNumber = (num, decimals = 2) => {
     if (num == null || !isFinite(num) || num <= 0) return '—'
     return Number(num).toLocaleString(undefined, {
