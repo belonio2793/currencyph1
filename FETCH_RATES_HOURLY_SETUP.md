@@ -29,6 +29,18 @@ VITE_OPEN_EXCHANGE_RATES_API=1ff26c05f12941fcb75443e0b009e407
 
 Both Supabase and Netlify already have these configured.
 
+## How It Works
+
+The edge function now:
+1. **Fetches** rates from ExConvert API (primary source)
+2. **Stores directly** in BOTH tables simultaneously:
+   - `crypto_rates` - Full rate data with 1-hour expiration
+   - `pairs` - Unified lookup table for all features
+3. **Marks source** as `'exconvert'` in both tables
+4. **No triggers needed** - Direct insertion is faster and simpler
+
+**Benefit:** Single API call → Single storage operation → All features see updated rates immediately
+
 ## Deployment
 
 ### 1. Deploy the Edge Function
