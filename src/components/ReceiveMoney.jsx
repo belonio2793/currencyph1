@@ -1113,17 +1113,20 @@ export default function ReceiveMoney({ userId, globalCurrency = 'PHP' }) {
             <ol className="space-y-3 text-sm text-slate-700">
               <li className="flex gap-3">
                 <span className="flex-shrink-0 w-6 h-6 bg-blue-100 text-blue-700 rounded-full flex items-center justify-center text-xs font-semibold">1</span>
-                <span>Select recipient and enter amount with currency</span>
+                <span>Select recipient, amount & currency (fiat or crypto)</span>
               </li>
               <li className="flex gap-3">
                 <span className="flex-shrink-0 w-6 h-6 bg-blue-100 text-blue-700 rounded-full flex items-center justify-center text-xs font-semibold">2</span>
-                <span>Choose payment method (GCash, Bank, Crypto)</span>
+                <span>Choose payment method with auto-rate conversion</span>
               </li>
               <li className="flex gap-3">
                 <span className="flex-shrink-0 w-6 h-6 bg-blue-100 text-blue-700 rounded-full flex items-center justify-center text-xs font-semibold">3</span>
                 <span>Review details and send payment request</span>
               </li>
             </ol>
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mt-4">
+              <p className="text-xs text-blue-800 font-medium">💡 <span className="font-semibold">Pro Tip:</span> Automatic rate conversions apply when currency differs from wallet.</p>
+            </div>
           </div>
 
           {/* Recent Deposits */}
