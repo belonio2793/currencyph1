@@ -1262,8 +1262,8 @@ export default function ReceiveMoney({ userId, globalCurrency = 'PHP' }) {
                         </div>
                       )}
 
-                      {/* Optional Chat Message Setting */}
-                      {selectedGuestProfile && (
+                      {/* Optional Chat Message Setting - Only for regular requests */}
+                      {selectedGuestProfile && !(isRequestMode && requestMode === 'custom_payment') && (
                         <div className="bg-gradient-to-br from-indigo-50 to-blue-50 border border-indigo-200 rounded-lg p-4 space-y-3">
                           <label className="flex items-start gap-3 cursor-pointer">
                             <input
