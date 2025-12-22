@@ -8,7 +8,7 @@ import receiveMoneyService from '../lib/receiveMoneyService'
 
 export default function ReceiveMoney({ userId, globalCurrency = 'PHP' }) {
   // State: User/Guest info
-  const [isGuest, setIsGuest] = useState(!userId || userId.includes('guest'))
+  const [isRequestMode, setIsRequestMode] = useState(!userId || userId.includes('guest'))
   const [guestSearch, setGuestSearch] = useState('')
   const [guestSearchResults, setGuestSearchResults] = useState([])
   const [showSearchResults, setShowSearchResults] = useState(false)
@@ -20,7 +20,7 @@ export default function ReceiveMoney({ userId, globalCurrency = 'PHP' }) {
   // State: Amount & currency
   const [amount, setAmount] = useState('')
   const [selectedCurrency, setSelectedCurrency] = useState(globalCurrency)
-  const [step, setStep] = useState(1) // 1: select wallet/guest, 2: method, 3: amount, 4: confirmation, 5: success
+  const [step, setStep] = useState(1) // 1: select wallet/guest, 2: profile preview, 3: amount/confirmation
   const [activeType, setActiveType] = useState('fiat') // 'fiat' or 'crypto'
 
   // State: Payment method selection
@@ -238,22 +238,20 @@ export default function ReceiveMoney({ userId, globalCurrency = 'PHP' }) {
     setShowSearchResults(false)
   }
 
-  const handleCreateReceiveLink = async (e) => {
+  const handleCreateTransfer = async (e) => {
     e.preventDefault()
     setError('')
     setSuccess('')
 
     if (!selectedWallet && !selectedGuestProfile) {
-      setError('Please select a wallet or guest profile')
+      setError('Please select a wallet or profile')
       return
     }
 
     setSubmitting(true)
     try {
-      const linkId = `receive_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
-
-      const linkData = {
-        id: linkId,
+      // Create transfer record in public.transfers table
+      const transferData = {
         user_id: userId || null,
         guest_user_id: selectedGuestProfile?.id || null,
         guest_name: selectedGuestProfile?.name || null,
@@ -263,21 +261,28 @@ export default function ReceiveMoney({ userId, globalCurrency = 'PHP' }) {
         method: selectedMethod,
         crypto_network: selectedCryptoNetwork || null,
         crypto_address: selectedDepositAddress?.address || null,
-        status: 'active',
+        status: 'pending',
         created_at: new Date().toISOString()
       }
 
-      // Create receive link record in database
-      await receiveMoneyService.createReceiveLink(linkData)
+      // Insert into public.transfers table
+      const { data: insertedTransfer, error: insertError } = await supabase
+        .from('transfers')
+        .insert([transferData])
+        .select()
+
+      if (insertError) {
+        throw new Error(insertError.message || 'Failed to create transfer')
+      }
 
       // If crypto deposit, pre-calculate PHP equivalent
       if (amount && selectedMethod === 'crypto' && exchangeRates[selectedCryptoNetwork]) {
         const phpAmount = parseFloat(amount) * exchangeRates[selectedCryptoNetwork]
-        linkData.expected_php_amount = phpAmount
+        transferData.expected_php_amount = phpAmount
       }
 
-      setReceiveLink(linkData)
-      setSuccess('Receive link created! Share it with the sender.')
+      setReceiveLink(insertedTransfer?.[0] || transferData)
+      setSuccess('Transfer request created! Share it with the sender.')
 
       setTimeout(() => {
         setAmount('')
@@ -289,8 +294,8 @@ export default function ReceiveMoney({ userId, globalCurrency = 'PHP' }) {
         setStep(1)
       }, 4000)
     } catch (err) {
-      console.error('Error creating receive link:', err)
-      setError('Failed to create receive link: ' + (err.message || 'Unknown error'))
+      console.error('Error creating transfer:', err)
+      setError('Failed to create transfer: ' + (err.message || 'Unknown error'))
     } finally {
       setSubmitting(false)
     }
@@ -338,18 +343,20 @@ export default function ReceiveMoney({ userId, globalCurrency = 'PHP' }) {
               <div className="space-y-6">
                 <div className="text-center">
                   <div className="inline-block w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mb-4">
-                    <span className="text-3xl">OK</span>
+                    <span className="text-3xl font-bold text-emerald-700">✓</span>
                   </div>
-                  <h3 className="text-2xl font-semibold text-slate-900 mb-2">Receive Link Created</h3>
+                  <h3 className="text-2xl font-semibold text-slate-900 mb-2">Transfer Request Created</h3>
                   <p className="text-slate-600">Share this with the sender</p>
                 </div>
 
                 {/* Link Details */}
                 <div className="bg-slate-50 rounded-lg p-4 space-y-3">
-                  <div className="flex justify-between items-start">
-                    <span className="text-sm font-medium text-slate-700">Link ID:</span>
-                    <span className="font-mono text-sm text-slate-600 text-right break-all">{receiveLink.id}</span>
-                  </div>
+                  {receiveLink.id && (
+                    <div className="flex justify-between items-start">
+                      <span className="text-sm font-medium text-slate-700">Request ID:</span>
+                      <span className="font-mono text-sm text-slate-600 text-right break-all">{receiveLink.id}</span>
+                    </div>
+                  )}
                   {receiveLink.guest_name && (
                     <div className="flex justify-between items-start">
                       <span className="text-sm font-medium text-slate-700">Receiving As:</span>
@@ -385,14 +392,14 @@ export default function ReceiveMoney({ userId, globalCurrency = 'PHP' }) {
                   onClick={() => copyToClipboard(`${window.location.origin}/checkout?link=${receiveLink.id}`, 'Link copied!')}
                   className="w-full px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
                 >
-                  {copyFeedback === 'Link copied!' ? '✓ Copied Payment Link' : 'Copy Payment Link'}
+                  {copyFeedback === 'Link copied!' ? 'Copied Payment Link' : 'Copy Payment Link'}
                 </button>
 
                 <button
                   onClick={() => setReceiveLink(null)}
                   className="w-full px-4 py-3 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors font-medium"
                 >
-                  Create Another Link
+                  Create Another Request
                 </button>
               </div>
             ) : (
@@ -400,7 +407,7 @@ export default function ReceiveMoney({ userId, globalCurrency = 'PHP' }) {
               <>
                 {/* Step Indicator */}
                 <div className="flex items-center space-x-4 mb-8">
-                  {[1, 2, 3, 4].map(s => (
+                  {[1, 2, 3].map(s => (
                     <div key={s} className="flex items-center flex-1">
                       <div
                         className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-medium transition-colors ${
@@ -409,27 +416,27 @@ export default function ReceiveMoney({ userId, globalCurrency = 'PHP' }) {
                       >
                         {s}
                       </div>
-                      {s < 4 && <div className={`flex-1 h-1 mx-2 ${s < step ? 'bg-blue-600' : 'bg-slate-200'}`}></div>}
+                      {s < 3 && <div className={`flex-1 h-1 mx-2 ${s < step ? 'bg-blue-600' : 'bg-slate-200'}`}></div>}
                     </div>
                   ))}
                 </div>
 
-                <form onSubmit={handleCreateReceiveLink} className="space-y-6">
-                  {/* Step 1: Select Wallet or Guest Profile */}
+                <form onSubmit={handleCreateTransfer} className="space-y-6">
+                  {/* Step 1: Select Wallet or Request Money */}
                   {step === 1 && (
                     <div className="space-y-4">
                       <h3 className="text-lg font-medium text-slate-900">Who is receiving funds?</h3>
 
-                      {/* Toggle between My Wallets and Guest */}
+                      {/* Toggle between My Wallets and Request Money */}
                       <div className="flex gap-4 mb-6">
                         <button
                           type="button"
                           onClick={() => {
-                            setIsGuest(false)
+                            setIsRequestMode(false)
                             setSelectedGuestProfile(null)
                           }}
                           className={`flex-1 px-4 py-3 rounded-lg border-2 transition-all ${
-                            !isGuest
+                            !isRequestMode
                               ? 'border-blue-600 bg-blue-50 text-blue-700 font-medium'
                               : 'border-slate-200 text-slate-700 hover:border-slate-300'
                           }`}
@@ -439,21 +446,21 @@ export default function ReceiveMoney({ userId, globalCurrency = 'PHP' }) {
                         <button
                           type="button"
                           onClick={() => {
-                            setIsGuest(true)
+                            setIsRequestMode(true)
                             setSelectedWallet(null)
                           }}
                           className={`flex-1 px-4 py-3 rounded-lg border-2 transition-all ${
-                            isGuest
+                            isRequestMode
                               ? 'border-blue-600 bg-blue-50 text-blue-700 font-medium'
                               : 'border-slate-200 text-slate-700 hover:border-slate-300'
                           }`}
                         >
-                          Guest Profile
+                          Request Money
                         </button>
                       </div>
 
-                      {/* Guest Profile Search */}
-                      {isGuest && (
+                      {/* Request Money Profile Search */}
+                      {isRequestMode && (
                         <div>
                           <label className="block text-sm font-medium text-slate-700 mb-2">Search User Profile</label>
                           <div className="relative">
@@ -493,10 +500,10 @@ export default function ReceiveMoney({ userId, globalCurrency = 'PHP' }) {
                                 <div>
                                   <p className="font-medium text-slate-900">{selectedGuestProfile.name}</p>
                                   {selectedGuestProfile.phone && (
-                                    <p className="text-sm text-slate-600 mt-1">📱 {selectedGuestProfile.phone}</p>
+                                    <p className="text-sm text-slate-600 mt-1">Phone: {selectedGuestProfile.phone}</p>
                                   )}
                                   {selectedGuestProfile.email && (
-                                    <p className="text-sm text-slate-600 mt-1">📧 {selectedGuestProfile.email}</p>
+                                    <p className="text-sm text-slate-600 mt-1">Email: {selectedGuestProfile.email}</p>
                                   )}
                                 </div>
                                 <button
@@ -513,7 +520,7 @@ export default function ReceiveMoney({ userId, globalCurrency = 'PHP' }) {
                       )}
 
                       {/* My Wallets */}
-                      {!isGuest && (
+                      {!isRequestMode && (
                         <div>
                           <label className="block text-sm font-medium text-slate-700 mb-3">Select Wallet</label>
                           {wallets.length === 0 ? (
@@ -539,10 +546,19 @@ export default function ReceiveMoney({ userId, globalCurrency = 'PHP' }) {
                                       : 'border-slate-200 hover:border-slate-300'
                                   }`}
                                 >
-                                  <div className="font-medium text-slate-900">{wallet.currency_code}</div>
-                                  <div className="text-sm text-slate-600 mt-1">
+                                  <div className="font-medium text-slate-900 mb-2">{wallet.currency_code}</div>
+                                  <div className="text-sm text-slate-600 mb-3">
                                     Balance: {getCurrencySymbol(wallet.currency_code)}{formatNumber(wallet.balance)}
                                   </div>
+                                  <div className="bg-white/50 rounded p-2 mb-2 border border-slate-200">
+                                    <p className="text-xs text-slate-600 font-semibold mb-1">Wallet ID</p>
+                                    <p className="text-xs font-mono text-slate-900 break-all">{wallet.id}</p>
+                                  </div>
+                                  {wallet.account_number && (
+                                    <div className="text-xs text-slate-600">
+                                      Account: {wallet.account_number}
+                                    </div>
+                                  )}
                                 </button>
                               ))}
                             </div>
@@ -556,60 +572,67 @@ export default function ReceiveMoney({ userId, globalCurrency = 'PHP' }) {
                         disabled={(!selectedWallet && !selectedGuestProfile) || loading}
                         className="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
                       >
-                        Next
+                        Next: Review Profile
                       </button>
                     </div>
                   )}
 
-                  {/* Step 2: Select Payment Method */}
+                  {/* Step 2: Profile Preview */}
                   {step === 2 && (
                     <div className="space-y-4">
-                      <h3 className="text-lg font-medium text-slate-900">Select Payment Method</h3>
+                      <h3 className="text-lg font-medium text-slate-900">Verify Profile</h3>
+                      <p className="text-sm text-slate-600 mb-4">Review the receiving profile details to ensure the match is correct before proceeding</p>
 
-                      <div className="mb-6">
-                        <FiatCryptoToggle
-                          active={activeType}
-                          onChange={setActiveType}
-                        />
-                      </div>
+                      {selectedWalletData ? (
+                        <div className="bg-gradient-to-br from-blue-50 to-blue-100 border border-blue-300 rounded-lg p-6 space-y-4">
+                          <div className="text-center">
+                            <p className="text-sm font-medium text-blue-700 mb-2">Receiving Wallet</p>
+                            <p className="text-3xl font-light text-slate-900 mb-2">{selectedWalletData.currency_code}</p>
+                            <p className="text-xl text-slate-700">{getCurrencySymbol(selectedWalletData.currency_code)}{formatNumber(selectedWalletData.balance)}</p>
+                          </div>
 
-                      <div className="grid grid-cols-1 gap-3">
-                        {activeType === 'fiat' && availableMethods.fiat.map(method => (
-                          <button
-                            key={method.id}
-                            type="button"
-                            onClick={() => setSelectedMethod(method.id)}
-                            className={`p-4 rounded-lg border-2 transition-all text-left ${
-                              selectedMethod === method.id
-                                ? 'border-blue-600 bg-blue-50'
-                                : 'border-slate-200 hover:border-slate-300'
-                            }`}
-                          >
-                            <div className="font-medium text-slate-900">
-                              {method.name}
+                          <div className="border-t border-blue-200 pt-4 space-y-3">
+                            <div className="flex justify-between items-start">
+                              <span className="text-sm font-medium text-slate-700">Wallet ID:</span>
+                              <span className="text-xs font-mono text-slate-900 text-right break-all">{selectedWalletData.id}</span>
                             </div>
-                            <div className="text-sm text-slate-600 mt-1">{method.description}</div>
-                          </button>
-                        ))}
-
-                        {activeType === 'crypto' && availableMethods.crypto.map(method => (
-                          <button
-                            key={method.id}
-                            type="button"
-                            onClick={() => setSelectedMethod(method.id)}
-                            className={`p-4 rounded-lg border-2 transition-all text-left ${
-                              selectedMethod === method.id
-                                ? 'border-blue-600 bg-blue-50'
-                                : 'border-slate-200 hover:border-slate-300'
-                            }`}
-                          >
-                            <div className="font-medium text-slate-900">
-                              {method.name}
+                            {selectedWalletData.account_number && (
+                              <div className="flex justify-between items-start">
+                                <span className="text-sm font-medium text-slate-700">Account Number:</span>
+                                <span className="text-sm font-semibold text-slate-900">{selectedWalletData.account_number}</span>
+                              </div>
+                            )}
+                            <div className="flex justify-between items-start">
+                              <span className="text-sm font-medium text-slate-700">Status:</span>
+                              <span className="text-xs px-2 py-1 bg-green-100 text-green-700 rounded-full font-semibold">
+                                {selectedWalletData.is_active ? 'Active' : 'Inactive'}
+                              </span>
                             </div>
-                            <div className="text-sm text-slate-600 mt-1">{method.description}</div>
-                          </button>
-                        ))}
-                      </div>
+                          </div>
+                        </div>
+                      ) : selectedGuestProfile ? (
+                        <div className="bg-gradient-to-br from-purple-50 to-purple-100 border border-purple-300 rounded-lg p-6 space-y-4">
+                          <div className="text-center">
+                            <p className="text-sm font-medium text-purple-700 mb-2">Request to Profile</p>
+                            <p className="text-3xl font-light text-slate-900 mb-2">{selectedGuestProfile.name}</p>
+                          </div>
+
+                          <div className="border-t border-purple-200 pt-4 space-y-3">
+                            {selectedGuestProfile.email && (
+                              <div className="flex justify-between items-start">
+                                <span className="text-sm font-medium text-slate-700">Email:</span>
+                                <span className="text-sm text-slate-900">{selectedGuestProfile.email}</span>
+                              </div>
+                            )}
+                            {selectedGuestProfile.phone && (
+                              <div className="flex justify-between items-start">
+                                <span className="text-sm font-medium text-slate-700">Phone:</span>
+                                <span className="text-sm text-slate-900">{selectedGuestProfile.phone}</span>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      ) : null}
 
                       <div className="flex space-x-4">
                         <button
@@ -622,24 +645,72 @@ export default function ReceiveMoney({ userId, globalCurrency = 'PHP' }) {
                         <button
                           type="button"
                           onClick={() => setStep(3)}
-                          disabled={!selectedMethod}
-                          className="flex-1 bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                          className="flex-1 bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium"
                         >
-                          Next
+                          Next: Amount Details
                         </button>
                       </div>
                     </div>
                   )}
 
-                  {/* Step 3: Payment Details */}
+                  {/* Step 3: Amount & Confirmation */}
                   {step === 3 && (
                     <div className="space-y-4">
-                      <h3 className="text-lg font-medium text-slate-900">Payment Details</h3>
+                      <h3 className="text-lg font-medium text-slate-900">Amount & Confirmation</h3>
 
-                      {/* Amount */}
+                      {/* Payment Method Selection */}
+                      <div>
+                        <label className="block text-sm font-medium text-slate-700 mb-3">Select Payment Method</label>
+                        <div className="mb-6">
+                          <FiatCryptoToggle
+                            active={activeType}
+                            onChange={setActiveType}
+                          />
+                        </div>
+
+                        <div className="grid grid-cols-1 gap-3 mb-4">
+                          {activeType === 'fiat' && availableMethods.fiat.map(method => (
+                            <button
+                              key={method.id}
+                              type="button"
+                              onClick={() => setSelectedMethod(method.id)}
+                              className={`p-4 rounded-lg border-2 transition-all text-left ${
+                                selectedMethod === method.id
+                                  ? 'border-blue-600 bg-blue-50'
+                                  : 'border-slate-200 hover:border-slate-300'
+                              }`}
+                            >
+                              <div className="font-medium text-slate-900">
+                                {method.name}
+                              </div>
+                              <div className="text-sm text-slate-600 mt-1">{method.description}</div>
+                            </button>
+                          ))}
+
+                          {activeType === 'crypto' && availableMethods.crypto.map(method => (
+                            <button
+                              key={method.id}
+                              type="button"
+                              onClick={() => setSelectedMethod(method.id)}
+                              className={`p-4 rounded-lg border-2 transition-all text-left ${
+                                selectedMethod === method.id
+                                  ? 'border-blue-600 bg-blue-50'
+                                  : 'border-slate-200 hover:border-slate-300'
+                              }`}
+                            >
+                              <div className="font-medium text-slate-900">
+                                {method.name}
+                              </div>
+                              <div className="text-sm text-slate-600 mt-1">{method.description}</div>
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Amount Input */}
                       <div>
                         <label className="block text-sm font-medium text-slate-700 mb-2">
-                          Amount (Optional - if specified)
+                          Amount to Receive (Optional)
                         </label>
                         <div className="flex gap-2">
                           <input
@@ -723,48 +794,21 @@ export default function ReceiveMoney({ userId, globalCurrency = 'PHP' }) {
                         </div>
                       )}
 
-                      <div className="flex space-x-4">
-                        <button
-                          type="button"
-                          onClick={() => setStep(2)}
-                          className="flex-1 px-4 py-3 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors font-medium"
-                        >
-                          Back
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => setStep(4)}
-                          disabled={selectedMethod === 'crypto' && !selectedDepositAddress}
-                          className="flex-1 bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
-                        >
-                          Review
-                        </button>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Step 4: Confirmation */}
-                  {step === 4 && (
-                    <div className="space-y-4">
-                      <h3 className="text-lg font-medium text-slate-900">Confirm Details</h3>
-
-                      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 space-y-3 text-sm">
-                        <p className="font-medium text-slate-900">Receive Details</p>
-
+                      {/* Confirmation Summary */}
+                      <div className="bg-slate-50 border border-slate-200 rounded-lg p-4 space-y-3 text-sm">
+                        <p className="font-medium text-slate-900">Transfer Details</p>
                         {selectedWalletData && (
                           <div className="flex justify-between">
                             <span className="text-slate-700">Receiving Wallet:</span>
                             <span className="font-medium text-slate-900">{selectedWalletData.currency_code}</span>
                           </div>
                         )}
-
                         {selectedGuestProfile && (
                           <div className="flex justify-between">
-                            <span className="text-slate-700">Guest Profile:</span>
+                            <span className="text-slate-700">Request To:</span>
                             <span className="font-medium text-slate-900">{selectedGuestProfile.name}</span>
                           </div>
                         )}
-
                         <div className="flex justify-between">
                           <span className="text-slate-700">Method:</span>
                           <span className="font-medium text-slate-900">
@@ -773,7 +817,6 @@ export default function ReceiveMoney({ userId, globalCurrency = 'PHP' }) {
                             {selectedMethod === 'crypto' && selectedCryptoNetwork}
                           </span>
                         </div>
-
                         {amount && (
                           <div className="flex justify-between">
                             <span className="text-slate-700">Amount:</span>
@@ -782,7 +825,6 @@ export default function ReceiveMoney({ userId, globalCurrency = 'PHP' }) {
                             </span>
                           </div>
                         )}
-
                         {selectedMethod === 'crypto' && amount && exchangeRates[selectedCryptoNetwork] && (
                           <div className="flex justify-between">
                             <span className="text-slate-700">Expected PHP:</span>
@@ -804,7 +846,7 @@ export default function ReceiveMoney({ userId, globalCurrency = 'PHP' }) {
                               onClick={() => copyToClipboard(selectedDepositAddress.address, 'Address copied!')}
                               className="w-full text-xs px-3 py-2 bg-blue-100 text-blue-700 rounded hover:bg-blue-200 transition-colors"
                             >
-                              {copyFeedback === 'Address copied!' ? '✓ Copied' : 'Copy Address'}
+                              {copyFeedback === 'Address copied!' ? 'Copied' : 'Copy Address'}
                             </button>
                           </div>
                         </div>
@@ -813,17 +855,17 @@ export default function ReceiveMoney({ userId, globalCurrency = 'PHP' }) {
                       <div className="flex space-x-4">
                         <button
                           type="button"
-                          onClick={() => setStep(3)}
+                          onClick={() => setStep(2)}
                           className="flex-1 px-4 py-3 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors font-medium"
                         >
                           Back
                         </button>
                         <button
                           type="submit"
-                          disabled={submitting || (selectedMethod === 'crypto' && !selectedDepositAddress)}
+                          disabled={submitting || (selectedMethod === 'crypto' && !selectedDepositAddress) || !selectedMethod}
                           className="flex-1 bg-emerald-600 text-white py-3 rounded-lg hover:bg-emerald-700 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
                         >
-                          {submitting ? 'Creating...' : 'Create Receive Link'}
+                          {submitting ? 'Creating Request...' : 'Create Request'}
                         </button>
                       </div>
                     </div>
@@ -844,25 +886,25 @@ export default function ReceiveMoney({ userId, globalCurrency = 'PHP' }) {
                 <span className="flex-shrink-0 w-6 h-6 bg-blue-100 text-blue-700 rounded-full flex items-center justify-center text-xs font-semibold">
                   1
                 </span>
-                <span>Select receiving wallet or guest profile</span>
+                <span>Select receiving wallet or request from profile</span>
               </li>
               <li className="flex gap-3">
                 <span className="flex-shrink-0 w-6 h-6 bg-blue-100 text-blue-700 rounded-full flex items-center justify-center text-xs font-semibold">
                   2
                 </span>
-                <span>Choose a payment method</span>
+                <span>Review the receiving profile details</span>
               </li>
               <li className="flex gap-3">
                 <span className="flex-shrink-0 w-6 h-6 bg-blue-100 text-blue-700 rounded-full flex items-center justify-center text-xs font-semibold">
                   3
                 </span>
-                <span>Enter amount (optional) and select details</span>
+                <span>Enter amount and select payment method</span>
               </li>
               <li className="flex gap-3">
                 <span className="flex-shrink-0 w-6 h-6 bg-blue-100 text-blue-700 rounded-full flex items-center justify-center text-xs font-semibold">
                   4
                 </span>
-                <span>Share the unique link with the sender</span>
+                <span>Share the request link with the sender</span>
               </li>
             </ol>
           </div>
@@ -901,26 +943,32 @@ export default function ReceiveMoney({ userId, globalCurrency = 'PHP' }) {
             </div>
           )}
 
-          {/* Payment Methods Info */}
+          {/* Accepted Methods */}
           <div className="bg-white border border-slate-200 rounded-xl p-6 space-y-4">
             <h3 className="text-lg font-medium text-slate-900">Accepted Methods</h3>
             <div className="space-y-2 text-sm">
               <div className="flex gap-2">
-                <span className="text-lg">📱</span>
+                <div className="flex-shrink-0 w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center text-sm font-semibold text-blue-700">
+                  G
+                </div>
                 <div>
                   <p className="font-medium text-slate-900">GCash</p>
                   <p className="text-xs text-slate-600">Mobile wallet</p>
                 </div>
               </div>
               <div className="flex gap-2">
-                <span className="text-lg">🏦</span>
+                <div className="flex-shrink-0 w-8 h-8 bg-green-100 rounded-full flex items-center justify-center text-sm font-semibold text-green-700">
+                  B
+                </div>
                 <div>
                   <p className="font-medium text-slate-900">Bank Transfer</p>
                   <p className="text-xs text-slate-600">Direct bank deposit</p>
                 </div>
               </div>
               <div className="flex gap-2">
-                <span className="text-lg">₿</span>
+                <div className="flex-shrink-0 w-8 h-8 bg-orange-100 rounded-full flex items-center justify-center text-sm font-semibold text-orange-700">
+                  C
+                </div>
                 <div>
                   <p className="font-medium text-slate-900">Crypto</p>
                   <p className="text-xs text-slate-600">50+ cryptocurrencies</p>
