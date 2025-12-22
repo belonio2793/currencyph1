@@ -66,16 +66,11 @@ export default function ReceiveMoney({ userId, globalCurrency = 'PHP' }) {
 
   // Helper function to extract crypto code from currency name
   const extractCryptoCode = (currencyName) => {
+    // Try to extract from parentheses first (e.g., "Bitcoin (BTC)" -> "BTC")
     const match = currencyName.match(/\(([A-Z]+)\)/)
     if (match) return match[1]
-    // For single-word cryptos like "Ethereum", "Solana", try full name
-    const fullNameMatch = CRYPTOCURRENCY_DEPOSITS.find(d => d.currency === currencyName)
-    if (fullNameMatch) {
-      const bracketMatch = fullNameMatch.currency.match(/\(([A-Z]+)\)/)
-      if (bracketMatch) return bracketMatch[1]
-    }
-    // Fallback to first word (for names like "Bitcoin", "Ethereum")
-    return currencyName.split(' ')[0].toUpperCase()
+    // Fallback to first word (e.g., "Ethereum" -> "Ethereum")
+    return currencyName.split(' ')[0]
   }
 
   // Load initial data
