@@ -39,14 +39,10 @@ export default function Rates() {
           .eq('active', true),
         supabase
           .from('currency_rates')
-          .select('from_currency,to_currency,rate,updated_at')
-          .order('updated_at', { ascending: false })
-          .limit(1),
+          .select('from_currency,to_currency,rate,updated_at'),
         supabase
           .from('cryptocurrency_rates')
-          .select('from_currency,to_currency,rate,updated_at')
-          .order('updated_at', { ascending: false })
-          .limit(1),
+          .select('from_currency,to_currency,rate,updated_at'),
         supabase
           .from('cryptocurrencies')
           .select('code,name,coingecko_id')
