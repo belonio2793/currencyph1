@@ -134,7 +134,7 @@ export default function AttendanceCheckInModal({ onClose, onSubmit, isLoading })
         {/* Check-in Summary */}
         <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
           <p className="text-xs text-blue-900">
-            <strong>Check-in Time:</strong> {new Date().toLocaleTimeString()}
+            <strong>Check-in Time:</strong> {formatTimeOnly(new Date())}
           </p>
         </div>
       </form>
