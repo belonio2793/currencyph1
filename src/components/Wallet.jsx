@@ -416,7 +416,7 @@ export default function Wallet({ userId, globalCurrency = 'PHP' }) {
               // List View
               <div className="space-y-8">
                 {/* Fiat Currencies Section */}
-                {activeType === 'fiat' && fiatWallets.length > 0 && (
+                {(activeType === 'all' || activeType === 'currency') && fiatWallets.length > 0 && (
                   <div>
                     <div className="mb-4 flex items-center gap-3">
                       <h2 className="text-xl font-semibold text-slate-900">Fiat Currencies</h2>
