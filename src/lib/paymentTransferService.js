@@ -346,6 +346,44 @@ export const paymentTransferService = {
       console.error('Error fetching recipient wallets:', error)
       return []
     }
+  },
+
+  /**
+   * Validate a transfer before processing
+   */
+  async validateTransfer(transferId) {
+    try {
+      const { data, error } = await supabase
+        .rpc('validate_transfer', {
+          p_transfer_id: transferId
+        })
+
+      if (error) {
+        return {
+          valid: false,
+          error: error.message
+        }
+      }
+
+      if (!data || data.length === 0) {
+        return {
+          valid: false,
+          error: 'Validation failed'
+        }
+      }
+
+      const result = data[0]
+      return {
+        valid: result.is_valid,
+        error: result.validation_error
+      }
+    } catch (error) {
+      console.error('Error validating transfer:', error)
+      return {
+        valid: false,
+        error: error.message
+      }
+    }
   }
 }
 
