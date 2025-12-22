@@ -170,6 +170,20 @@ export default function ReceiveMoney({ userId, globalCurrency = 'PHP' }) {
     }
   }, [walletSearch, wallets])
 
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (walletDropdownRef.current && !walletDropdownRef.current.contains(event.target)) {
+        setShowWalletDropdown(false)
+      }
+    }
+
+    if (showWalletDropdown) {
+      document.addEventListener('mousedown', handleClickOutside)
+      return () => document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [showWalletDropdown])
+
   const fetchConversionRate = async (from, to) => {
     setConversionLoading(true)
     setConversionError('')
