@@ -49,11 +49,22 @@ export default function Wallet({ userId, globalCurrency = 'PHP' }) {
 
       if (!session) {
         console.warn('No active auth session - user may not be authenticated with Supabase')
+        setAuthStatus({
+          authenticated: false,
+          userId: userId,
+          reason: 'No active session'
+        })
         setError('Not authenticated - please log in to see your wallets')
         setWallets([])
         setLoading(false)
         return
       }
+
+      setAuthStatus({
+        authenticated: true,
+        userId: session.user.id,
+        email: session.user.email
+      })
 
       console.debug('Wallet: Auth session found for user:', session.user.id)
 
