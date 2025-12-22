@@ -388,7 +388,7 @@ export default function Rates() {
                   </div>
 
                   {/* Result */}
-                  {result && (
+                  {result && !result.error && (
                     <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg p-6 border border-blue-200">
                       <p className="text-sm text-slate-600 mb-2">Result</p>
                       <div className="text-4xl font-bold text-blue-600 mb-2">
@@ -397,6 +397,12 @@ export default function Rates() {
                       <p className="text-sm text-slate-600">
                         1 {selectedFrom} = {formatNumber(result.rate, toCurrency?.metadata?.decimals || 2)} {selectedTo}
                       </p>
+                    </div>
+                  )}
+                  {result && result.error && (
+                    <div className="bg-red-50 rounded-lg p-6 border border-red-200">
+                      <p className="text-sm font-semibold text-red-700 mb-2">{result.error}</p>
+                      <p className="text-sm text-red-600">{result.message}</p>
                     </div>
                   )}
                 </div>
