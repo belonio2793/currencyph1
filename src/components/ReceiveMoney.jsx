@@ -208,8 +208,7 @@ export default function ReceiveMoney({ userId, globalCurrency = 'PHP' }) {
   const loadDepositMethods = async () => {
     try {
       const fiat = [
-        { id: 'gcash', name: 'GCash', description: 'Mobile wallet' },
-        { id: 'bank', name: 'Bank Transfer', description: 'Direct bank deposit' }
+        { id: 'gcash', name: 'GCash', description: 'Mobile wallet' }
       ]
       const crypto = [
         { id: 'crypto', name: 'Cryptocurrency', description: '50+ cryptocurrencies' }
