@@ -397,8 +397,17 @@ export default function Rates() {
                   })}
                 </p>
               </div>
-              <div className="text-sm text-slate-500">
-                {filteredRates.length} currency pair{filteredRates.length !== 1 ? 's' : ''}
+              <div className="flex items-center gap-4">
+                <div className="text-sm text-slate-500">
+                  {filteredRates.length} currency pair{filteredRates.length !== 1 ? 's' : ''}
+                </div>
+                <button
+                  onClick={loadData}
+                  disabled={loading}
+                  className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition"
+                >
+                  {loading ? '🔄 Refreshing...' : '🔄 Refresh'}
+                </button>
               </div>
             </div>
 
