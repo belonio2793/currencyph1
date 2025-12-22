@@ -710,10 +710,25 @@ export default function ReceiveMoney({ userId, globalCurrency = 'PHP' }) {
                             onChange={e => setSelectedCurrency(e.target.value)}
                             className="px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent"
                           >
-                            <option value="PHP">PHP</option>
-                            <option value="USD">USD</option>
-                            <option value="EUR">EUR</option>
-                            <option value="GBP">GBP</option>
+                            <optgroup label="Fiat Currencies">
+                              <option value="PHP">PHP</option>
+                              <option value="USD">USD</option>
+                              <option value="EUR">EUR</option>
+                              <option value="GBP">GBP</option>
+                              <option value="JPY">JPY</option>
+                              <option value="AUD">AUD</option>
+                              <option value="CAD">CAD</option>
+                              <option value="SGD">SGD</option>
+                              <option value="HKD">HKD</option>
+                              <option value="INR">INR</option>
+                            </optgroup>
+                            <optgroup label="Cryptocurrencies">
+                              {availableCryptos.map(crypto => (
+                                <option key={crypto.code} value={crypto.code}>
+                                  {crypto.code} - {crypto.currency}
+                                </option>
+                              ))}
+                            </optgroup>
                           </select>
                         </div>
 
