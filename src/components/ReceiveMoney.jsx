@@ -4,6 +4,7 @@ import { currencyAPI } from '../lib/payments'
 import { formatNumber, getCurrencySymbol } from '../lib/currency'
 import { CRYPTOCURRENCY_DEPOSITS } from '../data/cryptoDeposits'
 import FiatCryptoToggle from './FiatCryptoToggle'
+import receiveMoneyService from '../lib/receiveMoneyService'
 
 export default function ReceiveMoney({ userId, globalCurrency = 'PHP' }) {
   // State: User/Guest info
