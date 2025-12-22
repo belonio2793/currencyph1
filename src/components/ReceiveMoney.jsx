@@ -440,11 +440,14 @@ export default function ReceiveMoney({ userId, globalCurrency = 'PHP' }) {
   }
 
   const selectedWalletData = wallets.find(w => w.id === selectedWallet)
-  const availableCryptos = Object.entries(cryptoAddresses).map(([code, addresses]) => ({
+  const availableCryptos = Object.entries(cryptoAddresses).map(([code, data]) => ({
     code,
-    addresses
+    currency: data.currency,
+    networks: data.networks || []
   }))
-  const selectedCryptoAddresses = selectedCryptoNetwork ? cryptoAddresses[selectedCryptoNetwork] || [] : []
+  const selectedCryptoAddresses = selectedCryptoNetwork && cryptoAddresses[selectedCryptoNetwork]
+    ? cryptoAddresses[selectedCryptoNetwork].networks || []
+    : []
 
   const checkoutLink = transferRecord ? `${window.location.origin}/checkout?transferId=${transferRecord.id}` : null
 
