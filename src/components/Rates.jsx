@@ -41,22 +41,49 @@ export default function Rates() {
       setLoading(true)
       setError(null)
 
-      const allCodesToTrack = new Set([...trackedCurrencies.fiat, ...trackedCurrencies.crypto])
-      console.log(`📥 Fetching rates for ${allCodesToTrack.size} tracked currencies...`)
+      const trackedArray = Array.from(new Set([...trackedCurrencies.fiat, ...trackedCurrencies.crypto]))
+      console.log(`📥 Fetching rates for ${trackedArray.length} tracked currencies...`)
 
-      // 1. Fetch pairs that match the selected currencies
-      // Get all pairs where from_currency or to_currency is in tracked list
-      const pairsRes = await supabase
-        .from('pairs')
-        .select('from_currency,to_currency,rate,source_table,updated_at')
-        .or(`from_currency.in.(${Array.from(allCodesToTrack).join(',')}),to_currency.in.(${Array.from(allCodesToTrack).join(',')})`)
-
-      if (pairsRes.error) {
-        console.error('❌ pairs query failed:', pairsRes.error.message)
-        throw new Error(`Failed to fetch rates: ${pairsRes.error.message}`)
+      if (trackedArray.length === 0) {
+        setRates([])
+        setError('No currencies selected. Please customize tracked currencies.')
+        setLoading(false)
+        return
       }
 
-      const allPairs = pairsRes.data || []
+      // 1. Fetch pairs that match the selected currencies
+      // Get all pairs where from_currency is in tracked list
+      const [pairsFromRes, pairstoRes] = await Promise.all([
+        supabase
+          .from('pairs')
+          .select('from_currency,to_currency,rate,source_table,updated_at')
+          .in('from_currency', trackedArray),
+        supabase
+          .from('pairs')
+          .select('from_currency,to_currency,rate,source_table,updated_at')
+          .in('to_currency', trackedArray)
+      ])
+
+      if (pairsFromRes.error) {
+        console.error('❌ pairs query failed:', pairsFromRes.error.message)
+        throw new Error(`Failed to fetch rates: ${pairsFromRes.error.message}`)
+      }
+
+      // Merge results and deduplicate
+      const pairsMap = new Map()
+      const processedPairs = [
+        ...(pairsFromRes.data || []),
+        ...(pairstoRes.data || [])
+      ]
+
+      processedPairs.forEach(pair => {
+        const key = `${pair.from_currency}-${pair.to_currency}`
+        if (!pairsMap.has(key)) {
+          pairsMap.set(key, pair)
+        }
+      })
+
+      const allPairs = Array.from(pairsMap.values())
       console.log(`✅ Fetched ${allPairs.length} pairs for tracked currencies`)
 
       // 2. Fetch metadata for only the tracked currencies
