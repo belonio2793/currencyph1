@@ -633,8 +633,9 @@ export default function App() {
                 />
               )}
               <div className="flex-1 flex flex-col">
-                <Navbar
-                  activeTab={activeTab}
+                <div data-component="navbar">
+                  <Navbar
+                    activeTab={activeTab}
                   onTabChange={setActiveTab}
                   globalCurrency={globalCurrency}
                   setGlobalCurrency={setGlobalCurrency}
@@ -672,8 +673,9 @@ export default function App() {
                     setUserId(null)
                     setUserEmail(null)
                     setShowAuth(false)
-                  }}
-                />
+                    }}
+                  />
+                </div>
 
                 {/* User Status Bar */}
                 {activeTab !== 'home' && (
