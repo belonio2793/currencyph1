@@ -254,7 +254,7 @@ export class DepositService {
       [DEPOSIT_METHODS.COINS_PH]: {
         id: DEPOSIT_METHODS.COINS_PH,
         name: 'Coins.ph',
-        icon: '₿',
+        icon: '🪙',
         description: 'Crypto to fiat gateway (PH) - Instant crypto conversion',
         processingTime: 'Instant to 1 day',
         fees: '0.5-1%',
