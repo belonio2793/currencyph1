@@ -90,75 +90,42 @@ export const paymentTransferService = {
 
   /**
    * Complete a transfer and update wallets
-   * Called when payment is confirmed
+   * Uses database function for atomic operations
    */
   async completeTransfer(transferId, recipientConfirmation = {}) {
     try {
-      // Get transfer details
-      const { data: transfer, error: fetchError } = await supabase
+      // Call database function for atomic transfer
+      const { data, error } = await supabase
+        .rpc('process_payment_transfer', {
+          p_transfer_id: transferId,
+          p_recipient_confirmation: recipientConfirmation
+        })
+
+      if (error) {
+        throw new Error(error.message)
+      }
+
+      if (!data || !data[0]?.success) {
+        throw new Error(data?.[0]?.message || 'Failed to process transfer')
+      }
+
+      // Get updated transfer data
+      const { data: transfer } = await supabase
         .from('transfers')
         .select('*')
         .eq('id', transferId)
         .single()
 
-      if (fetchError) {
-        throw new Error('Transfer not found')
-      }
-
-      if (transfer.status !== 'pending') {
-        throw new Error(`Transfer is already ${transfer.status}`)
-      }
-
-      // Update transfer status
-      const { error: updateError } = await supabase
-        .from('transfers')
-        .update({
-          status: 'completed',
-          completed_at: new Date().toISOString(),
-          metadata: {
-            ...transfer.metadata,
-            recipient_confirmation: recipientConfirmation,
-            completed_at_iso: new Date().toISOString()
-          }
-        })
-        .eq('id', transferId)
-
-      if (updateError) {
-        throw new Error(`Failed to update transfer: ${updateError.message}`)
-      }
-
-      // Debit sender wallet
-      const debitResult = await this.updateWalletBalance(
-        transfer.from_wallet_id,
-        -transfer.sender_amount,
-        'transfer_debit',
-        `Sent ${transfer.sender_amount} ${transfer.sender_currency} to user`,
-        transferId
-      )
-
-      if (!debitResult.success) {
-        throw new Error('Failed to debit sender wallet')
-      }
-
-      // Credit recipient wallet
-      const creditResult = await this.updateWalletBalance(
-        transfer.to_wallet_id,
-        transfer.recipient_amount,
-        'transfer_credit',
-        `Received ${transfer.recipient_amount} ${transfer.recipient_currency} from user`,
-        transferId
-      )
-
-      if (!creditResult.success) {
-        throw new Error('Failed to credit recipient wallet')
-      }
-
       return {
         success: true,
-        transfer: {
-          ...transfer,
+        transfer: transfer || {
+          id: transferId,
           status: 'completed',
           completed_at: new Date().toISOString()
+        },
+        walletUpdates: {
+          senderNewBalance: data[0].new_sender_balance,
+          recipientNewBalance: data[0].new_recipient_balance
         },
         message: 'Transfer completed successfully'
       }
