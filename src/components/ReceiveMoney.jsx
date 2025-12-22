@@ -127,7 +127,13 @@ export default function ReceiveMoney({ userId, globalCurrency = 'PHP' }) {
     if (amount && selectedWallet) {
       const selectedWalletData = wallets.find(w => w.id === selectedWallet)
       if (selectedWalletData && selectedWalletData.currency_code !== selectedCurrency) {
-        fetchConversionRate(selectedCurrency, selectedWalletData.currency_code)
+        // Check if it's a crypto currency conversion
+        const isCryptoCurrency = CRYPTO_CURRENCY_CODES.includes(selectedCurrency.toUpperCase())
+        if (isCryptoCurrency) {
+          fetchCryptoConversionRate(selectedCurrency, selectedWalletData.currency_code)
+        } else {
+          fetchConversionRate(selectedCurrency, selectedWalletData.currency_code)
+        }
       } else if (selectedWalletData) {
         setConvertedAmount(parseFloat(amount))
         setConversionRate(1)
@@ -149,6 +155,28 @@ export default function ReceiveMoney({ userId, globalCurrency = 'PHP' }) {
       console.warn('Error fetching conversion rate:', err)
     } finally {
       setConversionLoading(false)
+    }
+  }
+
+  const fetchCryptoConversionRate = async (from, to) => {
+    setCryptoConversionLoading(true)
+    try {
+      // Try to get crypto rate
+      const rate = await currencyAPI.getExchangeRate(from, to)
+      if (rate) {
+        setCryptoConversionRate(rate)
+        setConversionRate(rate)
+        if (amount) {
+          setConvertedAmount(parseFloat(amount) * rate)
+        }
+      } else {
+        // If rate not available, show conversion as pending
+        console.warn(`Conversion rate from ${from} to ${to} not available`)
+      }
+    } catch (err) {
+      console.warn('Error fetching crypto conversion rate:', err)
+    } finally {
+      setCryptoConversionLoading(false)
     }
   }
 
