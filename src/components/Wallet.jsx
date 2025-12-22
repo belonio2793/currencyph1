@@ -88,6 +88,14 @@ export default function Wallet({ userId, globalCurrency = 'PHP' }) {
         return
       }
 
+      // Determine available wallet types based on user's wallets
+      const types = new Set(allWallets.map(w => w.currency_type))
+      const availableTypesList = ['all']
+      if (types.has('fiat')) availableTypesList.push('currency')
+      if (types.has('crypto')) availableTypesList.push('cryptocurrency')
+      if (types.has('wire')) availableTypesList.push('wire')
+      setAvailableTypes(availableTypesList)
+
       // Filter to only selected currencies
       const filteredWallets = allWallets.filter(w =>
         preferences?.includes(w.currency_code)
