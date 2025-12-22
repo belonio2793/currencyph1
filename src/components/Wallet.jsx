@@ -420,8 +420,10 @@ export default function Wallet({ userId, globalCurrency = 'PHP' }) {
           </div>
         )}
 
-        {/* Transactions List */}
-        <TransactionsList userId={userId} />
+        {/* Transactions List - Always shows all transactions across all wallets */}
+        <div className="mt-12">
+          <TransactionsList userId={userId} />
+        </div>
 
         {/* Customizer Modal */}
         {showCustomizer && (
