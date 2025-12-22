@@ -466,10 +466,10 @@ export default function Rates() {
                 <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg p-6 border border-blue-200">
                   <p className="text-sm text-slate-600 mb-2">Result</p>
                   <div className="text-4xl font-bold text-blue-600 mb-2">
-                    {result.amount} {selectedTo}
+                    {result.amount} {showSymbolInConverter && toCurrency ? getSymbolForCurrency(selectedTo, toCurrency.metadata) : selectedTo}
                   </div>
                   <p className="text-sm text-slate-600">
-                    1 {selectedFrom} = {formatNumber(result.rate, toCurrency?.metadata?.decimals || 2)} {selectedTo}
+                    1 {formatConverterDisplay(selectedFrom, fromCurrency?.metadata)} = {formatNumber(result.rate, toCurrency?.metadata?.decimals || 2)} {showSymbolInConverter && toCurrency ? getSymbolForCurrency(selectedTo, toCurrency.metadata) : selectedTo}
                   </p>
                 </div>
               )}
