@@ -268,7 +268,7 @@ export class DepositService {
       [DEPOSIT_METHODS.CRYPTO_DIRECT]: {
         id: DEPOSIT_METHODS.CRYPTO_DIRECT,
         name: 'Direct Cryptocurrency Transfer',
-        icon: '₿',
+        icon: '🪙',
         description: 'Send crypto directly from any wallet',
         processingTime: 'Varies by blockchain (typically 10 minutes - 1 hour)',
         fees: 'Network fees only',
