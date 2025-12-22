@@ -48,33 +48,46 @@ const CRYPTO_SYMBOLS = [
 
 async function fetchExConvertRates(fromCurrency: string, toCurrencies: string[]) {
   if (!EXCONVERT_KEY) return null
+
+  const rates: Record<string, number> = {}
+
   try {
-    const toParam = toCurrencies.join(',')
-    const url = `https://api.exconvert.com/convert?access_key=${EXCONVERT_KEY}&from=${fromCurrency}&to=${toParam}&amount=1`
+    // ExConvert API only accepts one target currency per request
+    // Make individual requests for each target currency
+    for (const toCurrency of toCurrencies) {
+      try {
+        const url = `https://api.exconvert.com/convert?access_key=${EXCONVERT_KEY}&from=${fromCurrency}&to=${toCurrency}&amount=1`
 
-    const resp = await fetch(url, {
-      headers: { Accept: 'application/json' },
-      signal: AbortSignal.timeout(15000)
-    })
+        const resp = await fetch(url, {
+          headers: { Accept: 'application/json' },
+          signal: AbortSignal.timeout(10000)
+        })
 
-    if (!resp.ok) {
-      console.warn(`[ExConvert] Failed for ${fromCurrency}: ${resp.status}`)
-      return null
-    }
+        if (!resp.ok) {
+          console.warn(`[ExConvert] Failed for ${fromCurrency}→${toCurrency}: ${resp.status}`)
+          continue
+        }
 
-    const json = await resp.json()
+        const json = await resp.json()
 
-    // ExConvert returns: { success: true, result: { [currency]: amount, ... } }
-    if (json.success && json.result) {
-      // Convert back to rates (1 unit = result[currency] in target)
-      const rates: Record<string, number> = {}
-      for (const [currency, amount] of Object.entries(json.result)) {
-        rates[currency as string] = 1 / (amount as number)
+        // ExConvert returns: { base: "USD", amount: "1", result: { [currency]: rate }, ms: 2 }
+        if (json.result && typeof json.result === 'object') {
+          // Find the rate value from result object
+          const rateValue = json.result[toCurrency] || json.result.rate
+          if (typeof rateValue === 'number' && rateValue > 0) {
+            rates[toCurrency] = rateValue
+          }
+        }
+      } catch (e) {
+        console.warn(`[ExConvert] Individual request failed for ${fromCurrency}→${toCurrency}:`, e?.message || e)
+        continue
       }
-      return rates
+
+      // Small delay to avoid rate limiting
+      await new Promise(resolve => setTimeout(resolve, 100))
     }
 
-    return null
+    return Object.keys(rates).length > 0 ? rates : null
   } catch (e) {
     console.warn(`[ExConvert] fetch failed for ${fromCurrency}:`, e?.message || e)
     return null
