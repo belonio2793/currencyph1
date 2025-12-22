@@ -34,36 +34,49 @@ export default function Rates() {
 
       // 1. Fetch all pairs from pairs table with pagination
       console.log('📥 Starting to fetch all pairs from public.pairs table...')
-      const pageSize = 1000
+      const pageSize = 500
       let allPairs = []
       let offset = 0
       let hasMore = true
+      let pageCount = 0
 
       while (hasMore) {
-        const pairsRes = await supabase
-          .from('pairs')
-          .select('from_currency,to_currency,rate,source_table,updated_at')
-          .range(offset, offset + pageSize - 1)
+        try {
+          console.log(`📥 Fetching page ${pageCount + 1} at offset ${offset}...`)
 
-        if (pairsRes.error) {
-          console.error('❌ pairs query failed:', pairsRes.error)
-          throw new Error(`Failed to load rates: ${pairsRes.error.message}`)
-        }
+          const pairsRes = await supabase
+            .from('pairs')
+            .select('from_currency,to_currency,rate,source_table,updated_at', { count: 'exact' })
+            .range(offset, offset + pageSize - 1)
 
-        const pageData = pairsRes.data || []
-        if (pageData.length === 0) {
-          hasMore = false
-        } else {
-          allPairs.push(...pageData)
-          console.log(`📥 Loaded page at offset ${offset}: ${pageData.length} pairs (total: ${allPairs.length})`)
-          offset += pageSize
+          if (pairsRes.error) {
+            console.error('❌ pairs query failed with error:')
+            console.error('  Error message:', pairsRes.error.message)
+            console.error('  Error details:', JSON.stringify(pairsRes.error, null, 2))
+            throw new Error(`Supabase error: ${pairsRes.error.message}`)
+          }
 
-          // Small delay to avoid rate limiting
-          await new Promise(resolve => setTimeout(resolve, 10))
+          const pageData = pairsRes.data || []
+          console.log(`✅ Page ${pageCount + 1}: Got ${pageData.length} pairs (total so far: ${allPairs.length + pageData.length})`)
+
+          if (pageData.length === 0) {
+            hasMore = false
+            console.log('📭 No more data, pagination complete')
+          } else {
+            allPairs.push(...pageData)
+            offset += pageSize
+            pageCount++
+
+            // Delay between requests to avoid rate limiting
+            await new Promise(resolve => setTimeout(resolve, 100))
+          }
+        } catch (pageErr) {
+          console.error(`❌ Error loading page ${pageCount + 1}:`, pageErr)
+          throw new Error(`Failed to load pairs at page ${pageCount + 1}: ${pageErr.message}`)
         }
       }
 
-      console.log(`✅ Loaded ${allPairs.length} total rate pairs from pairs table`)
+      console.log(`✅ Pagination complete! Loaded ${allPairs.length} total rate pairs from ${pageCount} pages`)
 
       // 2. Extract all unique currencies and cryptocurrencies from pairs
       const uniqueCodes = new Set()
