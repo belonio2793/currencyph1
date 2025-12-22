@@ -200,7 +200,6 @@ export default {
   paymentMethods,
   gcashAPI,
   cryptoAPI,
-  bankTransferAPI,
   partnerAPI,
   paymentHandler
 }
