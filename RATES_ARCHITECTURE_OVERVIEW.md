@@ -47,21 +47,23 @@ You asked: *"setup crypto_rates to fetch directly from exconvert and also make s
 | `cryptocurrency_rates` | Cryptos | Manual/legacy | `pairs` |
 | `cached_rates` | Cache for fallback | Edge function | - |
 
-### 3. **Triggers & Sync Mechanisms** ✅ NOW COMPLETE
+### 3. **Direct Storage (No Triggers)** ✅ SIMPLIFIED
 
-#### Trigger Chain:
+Edge function stores directly in both tables simultaneously:
 ```
-crypto_rates (INSERT/UPDATE/DELETE)
-  ↓ [NEW: crypto_rates_sync trigger]
-  pairs table (auto-updated)
-  ↓ [UNIQUE constraint]
-  Prevents duplicates, keeps latest rate
+storeAllRatesInDatabase()
+  ├─→ Build crypto_rates records (with 1-hour expiration)
+  ├─→ Build pairs records (for unified lookup)
+  ├─→ upsert to crypto_rates table
+  └─→ upsert to pairs table
 ```
 
-#### All Sync Paths:
-- ✅ `crypto_rates` → `pairs` (NEW migration 0116)
-- ✅ `currency_rates` → `pairs` (existing)
-- ✅ `cryptocurrency_rates` → `pairs` (existing)
+**Benefits:**
+- ✅ No trigger overhead
+- ✅ Atomic operation (both tables updated together)
+- ✅ Faster execution
+- ✅ Simpler debugging
+- ✅ Source='exconvert' explicitly set
 
 ---
 
