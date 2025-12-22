@@ -713,6 +713,7 @@ export default function App() {
                         {activeTab === 'dashboard' && <Dashboard userId={userId} onNavigate={setActiveTab} globalCurrency={globalCurrency} globalCryptocurrency={globalCryptocurrency} userEmail={userEmail} />}
                         {activeTab === 'wallet' && <Wallet userId={userId} totalBalancePHP={totalBalancePHP} globalCurrency={globalCurrency} />}
                         {activeTab === 'send' && <SendMoney userId={userId} />}
+                        {activeTab === 'send-payment' && <SendPaymentRequest userId={userId} onClose={() => setActiveTab('wallet')} />}
                         {activeTab === 'receive' && <ReceiveMoney userId={userId} />}
                         {activeTab === 'investments' && <Investments userId={userId} />}
                         {activeTab === 'bills' && <BillPayments userId={userId} />}
