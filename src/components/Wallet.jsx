@@ -340,7 +340,7 @@ export default function Wallet({ userId, globalCurrency = 'PHP' }) {
                               <tr key={wallet.id} className={idx % 2 === 0 ? 'bg-white' : 'bg-slate-50'}>
                                 <td className="px-6 py-4 text-sm font-medium text-slate-900">{wallet.currency_code}</td>
                                 <td className="px-6 py-4 text-sm text-slate-600">
-                                  {wallet.currency_code === 'PHP' ? '₱' : wallet.currency_code === 'USD' ? '$' : wallet.currency_code === 'EUR' ? '€' : wallet.currency_code === 'GBP' ? '£' : wallet.currency_code}
+                                  {wallet.symbol || (wallet.currency_code === 'PHP' ? '₱' : wallet.currency_code === 'USD' ? '$' : wallet.currency_code === 'EUR' ? '€' : wallet.currency_code === 'GBP' ? '£' : wallet.currency_code)}
                                 </td>
                                 <td className="px-6 py-4 text-sm font-mono text-slate-900 text-right">{formatNumber(wallet.balance || 0)}</td>
                                 <td className="px-6 py-4 text-sm font-mono text-slate-600 text-right">{formatNumber(wallet.total_deposited || 0)}</td>
