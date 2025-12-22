@@ -249,6 +249,19 @@ export default function ReceiveMoney({ userId, globalCurrency = 'PHP' }) {
 
       console.debug('ReceiveMoney loadData started:', { userId, isGuest: userId?.includes('guest') })
 
+      // Check authentication status
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession()
+      if (sessionError) {
+        console.error('Auth session error:', sessionError)
+        setAuthStatus({ authenticated: false, reason: 'Session check failed' })
+      } else if (!session) {
+        console.warn('No active auth session')
+        setAuthStatus({ authenticated: false, reason: 'No active session' })
+      } else {
+        console.debug('Auth session found:', session.user.id)
+        setAuthStatus({ authenticated: true, userId: session.user.id, email: session.user.email })
+      }
+
       if (userId && !userId.includes('guest')) {
         try {
           console.debug('Loading wallets for user:', userId)
