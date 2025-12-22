@@ -589,6 +589,12 @@ export default function App() {
             </Suspense>
           )}
 
+          {activeTab === 'payment-checkout' && (
+            <Suspense fallback={<PageLoader />}>
+              <DynamicCheckoutPage />
+            </Suspense>
+          )}
+
           {/* Normal layout for all other pages */}
           {activeTab !== 'planning-setup' && activeTab !== 'planning' && activeTab !== 'checkout' && (
             <div className="min-h-screen bg-slate-50 flex">
