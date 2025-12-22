@@ -30,6 +30,81 @@ if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE) {
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE)
 
+// List of major world currencies to fetch rates for
+const WORLD_CURRENCIES = [
+  'USD', 'EUR', 'GBP', 'JPY', 'AUD', 'CAD', 'CHF', 'CNY', 'SEK', 'NZD',
+  'MXN', 'SGD', 'HKD', 'NOK', 'KRW', 'TRY', 'RUB', 'INR', 'BRL', 'ZAR',
+  'PHP', 'THB', 'MYR', 'IDR', 'VND', 'PKR', 'BDT', 'AED', 'SAR', 'QAR',
+  'KWD', 'JOD', 'ILS', 'EGP', 'NGN', 'KES', 'GHS', 'CLP', 'PEN', 'COP',
+  'UYU', 'ARS', 'VEF', 'CZK', 'HUF', 'PLN', 'RON', 'BGN', 'HRK', 'RSD'
+]
+
+// All 30 cryptocurrencies (by symbol for easier API queries)
+const CRYPTO_SYMBOLS = [
+  'BTC', 'ETH', 'LTC', 'DOGE', 'XRP', 'ADA', 'SOL', 'AVAX', 'DOT', 'LINK',
+  'UNI', 'AAVE', 'USDC', 'USDT', 'BNB', 'XLM', 'TRX', 'HBAR', 'TON', 'SUI',
+  'BCH', 'SHIB', 'PYUSD', 'WLD', 'XAUT', 'PEPE', 'HYPE', 'ASTER', 'ENA', 'SKY'
+]
+
+async function fetchExConvertRates(fromCurrency: string, toCurrencies: string[]) {
+  if (!EXCONVERT_KEY) return null
+  try {
+    const toParam = toCurrencies.join(',')
+    const url = `https://api.exconvert.com/convert?access_key=${EXCONVERT_KEY}&from=${fromCurrency}&to=${toParam}&amount=1`
+
+    const resp = await fetch(url, {
+      headers: { Accept: 'application/json' },
+      signal: AbortSignal.timeout(15000)
+    })
+
+    if (!resp.ok) {
+      console.warn(`[ExConvert] Failed for ${fromCurrency}: ${resp.status}`)
+      return null
+    }
+
+    const json = await resp.json()
+
+    // ExConvert returns: { success: true, result: { [currency]: amount, ... } }
+    if (json.success && json.result) {
+      // Convert back to rates (1 unit = result[currency] in target)
+      const rates: Record<string, number> = {}
+      for (const [currency, amount] of Object.entries(json.result)) {
+        rates[currency as string] = 1 / (amount as number)
+      }
+      return rates
+    }
+
+    return null
+  } catch (e) {
+    console.warn(`[ExConvert] fetch failed for ${fromCurrency}:`, e?.message || e)
+    return null
+  }
+}
+
+async function fetchAllExConvertRates() {
+  const allRates: Record<string, Record<string, number>> = {}
+
+  console.log('[ExConvert] Fetching rates for', WORLD_CURRENCIES.length, 'fiat currencies and', CRYPTO_SYMBOLS.length, 'cryptocurrencies')
+
+  // Fetch all fiat currencies
+  for (const fromCurrency of WORLD_CURRENCIES) {
+    const rates = await fetchExConvertRates(fromCurrency, WORLD_CURRENCIES.filter(c => c !== fromCurrency))
+    if (rates) {
+      allRates[fromCurrency] = rates
+    }
+  }
+
+  // Fetch all cryptocurrencies
+  for (const cryptoSymbol of CRYPTO_SYMBOLS) {
+    const rates = await fetchExConvertRates(cryptoSymbol, ['USD', 'PHP', ...WORLD_CURRENCIES])
+    if (rates) {
+      allRates[cryptoSymbol] = rates
+    }
+  }
+
+  return Object.keys(allRates).length > 0 ? allRates : null
+}
+
 async function fetchOpenExchangeRates() {
   if (!OPEN_EXCHANGE_KEY) return null
   try {
