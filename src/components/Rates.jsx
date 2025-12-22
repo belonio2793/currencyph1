@@ -275,7 +275,7 @@ export default function Rates() {
       const fromRate = rates.find(r => r.code === selectedFrom)
       const toRate = rates.find(r => r.code === selectedTo)
 
-      if (fromRate && toRate && fromRate.rate > 0 && toRate.rate > 0) {
+      if (fromRate && toRate && isFinite(fromRate.rate) && fromRate.rate > 0 && isFinite(toRate.rate) && toRate.rate > 0) {
         const convertedAmount = (numAmount * toRate.rate) / fromRate.rate
         const toDecimals = toRate.metadata?.decimals || 2
         setResult({
