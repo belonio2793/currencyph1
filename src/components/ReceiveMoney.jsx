@@ -807,36 +807,50 @@ export default function ReceiveMoney({ userId, globalCurrency = 'PHP' }) {
                         ))}
                       </div>
 
-                      {/* Crypto Selection */}
+                      {/* Crypto Selection with Enhanced Display */}
                       {selectedMethod === 'crypto' && (
-                        <div>
-                          <label className="block text-sm font-medium text-slate-700 mb-3">
-                            Select Cryptocurrency
-                          </label>
-                          <div className="space-y-2 max-h-64 overflow-y-auto">
-                            {availableCryptos.map(crypto => (
-                              <button
-                                key={crypto.code}
-                                type="button"
-                                onClick={() => {
-                                  setSelectedCryptoNetwork(crypto.code)
-                                  if (crypto.addresses.length > 0) {
-                                    setSelectedDepositAddress(crypto.addresses[0])
-                                  }
-                                }}
-                                className={`w-full p-3 rounded-lg border-2 transition-all text-left ${
-                                  selectedCryptoNetwork === crypto.code
-                                    ? 'border-blue-600 bg-blue-50'
-                                    : 'border-slate-200 hover:border-slate-300'
-                                }`}
-                              >
-                                <div className="font-medium text-slate-900">{crypto.code}</div>
-                                <div className="text-xs text-slate-600 mt-1">
-                                  {crypto.addresses.length} network{crypto.addresses.length !== 1 ? 's' : ''}
-                                </div>
-                              </button>
-                            ))}
+                        <div className="space-y-4">
+                          <div>
+                            <label className="block text-sm font-medium text-slate-700 mb-3">
+                              Select Cryptocurrency
+                            </label>
+                            <div className="grid grid-cols-2 gap-2 max-h-80 overflow-y-auto p-1">
+                              {availableCryptos.map(crypto => (
+                                <button
+                                  key={crypto.code}
+                                  type="button"
+                                  onClick={() => {
+                                    setSelectedCryptoNetwork(crypto.code)
+                                    if (crypto.networks.length > 0) {
+                                      setSelectedDepositAddress(crypto.networks[0])
+                                    }
+                                  }}
+                                  className={`p-3 rounded-lg border-2 transition-all text-left ${
+                                    selectedCryptoNetwork === crypto.code
+                                      ? 'border-blue-600 bg-blue-50 shadow-md'
+                                      : 'border-slate-200 hover:border-slate-300 bg-white'
+                                  }`}
+                                >
+                                  <div className="font-semibold text-slate-900 text-sm">{crypto.code}</div>
+                                  <div className="text-xs text-slate-600 mt-1">
+                                    {crypto.networks.length} network{crypto.networks.length !== 1 ? 's' : ''}
+                                  </div>
+                                </button>
+                              ))}
+                            </div>
                           </div>
+
+                          {/* Show crypto details when selected */}
+                          {selectedCryptoNetwork && cryptoAddresses[selectedCryptoNetwork] && (
+                            <div className="bg-slate-50 rounded-lg p-4 border border-slate-200">
+                              <p className="text-sm font-semibold text-slate-900 mb-3">
+                                {cryptoAddresses[selectedCryptoNetwork].currency}
+                              </p>
+                              <div className="space-y-2 text-xs text-slate-600">
+                                <p>✓ Available on {cryptoAddresses[selectedCryptoNetwork].networks.length} network{cryptoAddresses[selectedCryptoNetwork].networks.length !== 1 ? 's' : ''}</p>
+                              </div>
+                            </div>
+                          )}
                         </div>
                       )}
 
