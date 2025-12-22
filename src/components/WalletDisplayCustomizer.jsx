@@ -155,9 +155,9 @@ export default function WalletDisplayCustomizer({ userId, onClose, onUpdate }) {
   return (
     <div className="bg-white rounded-lg border border-slate-200 p-8">
       <div className="mb-8">
-        <h2 className="text-4xl font-light text-slate-900 mb-3">Dashboard Currencies</h2>
+        <h2 className="text-4xl font-light text-slate-900 mb-3">Add Currencies to Wallet</h2>
         <p className="text-base text-slate-600">
-          Select which currencies to display on your dashboard. PHP is always included.
+          Select which currencies to add to your account. PHP is always included.
         </p>
       </div>
 
@@ -172,16 +172,48 @@ export default function WalletDisplayCustomizer({ userId, onClose, onUpdate }) {
         </div>
       )}
 
+      {/* Currency Type Tabs */}
+      <div className="mb-8 border-b border-slate-200">
+        <div className="flex gap-6">
+          <button
+            onClick={() => {
+              setActiveTab('currency')
+              setSearchInput('')
+            }}
+            className={`pb-3 px-2 font-medium text-base border-b-2 transition-colors ${
+              activeTab === 'currency'
+                ? 'border-blue-600 text-blue-600'
+                : 'border-transparent text-slate-600 hover:text-slate-900'
+            }`}
+          >
+            Fiat Currency ({allFiatCurrencies.length})
+          </button>
+          <button
+            onClick={() => {
+              setActiveTab('cryptocurrency')
+              setSearchInput('')
+            }}
+            className={`pb-3 px-2 font-medium text-base border-b-2 transition-colors ${
+              activeTab === 'cryptocurrency'
+                ? 'border-orange-600 text-orange-600'
+                : 'border-transparent text-slate-600 hover:text-slate-900'
+            }`}
+          >
+            Cryptocurrency ({allCryptoCurrencies.length})
+          </button>
+        </div>
+      </div>
+
       {/* Search and Dropdown */}
       <div className="mb-8">
         <label className="block text-lg font-medium text-slate-700 mb-3">
-          Search and Add Currencies
+          {activeTab === 'currency' ? 'Search Fiat Currencies' : 'Search Cryptocurrencies'}
         </label>
 
         <div className="relative">
           <input
             type="text"
-            placeholder="Search by code or name... (PHP, USD, EUR, etc.)"
+            placeholder={activeTab === 'currency' ? 'Search by code or name... (USD, EUR, GBP, etc.)' : 'Search by code... (BTC, ETH, SOL, etc.)'}
             value={searchInput}
             onChange={(e) => {
               setSearchInput(e.target.value)
