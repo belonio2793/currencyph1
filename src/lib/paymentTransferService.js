@@ -1,40 +1,177 @@
 import { supabase } from './supabaseClient'
+import { currencyAPI } from './payments'
 
 /**
- * Payment Transfer Service
- * Handles wallet-to-wallet transfers and balance management
+ * PaymentTransferService
+ * Handles multi-step payment transfers with currency conversion,
+ * wallet management, and transaction recording
  */
-
 export const paymentTransferService = {
   /**
-   * Get user's wallet balances for all active currencies
+   * Create a payment transfer request
+   * Step 1: User enters amount in their preferred currency
+   * Step 2: Select recipient and method
+   * Step 3: Finalize with profile details
    */
-  async getUserBalances(userId) {
+  async createTransferRequest(senderUserId, recipientUserId, transferData) {
     try {
-      const { data, error } = await supabase
-        .from('wallets')
-        .select('id, user_id, currency_code, balance, total_deposited, total_withdrawn, is_active, created_at, updated_at')
-        .eq('user_id', userId)
-        .eq('is_active', true)
-        .order('created_at', { ascending: true })
+      const {
+        senderAmount,
+        senderCurrency,
+        recipientAmount,
+        recipientCurrency,
+        senderWalletId,
+        recipientWalletId,
+        description,
+        exchangeRate,
+        rateSource,
+        metadata = {}
+      } = transferData
 
-      if (error) throw error
+      // Validate amounts
+      if (!senderAmount || senderAmount <= 0) {
+        throw new Error('Invalid sender amount')
+      }
+      if (!recipientAmount || recipientAmount <= 0) {
+        throw new Error('Invalid recipient amount')
+      }
+
+      // Check sender has sufficient balance
+      const senderWallet = await this.getWallet(senderWalletId)
+      if (!senderWallet) {
+        throw new Error('Sender wallet not found')
+      }
+      if (senderWallet.balance < senderAmount) {
+        throw new Error('Insufficient balance')
+      }
+
+      // Create transfer record
+      const { data: transfer, error: transferError } = await supabase
+        .from('transfers')
+        .insert([
+          {
+            from_user_id: senderUserId,
+            to_user_id: recipientUserId,
+            from_wallet_id: senderWalletId,
+            to_wallet_id: recipientWalletId,
+            sender_amount: senderAmount,
+            sender_currency: senderCurrency,
+            recipient_amount: recipientAmount,
+            recipient_currency: recipientCurrency,
+            exchange_rate: exchangeRate || 1,
+            rate_source: rateSource || 'manual',
+            rate_fetched_at: new Date().toISOString(),
+            status: 'pending',
+            fee: 0,
+            description: description || 'Payment transfer',
+            metadata: {
+              ...metadata,
+              created_via: 'payment_request'
+            }
+          }
+        ])
+        .select()
+        .single()
+
+      if (transferError) {
+        throw new Error(`Failed to create transfer: ${transferError.message}`)
+      }
 
       return {
         success: true,
-        balances: data || [],
-        total: data?.length || 0
+        transfer,
+        message: 'Transfer request created successfully'
       }
     } catch (error) {
-      console.error('Error fetching user balances:', error)
-      throw new Error(`Failed to fetch balances: ${error.message}`)
+      console.error('Error creating transfer request:', error)
+      throw error
     }
   },
 
   /**
-   * Get specific wallet balance
+   * Complete a transfer and update wallets
+   * Called when payment is confirmed
    */
-  async getWalletBalance(walletId) {
+  async completeTransfer(transferId, recipientConfirmation = {}) {
+    try {
+      // Get transfer details
+      const { data: transfer, error: fetchError } = await supabase
+        .from('transfers')
+        .select('*')
+        .eq('id', transferId)
+        .single()
+
+      if (fetchError) {
+        throw new Error('Transfer not found')
+      }
+
+      if (transfer.status !== 'pending') {
+        throw new Error(`Transfer is already ${transfer.status}`)
+      }
+
+      // Update transfer status
+      const { error: updateError } = await supabase
+        .from('transfers')
+        .update({
+          status: 'completed',
+          completed_at: new Date().toISOString(),
+          metadata: {
+            ...transfer.metadata,
+            recipient_confirmation: recipientConfirmation,
+            completed_at_iso: new Date().toISOString()
+          }
+        })
+        .eq('id', transferId)
+
+      if (updateError) {
+        throw new Error(`Failed to update transfer: ${updateError.message}`)
+      }
+
+      // Debit sender wallet
+      const debitResult = await this.updateWalletBalance(
+        transfer.from_wallet_id,
+        -transfer.sender_amount,
+        'transfer_debit',
+        `Sent ${transfer.sender_amount} ${transfer.sender_currency} to user`,
+        transferId
+      )
+
+      if (!debitResult.success) {
+        throw new Error('Failed to debit sender wallet')
+      }
+
+      // Credit recipient wallet
+      const creditResult = await this.updateWalletBalance(
+        transfer.to_wallet_id,
+        transfer.recipient_amount,
+        'transfer_credit',
+        `Received ${transfer.recipient_amount} ${transfer.recipient_currency} from user`,
+        transferId
+      )
+
+      if (!creditResult.success) {
+        throw new Error('Failed to credit recipient wallet')
+      }
+
+      return {
+        success: true,
+        transfer: {
+          ...transfer,
+          status: 'completed',
+          completed_at: new Date().toISOString()
+        },
+        message: 'Transfer completed successfully'
+      }
+    } catch (error) {
+      console.error('Error completing transfer:', error)
+      throw error
+    }
+  },
+
+  /**
+   * Get wallet details
+   */
+  async getWallet(walletId) {
     try {
       const { data, error } = await supabase
         .from('wallets')
@@ -42,234 +179,205 @@ export const paymentTransferService = {
         .eq('id', walletId)
         .single()
 
-      if (error) throw error
-
-      return {
-        success: true,
-        wallet: data
+      if (error) {
+        console.warn('Wallet not found:', error)
+        return null
       }
-    } catch (error) {
-      console.error('Error fetching wallet balance:', error)
-      throw new Error(`Failed to fetch wallet: ${error.message}`)
-    }
-  },
 
-  /**
-   * Get wallet by user ID and currency code
-   */
-  async getWalletByCurrency(userId, currencyCode) {
-    try {
-      const { data, error } = await supabase
-        .from('wallets')
-        .select('*')
-        .eq('user_id', userId)
-        .eq('currency_code', currencyCode)
-        .single()
-
-      if (error) throw error
-
-      return {
-        success: true,
-        wallet: data
-      }
+      return data
     } catch (error) {
       console.error('Error fetching wallet:', error)
-      throw new Error(`Failed to fetch wallet: ${error.message}`)
+      return null
     }
   },
 
   /**
-   * Get user info by ID (for display in checkout)
+   * Update wallet balance and create transaction record
    */
-  async getUserInfo(userId) {
+  async updateWalletBalance(walletId, amountChange, transactionType, description, referenceId) {
     try {
-      const { data, error } = await supabase
-        .from('users')
-        .select('id, email, display_name, avatar_url')
-        .eq('id', userId)
+      // Get current wallet
+      const wallet = await this.getWallet(walletId)
+      if (!wallet) {
+        throw new Error('Wallet not found')
+      }
+
+      const newBalance = parseFloat(wallet.balance || 0) + parseFloat(amountChange)
+
+      // Update wallet balance
+      const { error: walletError } = await supabase
+        .from('wallets')
+        .update({
+          balance: newBalance,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', walletId)
+
+      if (walletError) {
+        throw new Error(`Failed to update wallet: ${walletError.message}`)
+      }
+
+      // Record transaction
+      const { error: txError } = await supabase
+        .from('wallet_transactions')
+        .insert([
+          {
+            wallet_id: walletId,
+            user_id: wallet.user_id,
+            amount: Math.abs(amountChange),
+            currency_code: wallet.currency_code,
+            transaction_type: transactionType,
+            description: description || transactionType,
+            reference_id: referenceId,
+            balance_before: wallet.balance,
+            balance_after: newBalance,
+            metadata: {
+              reference_type: 'transfer',
+              reference_id: referenceId
+            },
+            created_at: new Date().toISOString()
+          }
+        ])
+
+      if (txError) {
+        console.warn('Failed to record transaction:', txError)
+        // Continue even if transaction recording fails
+      }
+
+      return {
+        success: true,
+        wallet: {
+          ...wallet,
+          balance: newBalance
+        }
+      }
+    } catch (error) {
+      console.error('Error updating wallet balance:', error)
+      return {
+        success: false,
+        error: error.message
+      }
+    }
+  },
+
+  /**
+   * Get exchange rate between currencies
+   */
+  async getExchangeRate(fromCurrency, toCurrency) {
+    try {
+      if (fromCurrency === toCurrency) {
+        return 1
+      }
+      const rate = await currencyAPI.getExchangeRate(fromCurrency, toCurrency)
+      return rate || 1
+    } catch (error) {
+      console.warn('Error fetching exchange rate:', error)
+      return 1
+    }
+  },
+
+  /**
+   * Cancel a pending transfer
+   */
+  async cancelTransfer(transferId) {
+    try {
+      const { data: transfer, error: fetchError } = await supabase
+        .from('transfers')
+        .select('*')
+        .eq('id', transferId)
         .single()
 
-      if (error) throw error
-
-      return {
-        success: true,
-        user: data
+      if (fetchError) {
+        throw new Error('Transfer not found')
       }
-    } catch (error) {
-      console.error('Error fetching user info:', error)
-      throw new Error(`Failed to fetch user: ${error.message}`)
-    }
-  },
 
-  /**
-   * Record balance transaction in the ledger
-   */
-  async recordBalanceTransaction(transactionData) {
-    try {
-      const {
-        userId,
-        currencyCode,
-        transactionType,
-        amount,
-        balanceBefore,
-        balanceAfter,
-        senderId = null,
-        receiverId = null,
-        referenceId = null,
-        referenceType = null,
-        description = null,
-        metadata = {}
-      } = transactionData
+      if (transfer.status !== 'pending') {
+        throw new Error(`Cannot cancel ${transfer.status} transfer`)
+      }
 
-      const { data, error } = await supabase
-        .rpc('record_balance_transaction', {
-          p_user_id: userId,
-          p_currency_code: currencyCode,
-          p_transaction_type: transactionType,
-          p_amount: amount,
-          p_balance_before: balanceBefore,
-          p_balance_after: balanceAfter,
-          p_sender_id: senderId,
-          p_receiver_id: receiverId,
-          p_reference_id: referenceId,
-          p_reference_type: referenceType,
-          p_description: description,
-          p_metadata: metadata
+      const { error: updateError } = await supabase
+        .from('transfers')
+        .update({
+          status: 'cancelled',
+          updated_at: new Date().toISOString()
         })
+        .eq('id', transferId)
 
-      if (error) throw error
+      if (updateError) {
+        throw new Error('Failed to cancel transfer')
+      }
 
       return {
         success: true,
-        transactionId: data
+        message: 'Transfer cancelled successfully'
       }
     } catch (error) {
-      console.error('Error recording balance transaction:', error)
-      throw new Error(`Failed to record transaction: ${error.message}`)
+      console.error('Error cancelling transfer:', error)
+      throw error
     }
   },
 
   /**
-   * Transfer funds between two users (wallet to wallet)
+   * Get transfer history for a user
    */
-  async transferFunds(transferData) {
+  async getTransferHistory(userId, limit = 20, offset = 0) {
     try {
-      const {
-        senderId,
-        receiverId,
-        amount,
-        currencyCode,
-        description = 'Payment transfer',
-        metadata = {}
-      } = transferData
-
-      if (!senderId || !receiverId || !amount || !currencyCode) {
-        throw new Error('Missing required transfer data: senderId, receiverId, amount, currencyCode')
-      }
-
-      if (senderId === receiverId) {
-        throw new Error('Cannot transfer to yourself')
-      }
-
-      if (amount <= 0) {
-        throw new Error('Amount must be greater than 0')
-      }
-
-      // Get sender's wallet
-      const senderWallet = await this.getWalletByCurrency(senderId, currencyCode)
-      if (!senderWallet.success) throw new Error('Sender wallet not found')
-
-      const senderBalance = parseFloat(senderWallet.wallet.balance)
-      if (senderBalance < amount) {
-        throw new Error(`Insufficient balance. Available: ${senderBalance} ${currencyCode}`)
-      }
-
-      // Get receiver's wallet
-      const receiverWallet = await this.getWalletByCurrency(receiverId, currencyCode)
-      if (!receiverWallet.success) throw new Error('Receiver wallet not found')
-
-      // Perform the transfer using Supabase RPC
-      const { data, error } = await supabase.rpc('transfer_funds', {
-        p_sender_id: senderId,
-        p_receiver_id: receiverId,
-        p_sender_wallet_id: senderWallet.wallet.id,
-        p_receiver_wallet_id: receiverWallet.wallet.id,
-        p_amount: amount,
-        p_currency_code: currencyCode,
-        p_description: description,
-        p_metadata: metadata
-      })
+      const { data, error } = await supabase
+        .from('transfers')
+        .select(`
+          *,
+          from_user:from_user_id(id, email, full_name),
+          to_user:to_user_id(id, email, full_name)
+        `)
+        .or(`from_user_id.eq.${userId},to_user_id.eq.${userId}`)
+        .order('created_at', { ascending: false })
+        .range(offset, offset + limit - 1)
 
       if (error) {
-        if (error.message.includes('Insufficient balance')) {
-          throw new Error(`Insufficient balance. Available: ${senderBalance} ${currencyCode}`)
-        }
         throw error
       }
 
       return {
         success: true,
-        transfer: data,
-        message: `Successfully transferred ${amount} ${currencyCode} to recipient`
-      }
-    } catch (error) {
-      console.error('Error transferring funds:', error)
-      throw new Error(`Transfer failed: ${error.message}`)
-    }
-  },
-
-  /**
-   * Get transaction history for a user
-   */
-  async getTransactionHistory(userId, currencyCode = null, limit = 50) {
-    try {
-      let query = supabase
-        .from('public.balances')
-        .select('*')
-        .eq('status', 'completed')
-        .order('created_at', { ascending: false })
-        .limit(limit)
-
-      // Filter by user (they sent or received)
-      query = query.or(`user_id.eq.${userId},sender_id.eq.${userId},receiver_id.eq.${userId}`)
-
-      if (currencyCode) {
-        query = query.eq('currency_code', currencyCode)
-      }
-
-      const { data, error } = await query
-
-      if (error) throw error
-
-      return {
-        success: true,
-        transactions: data || [],
+        transfers: data || [],
         total: data?.length || 0
       }
     } catch (error) {
-      console.error('Error fetching transaction history:', error)
-      throw new Error(`Failed to fetch transactions: ${error.message}`)
+      console.error('Error fetching transfer history:', error)
+      return {
+        success: false,
+        transfers: [],
+        total: 0
+      }
     }
   },
 
   /**
-   * Get balance by user and currency with conversion
+   * Generate payment link for transfer
    */
-  async getBalance(userId, currencyCode) {
+  generatePaymentLink(transferId, baseUrl = window.location.origin) {
+    return `${baseUrl}/payment/${transferId}`
+  },
+
+  /**
+   * Get recipient wallets for transfer
+   */
+  async getRecipientWallets(recipientUserId) {
     try {
-      const result = await this.getWalletByCurrency(userId, currencyCode)
-      if (!result.success) {
-        return { success: false, balance: 0 }
+      const { data, error } = await supabase
+        .from('wallets')
+        .select('*')
+        .eq('user_id', recipientUserId)
+        .eq('is_active', true)
+
+      if (error) {
+        throw error
       }
-      return {
-        success: true,
-        balance: parseFloat(result.wallet.balance),
-        walletId: result.wallet.id,
-        currency: currencyCode
-      }
+
+      return data || []
     } catch (error) {
-      console.error('Error getting balance:', error)
-      return { success: false, balance: 0, error: error.message }
+      console.error('Error fetching recipient wallets:', error)
+      return []
     }
   }
 }
