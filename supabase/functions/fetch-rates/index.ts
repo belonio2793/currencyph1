@@ -240,42 +240,72 @@ const coingeckoIdToCryptoCode = {
 
 async function storeAllRatesInDatabase(allRates: Record<string, Record<string, number>>, source = 'exconvert') {
   try {
-    const records: any[] = []
+    const cryptoRatesRecords: any[] = []
+    const pairsRecords: any[] = []
     const updatedAt = new Date().toISOString()
     const expiresAt = new Date(Date.now() + 3600000).toISOString() // 1 hour
 
     for (const [fromCurrency, ratesMap] of Object.entries(allRates)) {
       for (const [toCurrency, rate] of Object.entries(ratesMap)) {
         if (typeof rate === 'number' && rate > 0) {
-          records.push({
-            from_currency: fromCurrency.toUpperCase(),
-            to_currency: toCurrency.toUpperCase(),
-            rate: rate.toString(),
+          const fromUpper = fromCurrency.toUpperCase()
+          const toUpper = toCurrency.toUpperCase()
+          const rateStr = rate.toString()
+
+          // Record for crypto_rates table
+          cryptoRatesRecords.push({
+            from_currency: fromUpper,
+            to_currency: toUpper,
+            rate: rateStr,
             source,
             updated_at: updatedAt,
             expires_at: expiresAt
+          })
+
+          // Record for pairs table
+          pairsRecords.push({
+            from_currency: fromUpper,
+            to_currency: toUpper,
+            rate: rate,
+            source_table: source,
+            updated_at: updatedAt
           })
         }
       }
     }
 
-    if (records.length > 0) {
-      console.log(`[Database] Storing ${records.length} rate records...`)
-
-      const { error } = await supabase
-        .from('crypto_rates')
-        .upsert(records, { onConflict: 'from_currency,to_currency' })
-
-      if (error) {
-        console.warn('[Database] Failed to store rates:', error)
-        return 0
-      } else {
-        console.log(`[Database] Successfully stored ${records.length} rates`)
-        return records.length
-      }
+    if (cryptoRatesRecords.length === 0) {
+      return 0
     }
 
-    return 0
+    console.log(`[Database] Storing ${cryptoRatesRecords.length} rate records in crypto_rates...`)
+    console.log(`[Database] Storing ${pairsRecords.length} rate records in pairs...`)
+
+    // Insert into crypto_rates
+    const { error: cryptoError } = await supabase
+      .from('crypto_rates')
+      .upsert(cryptoRatesRecords, { onConflict: 'from_currency,to_currency' })
+
+    if (cryptoError) {
+      console.warn('[Database] Failed to store rates in crypto_rates:', cryptoError)
+      return 0
+    } else {
+      console.log(`[Database] Successfully stored ${cryptoRatesRecords.length} rates in crypto_rates`)
+    }
+
+    // Insert into pairs
+    const { error: pairsError } = await supabase
+      .from('pairs')
+      .upsert(pairsRecords, { onConflict: 'from_currency,to_currency' })
+
+    if (pairsError) {
+      console.warn('[Database] Failed to store rates in pairs:', pairsError)
+      return 0
+    } else {
+      console.log(`[Database] Successfully stored ${pairsRecords.length} rates in pairs`)
+    }
+
+    return cryptoRatesRecords.length
   } catch (e) {
     console.warn('[Database] storeAllRatesInDatabase failed:', e?.message || e)
     return 0
