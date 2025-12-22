@@ -650,7 +650,7 @@ export default function Jobs({ userId }) {
                   </div>
                   <div className="offer-footer">
                     <div className="footer-left">
-                      <span className="date">{new Date(offer.created_at).toLocaleDateString()}</span>
+                      <span className="date">{formatDateOnly(offer.created_at)}</span>
                       <button
                         className="btn-small"
                         onClick={() => handleJobSelect(offer.jobs)}
@@ -717,7 +717,7 @@ export default function Jobs({ userId }) {
                     </div>
                     <div className="detail-item">
                       <span className="label">Posted:</span>
-                      <span className="value">{new Date(job.created_at).toLocaleDateString()}</span>
+                      <span className="value">{formatDateOnly(job.created_at)}</span>
                     </div>
                   </div>
 
