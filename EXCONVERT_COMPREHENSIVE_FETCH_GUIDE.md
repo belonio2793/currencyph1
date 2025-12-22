@@ -206,10 +206,23 @@ This shows:
 ## FAQ
 
 **Q: Why fetch everything-to-everything?**
-A: Because ExConvert has unlimited free requests, you get the most comprehensive coverage with direct currency pair data.
+A: Because ExConvert has unlimited free requests, you get the most comprehensive coverage with direct currency pair data for all 163 fiat currencies + 31 cryptocurrencies.
+
+**Q: Why does it take so long (~2-3 hours)?**
+A: The script makes individual API calls with 150ms delays to avoid rate limiting:
+- Fiat-to-fiat: ~26,500 calls
+- Crypto-to-fiat: ~465 calls (31 × 15 major fiats)
+- Crypto-to-crypto: ~930 calls (31 × 30 other cryptos)
+- Total: ~27,900 calls = ~2.5 hours at 150ms/call
+
+**Q: Which cryptocurrencies are supported?**
+A: ExConvert supports 31 major cryptocurrencies: BTC, ETH, LTC, DOGE, XRP, ADA, SOL, AVAX, and 23 others.
 
 **Q: How often should I run this?**
-A: Daily is recommended for most use cases. Weekly is fine for slower-changing rates.
+A:
+- Daily: For most use cases (recommended)
+- Weekly: If traffic is low
+- Hourly: For high-frequency traders (will take 2-3 hours to complete)
 
 **Q: Will this interfere with page loads?**
 A: No - users fetch from the database, not from APIs. Page loads are fast.
@@ -219,3 +232,6 @@ A: Database rates stay available. Edge function falls back to OpenExchangeRates 
 
 **Q: Can I run multiple fetch scripts simultaneously?**
 A: Not recommended - they'll conflict on database writes. Run sequentially.
+
+**Q: What if the script crashes mid-way?**
+A: Run it again - it will upsert duplicate pairs without issues. Failed pairs just won't be in the database.
