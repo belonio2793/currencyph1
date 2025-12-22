@@ -25,6 +25,8 @@ export default function Rates() {
   const [favorites, setFavorites] = useState(['PHP', 'USD', 'EUR', 'BTC', 'ETH'])
   const [trackedCurrencies, setTrackedCurrencies] = useState(preferencesManager.getDefaultTrackedCurrencies())
   const [customizationOpen, setCustomizationOpen] = useState(false)
+  const [displayFormat, setDisplayFormat] = useState('code-symbol') // 'code-only', 'code-symbol', 'code-name', 'symbol-name'
+  const [showSymbolInConverter, setShowSymbolInConverter] = useState(true)
 
   // Load saved preferences on mount
   useEffect(() => {
