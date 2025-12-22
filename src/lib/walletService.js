@@ -73,7 +73,7 @@ export const walletService = {
       // Fetch wallets without relationship join first (more reliable)
       const { data: walletData, error: walletError } = await supabase
         .from('wallets')
-        .select('id, user_id, currency_code, balance, total_deposited, total_withdrawn, is_active, created_at, updated_at, account_number')
+        .select('id, user_id, currency_code, balance, total_deposited, total_withdrawn, is_active, created_at, updated_at, account_number, type')
         .eq('user_id', userId)
         .eq('is_active', true)
         .order('currency_code')
