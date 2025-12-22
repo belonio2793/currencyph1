@@ -107,20 +107,6 @@ export const cryptoAPI = {
   }
 }
 
-// Bank Transfer Integration (via Wise/PayPal)
-export const bankTransferAPI = {
-  async initiateBankTransfer(bankAccount, amount, currency) {
-    return {
-      transferId: `TRANSFER-${Date.now()}`,
-      status: 'pending',
-      amount,
-      currency,
-      bankAccount,
-      estimatedDelivery: new Date(Date.now() + 2 * 24 * 60 * 60000) // 2 days
-    }
-  }
-}
-
 // Partner Network Integration
 export const partnerAPI = {
   async getPartnerList() {
