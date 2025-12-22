@@ -70,16 +70,16 @@ export const walletService = {
         userIdMatchesAuth: userId === authUserId
       })
 
-      // Fetch directly from wallets table with currency join
+      // Fetch wallets without relationship join first (more reliable)
       const { data: walletData, error: walletError } = await supabase
         .from('wallets')
-        .select('id, user_id, currency_code, balance, total_deposited, total_withdrawn, is_active, created_at, updated_at, account_number, currencies(name, type, symbol, decimals)')
+        .select('id, user_id, currency_code, balance, total_deposited, total_withdrawn, is_active, created_at, updated_at, account_number')
         .eq('user_id', userId)
         .eq('is_active', true)
         .order('currency_code')
 
       if (walletError) {
-        console.warn('Error fetching user wallets with details:', walletError)
+        console.warn('Error fetching user wallets:', walletError)
         console.warn('Error details:', {
           code: walletError.code,
           message: walletError.message,
@@ -90,19 +90,44 @@ export const walletService = {
         return []
       }
 
+      if (!walletData || walletData.length === 0) {
+        console.debug('No wallets found for user:', userId)
+        return []
+      }
+
       console.debug('Wallets fetched successfully:', {
-        count: walletData?.length || 0,
-        walletCodes: walletData?.map(w => w.currency_code) || []
+        count: walletData.length,
+        walletCodes: walletData.map(w => w.currency_code)
       })
 
-      // Transform data to match expected format
-      const wallets = (walletData || []).map(w => {
-        // Handle missing currency data gracefully
-        let currencyType = w.currencies?.type || 'fiat'
-        let currencyName = w.currencies?.name || w.currency_code || 'Unknown'
+      // Now fetch currency details separately
+      const currencyCodes = [...new Set(walletData.map(w => w.currency_code))]
+      let currencyMap = {}
 
-        // Infer type from currency code if not available from join
-        if (!w.currencies && w.currency_code) {
+      if (currencyCodes.length > 0) {
+        const { data: currencyData, error: currencyError } = await supabase
+          .from('currencies')
+          .select('code, name, type, symbol, decimals')
+          .in('code', currencyCodes)
+
+        if (currencyError) {
+          console.warn('Error fetching currencies:', currencyError)
+        } else if (currencyData) {
+          currencyData.forEach(c => {
+            currencyMap[c.code] = c
+          })
+        }
+      }
+
+      // Transform data to match expected format
+      const wallets = walletData.map(w => {
+        const currencyInfo = currencyMap[w.currency_code]
+
+        // Infer type from currency code if currency not found
+        let currencyType = currencyInfo?.type || 'fiat'
+        let currencyName = currencyInfo?.name || w.currency_code || 'Unknown'
+
+        if (!currencyInfo && w.currency_code) {
           const cryptoCodes = ['BTC', 'ETH', 'XRP', 'ADA', 'SOL', 'DOGE', 'MATIC', 'LINK', 'LTC', 'BCH', 'USDT', 'USDC', 'BUSD', 'SHIB', 'AVAX', 'DOT']
           currencyType = cryptoCodes.includes(w.currency_code) ? 'crypto' : 'fiat'
         }
@@ -114,8 +139,8 @@ export const walletService = {
           currency_code: w.currency_code,
           currency_name: currencyName,
           currency_type: currencyType,
-          symbol: w.currencies?.symbol,
-          decimals: w.currencies?.decimals || 2,
+          symbol: currencyInfo?.symbol,
+          decimals: currencyInfo?.decimals || 2,
           balance: w.balance,
           total_deposited: w.total_deposited,
           total_withdrawn: w.total_withdrawn,
@@ -125,17 +150,6 @@ export const walletService = {
           account_number: w.account_number
         }
       })
-
-      if (wallets.length === 0) {
-        console.warn('No active wallets found for user:', userId, 'Attempting to create default wallets...')
-        // Try to create default wallets if none exist
-        try {
-          await this.ensurePhpWallet(userId)
-          console.log('Wallet creation initiated for user:', userId)
-        } catch (createErr) {
-          console.warn('Could not create default wallets:', createErr?.message)
-        }
-      }
 
       return wallets
     } catch (err) {
