@@ -24,6 +24,25 @@ export default function PokerPage({ userId, userEmail, onShowAuth }) {
   const isGuestLocal = userId && userId.includes('guest-local')
   const FUNCTIONS_BASE = (import.meta.env.VITE_PROJECT_URL || '').replace(/\/+$/,'') + '/functions/v1/poker-engine'
 
+  // Hide header when chip modal is open
+  useEffect(() => {
+    const navbar = document.querySelector('[data-component="navbar"]')
+    const userStatusBar = document.querySelector('[data-component="user-status-bar"]')
+
+    if (chipModalOpen) {
+      if (navbar) navbar.style.display = 'none'
+      if (userStatusBar) userStatusBar.style.display = 'none'
+    } else {
+      if (navbar) navbar.style.display = ''
+      if (userStatusBar) userStatusBar.style.display = ''
+    }
+
+    return () => {
+      if (navbar) navbar.style.display = ''
+      if (userStatusBar) userStatusBar.style.display = ''
+    }
+  }, [chipModalOpen])
+
   useEffect(() => { loadTables(); loadPlayerChips() }, [])
 
   useEffect(() => {
