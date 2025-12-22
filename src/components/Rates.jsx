@@ -198,8 +198,17 @@ export default function Rates() {
       console.log(`✅ Final rates list: ${validRates.length} unique items (${ratesWithValues.length} with rates)`)
     } catch (err) {
       const errorMsg = err?.message || String(err) || 'Unknown error'
-      console.error('Error loading rates:', errorMsg, err)
-      setError(`Failed to load exchange rates: ${errorMsg}`)
+      console.error('❌ Error loading rates:', errorMsg)
+      console.error('Full error object:', err)
+
+      // Check if it's a network error
+      if (err.message?.includes('Failed to fetch')) {
+        setError(`Network error - could not connect to database. Please check your internet connection.`)
+      } else if (err.message?.includes('CORS')) {
+        setError(`CORS error - check Supabase configuration`)
+      } else {
+        setError(`Failed to load exchange rates: ${errorMsg}`)
+      }
     } finally {
       setLoading(false)
     }
