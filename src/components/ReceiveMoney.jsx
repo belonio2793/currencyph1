@@ -6,6 +6,13 @@ import { CRYPTOCURRENCY_DEPOSITS } from '../data/cryptoDeposits'
 import FiatCryptoToggle from './FiatCryptoToggle'
 import receiveMoneyService from '../lib/receiveMoneyService'
 
+// List of common cryptocurrencies that we accept
+const CRYPTO_CURRENCY_CODES = [
+  'BTC', 'ETH', 'USDT', 'USDC', 'SOL', 'XRP', 'DOGE', 'ADA', 'LINK', 'UNI',
+  'BNB', 'TRX', 'DOT', 'AVAX', 'HBAR', 'LITECOIN', 'BCH', 'XLM', 'TON', 'AAVE',
+  'SHIB', 'PYUSD', 'WLD', 'XAUT', 'PEPE', 'ASTER', 'ENA', 'SKY', 'HYPE', 'Sui'
+]
+
 export default function ReceiveMoney({ userId, globalCurrency = 'PHP' }) {
   // State: Recipient selection
   const [isRequestMode, setIsRequestMode] = useState(!userId || userId.includes('guest'))
