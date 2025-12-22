@@ -60,6 +60,58 @@ export default function Rates() {
     return showSymbolInConverter ? `${code} ${symbol}` : code
   }
 
+  // Load all available currencies from pairs table
+  useEffect(() => {
+    const loadAvailableCurrencies = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('pairs')
+          .select('from_currency, to_currency')
+
+        if (error) throw error
+
+        const codes = new Set()
+        if (data) {
+          data.forEach(pair => {
+            if (pair.from_currency) codes.add(pair.from_currency)
+            if (pair.to_currency) codes.add(pair.to_currency)
+          })
+        }
+
+        const fiats = []
+        const cryptos = []
+
+        const codeArray = Array.from(codes)
+
+        const [currenciesRes, cryptosRes] = await Promise.all([
+          supabase
+            .from('currencies')
+            .select('code')
+            .in('code', codeArray),
+          supabase
+            .from('cryptocurrencies')
+            .select('code')
+            .in('code', codeArray)
+        ])
+
+        if (currenciesRes.data) {
+          fiats.push(...currenciesRes.data.map(c => c.code).sort())
+        }
+
+        if (cryptosRes.data) {
+          cryptos.push(...cryptosRes.data.map(c => c.code).sort())
+        }
+
+        setAvailableFiats(fiats)
+        setAvailableCryptos(cryptos)
+      } catch (err) {
+        console.error('Error loading available currencies:', err)
+      }
+    }
+
+    loadAvailableCurrencies()
+  }, [])
+
   // Load saved preferences on mount
   useEffect(() => {
     const saved = preferencesManager.getRatesCurrencyPreferences(null)
