@@ -118,28 +118,44 @@ export default function CurrencyRates() {
         <div className="bg-white border border-gray-200 p-6 mb-6">
           <h3 className="text-lg font-semibold text-black mb-4">Major Cryptocurrencies</h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {Object.entries(cryptoPrices).map(([symbol, crypto]) => (
-              <div key={symbol} className="border border-gray-200 p-4 rounded">
-                <p className="font-semibold text-black mb-2">{symbol} - {crypto.name}</p>
-                <p className="text-2xl font-bold text-black mb-3">
-                  ${crypto.prices.usd?.toLocaleString('en-US', { maximumFractionDigits: 2 })}
-                </p>
-                <div className="grid grid-cols-2 gap-2 text-xs">
-                  <div>
-                    <p className="text-gray-600">Market Cap</p>
-                    <p className="text-gray-900 font-medium">
-                      ${(crypto.prices.usd_market_cap / 1e9).toFixed(1)}B
-                    </p>
-                  </div>
-                  <div>
-                    <p className="text-gray-600">24h Vol</p>
-                    <p className="text-gray-900 font-medium">
-                      ${(crypto.prices.usd_24h_vol / 1e9).toFixed(1)}B
-                    </p>
-                  </div>
+            {Object.entries(cryptoPrices).map(([symbol, crypto]) => {
+              const price = crypto.prices?.usd
+              const marketCap = crypto.prices?.usd_market_cap
+              const volume = crypto.prices?.usd_24h_vol
+              const isValidPrice = price && price > 0
+
+              return (
+                <div key={symbol} className="border border-gray-200 p-4 rounded">
+                  <p className="font-semibold text-black mb-2">{symbol} - {crypto.name}</p>
+                  {isValidPrice ? (
+                    <>
+                      <p className="text-2xl font-bold text-black mb-3">
+                        ${price.toLocaleString('en-US', { maximumFractionDigits: 2 })}
+                      </p>
+                      <div className="grid grid-cols-2 gap-2 text-xs">
+                        <div>
+                          <p className="text-gray-600">Market Cap</p>
+                          <p className="text-gray-900 font-medium">
+                            ${marketCap ? (marketCap / 1e9).toFixed(1) : '—'}B
+                          </p>
+                        </div>
+                        <div>
+                          <p className="text-gray-600">24h Vol</p>
+                          <p className="text-gray-900 font-medium">
+                            ${volume ? (volume / 1e9).toFixed(1) : '—'}B
+                          </p>
+                        </div>
+                      </div>
+                    </>
+                  ) : (
+                    <div className="bg-red-50 border border-red-200 p-3 rounded">
+                      <p className="text-xs text-red-700 font-semibold">Service unavailable</p>
+                      <p className="text-xs text-red-600">Price not available</p>
+                    </div>
+                  )}
                 </div>
-              </div>
-            ))}
+              )
+            })}
           </div>
         </div>
       )}
