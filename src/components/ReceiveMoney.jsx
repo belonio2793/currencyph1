@@ -147,31 +147,7 @@ export default function ReceiveMoney({ userId, globalCurrency = 'PHP' }) {
         }
       }
 
-      // Organize crypto addresses by currency (synchronous, shouldn't block)
-      const addressesByCode = {}
-      try {
-        CRYPTOCURRENCY_DEPOSITS.forEach(deposit => {
-          const code = deposit.currency.split('(')[1]?.replace(')', '') || deposit.currency.split(' ')[0]
-          if (!addressesByCode[code]) {
-            addressesByCode[code] = []
-          }
-          addressesByCode[code].push({
-            currency: deposit.currency,
-            network: deposit.network,
-            address: deposit.address,
-            metadata: deposit.metadata || {}
-          })
-        })
-        setCryptoAddresses(addressesByCode)
-
-        // Set first crypto option as default
-        const firstCryptoCode = Object.keys(addressesByCode)[0]
-        if (firstCryptoCode) {
-          setSelectedCryptoNetwork(firstCryptoCode)
-        }
-      } catch (err) {
-        console.warn('Error organizing crypto addresses:', err)
-      }
+      // Crypto addresses already set in useEffect
     } catch (err) {
       console.error('Error loading data:', err)
       setError('Some data could not be loaded, but you can still use the page')
