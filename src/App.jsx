@@ -60,6 +60,8 @@ const ShopProductDetail = lazy(() => import('./components/ShopProductDetail'))
 const ShoppingCart = lazy(() => import('./components/ShoppingCart'))
 const ShopCheckout = lazy(() => import('./components/ShopCheckout'))
 const OrderConfirmation = lazy(() => import('./components/OrderConfirmation'))
+const SendPaymentRequest = lazy(() => import('./components/SendPaymentRequest'))
+const DynamicCheckoutPage = lazy(() => import('./components/DynamicCheckoutPage'))
 
 export default function App() {
   const [userId, setUserId] = useState(null)
