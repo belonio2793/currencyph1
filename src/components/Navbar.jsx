@@ -79,16 +79,12 @@ function NavbarComponent({ activeTab, onTabChange, globalCurrency, setGlobalCurr
                 </div>
                 <div className="px-3 py-1 border-l border-slate-200">
                   <span className="font-medium text-slate-900 text-xs sm:text-sm">
-                    {typeof totalBalanceConverted !== 'undefined' ? formatNumber(totalBalanceConverted) : formatNumber(totalBalancePHP)}
-                    {' '}
-                    {globalCurrency}
-                    {' + '}
-                    {loadingCrypto ? (
+                    {loadingConsolidated ? (
                       <span className="text-slate-400 italic">loading {globalCryptocurrency}...</span>
-                    ) : cryptoBalance !== null ? (
-                      <>{cryptoBalance.toFixed(8)} {globalCryptocurrency}</>
+                    ) : consolidatedHoldingsInCrypto !== null && consolidatedHoldingsInCrypto !== undefined ? (
+                      <>{formatNumber(consolidatedHoldingsInCrypto.toFixed(8))} {globalCryptocurrency}</>
                     ) : (
-                      <span className="text-slate-400 italic">crypto unavailable</span>
+                      <span className="text-slate-400 italic">0.00 {globalCryptocurrency}</span>
                     )}
                   </span>
                 </div>
