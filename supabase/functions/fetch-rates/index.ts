@@ -4,9 +4,11 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.38.0'
 // Read env
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL') || Deno.env.get('VITE_PROJECT_URL')
 const SUPABASE_SERVICE_ROLE = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || Deno.env.get('VITE_SUPABASE_SERVICE_ROLE_KEY')
+const EXCONVERT_KEY = Deno.env.get('EXCONVERT') || Deno.env.get('VITE_EXCONVERT')
 const OPEN_EXCHANGE_KEY = Deno.env.get('OPEN_EXCHANGE_RATES_API') || Deno.env.get('VITE_OPEN_EXCHANGE_RATES_API')
 
 console.log('[fetch-rates] Starting service with Supabase URL:', SUPABASE_URL ? 'configured' : 'MISSING')
+console.log('[fetch-rates] ExConvert API:', EXCONVERT_KEY ? 'configured' : 'MISSING')
 
 const CACHED_TTL_MS = 1000 * 60 * 60 // 1 hour
 
