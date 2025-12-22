@@ -518,7 +518,13 @@ export const currencyAPI = {
         .maybeSingle()
 
       if (!error && data && typeof data.rate !== 'undefined') {
-        return Number(data.rate)
+        const rate = Number(data.rate)
+        // Validate rate is not 0.00 or NaN
+        if (isFinite(rate) && rate > 0) {
+          return rate
+        } else {
+          console.warn(`Invalid rate from DB for ${from}/${to}: ${rate}`)
+        }
       }
     } catch (e) {
       // ignore and fallback
@@ -526,7 +532,15 @@ export const currencyAPI = {
 
     try {
       const conv = await currencyConverter.convert(1, from, to)
-      if (conv && conv.rate) return Number(conv.rate)
+      if (conv && conv.rate) {
+        const rate = Number(conv.rate)
+        // Validate rate is not 0.00 or NaN
+        if (isFinite(rate) && rate > 0) {
+          return rate
+        } else {
+          console.warn(`Invalid rate from converter for ${from}/${to}: ${rate}`)
+        }
+      }
     } catch (e) {
       console.warn('Failed to compute exchange rate via currencyAPI', e)
     }
