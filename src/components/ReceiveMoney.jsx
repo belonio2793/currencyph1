@@ -300,8 +300,8 @@ export default function ReceiveMoney({ userId, globalCurrency = 'PHP' }) {
       const transfer = insertedTransfer?.[0]
       setTransferRecord(transfer)
 
-      // Send chat message to the other user (if request mode)
-      if (selectedGuestProfile) {
+      // Send chat message to the other user (if request mode AND user enabled it)
+      if (selectedGuestProfile && sendChatMessage) {
         try {
           await sendPaymentRequestMessage(selectedGuestProfile, transfer, finalAmount, finalCurrency)
         } catch (chatErr) {
