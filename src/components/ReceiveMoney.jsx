@@ -1015,17 +1015,41 @@ export default function ReceiveMoney({ userId, globalCurrency = 'PHP' }) {
 
                       {/* Crypto Address Display */}
                       {selectedMethod === 'crypto' && selectedDepositAddress && (
-                        <div className="bg-slate-50 rounded-lg p-4 space-y-2">
-                          <p className="text-sm font-medium text-slate-700 mb-2">Send to this address:</p>
-                          <div className="bg-white border border-slate-300 rounded p-3">
-                            <div className="text-xs font-medium text-slate-700 mb-2">{selectedDepositAddress.network}</div>
-                            <div className="text-xs font-mono text-slate-900 break-all mb-3">{selectedDepositAddress.address}</div>
+                        <div className="bg-orange-50 border border-orange-200 rounded-lg p-4 space-y-3">
+                          <p className="text-sm font-semibold text-orange-900 mb-2">📬 Send {selectedCryptoNetwork} to this address:</p>
+                          <div className="bg-white border border-orange-300 rounded p-4 space-y-3">
+                            <div>
+                              <div className="text-xs font-semibold text-slate-700 mb-2">Network</div>
+                              <div className="text-sm font-semibold text-slate-900">{selectedDepositAddress.network}</div>
+                            </div>
+                            <div>
+                              <div className="text-xs font-semibold text-slate-700 mb-2">Address</div>
+                              <div className="text-xs font-mono text-slate-900 break-all bg-slate-100 p-3 rounded border border-slate-200">
+                                {selectedDepositAddress.address}
+                              </div>
+                            </div>
+                            {selectedDepositAddress.metadata?.tag && (
+                              <div>
+                                <div className="text-xs font-semibold text-slate-700 mb-2">Destination Tag</div>
+                                <div className="text-xs font-mono text-slate-900 bg-slate-100 p-3 rounded border border-slate-200">
+                                  {selectedDepositAddress.metadata.tag}
+                                </div>
+                              </div>
+                            )}
+                            {selectedDepositAddress.metadata?.memo && (
+                              <div>
+                                <div className="text-xs font-semibold text-slate-700 mb-2">Memo</div>
+                                <div className="text-xs font-mono text-slate-900 bg-slate-100 p-3 rounded border border-slate-200">
+                                  {selectedDepositAddress.metadata.memo}
+                                </div>
+                              </div>
+                            )}
                             <button
                               type="button"
                               onClick={() => copyToClipboard(selectedDepositAddress.address, 'Address copied!')}
-                              className="w-full text-xs px-3 py-2 bg-blue-100 text-blue-700 rounded hover:bg-blue-200 transition-colors"
+                              className="w-full text-xs px-3 py-2 bg-orange-100 text-orange-700 rounded hover:bg-orange-200 transition-colors font-medium"
                             >
-                              {copyFeedback === 'Address copied!' ? 'Copied' : 'Copy Address'}
+                              {copyFeedback === 'Address copied!' ? '✓ Copied' : 'Copy Address'}
                             </button>
                           </div>
                         </div>
