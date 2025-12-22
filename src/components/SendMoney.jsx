@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabaseClient'
 import { currencyAPI } from '../lib/payments'
-import { currencySymbols, formatCurrency, getCurrencySymbol, formatNumber } from '../lib/currency'
+import { currencySymbols, formatCurrency, getCurrencySymbol, formatNumber, isFiatCurrency, isCryptoCurrency } from '../lib/currency'
 
 export default function SendMoney({ userId }) {
   const [wallets, setWallets] = useState([])
