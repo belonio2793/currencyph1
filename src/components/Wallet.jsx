@@ -184,11 +184,6 @@ export default function Wallet({ userId, globalCurrency = 'PHP' }) {
                 </button>
               </div>
 
-              {/* Fiat/Crypto Toggle */}
-              {wallets.length > 0 && (
-                <FiatCryptoToggle active={activeType} onChange={setActiveType} />
-              )}
-
               {/* View Mode Toggle */}
               {wallets.length > 0 && (
                 <div className="flex gap-2 bg-white border border-slate-200 rounded-lg p-1">
@@ -215,6 +210,35 @@ export default function Wallet({ userId, globalCurrency = 'PHP' }) {
                 </div>
               )}
             </div>
+
+            {/* Dynamic Wallet Type Navigation Menu */}
+            {wallets.length > 0 && availableTypes.length > 1 && (
+              <div className="mb-6 flex gap-2 border-b border-slate-200">
+                {availableTypes.map(type => {
+                  const typeConfig = {
+                    all: { label: 'All Wallets', color: 'slate' },
+                    currency: { label: 'Fiat Currency', color: 'blue' },
+                    cryptocurrency: { label: 'Cryptocurrency', color: 'orange' },
+                    wire: { label: 'Wire Transfer', color: 'purple' }
+                  }
+                  const config = typeConfig[type]
+
+                  return (
+                    <button
+                      key={type}
+                      onClick={() => setActiveType(type)}
+                      className={`px-4 py-3 font-medium text-sm border-b-2 transition-colors ${
+                        activeType === type
+                          ? `border-${config.color}-600 text-${config.color}-600`
+                          : `border-transparent text-slate-600 hover:text-slate-900`
+                      }`}
+                    >
+                      {config.label}
+                    </button>
+                  )
+                })}
+              </div>
+            )}
 
             {wallets.length === 0 ? (
               <div className="bg-white border border-slate-200 rounded-lg p-8 text-center">
