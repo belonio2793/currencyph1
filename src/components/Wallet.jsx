@@ -453,6 +453,37 @@ export default function Wallet({ userId, globalCurrency = 'PHP' }) {
           <TransactionsList userId={userId} />
         </div>
 
+        {/* Diagnostic Panel - Debug Mode */}
+        {wallets.length === 0 && !loading && (
+          <div className="mt-8 p-4 bg-amber-50 border border-amber-200 rounded-lg">
+            <button
+              onClick={() => setShowDiagnostics(!showDiagnostics)}
+              className="text-sm font-medium text-amber-800 hover:text-amber-900 underline"
+            >
+              {showDiagnostics ? 'Hide' : 'Show'} Diagnostic Info
+            </button>
+
+            {showDiagnostics && (
+              <div className="mt-3 text-xs text-amber-700 space-y-2 font-mono bg-white p-3 rounded border border-amber-100">
+                <div><span className="font-semibold">User ID:</span> {userId}</div>
+                <div><span className="font-semibold">Auth Status:</span> {authStatus?.authenticated ? 'Authenticated' : 'Not Authenticated'}</div>
+                {authStatus?.reason && <div><span className="font-semibold">Status Reason:</span> {authStatus.reason}</div>}
+                <div><span className="font-semibold">Session Email:</span> {authStatus?.email || 'N/A'}</div>
+                <div><span className="font-semibold">Error:</span> {error || 'None'}</div>
+                <div className="text-amber-600 mt-2 text-xs leading-relaxed">
+                  <p>💡 <strong>Troubleshooting:</strong></p>
+                  <ul className="mt-1 ml-4 space-y-1 list-disc">
+                    <li>Make sure you're logged in with your Supabase account</li>
+                    <li>Check your browser's developer console (F12) for error messages</li>
+                    <li>If error shows "Not authenticated", please log out and log back in</li>
+                    <li>Wallets should be automatically created when you first log in</li>
+                  </ul>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
         {/* Customizer Modal */}
         {showCustomizer && (
           <div className="fixed inset-0 bg-black/20 backdrop-blur-sm flex items-center justify-center z-50 p-4">
