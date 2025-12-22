@@ -478,8 +478,8 @@ export default function ReceiveMoney({ userId, globalCurrency = 'PHP' }) {
                                   >
                                     <div className="font-medium text-slate-900">{profile.name}</div>
                                     <div className="text-xs text-slate-500 mt-1">
-                                      {profile.phone && `📱 ${profile.phone}`}
-                                      {profile.email && ` 📧 ${profile.email}`}
+                                      {profile.phone && `Phone: ${profile.phone}`}
+                                      {profile.email && ` Email: ${profile.email}`}
                                     </div>
                                   </button>
                                 ))}
