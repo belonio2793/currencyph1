@@ -129,6 +129,14 @@ export const walletService = {
         let currencyType = w.type || currencyInfo?.type || 'fiat'
         let currencyName = currencyInfo?.name || w.currency_code || 'Unknown'
 
+        // Debug: Log wallets where type might be missing
+        if (!w.type && !currencyInfo?.type) {
+          console.warn(`Wallet ${w.currency_code} (${w.id}) has no type - defaulting to fiat`, {
+            wallet_type_column: w.type,
+            currency_info: currencyInfo
+          })
+        }
+
         return {
           id: w.id,
           wallet_id: w.id,
@@ -153,6 +161,7 @@ export const walletService = {
         walletDetails: wallets.map(w => ({
           code: w.currency_code,
           type: w.currency_type,
+          dbType: walletData.find(wd => wd.currency_code === w.currency_code)?.type,
           id: w.id
         }))
       })
