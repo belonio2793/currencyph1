@@ -24,21 +24,12 @@ export const paymentMethods = {
   crypto: {
     id: 'crypto',
     name: 'Cryptocurrency',
-    icon: '₿',
+    icon: '🪙',
     description: 'Pay with Bitcoin, Ethereum, or other crypto',
     requires: ['wallet_address'],
     isAvailable: (user) => user && user.wallet_address,
     processor: 'thirdweb',
     chains: ['ethereum', 'polygon', 'arbitrum', 'solana']
-  },
-  bank_transfer: {
-    id: 'bank_transfer',
-    name: 'Bank Transfer',
-    icon: '🏦',
-    description: 'Direct bank-to-bank transfer',
-    requires: ['bank_account'],
-    isAvailable: (user) => user && user.bank_account_linked,
-    processor: 'wise_or_paypal'
   },
   partner: {
     id: 'partner',
