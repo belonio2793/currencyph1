@@ -28,11 +28,32 @@ export default function Wallet({ userId, globalCurrency = 'PHP' }) {
       setError('')
 
       if (!userId || userId === 'null' || userId === 'undefined' || userId.includes('guest-local')) {
+        console.debug('Wallet: Invalid or guest userId:', userId)
         setWallets([])
         setSelectedCurrencies(['PHP'])
         setLoading(false)
         return
       }
+
+      // Check if user is properly authenticated with Supabase
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession()
+      if (sessionError) {
+        console.error('Auth session error:', sessionError)
+        setError('Authentication error - please log in again')
+        setWallets([])
+        setLoading(false)
+        return
+      }
+
+      if (!session) {
+        console.warn('No active auth session - user may not be authenticated with Supabase')
+        setError('Not authenticated - please log in to see your wallets')
+        setWallets([])
+        setLoading(false)
+        return
+      }
+
+      console.debug('Wallet: Auth session found for user:', session.user.id)
 
       // Auto-generate account numbers for any wallets that don't have them
       try {
