@@ -322,10 +322,13 @@ export const walletService = {
       'SEK': 'kr', 'NZD': '$', 'SGD': '$', 'HKD': '$', 'IDR': 'Rp',
       'MYR': 'RM', 'THB': '฿', 'VND': '₫', 'KRW': '₩', 'ZAR': 'R',
       'BRL': 'R$', 'MXN': '$', 'NOK': 'kr', 'DKK': 'kr', 'AED': 'د.إ',
-      'BTC': 'BTC', 'ETH': 'ETH', 'XRP': 'XRP', 'ADA': 'ADA', 'SOL': 'SOL',
-      'DOGE': 'DOGE', 'MATIC': 'MATIC', 'LINK': 'LINK', 'LTC': 'LTC', 'BCH': 'BCH',
+      'BTC': '₿', 'ETH': 'Ξ', 'XRP': 'XRP', 'ADA': 'ADA', 'SOL': 'SOL',
+      'DOGE': 'Ð', 'MATIC': 'MATIC', 'LINK': 'LINK', 'LTC': 'Ł', 'BCH': 'BCH',
       'USDT': 'USDT', 'USDC': 'USDC', 'BUSD': 'BUSD', 'SHIB': 'SHIB',
-      'AVAX': 'AVAX', 'DOT': 'DOT'
+      'AVAX': 'AVAX', 'DOT': 'DOT', 'BNB': 'BNB', 'XLM': 'XLM', 'TRX': 'TRX',
+      'HBAR': 'HBAR', 'TON': 'TON', 'SUI': 'SUI', 'PYUSD': 'PYUSD', 'WLD': 'WLD',
+      'XAUT': 'XAUT', 'PEPE': 'PEPE', 'HYPE': 'HYPE', 'ASTER': 'ASTER', 'ENA': 'ENA',
+      'SKY': 'SKY'
     }
     
     return fallbackSymbols[currency.code || currency] || null
