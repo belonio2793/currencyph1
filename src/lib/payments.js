@@ -666,12 +666,13 @@ export const currencyAPI = {
   async getBeneficiaries(userId) {
     if (!userId) return []
     try {
-      // Optimize: Only fetch needed columns
+      // Fetch all beneficiary columns including new recipient_id reference
       const { data, error } = await supabase
         .from('beneficiaries')
-        .select('id,user_id,name,account_number,bank_name,phone,email,verified,created_at')
+        .select('id,user_id,recipient_id,recipient_email,recipient_phone,recipient_name,bank_account,bank_name,country_code,relationship,is_favorite,created_at')
         .eq('user_id', userId)
         .order('created_at', { ascending: false })
+
       if (error) throw error
       return data || []
     } catch (err) {
