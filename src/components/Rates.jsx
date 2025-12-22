@@ -87,7 +87,6 @@ export default function Rates() {
       console.log(`✅ Fetched ${allPairs.length} pairs for tracked currencies`)
 
       // 2. Fetch metadata for only the tracked currencies
-      const trackedArray = Array.from(allCodesToTrack)
       let allMetadata = {}
 
       const [currenciesRes, cryptosRes] = await Promise.all([
