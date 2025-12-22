@@ -15,20 +15,45 @@ import { supabase } from './supabaseClient'
 /**
  * Get latest rate with timestamp for user confirmation
  * Returns rate data that can be displayed with time/date info
+ * Checks public.pairs first, then falls back to crypto_rates_valid
  */
 export async function getLatestRateWithConfirmation(fromCurrency, toCurrency = 'PHP') {
   try {
-    const { data, error } = await supabase
-      .from('crypto_rates_valid')
-      .select('rate, source, updated_at')
-      .eq('from_currency', fromCurrency)
-      .eq('to_currency', toCurrency)
-      .order('updated_at', { ascending: false })
-      .limit(1)
+    const fromCode = fromCurrency.toUpperCase()
+    const toCode = toCurrency.toUpperCase()
+    let data = null
+    let source = null
+
+    // Try public.pairs first (primary source for all rates)
+    const { data: pairsData, error: pairsError } = await supabase
+      .from('pairs')
+      .select('rate, source_table, updated_at')
+      .eq('from_currency', fromCode)
+      .eq('to_currency', toCode)
       .single()
 
-    if (error || !data) {
-      console.warn(`No rate found for ${fromCurrency}/${toCurrency}`)
+    if (!pairsError && pairsData && typeof pairsData.rate === 'number' && isFinite(pairsData.rate) && pairsData.rate > 0) {
+      data = pairsData
+      source = pairsData.source_table || 'pairs'
+    } else {
+      // Fallback to crypto_rates_valid
+      const { data: cryptoData, error: cryptoError } = await supabase
+        .from('crypto_rates_valid')
+        .select('rate, source, updated_at')
+        .eq('from_currency', fromCode)
+        .eq('to_currency', toCode)
+        .order('updated_at', { ascending: false })
+        .limit(1)
+        .single()
+
+      if (!cryptoError && cryptoData) {
+        data = cryptoData
+        source = cryptoData.source || 'crypto_rates_valid'
+      }
+    }
+
+    if (!data) {
+      console.warn(`No rate found for ${fromCode}/${toCode}`)
       return null
     }
 
@@ -37,15 +62,15 @@ export async function getLatestRateWithConfirmation(fromCurrency, toCurrency = '
 
     // Check if rate is valid (not 0.00 or NaN)
     if (!isFinite(rate) || rate <= 0) {
-      console.warn(`Invalid rate returned for ${fromCurrency}/${toCurrency}: ${rate}`)
+      console.warn(`Invalid rate returned for ${fromCode}/${toCode}: ${rate}`)
       return null
     }
 
     return {
-      from_currency: fromCurrency,
-      to_currency: toCurrency,
+      from_currency: fromCode,
+      to_currency: toCode,
       rate: rate,
-      source: data.source,
+      source: source,
       updated_at: data.updated_at,
       timestamp: {
         iso: data.updated_at,
@@ -66,9 +91,9 @@ export async function getLatestRateWithConfirmation(fromCurrency, toCurrency = '
         minutes_ago: getMinutesAgo(updatedAt)
       },
       display: {
-        rate_formatted: formatCurrencyDisplay(rate, toCurrency),
+        rate_formatted: formatCurrencyDisplay(rate, toCode),
         rate_rounded: parseFloat(rate.toFixed(2)),
-        confirmation_message: `${fromCurrency} rate updated ${formatRateTimestamp(updatedAt)}`
+        confirmation_message: `${fromCode} rate updated ${formatRateTimestamp(updatedAt)}`
       }
     }
   } catch (error) {
