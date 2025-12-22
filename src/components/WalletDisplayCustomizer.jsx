@@ -267,35 +267,79 @@ export default function WalletDisplayCustomizer({ userId, onClose, onUpdate }) {
           Selected Currencies ({selectedCurrencies.length})
         </label>
 
-        <div className="flex flex-wrap gap-3">
+        <div className="space-y-4">
           {selectedCurrencies.length === 0 ? (
-            <p className="text-base text-slate-500">Select currencies to display</p>
+            <p className="text-base text-slate-500">No currencies selected yet. Add one above.</p>
           ) : (
-            selectedCurrencies.map(code => {
-              const currency = allFiatCurrencies.find(c => c.code === code)
-              if (!currency) return null
+            <>
+              {/* Fiat currencies */}
+              {selectedCurrencies.some(code => {
+                const currency = allFiatCurrencies.find(c => c.code === code)
+                return !!currency
+              }) && (
+                <div>
+                  <p className="text-sm font-medium text-slate-600 mb-2">Fiat Currencies</p>
+                  <div className="flex flex-wrap gap-3">
+                    {selectedCurrencies.map(code => {
+                      const currency = allFiatCurrencies.find(c => c.code === code)
+                      if (!currency) return null
 
-              return (
-                <div
-                  key={code}
-                  className={`px-4 py-3 rounded-lg text-base font-medium flex items-center gap-3 ${
-                    code === 'PHP'
-                      ? 'bg-blue-100 text-blue-800 border border-blue-300'
-                      : 'bg-slate-100 text-slate-700 border border-slate-300'
-                  }`}
-                >
-                  <span>{code}</span>
-                  {code !== 'PHP' && (
-                    <button
-                      onClick={() => handleToggleCurrency(code)}
-                      className="hover:text-red-600 font-bold text-lg"
-                    >
-                      ×
-                    </button>
-                  )}
+                      return (
+                        <div
+                          key={code}
+                          className={`px-4 py-3 rounded-lg text-base font-medium flex items-center gap-3 ${
+                            code === 'PHP'
+                              ? 'bg-blue-100 text-blue-800 border border-blue-300'
+                              : 'bg-blue-50 text-blue-700 border border-blue-200'
+                          }`}
+                        >
+                          <span>{code}</span>
+                          {code !== 'PHP' && (
+                            <button
+                              onClick={() => handleToggleCurrency(code)}
+                              className="hover:text-red-600 font-bold text-lg"
+                            >
+                              ×
+                            </button>
+                          )}
+                        </div>
+                      )
+                    })}
+                  </div>
                 </div>
-              )
-            })
+              )}
+
+              {/* Crypto currencies */}
+              {selectedCurrencies.some(code => {
+                const currency = allCryptoCurrencies.find(c => c.code === code)
+                return !!currency
+              }) && (
+                <div>
+                  <p className="text-sm font-medium text-slate-600 mb-2">Cryptocurrencies</p>
+                  <div className="flex flex-wrap gap-3">
+                    {selectedCurrencies.map(code => {
+                      const currency = allCryptoCurrencies.find(c => c.code === code)
+                      if (!currency) return null
+
+                      return (
+                        <div
+                          key={code}
+                          className="px-4 py-3 rounded-lg text-base font-medium flex items-center gap-3 bg-orange-50 text-orange-700 border border-orange-200"
+                        >
+                          <span>{code}</span>
+                          <button
+                            onClick={() => handleToggleCurrency(code)}
+                            className="hover:text-red-600 font-bold text-lg"
+                          >
+                            ×
+                          </button>
+                        </div>
+                      )
+                    })}
+                  </div>
+                </div>
+              )}
+            </>
           )}
         </div>
       </div>
