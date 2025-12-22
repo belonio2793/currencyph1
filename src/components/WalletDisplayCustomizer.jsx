@@ -5,12 +5,14 @@ import { currencyAPI } from '../lib/payments'
 
 export default function WalletDisplayCustomizer({ userId, onClose, onUpdate }) {
   const [allFiatCurrencies, setAllFiatCurrencies] = useState([])
+  const [allCryptoCurrencies, setAllCryptoCurrencies] = useState([])
   const [selectedCurrencies, setSelectedCurrencies] = useState(['PHP'])
   const [searchInput, setSearchInput] = useState('')
   const [loading, setLoading] = useState(true)
   const [showDropdown, setShowDropdown] = useState(false)
   const [saving, setSaving] = useState(false)
   const [message, setMessage] = useState('')
+  const [activeTab, setActiveTab] = useState('currency') // 'currency' or 'cryptocurrency'
 
   useEffect(() => {
     loadData()
@@ -20,12 +22,11 @@ export default function WalletDisplayCustomizer({ userId, onClose, onUpdate }) {
     try {
       setLoading(true)
 
-      // Fetch fiat currencies only
+      // Fetch both fiat and crypto currencies
       const { data: currencies, error: currError } = await supabase
         .from('currencies')
-        .select('code, name, symbol')
+        .select('code, name, symbol, type')
         .eq('active', true)
-        .eq('type', 'fiat')
         .order('code')
 
       if (currError) {
@@ -33,7 +34,11 @@ export default function WalletDisplayCustomizer({ userId, onClose, onUpdate }) {
         return
       }
 
-      setAllFiatCurrencies(currencies || [])
+      const fiat = (currencies || []).filter(c => c.type === 'fiat')
+      const crypto = (currencies || []).filter(c => c.type === 'crypto')
+
+      setAllFiatCurrencies(fiat)
+      setAllCryptoCurrencies(crypto)
 
       // Load user preferences
       const prefs = await getWalletDisplayPreferences(userId)
