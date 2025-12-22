@@ -287,7 +287,8 @@ export default function Rates() {
   }
 
   const formatNumber = (num, decimals = 2) => {
-    if (num == null || !isFinite(num) || num <= 0) return '—'
+    if (num == null || !isFinite(num) || num === 0) return 'Service unavailable'
+    if (num < 0) return '—'
     return Number(num).toLocaleString(undefined, {
       minimumFractionDigits: Math.min(decimals, 2),
       maximumFractionDigits: Math.max(decimals, 6)
