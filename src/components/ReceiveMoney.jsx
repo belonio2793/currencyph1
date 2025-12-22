@@ -71,6 +71,8 @@ export default function ReceiveMoney({ userId, globalCurrency = 'PHP' }) {
   const [customPaymentDescription, setCustomPaymentDescription] = useState('')
   const [customPaymentEmail, setCustomPaymentEmail] = useState('')
   const [generatingPayment, setGeneratingPayment] = useState(false)
+  const [authStatus, setAuthStatus] = useState(null)
+  const [showDiagnostics, setShowDiagnostics] = useState(true)
 
   const searchInputRef = useRef(null)
 
