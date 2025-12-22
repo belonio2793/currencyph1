@@ -16,9 +16,10 @@ export default function Wallet({ userId, globalCurrency = 'PHP' }) {
   const [error, setError] = useState('')
   const [copied, setCopied] = useState(null)
   const [viewMode, setViewMode] = useState('grid') // 'grid' or 'list'
-  const [activeType, setActiveType] = useState('fiat') // 'fiat' or 'crypto'
+  const [activeType, setActiveType] = useState('all') // 'all', 'currency', 'cryptocurrency', 'wire'
   const [authStatus, setAuthStatus] = useState(null)
   const [showDiagnostics, setShowDiagnostics] = useState(true) // Show by default when no wallets
+  const [availableTypes, setAvailableTypes] = useState([])
 
   useEffect(() => {
     loadData()
