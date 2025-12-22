@@ -24,7 +24,7 @@ import NetworkBalances from './NetworkBalances'
 import P2PLoanMarketplace from './P2PLoanMarketplace'
 import PaymentsHub from './PaymentsHub'
 
-export default function HomePage({ userId, userEmail, globalCurrency = 'PHP', setGlobalCurrency, globalCryptocurrency = 'BTC', setGlobalCryptocurrency, onTabChange, onShowAuth }) {
+export default function HomePage({ userId, userEmail, globalCurrency = 'PHP', setGlobalCurrency, globalCryptocurrency = 'BTC', setGlobalCryptocurrency, onTabChange, onSetTotalCryptoBalance, onShowAuth }) {
   const [wallets, setWallets] = useState([])
   const [loans, setLoans] = useState([])
   const [cryptoWallets, setCryptoWallets] = useState([])
