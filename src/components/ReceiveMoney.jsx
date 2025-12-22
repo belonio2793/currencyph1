@@ -1082,27 +1082,48 @@ export default function ReceiveMoney({ userId, globalCurrency = 'PHP' }) {
           {/* Accepted Methods */}
           <div className="bg-white border border-slate-200 rounded-xl p-6 space-y-4">
             <h3 className="text-lg font-medium text-slate-900">Accepted Methods</h3>
-            <div className="space-y-2 text-sm">
-              <div className="flex gap-2">
-                <div className="flex-shrink-0 w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center text-sm font-semibold text-blue-700">G</div>
-                <div>
-                  <p className="font-medium text-slate-900">GCash</p>
-                  <p className="text-xs text-slate-600">Mobile wallet</p>
+
+            {/* Fiat Methods */}
+            <div className="pb-4 border-b border-slate-200">
+              <p className="text-xs font-semibold text-slate-600 uppercase tracking-wider mb-3">Fiat & Mobile</p>
+              <div className="space-y-2 text-sm">
+                <div className="flex gap-2">
+                  <div className="flex-shrink-0 w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center text-sm font-semibold text-blue-700">G</div>
+                  <div>
+                    <p className="font-medium text-slate-900">GCash</p>
+                    <p className="text-xs text-slate-600">Mobile wallet</p>
+                  </div>
+                </div>
+                <div className="flex gap-2">
+                  <div className="flex-shrink-0 w-8 h-8 bg-green-100 rounded-full flex items-center justify-center text-sm font-semibold text-green-700">🏦</div>
+                  <div>
+                    <p className="font-medium text-slate-900">Bank Transfer</p>
+                    <p className="text-xs text-slate-600">Direct bank deposit</p>
+                  </div>
                 </div>
               </div>
-              <div className="flex gap-2">
-                <div className="flex-shrink-0 w-8 h-8 bg-green-100 rounded-full flex items-center justify-center text-sm font-semibold text-green-700">B</div>
-                <div>
-                  <p className="font-medium text-slate-900">Bank Transfer</p>
-                  <p className="text-xs text-slate-600">Direct bank deposit</p>
+            </div>
+
+            {/* Crypto Methods */}
+            <div>
+              <p className="text-xs font-semibold text-slate-600 uppercase tracking-wider mb-3">Cryptocurrency</p>
+              <div className="space-y-2">
+                <div className="flex gap-2">
+                  <div className="flex-shrink-0 w-8 h-8 bg-orange-100 rounded-full flex items-center justify-center text-sm font-semibold text-orange-700">₿</div>
+                  <div className="flex-1">
+                    <p className="font-medium text-slate-900">{availableCryptos.length}+ Cryptocurrencies</p>
+                    <p className="text-xs text-slate-600">Bitcoin, Ethereum, USDT, USDC & more</p>
+                  </div>
                 </div>
-              </div>
-              <div className="flex gap-2">
-                <div className="flex-shrink-0 w-8 h-8 bg-orange-100 rounded-full flex items-center justify-center text-sm font-semibold text-orange-700">C</div>
-                <div>
-                  <p className="font-medium text-slate-900">Crypto</p>
-                  <p className="text-xs text-slate-600">50+ cryptocurrencies</p>
-                </div>
+                {availableCryptos.slice(0, 5).map(crypto => (
+                  <div key={crypto.code} className="text-xs text-slate-600 flex gap-2 ml-10">
+                    <span>✓</span>
+                    <span>{crypto.code}</span>
+                  </div>
+                ))}
+                {availableCryptos.length > 5 && (
+                  <div className="text-xs text-slate-600 ml-10 font-medium">+ {availableCryptos.length - 5} more</div>
+                )}
               </div>
             </div>
           </div>
