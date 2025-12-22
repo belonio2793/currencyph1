@@ -69,6 +69,7 @@
     "populate-full": "node scripts/populate-via-google-custom-search.js && node scripts/enrich-listings-comprehensive.js",
     "populate-nearby-batch": "node scripts/populate-nearby-batch.js",
     "populate-nearby-forever": "node scripts/run-populate-nearby-forever.js",
+    "fetch-all-exconvert": "node scripts/fetch-all-exconvert-rates.js",
     "generate-thirdweb-wallets": "node scripts/generate-thirdweb-wallets.js",
     "sync-thirdweb-balances": "node scripts/sync-thirdweb-balances.js",
     "batch-create-wallets": "node scripts/batch-create-wallets.js",
