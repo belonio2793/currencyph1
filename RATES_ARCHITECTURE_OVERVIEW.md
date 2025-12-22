@@ -23,9 +23,11 @@ You asked: *"setup crypto_rates to fetch directly from exconvert and also make s
 │ ↓                                                               │
 │ Edge Function: supabase/functions/fetch-rates/index.ts        │
 │ ↓                                                               │
-│ Stores in: crypto_rates table (~1,500 pairs)                 │
-│ ↓ (NEW TRIGGER ADDED)                                         │
-│ SYNCS TO: pairs table (unified rates)                         │
+│ Stores in BOTH (single operation, no triggers):               │
+│ ├─ crypto_rates table (~1,500 pairs, 1-hour expiration)      │
+│ └─ pairs table (unified rates for all features)              │
+│ ↓                                                               │
+│ Source marked as: 'exconvert' (in both tables)                │
 │ ↓                                                               │
 │ USED BY:                                                        │
 │   ├─ Wallets (balance conversions)                            │
