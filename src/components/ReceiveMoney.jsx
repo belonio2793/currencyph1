@@ -1169,10 +1169,12 @@ export default function ReceiveMoney({ userId, globalCurrency = 'PHP' }) {
                         {isRequestMode && requestMode === 'custom_payment' ? 'Review Payment Link' : 'Finalize Request'}
                       </h3>
 
-                      {/* Your Profile */}
-                      {userProfile && (
+                      {/* Your Profile - Show for both modes */}
+                      {userProfile && !customPaymentLink && (
                         <div className="bg-gradient-to-br from-slate-50 to-slate-100 border border-slate-300 rounded-lg p-6 space-y-3">
-                          <p className="text-xs font-semibold text-slate-700 uppercase tracking-wider">Your Profile</p>
+                          <p className="text-xs font-semibold text-slate-700 uppercase tracking-wider">
+                            {isRequestMode && requestMode === 'custom_payment' ? 'Your Business/Profile' : 'Your Profile'}
+                          </p>
                           <div>
                             <p className="text-2xl font-light text-slate-900 mb-2">{userProfile.full_name || userProfile.email || 'User'}</p>
                             {userProfile.email && <p className="text-sm text-slate-600">Email: {userProfile.email}</p>}
