@@ -899,28 +899,42 @@ export default function ReceiveMoney({ userId, globalCurrency = 'PHP' }) {
                         </div>
                       )}
 
-                      {/* Crypto Address Selection */}
+                      {/* Crypto Network/Address Selection */}
                       {selectedMethod === 'crypto' && selectedCryptoNetwork && selectedCryptoAddresses.length > 0 && (
-                        <div>
-                          <label className="block text-sm font-medium text-slate-700 mb-3">
-                            Select Receive Address
-                          </label>
-                          <div className="space-y-2 max-h-48 overflow-y-auto">
-                            {selectedCryptoAddresses.map((addr, idx) => (
-                              <button
-                                key={idx}
-                                type="button"
-                                onClick={() => setSelectedDepositAddress(addr)}
-                                className={`w-full p-3 rounded-lg border-2 transition-all text-left ${
-                                  selectedDepositAddress === addr
-                                    ? 'border-blue-600 bg-blue-50'
-                                    : 'border-slate-200 hover:border-slate-300'
-                                }`}
-                              >
-                                <div className="text-xs font-medium text-slate-700 mb-1">{addr.network}</div>
-                                <div className="text-xs font-mono text-slate-900 break-all">{addr.address}</div>
-                              </button>
-                            ))}
+                        <div className="space-y-4">
+                          <div>
+                            <label className="block text-sm font-medium text-slate-700 mb-3">
+                              Select Network ({selectedCryptoAddresses.length} available)
+                            </label>
+                            <div className="space-y-2 max-h-56 overflow-y-auto">
+                              {selectedCryptoAddresses.map((addr, idx) => (
+                                <button
+                                  key={idx}
+                                  type="button"
+                                  onClick={() => setSelectedDepositAddress(addr)}
+                                  className={`w-full p-3 rounded-lg border-2 transition-all text-left ${
+                                    selectedDepositAddress === addr
+                                      ? 'border-orange-600 bg-orange-50 shadow-md'
+                                      : 'border-slate-200 hover:border-slate-300'
+                                  }`}
+                                >
+                                  <div className="text-sm font-semibold text-slate-900 mb-2">{addr.network}</div>
+                                  <div className="text-xs font-mono text-slate-700 break-all bg-white/50 p-2 rounded mb-2">
+                                    {addr.address}
+                                  </div>
+                                  {addr.metadata?.tag && (
+                                    <div className="text-xs text-slate-600">
+                                      <span className="font-medium">Memo/Tag:</span> {addr.metadata.tag}
+                                    </div>
+                                  )}
+                                  {addr.metadata?.memo && (
+                                    <div className="text-xs text-slate-600">
+                                      <span className="font-medium">Memo:</span> {addr.metadata.memo}
+                                    </div>
+                                  )}
+                                </button>
+                              ))}
+                            </div>
                           </div>
                         </div>
                       )}
