@@ -169,14 +169,7 @@ export const paymentHandler = {
           details.currency,
           details.network
         )
-      
-      case 'bank_transfer':
-        return bankTransferAPI.initiateBankTransfer(
-          details.bankAccount,
-          amount,
-          details.currency
-        )
-      
+
       case 'partner':
         return partnerAPI.initiatePartnerPayment(
           details.partnerId,
