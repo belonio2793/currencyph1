@@ -523,8 +523,83 @@ export default function ReceiveMoney({ userId, globalCurrency = 'PHP' }) {
         {/* Main Form */}
         <div className="lg:col-span-2">
           <div className="bg-white border border-slate-200 rounded-xl p-8">
-            {transferRecord ? (
-              // Success Screen
+            {customPaymentLink && isRequestMode && requestMode === 'custom_payment' ? (
+              // Custom Payment Link Success Screen
+              <div className="space-y-6">
+                <div className="text-center">
+                  <div className="inline-block w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-4">
+                    <span className="text-3xl font-bold text-green-700">✓</span>
+                  </div>
+                  <h3 className="text-2xl font-semibold text-slate-900 mb-2">Payment Link Generated</h3>
+                  <p className="text-slate-600">Share this link to collect payments from anyone</p>
+                </div>
+
+                {/* Payment Details */}
+                <div className="bg-slate-50 rounded-lg p-4 space-y-3">
+                  <div className="flex justify-between items-start">
+                    <span className="text-sm font-medium text-slate-700">Amount:</span>
+                    <span className="font-semibold text-slate-900">
+                      {getCurrencySymbol(selectedCurrency)}{formatNumber(amount)}
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-start">
+                    <span className="text-sm font-medium text-slate-700">Method:</span>
+                    <span className="text-slate-600">
+                      {selectedMethod === 'gcash' && '💰 GCash'}
+                      {selectedMethod === 'bank' && '🏦 Bank Transfer'}
+                      {selectedMethod === 'crypto' && `₿ ${selectedCryptoNetwork}`}
+                    </span>
+                  </div>
+                  {customPaymentDescription && (
+                    <div className="flex justify-between items-start">
+                      <span className="text-sm font-medium text-slate-700">Description:</span>
+                      <span className="text-slate-600 text-right">{customPaymentDescription}</span>
+                    </div>
+                  )}
+                  <div className="flex justify-between items-start">
+                    <span className="text-sm font-medium text-slate-700">Payment Code:</span>
+                    <span className="font-mono text-sm text-slate-600">{customPaymentLink.paymentCode}</span>
+                  </div>
+                </div>
+
+                {/* Payment Link */}
+                <div className="bg-green-50 rounded-lg p-4 space-y-2">
+                  <p className="text-sm font-medium text-green-700">🔗 Payment Link</p>
+                  <div className="bg-white border border-slate-300 rounded p-3">
+                    <div className="text-xs font-mono text-slate-900 break-all mb-3">{customPaymentLink.paymentLink}</div>
+                    <button
+                      onClick={() => copyToClipboard(customPaymentLink.paymentLink, 'Link copied!')}
+                      className="w-full text-xs px-3 py-2 bg-green-100 text-green-700 rounded hover:bg-green-200 transition-colors font-medium"
+                    >
+                      {copyFeedback === 'Link copied!' ? '✓ Copied' : 'Copy Payment Link'}
+                    </button>
+                  </div>
+                </div>
+
+                {/* QR Code Section - Optional */}
+                <div className="bg-slate-50 rounded-lg p-4">
+                  <p className="text-sm font-medium text-slate-700 mb-2">💡 Tip: Share this link via email, WhatsApp, or QR code</p>
+                  <p className="text-xs text-slate-600">Payment link expires in 7 days if not completed</p>
+                </div>
+
+                <button
+                  onClick={() => {
+                    setCustomPaymentLink(null)
+                    setCustomPaymentDescription('')
+                    setCustomPaymentEmail('')
+                    setAmount('')
+                    setSelectedCryptoNetwork(null)
+                    setSelectedMethod(null)
+                    setRequestMode('recipient')
+                    setStep(1)
+                  }}
+                  className="w-full px-4 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium"
+                >
+                  Generate Another Link
+                </button>
+              </div>
+            ) : transferRecord ? (
+              // Success Screen for regular request
               <div className="space-y-6">
                 <div className="text-center">
                   <div className="inline-block w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mb-4">
