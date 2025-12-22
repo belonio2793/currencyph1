@@ -46,7 +46,7 @@ function SidebarComponent({ activeTab, onTabChange, userEmail, onShowAuth, onSig
           { id: 'sales-tax', label: 'Sales & Tax Reporting', auth: true }
         ]},
         { id: 'transactions', label: 'History', auth: true },
-        { id: 'wallet', label: 'Wallet', auth: true },
+        { id: 'wallet', label: 'Wallets', auth: true },
         { id: 'deposit', label: 'Deposit Funds', auth: true }
       ]
     },
