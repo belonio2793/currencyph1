@@ -95,6 +95,25 @@ export default function HomePage({ userId, userEmail, globalCurrency = 'PHP', se
     }
 
     loadCryptoData()
+
+    // Subscribe to realtime updates for crypto wallets
+    let channel = null
+    if (userId && !userId.includes('guest-local')) {
+      try {
+        channel = supabase
+          .channel('crypto:wallets')
+          .on('postgres_changes', { event: '*', schema: 'public', table: 'wallets', filter: `user_id=eq.${userId},wallet_type=eq.crypto` }, () => {
+            loadCryptoData()
+          })
+          .subscribe()
+      } catch (err) {
+        console.warn('Crypto wallets realtime subscription failed:', err)
+      }
+    }
+
+    return () => {
+      try { if (channel && typeof channel.unsubscribe === 'function') channel.unsubscribe() } catch (e) { /* ignore */ }
+    }
   }, [userId])
 
   // Load quick access preferences from database on mount and when userId changes
