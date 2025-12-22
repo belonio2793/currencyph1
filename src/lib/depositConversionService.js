@@ -35,18 +35,42 @@ export class DepositConversionService {
     }
 
     try {
-      // Get exchange rate
-      const { data: rateData, error } = await this.supabase
-        .from('crypto_rates_valid')
-        .select('rate, source, updated_at')
-        .eq('from_currency', deposit.currency_code)
-        .eq('to_currency', wallet.currency_code)
-        .order('updated_at', { ascending: false })
-        .limit(1)
+      const fromCode = deposit.currency_code.toUpperCase()
+      const toCode = wallet.currency_code.toUpperCase()
+
+      // Try public.pairs first (primary source for all rates)
+      let rateData = null
+      let rateSource = null
+
+      const { data: pairsData, error: pairsError } = await this.supabase
+        .from('pairs')
+        .select('rate, source_table, updated_at')
+        .eq('from_currency', fromCode)
+        .eq('to_currency', toCode)
         .single()
 
-      if (error || !rateData) {
-        console.warn(`No exchange rate available for ${deposit.currency_code}/${wallet.currency_code}`)
+      if (!pairsError && pairsData && typeof pairsData.rate === 'number' && isFinite(pairsData.rate) && pairsData.rate > 0) {
+        rateData = pairsData
+        rateSource = 'pairs'
+      } else {
+        // Fallback to crypto_rates_valid
+        const { data: cryptoRatesData, error: cryptoError } = await this.supabase
+          .from('crypto_rates_valid')
+          .select('rate, source, updated_at')
+          .eq('from_currency', fromCode)
+          .eq('to_currency', toCode)
+          .order('updated_at', { ascending: false })
+          .limit(1)
+          .single()
+
+        if (!cryptoError && cryptoRatesData) {
+          rateData = cryptoRatesData
+          rateSource = 'crypto_rates_valid'
+        }
+      }
+
+      if (!rateData) {
+        console.warn(`No exchange rate available for ${fromCode}/${toCode}`)
         return null
       }
 
@@ -59,7 +83,7 @@ export class DepositConversionService {
         originalAmount: deposit.amount,
         exchangeRate: exchangeRate,
         convertedAmount: convertedAmount,
-        rateSource: rateData.source,
+        rateSource: rateSource,
         rateUpdatedAt: rateData.updated_at,
         timestamp: new Date().toISOString()
       }
