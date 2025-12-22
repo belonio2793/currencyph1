@@ -97,19 +97,30 @@ async function fetchExConvertRates(fromCurrency: string, toCurrencies: string[])
 async function fetchAllExConvertRates() {
   const allRates: Record<string, Record<string, number>> = {}
 
-  console.log('[ExConvert] Fetching rates for', WORLD_CURRENCIES.length, 'fiat currencies and', CRYPTO_SYMBOLS.length, 'cryptocurrencies')
+  // Since ExConvert charges per request and we make individual API calls,
+  // we'll be selective about which currencies we fetch
+  const majorCurrencies = ['USD', 'EUR', 'GBP', 'JPY', 'AUD', 'CAD', 'CHF', 'PHP', 'SGD', 'HKD']
+  const targetCurrencies = ['USD', 'PHP', 'EUR', 'GBP']
 
-  // Fetch all fiat currencies
-  for (const fromCurrency of WORLD_CURRENCIES) {
-    const rates = await fetchExConvertRates(fromCurrency, WORLD_CURRENCIES.filter(c => c !== fromCurrency))
+  console.log('[ExConvert] Fetching major currency pairs to minimize API calls')
+  console.log('[ExConvert] From currencies:', majorCurrencies.length, 'To currencies:', targetCurrencies.length)
+
+  // Fetch major currency pairs (limited scope for API efficiency)
+  for (const fromCurrency of majorCurrencies) {
+    const targetForThisCurrency = targetCurrencies.filter(c => c !== fromCurrency)
+    if (targetForThisCurrency.length === 0) continue
+
+    console.log(`[ExConvert] Fetching ${fromCurrency} to [${targetForThisCurrency.join(',')}]`)
+    const rates = await fetchExConvertRates(fromCurrency, targetForThisCurrency)
     if (rates) {
       allRates[fromCurrency] = rates
     }
   }
 
-  // Fetch all cryptocurrencies
+  // Fetch cryptocurrencies to major currencies
+  console.log('[ExConvert] Fetching', CRYPTO_SYMBOLS.length, 'cryptocurrencies')
   for (const cryptoSymbol of CRYPTO_SYMBOLS) {
-    const rates = await fetchExConvertRates(cryptoSymbol, ['USD', 'PHP', ...WORLD_CURRENCIES])
+    const rates = await fetchExConvertRates(cryptoSymbol, targetCurrencies)
     if (rates) {
       allRates[cryptoSymbol] = rates
     }
