@@ -34,6 +34,7 @@ export default function ReceiveMoney({ userId, globalCurrency = 'PHP' }) {
   const [convertedAmount, setConvertedAmount] = useState(null)
   const [conversionRate, setConversionRate] = useState(null)
   const [conversionLoading, setConversionLoading] = useState(false)
+  const [conversionError, setConversionError] = useState('')
   const [cryptoConversionRate, setCryptoConversionRate] = useState(null)
   const [cryptoConversionLoading, setCryptoConversionLoading] = useState(false)
 
