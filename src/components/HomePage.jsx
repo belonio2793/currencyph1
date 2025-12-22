@@ -170,32 +170,34 @@ export default function HomePage({ userId, userEmail, globalCurrency = 'PHP', se
     }
   }, [globalCurrency])
 
-  // Convert balances to cryptocurrency for dual display
+  // Convert consolidated balance (fiat + crypto) to selected cryptocurrency for display
   useEffect(() => {
-    const convertToCrypto = async () => {
-      if (!totalBalanceConverted || !globalCryptocurrency || !globalCurrency || !userEmail) {
-        setCryptoBalance(null)
-        setCryptoDebt(null)
+    const convertToSelectedCrypto = async () => {
+      if (!globalCryptocurrency || !globalCurrency || !userEmail) {
+        setTotalBalanceInCrypto(0)
         return
       }
 
-      setLoadingCrypto(true)
+      setLoadingCryptoConversion(true)
       try {
-        const balanceCrypto = await convertFiatToCryptoDb(totalBalanceConverted, globalCurrency, globalCryptocurrency)
-        const debtCrypto = totalDebtConverted ? await convertFiatToCryptoDb(totalDebtConverted, globalCurrency, globalCryptocurrency) : null
+        const totalAssets = Number(totalBalanceConverted || 0) + Number(totalCryptoBalancePHP || 0)
+        if (totalAssets === 0) {
+          setTotalBalanceInCrypto(0)
+          return
+        }
 
-        setCryptoBalance(balanceCrypto)
-        setCryptoDebt(debtCrypto)
+        const converted = await convertFiatToCryptoDb(totalAssets, globalCurrency, globalCryptocurrency)
+        setTotalBalanceInCrypto(converted || 0)
       } catch (error) {
-        console.error('Failed to convert balances to crypto:', error)
-        setCryptoBalance(null)
-        setCryptoDebt(null)
+        console.error('Failed to convert balance to selected cryptocurrency:', error)
+        setTotalBalanceInCrypto(0)
+      } finally {
+        setLoadingCryptoConversion(false)
       }
-      setLoadingCrypto(false)
     }
 
-    convertToCrypto()
-  }, [totalBalanceConverted, totalDebtConverted, globalCryptocurrency, globalCurrency, userEmail])
+    convertToSelectedCrypto()
+  }, [totalBalanceConverted, totalCryptoBalancePHP, globalCryptocurrency, globalCurrency, userEmail])
 
   const convertTotals = useCallback(async (w = wallets, l = loans) => {
     try {
