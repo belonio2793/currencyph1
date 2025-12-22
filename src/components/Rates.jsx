@@ -39,19 +39,38 @@ export default function Rates() {
           .eq('active', true),
         supabase
           .from('currency_rates')
-          .select('from_currency,to_currency,rate,updated_at'),
+          .select('from_currency,to_currency,rate'),
         supabase
           .from('cryptocurrency_rates')
-          .select('from_currency,to_currency,rate,updated_at'),
+          .select('from_currency,to_currency,rate'),
         supabase
           .from('cryptocurrencies')
           .select('code,name,coingecko_id')
       ])
 
-      if (currenciesRes.error) throw currenciesRes.error
-      if (currencyPairsRes.error) throw currencyPairsRes.error
-      if (cryptocurrencyPairsRes.error) throw cryptocurrencyPairsRes.error
-      if (cryptocurrencyMetadataRes.error) throw cryptocurrencyMetadataRes.error
+      if (currenciesRes.error) {
+        console.error('❌ currencies query failed:', currenciesRes.error)
+        throw new Error(`Failed to load currencies: ${currenciesRes.error.message}`)
+      }
+      if (currencyPairsRes.error) {
+        console.error('❌ currency_rates query failed:', currencyPairsRes.error)
+        throw new Error(`Failed to load currency rates: ${currencyPairsRes.error.message}`)
+      }
+      if (cryptocurrencyPairsRes.error) {
+        console.error('❌ cryptocurrency_rates query failed:', cryptocurrencyPairsRes.error)
+        throw new Error(`Failed to load crypto rates: ${cryptocurrencyPairsRes.error.message}`)
+      }
+      if (cryptocurrencyMetadataRes.error) {
+        console.error('❌ cryptocurrencies query failed:', cryptocurrencyMetadataRes.error)
+        throw new Error(`Failed to load cryptocurrencies: ${cryptocurrencyMetadataRes.error.message}`)
+      }
+
+      if (!currencyPairsRes.data || currencyPairsRes.data.length === 0) {
+        console.warn('⚠️ No currency rates data found. Please populate currency_rates table.')
+      }
+      if (!cryptocurrencyPairsRes.data || cryptocurrencyPairsRes.data.length === 0) {
+        console.warn('⚠️ No cryptocurrency rates data found. Please populate cryptocurrency_rates table.')
+      }
 
       const currencyMap = {}
       const cryptocurrencyMetadataMap = {}
