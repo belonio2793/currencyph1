@@ -255,14 +255,15 @@ export class DepositService {
         id: DEPOSIT_METHODS.COINS_PH,
         name: 'Coins.ph',
         icon: '₿',
-        description: 'Crypto to fiat gateway (PH)',
+        description: 'Crypto to fiat gateway (PH) - Instant crypto conversion',
         processingTime: 'Instant to 1 day',
         fees: '0.5-1%',
         minAmount: 500,
         maxAmount: 1000000,
-        currencies: ['PHP', 'USD'],
+        currencies: ['PHP', 'USD', 'BTC', 'ETH', 'USDC', 'USDT'],
         requiredFields: ['cryptoAmount', 'cryptoSymbol', 'amount'],
-        webhookSupported: true
+        webhookSupported: true,
+        available: true
       },
       [DEPOSIT_METHODS.CRYPTO_DIRECT]: {
         id: DEPOSIT_METHODS.CRYPTO_DIRECT,
