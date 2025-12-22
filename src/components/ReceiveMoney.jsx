@@ -68,6 +68,34 @@ export default function ReceiveMoney({ userId, globalCurrency = 'PHP' }) {
 
   // Load initial data
   useEffect(() => {
+    // Set crypto addresses immediately (synchronous)
+    const addressesByCode = {}
+    try {
+      if (CRYPTOCURRENCY_DEPOSITS && CRYPTOCURRENCY_DEPOSITS.length > 0) {
+        CRYPTOCURRENCY_DEPOSITS.forEach(deposit => {
+          const code = deposit.currency.split('(')[1]?.replace(')', '') || deposit.currency.split(' ')[0]
+          if (!addressesByCode[code]) {
+            addressesByCode[code] = []
+          }
+          addressesByCode[code].push({
+            currency: deposit.currency,
+            network: deposit.network,
+            address: deposit.address,
+            metadata: deposit.metadata || {}
+          })
+        })
+      }
+    } catch (err) {
+      console.warn('Error organizing crypto addresses:', err)
+    }
+
+    setCryptoAddresses(addressesByCode)
+    const firstCryptoCode = Object.keys(addressesByCode)[0]
+    if (firstCryptoCode) {
+      setSelectedCryptoNetwork(firstCryptoCode)
+    }
+
+    // Load wallets and deposits asynchronously
     loadData()
   }, [userId])
 
