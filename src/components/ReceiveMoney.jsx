@@ -1237,8 +1237,7 @@ export default function ReceiveMoney({ userId, globalCurrency = 'PHP' }) {
                             <span className="text-slate-700">Method:</span>
                             <span className="font-medium text-slate-900">
                               {selectedMethod === 'gcash' && '💰 GCash'}
-                              {selectedMethod === 'bank' && '🏦 Bank Transfer'}
-                              {selectedMethod === 'crypto' && `₿ ${selectedCryptoNetwork}`}
+                              {selectedMethod === 'crypto' && `🪙 ${selectedCryptoNetwork}`}
                             </span>
                           </div>
                         </div>
