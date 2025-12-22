@@ -138,6 +138,26 @@ export default function ReceiveMoney({ userId, globalCurrency = 'PHP' }) {
     }
   }, [activeType])
 
+  const loadUserProfile = async () => {
+    try {
+      if (!userId || userId.includes('guest')) {
+        return
+      }
+
+      const { data: profile, error: profileError } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', userId)
+        .single()
+
+      if (!profileError && profile) {
+        setUserProfile(profile)
+      }
+    } catch (err) {
+      console.warn('Error loading user profile:', err)
+    }
+  }
+
   const loadData = async () => {
     try {
       setLoading(true)
@@ -161,6 +181,9 @@ export default function ReceiveMoney({ userId, globalCurrency = 'PHP' }) {
         } catch (err) {
           console.warn('Error loading wallets:', err)
         }
+
+        // Load user profile
+        await loadUserProfile()
 
         // Load recent deposits
         try {
