@@ -210,7 +210,17 @@ function formatCurrencyDisplay(rate, currency) {
  */
 export function buildRateConfirmationMessage(confirmation) {
   if (!confirmation) {
-    return 'Rate information unavailable'
+    return {
+      title: 'Service Unavailable',
+      rate: '—',
+      timestamp_text: 'Rate service is temporarily unavailable',
+      detail: 'The exchange rate service is temporarily unavailable. Please try again in a few moments.',
+      minutes_ago: '—',
+      is_fresh: false,
+      source: 'unavailable',
+      full_message: 'Service is temporarily unavailable - exchange rate cannot be confirmed at this time. Please try again later.',
+      error: true
+    }
   }
 
   const {
@@ -229,7 +239,8 @@ export function buildRateConfirmationMessage(confirmation) {
     minutes_ago: timestamp.minutes_ago,
     is_fresh: timestamp.is_current,
     source: source,
-    full_message: `You'll receive ${display.rate_formatted} for your deposit. Rate confirmed ${timestamp.readable} (${source} source).`
+    full_message: `You'll receive ${display.rate_formatted} for your deposit. Rate confirmed ${timestamp.readable} (${source} source).`,
+    error: false
   }
 }
 
