@@ -28,6 +28,36 @@ export default function Rates() {
   const [displayFormat, setDisplayFormat] = useState('code-symbol') // 'code-only', 'code-symbol', 'code-name', 'symbol-name'
   const [showSymbolInConverter, setShowSymbolInConverter] = useState(true)
 
+  // Helper to get currency symbol from metadata or fallback
+  const getSymbolForCurrency = (code, metadata) => {
+    return metadata?.symbol || getCurrencySymbol(code) || '$'
+  }
+
+  // Format currency display based on selected format
+  const formatCurrencyDisplay = (code, metadata) => {
+    const symbol = getSymbolForCurrency(code, metadata)
+    const name = metadata?.name || code
+
+    switch (displayFormat) {
+      case 'code-only':
+        return code
+      case 'code-symbol':
+        return `${code} ${symbol}`
+      case 'code-name':
+        return `${code} - ${name}`
+      case 'symbol-name':
+        return `${symbol} ${name}`
+      default:
+        return code
+    }
+  }
+
+  // Format for converter dropdown (shorter format)
+  const formatConverterDisplay = (code, metadata) => {
+    const symbol = getSymbolForCurrency(code, metadata)
+    return showSymbolInConverter ? `${code} ${symbol}` : code
+  }
+
   // Load saved preferences on mount
   useEffect(() => {
     const saved = preferencesManager.getRatesCurrencyPreferences(null)
