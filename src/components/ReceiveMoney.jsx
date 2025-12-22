@@ -941,51 +941,57 @@ export default function ReceiveMoney({ userId, globalCurrency = 'PHP' }) {
 
                               {/* Dropdown Results */}
                               {showWalletDropdown && (
-                                <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-slate-200 rounded-lg shadow-lg z-50 max-h-64 overflow-y-auto">
+                                <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-slate-300 rounded-lg shadow-xl z-50 max-h-72 overflow-y-auto animate-in fade-in slide-in-from-top-2">
                                   {filteredWallets.length === 0 ? (
-                                    <div className="px-4 py-3 text-sm text-slate-500 text-center">
-                                      No wallets match your search
+                                    <div className="px-4 py-6 text-sm text-slate-500 text-center">
+                                      <p className="font-medium mb-1">No wallets found</p>
+                                      <p className="text-xs">Try a different search term</p>
                                     </div>
                                   ) : (
-                                    filteredWallets.map(wallet => {
-                                      const isSelected = selectedWallet === wallet.id
-                                      return (
-                                        <button
-                                          key={wallet.id}
-                                          type="button"
-                                          onClick={() => {
-                                            setSelectedWallet(wallet.id)
-                                            setWalletSearch('')
-                                            setShowWalletDropdown(false)
-                                          }}
-                                          className={`w-full text-left px-4 py-3 border-b border-slate-100 last:border-b-0 transition-colors ${
-                                            isSelected
-                                              ? 'bg-blue-50 hover:bg-blue-100'
-                                              : 'hover:bg-slate-50'
-                                          }`}
-                                        >
-                                          <div className="flex items-start justify-between gap-3">
-                                            <div className="flex-1">
-                                              <div className="font-semibold text-slate-900">{wallet.currency_code}</div>
-                                              {wallet.currency_name && (
-                                                <div className="text-xs text-slate-600">{wallet.currency_name}</div>
-                                              )}
-                                              <div className="text-sm text-slate-700 mt-1">
-                                                Balance: {getCurrencySymbol(wallet.currency_code)}{formatNumber(wallet.balance)}
-                                              </div>
-                                              {wallet.account_number && (
-                                                <div className="text-xs text-slate-600 mt-1">
-                                                  Account: {wallet.account_number}
+                                    <div className="py-1">
+                                      <p className="px-4 py-2 text-xs font-semibold text-slate-500 uppercase tracking-wide">
+                                        {filteredWallets.length} {filteredWallets.length === 1 ? 'wallet' : 'wallets'} found
+                                      </p>
+                                      {filteredWallets.map(wallet => {
+                                        const isSelected = selectedWallet === wallet.id
+                                        return (
+                                          <button
+                                            key={wallet.id}
+                                            type="button"
+                                            onClick={() => {
+                                              setSelectedWallet(wallet.id)
+                                              setWalletSearch('')
+                                              setShowWalletDropdown(false)
+                                            }}
+                                            className={`w-full text-left px-4 py-3 transition-colors ${
+                                              isSelected
+                                                ? 'bg-blue-100 border-l-4 border-blue-600'
+                                                : 'border-l-4 border-transparent hover:bg-slate-50'
+                                            }`}
+                                          >
+                                            <div className="flex items-start justify-between gap-3">
+                                              <div className="flex-1 min-w-0">
+                                                <div className="font-semibold text-slate-900">{wallet.currency_code}</div>
+                                                {wallet.currency_name && (
+                                                  <div className="text-xs text-slate-600">{wallet.currency_name}</div>
+                                                )}
+                                                <div className="text-sm text-slate-700 mt-1 font-medium">
+                                                  {getCurrencySymbol(wallet.currency_code)}{formatNumber(wallet.balance)}
                                                 </div>
+                                                {wallet.account_number && (
+                                                  <div className="text-xs text-slate-500 mt-1">
+                                                    Acct: {wallet.account_number}
+                                                  </div>
+                                                )}
+                                              </div>
+                                              {isSelected && (
+                                                <div className="text-blue-600 font-bold text-lg mt-1 flex-shrink-0">✓</div>
                                               )}
                                             </div>
-                                            {isSelected && (
-                                              <div className="text-blue-600 font-semibold mt-1">✓</div>
-                                            )}
-                                          </div>
-                                        </button>
-                                      )
-                                    })
+                                          </button>
+                                        )
+                                      })}
+                                    </div>
                                   )}
                                 </div>
                               )}
