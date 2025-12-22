@@ -572,6 +572,93 @@ export default function Rates() {
 
         {/* Right Column - Favorites and Info */}
         <div className="lg:col-span-1 space-y-6">
+          {/* Currency Customization Card */}
+          <div className="bg-white rounded-2xl shadow-lg p-6 border border-slate-200">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold text-slate-900">Tracked Currencies</h3>
+              <button
+                onClick={() => setCustomizationOpen(!customizationOpen)}
+                className="text-sm px-3 py-1 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition font-medium"
+              >
+                {customizationOpen ? 'Done' : 'Customize'}
+              </button>
+            </div>
+
+            {customizationOpen ? (
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-2">Fiat Currencies</label>
+                  <div className="grid grid-cols-2 gap-2 max-h-64 overflow-y-auto">
+                    {['PHP', 'USD', 'EUR', 'GBP', 'JPY', 'SGD', 'HKD', 'AUD', 'CAD', 'CHF', 'INR', 'MYR', 'THB', 'IDR', 'VND'].map(code => (
+                      <label key={code} className="flex items-center gap-2 p-2 rounded hover:bg-slate-50 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={trackedCurrencies.fiat.includes(code)}
+                          onChange={() => toggleCurrencyTracking(code)}
+                          className="w-4 h-4 text-blue-600 rounded"
+                        />
+                        <span className="text-sm text-slate-700">{code}</span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="border-t border-slate-200 pt-4">
+                  <label className="block text-sm font-medium text-slate-700 mb-2">Cryptocurrencies</label>
+                  <div className="grid grid-cols-2 gap-2 max-h-64 overflow-y-auto">
+                    {['BTC', 'ETH', 'USDC', 'USDT', 'BNB', 'XRP', 'SOL', 'ADA', 'DOGE', 'MATIC', 'LINK', 'LTC', 'BCH', 'XLM', 'HBAR'].map(code => (
+                      <label key={code} className="flex items-center gap-2 p-2 rounded hover:bg-slate-50 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={trackedCurrencies.crypto.includes(code)}
+                          onChange={() => toggleCurrencyTracking(code)}
+                          className="w-4 h-4 text-blue-600 rounded"
+                        />
+                        <span className="text-sm text-slate-700">{code}</span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+
+                <button
+                  onClick={resetToDefaults}
+                  className="w-full mt-4 px-4 py-2 text-sm bg-slate-100 text-slate-700 rounded-lg hover:bg-slate-200 transition font-medium"
+                >
+                  Reset to Defaults
+                </button>
+              </div>
+            ) : (
+              <div className="space-y-2">
+                <p className="text-xs text-slate-600 font-medium">Fiat ({trackedCurrencies.fiat.length})</p>
+                <div className="flex flex-wrap gap-1 mb-3">
+                  {trackedCurrencies.fiat.slice(0, 6).map(code => (
+                    <span key={code} className="px-2 py-1 bg-blue-100 text-blue-700 text-xs rounded-full">
+                      {code}
+                    </span>
+                  ))}
+                  {trackedCurrencies.fiat.length > 6 && (
+                    <span className="px-2 py-1 bg-slate-100 text-slate-600 text-xs rounded-full">
+                      +{trackedCurrencies.fiat.length - 6}
+                    </span>
+                  )}
+                </div>
+                <p className="text-xs text-slate-600 font-medium">Crypto ({trackedCurrencies.crypto.length})</p>
+                <div className="flex flex-wrap gap-1">
+                  {trackedCurrencies.crypto.slice(0, 6).map(code => (
+                    <span key={code} className="px-2 py-1 bg-orange-100 text-orange-700 text-xs rounded-full">
+                      {code}
+                    </span>
+                  ))}
+                  {trackedCurrencies.crypto.length > 6 && (
+                    <span className="px-2 py-1 bg-slate-100 text-slate-600 text-xs rounded-full">
+                      +{trackedCurrencies.crypto.length - 6}
+                    </span>
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
+
           {/* Favorites Card */}
           <div className="bg-white rounded-2xl shadow-lg p-6 border border-slate-200">
             <h3 className="text-lg font-semibold text-slate-900 mb-4">Favorite Rates</h3>
