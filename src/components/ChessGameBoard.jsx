@@ -72,6 +72,13 @@ export default function ChessGameBoard({ game, userId, userEmail, onClose }) {
     }
   }, [currentGame.id])
 
+  // Cleanup AI timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (aiTimeoutRef.current) clearTimeout(aiTimeoutRef.current)
+    }
+  }, [])
+
   useEffect(() => {
     if (isVsComputer) return
     if (!currentGame.time_control || currentGame.time_control === 'unlimited') return
