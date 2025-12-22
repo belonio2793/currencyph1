@@ -32,83 +32,59 @@ export default function Rates() {
       setLoading(true)
       setError(null)
 
-      // Fetch all metadata first
-      const [currenciesRes, cryptocurrenciesRes] = await Promise.all([
-        supabase
-          .from('currencies')
-          .select('code,name,type,symbol,decimals,is_default,active'),
-        supabase
-          .from('cryptocurrencies')
-          .select('code,name,coingecko_id')
-      ])
-
-      if (currenciesRes.error) {
-        console.error('❌ currencies query failed:', currenciesRes.error)
-        throw new Error(`Failed to load currencies: ${currenciesRes.error.message}`)
-      }
-
-      if (cryptocurrenciesRes.error) {
-        console.error('❌ cryptocurrencies query failed:', cryptocurrenciesRes.error)
-        throw new Error(`Failed to load cryptocurrencies: ${cryptocurrenciesRes.error.message}`)
-      }
-
-      const currencyMap = {}
-      const cryptocurrencyMetadataMap = {}
-
-      currenciesRes.data?.forEach(c => {
-        currencyMap[c.code] = c
-      })
-
-      cryptocurrenciesRes.data?.forEach(c => {
-        cryptocurrencyMetadataMap[c.code] = c
-      })
-
-      setCurrencies(currencyMap)
-
-      const ratesByCode = {}
-
-      // Try to fetch from pairs table first (unified source)
+      // Fetch all rates from pairs table (unified source)
       const pairsRes = await supabase
         .from('pairs')
         .select('from_currency,to_currency,rate,source_table,updated_at')
 
-      let pairsData = []
-      if (!pairsRes.error && pairsRes.data && pairsRes.data.length > 0) {
-        console.log('✅ Loaded rates from pairs table')
-        pairsData = pairsRes.data
-      } else {
-        console.warn('⚠️ Pairs table is empty or unavailable, falling back to legacy tables')
+      if (pairsRes.error) {
+        console.error('❌ pairs query failed:', pairsRes.error)
+        throw new Error(`Failed to load rates: ${pairsRes.error.message}`)
+      }
 
-        // Fallback: fetch from currency_rates and cryptocurrency_rates
-        const [currencyRatesRes, cryptoRatesRes] = await Promise.all([
+      const pairsData = pairsRes.data || []
+      console.log(`✅ Loaded ${pairsData.length} rate pairs from pairs table`)
+
+      // Extract all unique currencies and cryptocurrencies from pairs table
+      const uniqueCodes = new Set()
+      pairsData.forEach(pair => {
+        uniqueCodes.add(pair.from_currency)
+        uniqueCodes.add(pair.to_currency)
+      })
+
+      // Fetch metadata for all unique codes
+      const codesArray = Array.from(uniqueCodes)
+      let currencyMetadata = {}
+      let cryptoMetadata = {}
+
+      if (codesArray.length > 0) {
+        const [currenciesRes, cryptosRes] = await Promise.all([
           supabase
-            .from('currency_rates')
-            .select('from_currency,to_currency,rate,updated_at'),
+            .from('currencies')
+            .select('code,name,type,symbol,decimals,is_default,active')
+            .in('code', codesArray),
           supabase
-            .from('cryptocurrency_rates')
-            .select('from_currency,to_currency,rate,updated_at')
+            .from('cryptocurrencies')
+            .select('code,name,coingecko_id')
+            .in('code', codesArray)
         ])
 
-        if (currencyRatesRes.data) {
-          pairsData.push(...currencyRatesRes.data.map(r => ({
-            ...r,
-            source_table: 'currency_rates'
-          })))
+        if (currenciesRes.data) {
+          currenciesRes.data.forEach(c => {
+            currencyMetadata[c.code] = c
+          })
         }
 
-        if (cryptoRatesRes.data) {
-          pairsData.push(...cryptoRatesRes.data.map(r => ({
-            ...r,
-            source_table: 'cryptocurrency_rates'
-          })))
-        }
-
-        if (pairsData.length === 0) {
-          console.warn('⚠️ No rates data found in any source. Showing metadata only.')
-        } else {
-          console.log(`✅ Loaded ${pairsData.length} rates from fallback sources`)
+        if (cryptosRes.data) {
+          cryptosRes.data.forEach(c => {
+            cryptoMetadata[c.code] = c
+          })
         }
       }
+
+      setCurrencies({ ...currencyMetadata, ...cryptoMetadata })
+
+      const ratesByCode = {}
 
       // Process all rate pairs
       pairsData.forEach(pair => {
@@ -124,16 +100,16 @@ export default function Rates() {
         }
 
         if (targetCode && !ratesByCode[targetCode]) {
-          const currencyMetadata = currencyMap[targetCode]
-          const cryptoMetadata = cryptocurrencyMetadataMap[targetCode]
+          const currMeta = currencyMetadata[targetCode]
+          const cryptoMeta = cryptoMetadata[targetCode]
 
-          const type = cryptoMetadata ? 'cryptocurrency' : (currencyMetadata?.type || 'currency')
+          const type = cryptoMeta ? 'cryptocurrency' : (currMeta?.type || 'currency')
           const metadata = {
             code: targetCode,
-            name: currencyMetadata?.name || cryptoMetadata?.name || targetCode,
+            name: currMeta?.name || cryptoMeta?.name || targetCode,
             type: type,
-            symbol: currencyMetadata?.symbol || '',
-            decimals: type === 'cryptocurrency' ? 8 : (currencyMetadata?.decimals || 2)
+            symbol: currMeta?.symbol || '',
+            decimals: type === 'cryptocurrency' ? 8 : (currMeta?.decimals || 2)
           }
 
           ratesByCode[targetCode] = {
@@ -146,43 +122,39 @@ export default function Rates() {
         }
       })
 
-      // Add all currencies and cryptocurrencies that don't have rates yet
-      // This ensures all metadata is displayed even without rates
-      Object.values(currencyMap).forEach(currency => {
-        if (!ratesByCode[currency.code]) {
-          ratesByCode[currency.code] = {
-            code: currency.code,
+      // Add all currencies/cryptos from pairs that don't have a PHP pair yet
+      uniqueCodes.forEach(code => {
+        if (!ratesByCode[code]) {
+          const currMeta = currencyMetadata[code]
+          const cryptoMeta = cryptoMetadata[code]
+
+          const type = cryptoMeta ? 'cryptocurrency' : (currMeta?.type || 'currency')
+          const metadata = {
+            code: code,
+            name: currMeta?.name || cryptoMeta?.name || code,
+            type: type,
+            symbol: currMeta?.symbol || '',
+            decimals: type === 'cryptocurrency' ? 8 : (currMeta?.decimals || 2)
+          }
+
+          ratesByCode[code] = {
+            code: code,
             rate: null,
-            metadata: {
-              code: currency.code,
-              name: currency.name,
-              type: 'currency',
-              symbol: currency.symbol || '',
-              decimals: currency.decimals || 2
-            },
-            source: 'metadata',
+            metadata: metadata,
+            source: 'pairs',
             updatedAt: new Date().toISOString()
           }
         }
       })
 
-      Object.values(cryptocurrencyMetadataMap).forEach(crypto => {
-        if (!ratesByCode[crypto.code]) {
-          ratesByCode[crypto.code] = {
-            code: crypto.code,
-            rate: null,
-            metadata: {
-              code: crypto.code,
-              name: crypto.name,
-              type: 'cryptocurrency',
-              symbol: '',
-              decimals: 8
-            },
-            source: 'metadata',
-            updatedAt: new Date().toISOString()
-          }
-        }
-      })
+      // Get the most recent timestamp from all pairs
+      let mostRecentTimestamp = new Date()
+      if (pairsData.length > 0) {
+        const timestamps = pairsData
+          .map(p => p.updated_at ? new Date(p.updated_at) : new Date())
+          .sort((a, b) => b - a)
+        mostRecentTimestamp = timestamps[0] || new Date()
+      }
 
       // Separate rates with values from rates without values
       const ratesWithValues = Object.values(ratesByCode)
@@ -203,18 +175,25 @@ export default function Rates() {
         phpRate.rate = 1
         phpRate.source = 'base'
         validRates.unshift(phpRate)
-      } else if (currencyMap['PHP']) {
+      } else {
+        // If PHP not in pairs, add it as base
         validRates.unshift({
           code: 'PHP',
           rate: 1,
-          metadata: currencyMap['PHP'],
+          metadata: currencyMetadata['PHP'] || {
+            code: 'PHP',
+            name: 'Philippine Peso',
+            type: 'currency',
+            symbol: '₱',
+            decimals: 2
+          },
           source: 'base',
           updatedAt: new Date().toISOString()
         })
       }
 
       setRates(validRates)
-      setLastUpdated(new Date())
+      setLastUpdated(mostRecentTimestamp)
     } catch (err) {
       const errorMsg = err?.message || String(err) || 'Unknown error'
       console.error('Error loading rates:', errorMsg, err)
