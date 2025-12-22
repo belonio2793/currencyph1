@@ -907,9 +907,14 @@ export default function ReceiveMoney({ userId, globalCurrency = 'PHP' }) {
                         <button
                           type="submit"
                           disabled={submitting}
-                          className="flex-1 bg-emerald-600 text-white py-3 rounded-lg hover:bg-emerald-700 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                          className="flex-1 bg-emerald-600 text-white py-3 rounded-lg hover:bg-emerald-700 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed text-sm"
                         >
-                          {submitting ? 'Creating...' : 'Create & Send Payment Request'}
+                          {submitting ? 'Creating...' : (
+                            <>
+                              Create Payment Request
+                              {selectedGuestProfile && sendChatMessage && ' + Send Chat'}
+                            </>
+                          )}
                         </button>
                       </div>
                     </div>
