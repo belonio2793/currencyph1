@@ -96,23 +96,46 @@ export const walletService = {
       })
 
       // Transform data to match expected format
-      const wallets = (walletData || []).map(w => ({
-        id: w.id,
-        wallet_id: w.id,
-        user_id: w.user_id,
-        currency_code: w.currency_code,
-        currency_name: w.currencies?.name || w.currency_code,
-        currency_type: w.currencies?.type || 'fiat',
-        symbol: w.currencies?.symbol,
-        decimals: w.currencies?.decimals,
-        balance: w.balance,
-        total_deposited: w.total_deposited,
-        total_withdrawn: w.total_withdrawn,
-        is_active: w.is_active,
-        created_at: w.created_at,
-        updated_at: w.updated_at,
-        account_number: w.account_number
-      }))
+      const wallets = (walletData || []).map(w => {
+        // Handle missing currency data gracefully
+        let currencyType = w.currencies?.type || 'fiat'
+        let currencyName = w.currencies?.name || w.currency_code || 'Unknown'
+
+        // Infer type from currency code if not available from join
+        if (!w.currencies && w.currency_code) {
+          const cryptoCodes = ['BTC', 'ETH', 'XRP', 'ADA', 'SOL', 'DOGE', 'MATIC', 'LINK', 'LTC', 'BCH', 'USDT', 'USDC', 'BUSD', 'SHIB', 'AVAX', 'DOT']
+          currencyType = cryptoCodes.includes(w.currency_code) ? 'crypto' : 'fiat'
+        }
+
+        return {
+          id: w.id,
+          wallet_id: w.id,
+          user_id: w.user_id,
+          currency_code: w.currency_code,
+          currency_name: currencyName,
+          currency_type: currencyType,
+          symbol: w.currencies?.symbol,
+          decimals: w.currencies?.decimals || 2,
+          balance: w.balance,
+          total_deposited: w.total_deposited,
+          total_withdrawn: w.total_withdrawn,
+          is_active: w.is_active,
+          created_at: w.created_at,
+          updated_at: w.updated_at,
+          account_number: w.account_number
+        }
+      })
+
+      if (wallets.length === 0) {
+        console.warn('No active wallets found for user:', userId, 'Attempting to create default wallets...')
+        // Try to create default wallets if none exist
+        try {
+          await this.ensurePhpWallet(userId)
+          console.log('Wallet creation initiated for user:', userId)
+        } catch (createErr) {
+          console.warn('Could not create default wallets:', createErr?.message)
+        }
+      }
 
       return wallets
     } catch (err) {
