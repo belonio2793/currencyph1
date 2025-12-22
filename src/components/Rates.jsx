@@ -455,7 +455,7 @@ export default function Rates() {
                 >
                   {rates.map(r => (
                     <option key={r.code} value={r.code}>
-                      {r.code} - {r.metadata?.name || r.code}
+                      {formatConverterDisplay(r.code, r.metadata)} - {r.metadata?.name || r.code}
                     </option>
                   ))}
                 </select>
