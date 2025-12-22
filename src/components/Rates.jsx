@@ -176,8 +176,9 @@ export default function Rates() {
       setRates(validRates)
       setLastUpdated(new Date())
     } catch (err) {
-      console.error('Error loading rates:', err)
-      setError('Failed to load exchange rates. Please try again.')
+      const errorMsg = err?.message || String(err) || 'Unknown error'
+      console.error('Error loading rates:', errorMsg, err)
+      setError(`Failed to load exchange rates: ${errorMsg}`)
     } finally {
       setLoading(false)
     }
