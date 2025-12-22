@@ -758,34 +758,42 @@ export default function Rates() {
                     <div>
                       <label className="block text-sm font-medium text-slate-700 mb-2">Fiat Currencies</label>
                       <div className="grid grid-cols-2 gap-2 max-h-64 overflow-y-auto">
-                        {['PHP', 'USD', 'EUR', 'GBP', 'JPY', 'SGD', 'HKD', 'AUD', 'CAD', 'CHF', 'INR', 'MYR', 'THB', 'IDR', 'VND'].map(code => (
-                          <label key={code} className="flex items-center gap-2 p-2 rounded hover:bg-slate-50 cursor-pointer">
-                            <input
-                              type="checkbox"
-                              checked={trackedCurrencies.fiat.includes(code)}
-                              onChange={() => toggleCurrencyTracking(code)}
-                              className="w-4 h-4 text-blue-600 rounded"
-                            />
-                            <span className="text-sm text-slate-700">{code}</span>
-                          </label>
-                        ))}
+                        {availableFiats.length > 0 ? (
+                          availableFiats.map(code => (
+                            <label key={code} className="flex items-center gap-2 p-2 rounded hover:bg-slate-50 cursor-pointer">
+                              <input
+                                type="checkbox"
+                                checked={trackedCurrencies.fiat.includes(code)}
+                                onChange={() => toggleCurrencyTracking(code)}
+                                className="w-4 h-4 text-blue-600 rounded"
+                              />
+                              <span className="text-sm text-slate-700">{code}</span>
+                            </label>
+                          ))
+                        ) : (
+                          <p className="text-xs text-slate-500">Loading currencies...</p>
+                        )}
                       </div>
                     </div>
 
                     <div className="border-t border-slate-200 pt-4">
                       <label className="block text-sm font-medium text-slate-700 mb-2">Cryptocurrencies</label>
                       <div className="grid grid-cols-2 gap-2 max-h-64 overflow-y-auto">
-                        {['BTC', 'ETH', 'USDC', 'USDT', 'BNB', 'XRP', 'SOL', 'ADA', 'DOGE', 'MATIC', 'LINK', 'LTC', 'BCH', 'XLM', 'HBAR'].map(code => (
-                          <label key={code} className="flex items-center gap-2 p-2 rounded hover:bg-slate-50 cursor-pointer">
-                            <input
-                              type="checkbox"
-                              checked={trackedCurrencies.crypto.includes(code)}
-                              onChange={() => toggleCurrencyTracking(code)}
-                              className="w-4 h-4 text-blue-600 rounded"
-                            />
-                            <span className="text-sm text-slate-700">{code}</span>
-                          </label>
-                        ))}
+                        {availableCryptos.length > 0 ? (
+                          availableCryptos.map(code => (
+                            <label key={code} className="flex items-center gap-2 p-2 rounded hover:bg-slate-50 cursor-pointer">
+                              <input
+                                type="checkbox"
+                                checked={trackedCurrencies.crypto.includes(code)}
+                                onChange={() => toggleCurrencyTracking(code)}
+                                className="w-4 h-4 text-blue-600 rounded"
+                              />
+                              <span className="text-sm text-slate-700">{code}</span>
+                            </label>
+                          ))
+                        ) : (
+                          <p className="text-xs text-slate-500">Loading cryptocurrencies...</p>
+                        )}
                       </div>
                     </div>
 
