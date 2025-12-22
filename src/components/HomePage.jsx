@@ -58,6 +58,45 @@ export default function HomePage({ userId, userEmail, globalCurrency = 'PHP', se
     loadData()
   }, [userId])
 
+  // Load crypto wallets and calculate total crypto balance in PHP
+  useEffect(() => {
+    const loadCryptoData = async () => {
+      if (!userId || userId.includes('guest-local')) {
+        setCryptoWallets([])
+        setTotalCryptoBalancePHP(0)
+        setCryptoPrices({})
+        return
+      }
+
+      setLoadingCryptoWallets(true)
+      try {
+        const [wallets, prices] = await Promise.all([
+          cryptoBalanceService.getCryptoWallets(userId),
+          cryptoBalanceService.getCryptoPrices()
+        ])
+
+        setCryptoWallets(wallets || [])
+        setCryptoPrices(prices || {})
+
+        if (wallets && wallets.length > 0) {
+          const totalPHP = cryptoBalanceService.calculateTotalCryptoInPHP(wallets, prices || {})
+          setTotalCryptoBalancePHP(totalPHP)
+        } else {
+          setTotalCryptoBalancePHP(0)
+        }
+      } catch (err) {
+        console.warn('Failed to load crypto wallets:', err)
+        setCryptoWallets([])
+        setTotalCryptoBalancePHP(0)
+        setCryptoPrices({})
+      } finally {
+        setLoadingCryptoWallets(false)
+      }
+    }
+
+    loadCryptoData()
+  }, [userId])
+
   // Load quick access preferences from database on mount and when userId changes
   useEffect(() => {
     const loadQuickAccessFromDB = async () => {
