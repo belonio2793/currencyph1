@@ -128,8 +128,9 @@ export const walletService = {
         let currencyName = currencyInfo?.name || w.currency_code || 'Unknown'
 
         if (!currencyInfo && w.currency_code) {
-          const cryptoCodes = ['BTC', 'ETH', 'XRP', 'ADA', 'SOL', 'DOGE', 'MATIC', 'LINK', 'LTC', 'BCH', 'USDT', 'USDC', 'BUSD', 'SHIB', 'AVAX', 'DOT']
-          currencyType = cryptoCodes.includes(w.currency_code) ? 'crypto' : 'fiat'
+          // Expanded list of all known crypto currencies
+          const cryptoCodes = ['BTC', 'ETH', 'XRP', 'ADA', 'SOL', 'DOGE', 'MATIC', 'LINK', 'LTC', 'BCH', 'USDT', 'USDC', 'BUSD', 'SHIB', 'AVAX', 'DOT', 'USDC', 'PYUSD', 'WLD', 'XAUT', 'PEPE', 'HYPE', 'ASTER', 'ENA', 'SKY', 'TON', 'SUI', 'BNB', 'XLM', 'TRX', 'HBAR']
+          currencyType = cryptoCodes.includes(w.currency_code?.toUpperCase()) ? 'crypto' : 'fiat'
         }
 
         return {
