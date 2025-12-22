@@ -958,22 +958,31 @@ export default function ReceiveMoney({ userId, globalCurrency = 'PHP' }) {
                             }`}>
                               Conversion
                             </p>
-                            <div className="flex justify-between items-center gap-2">
-                              <span className="text-sm text-slate-700">
-                                {amount} {selectedCurrency} equals
-                              </span>
-                              <span className={`text-lg font-semibold ${
-                                CRYPTO_CURRENCY_CODES.includes(selectedCurrency.toUpperCase())
-                                  ? 'text-orange-600'
-                                  : 'text-blue-600'
-                              }`}>
-                                {cryptoConversionLoading || conversionLoading ? 'Loading...' : formatNumber(convertedAmount)} {selectedWalletData.currency_code}
-                              </span>
-                            </div>
-                            {conversionRate && (
-                              <p className="text-xs text-slate-600 mt-2">
-                                Rate: 1 {selectedCurrency} = {formatNumber(conversionRate)} {selectedWalletData.currency_code}
-                              </p>
+                            {conversionError ? (
+                              <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
+                                <p className="text-sm text-red-700 font-medium">Service Unavailable</p>
+                                <p className="text-xs text-red-600 mt-1">{conversionError}</p>
+                              </div>
+                            ) : (
+                              <>
+                                <div className="flex justify-between items-center gap-2">
+                                  <span className="text-sm text-slate-700">
+                                    {amount} {selectedCurrency} equals
+                                  </span>
+                                  <span className={`text-lg font-semibold ${
+                                    CRYPTO_CURRENCY_CODES.includes(selectedCurrency.toUpperCase())
+                                      ? 'text-orange-600'
+                                      : 'text-blue-600'
+                                  }`}>
+                                    {cryptoConversionLoading || conversionLoading ? 'Loading...' : formatNumber(convertedAmount)} {selectedWalletData.currency_code}
+                                  </span>
+                                </div>
+                                {conversionRate && (
+                                  <p className="text-xs text-slate-600 mt-2">
+                                    Rate: 1 {selectedCurrency} = {formatNumber(conversionRate)} {selectedWalletData.currency_code}
+                                  </p>
+                                )}
+                              </>
                             )}
                           </div>
                         )}
