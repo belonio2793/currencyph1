@@ -105,6 +105,7 @@ export default function App() {
   const [totalBalancePHP, setTotalBalancePHP] = useState(0)
   const [totalBalanceConverted, setTotalBalanceConverted] = useState(0)
   const [totalDebtConverted, setTotalDebtConverted] = useState(0)
+  const [totalCryptoBalancePHP, setTotalCryptoBalancePHP] = useState(0)
   const totalNet = Number(totalBalanceConverted || 0) - Number(totalDebtConverted || 0)
 
   useEffect(() => {
