@@ -32,44 +32,39 @@ export default function Rates() {
       setLoading(true)
       setError(null)
 
-      const [currenciesRes, currencyPairsRes, cryptocurrencyPairsRes, cryptocurrencyMetadataRes] = await Promise.all([
-        supabase
-          .from('currencies')
-          .select('code,name,type,symbol,decimals,is_default,active')
-          .eq('active', true),
-        supabase
-          .from('currency_rates')
-          .select('from_currency,to_currency,rate'),
-        supabase
-          .from('cryptocurrency_rates')
-          .select('from_currency,to_currency,rate'),
-        supabase
-          .from('cryptocurrencies')
-          .select('code,name,coingecko_id')
-      ])
+      // Fetch all pairs from the unified pairs table
+      const pairsRes = await supabase
+        .from('pairs')
+        .select('from_currency,to_currency,rate,source_table,updated_at')
+
+      if (pairsRes.error) {
+        console.error('❌ pairs query failed:', pairsRes.error)
+        throw new Error(`Failed to load rates: ${pairsRes.error.message}`)
+      }
+
+      if (!pairsRes.data || pairsRes.data.length === 0) {
+        console.warn('⚠️ No rates data found in pairs table.')
+      }
+
+      // Fetch currency metadata
+      const currenciesRes = await supabase
+        .from('currencies')
+        .select('code,name,type,symbol,decimals,is_default,active')
+        .eq('active', true)
 
       if (currenciesRes.error) {
         console.error('❌ currencies query failed:', currenciesRes.error)
         throw new Error(`Failed to load currencies: ${currenciesRes.error.message}`)
       }
-      if (currencyPairsRes.error) {
-        console.error('❌ currency_rates query failed:', currencyPairsRes.error)
-        throw new Error(`Failed to load currency rates: ${currencyPairsRes.error.message}`)
-      }
-      if (cryptocurrencyPairsRes.error) {
-        console.error('❌ cryptocurrency_rates query failed:', cryptocurrencyPairsRes.error)
-        throw new Error(`Failed to load crypto rates: ${cryptocurrencyPairsRes.error.message}`)
-      }
-      if (cryptocurrencyMetadataRes.error) {
-        console.error('❌ cryptocurrencies query failed:', cryptocurrencyMetadataRes.error)
-        throw new Error(`Failed to load cryptocurrencies: ${cryptocurrencyMetadataRes.error.message}`)
-      }
 
-      if (!currencyPairsRes.data || currencyPairsRes.data.length === 0) {
-        console.warn('⚠️ No currency rates data found. Please populate currency_rates table.')
-      }
-      if (!cryptocurrencyPairsRes.data || cryptocurrencyPairsRes.data.length === 0) {
-        console.warn('⚠️ No cryptocurrency rates data found. Please populate cryptocurrency_rates table.')
+      // Fetch cryptocurrency metadata
+      const cryptocurrenciesRes = await supabase
+        .from('cryptocurrencies')
+        .select('code,name,coingecko_id')
+
+      if (cryptocurrenciesRes.error) {
+        console.error('❌ cryptocurrencies query failed:', cryptocurrenciesRes.error)
+        throw new Error(`Failed to load cryptocurrencies: ${cryptocurrenciesRes.error.message}`)
       }
 
       const currencyMap = {}
@@ -79,7 +74,7 @@ export default function Rates() {
         currencyMap[c.code] = c
       })
 
-      cryptocurrencyMetadataRes.data?.forEach(c => {
+      cryptocurrenciesRes.data?.forEach(c => {
         cryptocurrencyMetadataMap[c.code] = c
       })
 
@@ -87,72 +82,40 @@ export default function Rates() {
 
       const ratesByCode = {}
 
-      // Normalize currency pairs: accept rates stored either as PHP->X (units of X per PHP)
-      // or X->PHP (PHP per X) and convert to a consistent representation: units of currency per PHP
-      currencyPairsRes.data?.forEach(pair => {
-        // Determine target code and compute normalized rate as "units of target currency per 1 PHP"
+      // Process all pairs from the unified pairs table
+      pairsRes.data?.forEach(pair => {
         let targetCode = null
         let normalizedRate = null
 
         if (pair.from_currency === 'PHP') {
-          // stored as PHP -> TARGET (units of TARGET per 1 PHP)
+          // Stored as PHP -> TARGET (units of TARGET per 1 PHP)
           targetCode = pair.to_currency
           normalizedRate = Number(pair.rate)
         } else if (pair.to_currency === 'PHP') {
-          // stored as SOURCE -> PHP (PHP per 1 SOURCE) => normalized rate for SOURCE = 1 / (PHP per SOURCE)
+          // Stored as SOURCE -> PHP (PHP per 1 SOURCE) => normalized rate for SOURCE = 1 / (PHP per SOURCE)
           targetCode = pair.from_currency
           normalizedRate = pair.rate > 0 ? 1 / Number(pair.rate) : 0
         }
 
         if (targetCode && !ratesByCode[targetCode]) {
-          const metadata = currencyMap[targetCode] || {
-            code: targetCode,
-            name: targetCode,
-            type: 'currency',
-            symbol: '',
-            decimals: 2
-          }
+          // Determine type from metadata tables
+          const currencyMetadata = currencyMap[targetCode]
+          const cryptoMetadata = cryptocurrencyMetadataMap[targetCode]
 
-          ratesByCode[targetCode] = {
-            code: targetCode,
-            rate: normalizedRate,
-            metadata: metadata,
-            source: 'currency_rates',
-            updatedAt: pair.updated_at || new Date().toISOString()
-          }
-        }
-      })
-
-      // Normalize cryptocurrency pairs similarly. Accept both directions and convert to units of cryptocurrency per 1 PHP
-      cryptocurrencyPairsRes.data?.forEach(pair => {
-        let targetCode = null
-        let normalizedRate = null
-
-        if (pair.from_currency === 'PHP') {
-          // stored as PHP -> CRYPTO (units of CRYPTO per 1 PHP)
-          targetCode = pair.to_currency
-          normalizedRate = Number(pair.rate)
-        } else if (pair.to_currency === 'PHP') {
-          // stored as CRYPTO -> PHP (PHP per 1 CRYPTO) => convert to CRYPTO per 1 PHP
-          targetCode = pair.from_currency
-          normalizedRate = pair.rate > 0 ? 1 / Number(pair.rate) : 0
-        }
-
-        if (targetCode && !ratesByCode[targetCode]) {
-          const cryptocurrencyMetadata = cryptocurrencyMetadataMap[targetCode]
+          const type = cryptoMetadata ? 'cryptocurrency' : (currencyMetadata?.type || 'currency')
           const metadata = {
             code: targetCode,
-            name: cryptocurrencyMetadata?.name || targetCode,
-            type: 'cryptocurrency',
-            symbol: '',
-            decimals: 8
+            name: currencyMetadata?.name || cryptoMetadata?.name || targetCode,
+            type: type,
+            symbol: currencyMetadata?.symbol || '',
+            decimals: type === 'cryptocurrency' ? 8 : (currencyMetadata?.decimals || 2)
           }
 
           ratesByCode[targetCode] = {
             code: targetCode,
             rate: normalizedRate,
             metadata: metadata,
-            source: 'cryptocurrency_rates',
+            source: pair.source_table || 'pairs',
             updatedAt: pair.updated_at || new Date().toISOString()
           }
         }
