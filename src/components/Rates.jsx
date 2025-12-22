@@ -189,9 +189,7 @@ export default function Rates() {
   const filteredRates = useMemo(() => {
     let filtered = rates
 
-    // Filter out currencies without rate values
-    filtered = filtered.filter(r => r.rate !== null && isFinite(r.rate) && r.rate > 0)
-
+    // Keep all rates (including those without values) but prioritize ones with rates
     if (typeFilter !== 'all') {
       filtered = filtered.filter(r => r.metadata?.type === typeFilter)
     }
@@ -204,30 +202,37 @@ export default function Rates() {
       )
     }
 
-    const sorted = [...filtered].sort((a, b) => {
-      let comparison = 0
+    // Separate rates with values from those without
+    const ratesWithValues = filtered.filter(r => r.rate !== null && isFinite(r.rate) && r.rate > 0)
+    const ratesWithoutValues = filtered.filter(r => r.rate === null || !isFinite(r.rate) || r.rate <= 0)
 
-      switch (sortBy) {
-        case 'code':
-          comparison = a.code.localeCompare(b.code)
-          break
-        case 'name':
-          comparison = (a.metadata?.name || '').localeCompare(b.metadata?.name || '')
-          break
-        case 'rate':
-          comparison = a.rate - b.rate
-          break
-        case 'recent':
-          comparison = new Date(b.updatedAt) - new Date(a.updatedAt)
-          break
-        default:
-          comparison = 0
-      }
+    // Sort each group
+    const sortGroup = (group) => {
+      return [...group].sort((a, b) => {
+        let comparison = 0
 
-      return sortDirection === 'asc' ? comparison : -comparison
-    })
+        switch (sortBy) {
+          case 'code':
+            comparison = a.code.localeCompare(b.code)
+            break
+          case 'name':
+            comparison = (a.metadata?.name || '').localeCompare(b.metadata?.name || '')
+            break
+          case 'rate':
+            comparison = (a.rate || 0) - (b.rate || 0)
+            break
+          case 'recent':
+            comparison = new Date(b.updatedAt || 0) - new Date(a.updatedAt || 0)
+            break
+          default:
+            comparison = 0
+        }
 
-    return sorted
+        return sortDirection === 'asc' ? comparison : -comparison
+      })
+    }
+
+    return [...sortGroup(ratesWithValues), ...sortGroup(ratesWithoutValues)]
   }, [rates, typeFilter, searchTerm, sortBy, sortDirection])
 
   const favoriteRates = useMemo(() => {
