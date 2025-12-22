@@ -449,14 +449,7 @@ export default function Rates() {
             <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
               <p className="text-sm text-blue-900">
                 <span className="font-semibold">Last Fetched Rates:</span>{' '}
-                {lastUpdated.toLocaleString(undefined, {
-                  year: 'numeric',
-                  month: 'short',
-                  day: 'numeric',
-                  hour: '2-digit',
-                  minute: '2-digit',
-                  second: '2-digit'
-                })}
+                {formatFullDateTime(lastUpdated)}
               </p>
             </div>
 
