@@ -149,24 +149,6 @@ export default function Rates() {
         }
       })
 
-      // Add rates from cryptocurrency_rates table (direct rates per crypto)
-      cryptoRatesData?.forEach(cryptoRate => {
-        if (cryptoRate.updated_at) {
-          timestamps.push(new Date(cryptoRate.updated_at))
-        }
-
-        // Handle different possible column names for the crypto code
-        const code = cryptoRate.code || cryptoRate.symbol || cryptoRate.cryptocurrency_code || cryptoRate.crypto_code
-        const rateValue = cryptoRate.rate || cryptoRate.php_rate || cryptoRate.price
-
-        if (code && ratesByCode[code]) {
-          if (!ratesByCode[code].rate && rateValue && isFinite(Number(rateValue)) && Number(rateValue) > 0) {
-            ratesByCode[code].rate = Number(rateValue)
-            ratesByCode[code].updatedAt = cryptoRate.updated_at || new Date().toISOString()
-          }
-        }
-      })
-
       // Get the most recent timestamp
       let mostRecentTimestamp = new Date()
       if (timestamps.length > 0) {
