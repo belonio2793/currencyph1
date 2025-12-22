@@ -363,30 +363,62 @@ async function handle(req: Request): Promise<Response> {
 
   // Not fresh - fetch new from primary sources
   try {
-    console.log('[fetch-rates] Fetching fresh rates for 30 cryptocurrencies from APIs...')
-    const [exchangeRates, cryptoPricesUSD, cryptoPricesPHP] = await Promise.all([
-      fetchOpenExchangeRates(),
-      fetchCoinGecko('usd'),
-      fetchCoinGecko('php')
-    ])
+    console.log('[fetch-rates] Fetching fresh rates from primary source (ExConvert)...')
 
-    // Combine crypto prices (PHP takes priority)
-    const cryptoPrices = { ...cryptoPricesUSD, ...cryptoPricesPHP }
-    console.log(`[fetch-rates] Processing ${Object.keys(cryptoPricesPHP || {}).length} cryptocurrency prices`)
+    let allRates: Record<string, Record<string, number>> | null = null
+    let source = 'exconvert'
 
-    // If exchangeRates not available, try last cached (even if stale)
-    if (!exchangeRates && !cryptoPrices) {
-      console.warn('[fetch-rates] Both APIs failed, falling back to cache')
+    // Try ExConvert first (primary - unlimited free requests)
+    if (EXCONVERT_KEY) {
+      console.log('[fetch-rates] Attempting ExConvert API...')
+      allRates = await fetchAllExConvertRates()
+      if (allRates) {
+        console.log('[fetch-rates] ExConvert succeeded, fetched', Object.keys(allRates).length, 'currencies')
+        source = 'exconvert'
+      }
+    }
+
+    // Fallback to OpenExchangeRates + CoinGecko if ExConvert fails
+    if (!allRates) {
+      console.warn('[fetch-rates] ExConvert failed or unavailable, falling back to secondary sources...')
+      const [exchangeRates, cryptoPricesUSD, cryptoPricesPHP] = await Promise.all([
+        fetchOpenExchangeRates(),
+        fetchCoinGecko('usd'),
+        fetchCoinGecko('php')
+      ])
+
+      allRates = {}
+
+      // Add fiat currency rates from OpenExchangeRates
+      if (exchangeRates) {
+        allRates['USD'] = exchangeRates
+        console.log('[fetch-rates] OpenExchangeRates succeeded')
+      }
+
+      // Add crypto rates from CoinGecko
+      const cryptoPrices = { ...cryptoPricesUSD, ...cryptoPricesPHP }
+      if (Object.keys(cryptoPrices).length > 0) {
+        // Convert CoinGecko format to our format
+        for (const [coingeckoId, priceData] of Object.entries(cryptoPrices)) {
+          const cryptoCode = coingeckoIdToCryptoCode[coingeckoId as string] || (coingeckoId as string).toUpperCase()
+          allRates[cryptoCode] = priceData as Record<string, number>
+        }
+        console.log('[fetch-rates] CoinGecko succeeded with', Object.keys(cryptoPrices).length, 'cryptos')
+        source = 'fallback_openexchange_coingecko'
+      }
+    }
+
+    // If still no rates, try last cached (even if stale)
+    if (!allRates || Object.keys(allRates).length === 0) {
+      console.warn('[fetch-rates] All primary APIs failed, falling back to cache')
       const last = await getCachedLatest()
       if (last) {
-        const staleConfirmations = await getRateConfirmations(last.crypto_prices || {}, 'php')
         return jsonResponse({
           exchangeRates: last.exchange_rates || {},
           cryptoPrices: last.crypto_prices || {},
           cached: true,
           fetched_at: last.fetched_at,
-          rate_confirmations: staleConfirmations.slice(0, 10),
-          total_confirmations: staleConfirmations.length,
+          total_rates: Object.keys(last.exchange_rates || {}).length + Object.keys(last.crypto_prices || {}).length,
           warning: 'Using stale cached data - APIs currently unavailable'
         })
       }
@@ -400,24 +432,21 @@ async function handle(req: Request): Promise<Response> {
       }, 500)
     }
 
-    // Store and return
-    console.log('[fetch-rates] Successfully fetched rates, storing cache')
-    const [_, rateConfirmations] = await Promise.all([
-      Promise.all([
-        upsertCachedRates(exchangeRates || {}, cryptoPrices || {}, 'mixed'),
-        storeCryptoPricesInDatabase(cryptoPricesPHP || {}, 'php')
-      ]),
-      getRateConfirmations(cryptoPricesPHP || {}, 'php')
-    ])
+    // Store all rates in database
+    console.log('[fetch-rates] Storing all rates in database...')
+    const storedCount = await storeAllRatesInDatabase(allRates, source)
+
+    // Also update cache for backward compatibility
+    await upsertCachedRates({}, allRates, source)
 
     return jsonResponse({
-      exchangeRates: exchangeRates || {},
-      cryptoPrices: cryptoPrices || {},
+      success: true,
       cached: false,
       fetched_at: new Date().toISOString(),
-      rate_confirmations: rateConfirmations.slice(0, 10), // Return first 10 for UI
-      total_confirmations: rateConfirmations.length,
-      message: 'All rates updated with timestamps for user confirmation'
+      source,
+      total_rates_stored: storedCount,
+      currency_pairs: Object.keys(allRates).length,
+      message: `Successfully fetched and stored rates from ${source}`
     })
   } catch (err) {
     console.error('[fetch-rates] Handler error:', err)
@@ -426,14 +455,12 @@ async function handle(req: Request): Promise<Response> {
       const last = await getCachedLatest()
       if (last) {
         console.log('[fetch-rates] Returning stale cached rates as fallback')
-        const fallbackConfirmations = await getRateConfirmations(last.crypto_prices || {}, 'php')
         return jsonResponse({
           exchangeRates: last.exchange_rates || {},
           cryptoPrices: last.crypto_prices || {},
           cached: true,
           fetched_at: last.fetched_at,
-          rate_confirmations: fallbackConfirmations.slice(0, 10),
-          total_confirmations: fallbackConfirmations.length,
+          total_rates: Object.keys(last.exchange_rates || {}).length + Object.keys(last.crypto_prices || {}).length,
           warning: 'Returning stale cache due to error - rates may be outdated'
         })
       }
