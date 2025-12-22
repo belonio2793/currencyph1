@@ -268,15 +268,16 @@ export class DepositService {
         id: DEPOSIT_METHODS.CRYPTO_DIRECT,
         name: 'Direct Cryptocurrency Transfer',
         icon: '₿',
-        description: 'Send crypto from any wallet',
-        processingTime: 'Varies by blockchain',
+        description: 'Send crypto directly from any wallet',
+        processingTime: 'Varies by blockchain (typically 10 minutes - 1 hour)',
         fees: 'Network fees only',
         minAmount: 0.001,
         maxAmount: 999999,
-        currencies: ['BTC', 'ETH', 'USDC', 'USDT', 'SOL'],
+        currencies: ['BTC', 'ETH', 'USDC', 'USDT', 'SOL', 'USDC', 'BNB', 'MATIC', 'AVAX', 'ARB'],
         requiredFields: ['cryptoAmount', 'cryptoSymbol', 'chainId'],
         webhookSupported: true,
-        blockchainSupported: true
+        blockchainSupported: true,
+        available: true
       },
       [DEPOSIT_METHODS.BANK_TRANSFER]: {
         id: DEPOSIT_METHODS.BANK_TRANSFER,
