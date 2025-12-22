@@ -110,10 +110,45 @@ export default function ReceiveMoney({ userId, globalCurrency = 'PHP' }) {
 
   const loadDepositMethods = async () => {
     try {
-      const methods = await receiveMoneyService.getAvailableDepositMethods()
-      setDepositMethods(methods)
+      // Fetch all transfer methods from public.transfers
+      const { data: transfers, error } = await supabase
+        .from('transfers')
+        .select('id, name, type')
+        .eq('active', true)
+
+      if (error) throw error
+
+      // Organize methods by type and filter out bank transfers
+      const fiat = []
+      const crypto = []
+
+      if (transfers) {
+        transfers.forEach(transfer => {
+          // Skip bank transfer method
+          if (transfer.name?.toLowerCase() === 'bank transfer' || transfer.name?.toLowerCase() === 'bank') {
+            return
+          }
+
+          const method = {
+            id: transfer.id || transfer.name?.toLowerCase(),
+            name: transfer.name,
+            description: transfer.type || ''
+          }
+
+          if (transfer.type?.toLowerCase() === 'crypto' || transfer.name?.toLowerCase().includes('crypto')) {
+            crypto.push(method)
+          } else {
+            fiat.push(method)
+          }
+        })
+      }
+
+      setAvailableMethods({ fiat, crypto })
+      setDepositMethods({ fiat, crypto })
     } catch (err) {
       console.warn('Error loading deposit methods:', err)
+      // Fallback to default GCash only if no data
+      setAvailableMethods({ fiat: [{ id: 'gcash', name: 'GCash', description: 'Mobile wallet' }], crypto: [] })
     }
   }
 
