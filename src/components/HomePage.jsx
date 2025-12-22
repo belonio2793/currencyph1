@@ -54,6 +54,8 @@ export default function HomePage({ userId, userEmail, globalCurrency = 'PHP', se
   const [showProfileModal, setShowProfileModal] = useState(false)
   const [showVerificationModal, setShowVerificationModal] = useState(false)
   const [showCurrencyModal, setShowCurrencyModal] = useState(false)
+  const [totalBalanceInCrypto, setTotalBalanceInCrypto] = useState(0)
+  const [loadingCryptoConversion, setLoadingCryptoConversion] = useState(false)
 
   useEffect(() => {
     loadData()
