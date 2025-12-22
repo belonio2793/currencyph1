@@ -225,6 +225,27 @@ export default function ReceiveMoney({ userId, globalCurrency = 'PHP' }) {
     setSelectedGuestProfile(profile)
     setGuestSearch('')
     setShowSearchResults(false)
+    // Check if recipient is online
+    checkRecipientStatus(profile.id)
+  }
+
+  const checkRecipientStatus = async (recipientUserId) => {
+    try {
+      const { data: presence } = await supabase
+        .from('presence')
+        .select('is_online')
+        .eq('user_id', recipientUserId)
+        .order('updated_at', { ascending: false })
+        .limit(1)
+        .single()
+
+      if (presence) {
+        setRecipientOnlineStatus(presence.is_online)
+      }
+    } catch (err) {
+      console.warn('Could not check recipient status:', err)
+      setRecipientOnlineStatus(null)
+    }
   }
 
   const handleCreateTransfer = async (e) => {
