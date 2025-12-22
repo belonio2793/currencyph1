@@ -17,6 +17,9 @@ export default function ReceiveMoney({ userId, globalCurrency = 'PHP' }) {
   const [wallets, setWallets] = useState([])
   const [selectedWallet, setSelectedWallet] = useState(null)
 
+  // State: User profile
+  const [userProfile, setUserProfile] = useState(null)
+
   // State: Amount & currency
   const [amount, setAmount] = useState('')
   const [selectedCurrency, setSelectedCurrency] = useState(globalCurrency)
