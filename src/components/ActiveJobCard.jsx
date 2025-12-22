@@ -46,7 +46,7 @@ export default function ActiveJobCard({ job, userId }) {
           <div>
             <p className="text-xs text-slate-600 font-semibold uppercase">Start Date</p>
             <p className="text-sm font-medium text-slate-900 mt-1">
-              {new Date(job.start_date).toLocaleDateString()}
+              {formatDateOnly(job.start_date)}
             </p>
           </div>
         )}
@@ -54,7 +54,7 @@ export default function ActiveJobCard({ job, userId }) {
           <div>
             <p className="text-xs text-slate-600 font-semibold uppercase">Deadline</p>
             <p className="text-sm font-medium text-slate-900 mt-1">
-              {new Date(job.deadline).toLocaleDateString()}
+              {formatDateOnly(job.deadline)}
             </p>
           </div>
         )}
@@ -89,7 +89,7 @@ export default function ActiveJobCard({ job, userId }) {
       {job.started_at && (
         <div className="mb-4 bg-slate-50 p-3 rounded">
           <p className="text-xs text-slate-600">
-            <strong>Started:</strong> {new Date(job.started_at).toLocaleDateString()}
+            <strong>Started:</strong> {formatDateOnly(job.started_at)}
           </p>
         </div>
       )}
@@ -97,7 +97,7 @@ export default function ActiveJobCard({ job, userId }) {
       {job.completed_at && (
         <div className="mb-4 bg-green-50 border border-green-200 rounded p-3">
           <p className="text-xs text-green-700 font-semibold">
-            ✓ Completed on {new Date(job.completed_at).toLocaleDateString()}
+            ✓ Completed on {formatDateOnly(job.completed_at)}
           </p>
         </div>
       )}
@@ -115,7 +115,7 @@ export default function ActiveJobCard({ job, userId }) {
       {/* Status Badge */}
       <div className="mt-3 text-xs text-slate-600 flex items-center gap-2">
         <span className="inline-block w-2 h-2 bg-slate-400 rounded-full"></span>
-        Accepted on {job.accepted_at ? new Date(job.accepted_at).toLocaleDateString() : 'N/A'}
+        Accepted on {job.accepted_at ? formatDateOnly(job.accepted_at) : 'N/A'}
       </div>
     </div>
   )
