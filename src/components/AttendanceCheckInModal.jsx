@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import ExpandableModal from './ExpandableModal'
 import { useDevice } from '../context/DeviceContext'
+import { formatTimeOnly } from '../lib/dateTimeUtils'
 
 export default function AttendanceCheckInModal({ onClose, onSubmit, isLoading }) {
   const { isMobile } = useDevice()
