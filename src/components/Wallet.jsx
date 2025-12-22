@@ -427,7 +427,7 @@ export default function Wallet({ userId, globalCurrency = 'PHP' }) {
                           {/* Meta Info */}
                           <div className="text-xs text-slate-500 space-y-1 pt-3 border-t border-orange-200">
                             <div>Created: {new Date(wallet.created_at).toLocaleDateString()}</div>
-                            <div>Network: {wallet.account_number || 'Blockchain'}</div>
+                            <div>Account: {wallet.account_number || 'Blockchain'}</div>
                           </div>
                         </div>
                       ))}
@@ -507,7 +507,7 @@ export default function Wallet({ userId, globalCurrency = 'PHP' }) {
                               <th className="px-6 py-3 text-right text-xs font-semibold text-orange-700 uppercase tracking-wider">Balance</th>
                               <th className="px-6 py-3 text-right text-xs font-semibold text-orange-700 uppercase tracking-wider">Received</th>
                               <th className="px-6 py-3 text-left text-xs font-semibold text-orange-700 uppercase tracking-wider">Address</th>
-                              <th className="px-6 py-3 text-left text-xs font-semibold text-orange-700 uppercase tracking-wider">Network</th>
+                              <th className="px-6 py-3 text-left text-xs font-semibold text-orange-700 uppercase tracking-wider">Account</th>
                               <th className="px-6 py-3 text-left text-xs font-semibold text-orange-700 uppercase tracking-wider">Status</th>
                             </tr>
                           </thead>
