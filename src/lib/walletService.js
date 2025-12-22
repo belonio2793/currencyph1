@@ -52,8 +52,23 @@ export const walletService = {
   async getUserWalletsWithDetails(userId) {
     try {
       if (!userId || userId === 'null' || userId === 'undefined') {
+        console.debug('getUserWalletsWithDetails: Invalid userId:', userId)
         return []
       }
+
+      // Get current auth session to debug RLS issues
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession()
+      if (sessionError) {
+        console.warn('Error checking auth session:', sessionError)
+      }
+
+      const authUserId = session?.user?.id
+      console.debug('getUserWalletsWithDetails debug:', {
+        userId,
+        authUserId,
+        sessionExists: !!session,
+        userIdMatchesAuth: userId === authUserId
+      })
 
       // Fetch directly from wallets table with currency join
       const { data: walletData, error: walletError } = await supabase
@@ -65,9 +80,20 @@ export const walletService = {
 
       if (walletError) {
         console.warn('Error fetching user wallets with details:', walletError)
+        console.warn('Error details:', {
+          code: walletError.code,
+          message: walletError.message,
+          details: walletError.details,
+          hint: walletError.hint
+        })
         // Return empty array - user may not have wallets yet
         return []
       }
+
+      console.debug('Wallets fetched successfully:', {
+        count: walletData?.length || 0,
+        walletCodes: walletData?.map(w => w.currency_code) || []
+      })
 
       // Transform data to match expected format
       const wallets = (walletData || []).map(w => ({
