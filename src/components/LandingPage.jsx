@@ -685,7 +685,12 @@ export default function LandingPage({ userId, userEmail, globalCurrency = 'PHP',
         throw new Error('Please select a cryptocurrency')
       }
 
-      const convertedAmt = cryptoConvertedAmounts[globalCurrency] || (numAmount * (cryptoRates[selectedCrypto] || 0)).toFixed(2)
+      const cryptoPrice = cryptoRates[selectedCrypto] || 0
+      if (!cryptoPrice || cryptoPrice <= 0) {
+        throw new Error('Cryptocurrency price is currently unavailable. Please try again later.')
+      }
+
+      const convertedAmt = cryptoConvertedAmounts[globalCurrency] || (numAmount * cryptoPrice).toFixed(2)
 
       await currencyAPI.addFunds(userId, globalCurrency, parseFloat(convertedAmt))
       setSuccess(`Successfully added ${cryptoAmount} ${selectedCrypto}`)
