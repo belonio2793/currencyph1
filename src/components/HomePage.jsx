@@ -290,13 +290,14 @@ export default function HomePage({ userId, userEmail, globalCurrency = 'PHP', se
   )
 
   const { net, isNegativeNet, netDisplay } = useMemo(() => {
-    const netValue = Number(totalBalanceConverted || 0) - Number(totalDebtConverted || 0)
+    const totalAssets = Number(totalBalanceConverted || 0) + Number(totalCryptoBalancePHP || 0)
+    const netValue = totalAssets - Number(totalDebtConverted || 0)
     return {
       net: netValue,
       isNegativeNet: netValue < 0,
       netDisplay: Number.isFinite(netValue) ? netValue.toFixed(2) : '0.00'
     }
-  }, [totalBalanceConverted, totalDebtConverted])
+  }, [totalBalanceConverted, totalCryptoBalancePHP, totalDebtConverted])
 
   const handleCardClick = (cardKey) => {
     const modalMap = {
