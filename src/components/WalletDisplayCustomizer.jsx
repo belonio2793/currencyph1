@@ -129,12 +129,14 @@ export default function WalletDisplayCustomizer({ userId, onClose, onUpdate }) {
   }
 
   const getFilteredCurrencies = () => {
+    const currencies = activeTab === 'currency' ? allFiatCurrencies : allCryptoCurrencies
+
     if (!searchInput) {
-      return allFiatCurrencies
+      return currencies
     }
 
     const query = searchInput.toLowerCase()
-    return allFiatCurrencies.filter(c =>
+    return currencies.filter(c =>
       c.code.toLowerCase().includes(query) ||
       c.name.toLowerCase().includes(query)
     )
