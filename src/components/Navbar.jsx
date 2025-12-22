@@ -73,16 +73,21 @@ function NavbarComponent({ activeTab, onTabChange, globalCurrency, setGlobalCurr
           <div className="flex items-center gap-3">
             <h1 className="text-2xl sm:text-2xl md:text-2xl font-light text-slate-900 tracking-wide">currency.ph</h1>
             {userEmail && (
-              <div className="ml-2 flex items-center gap-1 rounded-full bg-slate-50 border border-slate-100 text-sm text-slate-700 hidden sm:inline-flex">
-                <div className="px-3 py-1 flex items-center gap-2">
-                  <span className="text-slate-400 text-xs">Total</span>
+              <div className="ml-2 flex items-center gap-2 hidden sm:inline-flex">
+                {/* FIAT Section */}
+                <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-blue-50 border border-blue-200">
+                  <span className="inline-block px-2 py-0.5 bg-blue-600 text-white text-xs font-bold rounded">FIAT</span>
+                  <span className="font-semibold text-slate-900 text-xs sm:text-sm">
+                    {formatNumber(totalBalanceConverted || 0)} {globalCurrency}
+                  </span>
                 </div>
-                <div className="px-3 py-1 border-l border-slate-200">
-                  <span className="font-medium text-slate-900 text-xs sm:text-sm">
-                    <span className="text-slate-500 text-xs">Currency:</span> {formatNumber(totalBalanceConverted || 0)} {globalCurrency}
-                    {' and '}
-                    <span className="text-slate-500 text-xs">Cryptocurrency:</span> {loadingConsolidated ? (
-                      <span className="text-slate-400 italic">loading {globalCryptocurrency}...</span>
+
+                {/* CRYPTO Section */}
+                <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-orange-50 border border-orange-200">
+                  <span className="inline-block px-2 py-0.5 bg-orange-600 text-white text-xs font-bold rounded">CRYPTO</span>
+                  <span className="font-semibold text-slate-900 text-xs sm:text-sm">
+                    {loadingConsolidated ? (
+                      <span className="text-slate-400 italic">loading...</span>
                     ) : consolidatedHoldingsInCrypto !== null && consolidatedHoldingsInCrypto !== undefined ? (
                       <>{formatNumber(consolidatedHoldingsInCrypto.toFixed(8))} {globalCryptocurrency}</>
                     ) : (
