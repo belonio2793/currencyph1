@@ -154,42 +154,62 @@ async function storeRateInDatabase(cryptoCode, toCurrency, rate, source) {
 /**
  * Get cryptocurrency price in PHP with comprehensive fallback strategy:
  * 1. Try in-memory cache (60 seconds)
- * 2. Try CoinGecko API with retry logic (3 attempts)
- * 3. Try alternative API (Coingecko fallback endpoint or other source)
- * 4. Fall back to database cached rates
- * 5. Return stale cache or null
+ * 2. Try public.pairs table (primary source for all rates)
+ * 3. Try crypto_rates_valid view (secondary cached source)
+ * 4. Try CoinGecko API with retry logic (3 attempts)
+ * 5. Try alternative API (Coingecko fallback endpoint or other source)
+ * 6. Return stale cache or null
  */
 export async function getCryptoPrice(cryptoCode, toCurrency = 'PHP') {
   try {
     const cacheKey = `${cryptoCode}_${toCurrency}`
+    const cryptoCodeUpper = cryptoCode.toUpperCase()
+    const toCurrencyUpper = toCurrency.toUpperCase()
 
     // 1. Check in-memory cache first
     if (isCacheValid(cacheKey)) {
       const cached = rateCache.get(cacheKey)
-      console.log(`Using in-memory cached price for ${cryptoCode}: ${cached.rate} ${toCurrency}`)
+      console.log(`✓ Using in-memory cached price for ${cryptoCode}: ${cached.rate} ${toCurrency}`)
       return cached.rate
     }
 
-    // 2. Try primary API (CoinGecko) with retry logic
-    let price = await getCoinGeckoPrice(cryptoCode, toCurrency)
+    // 2. Try public.pairs table first (primary source for all rates)
+    let price = await getPriceFromPairs(cryptoCodeUpper, toCurrencyUpper)
+    if (price) {
+      console.log(`✓ Got ${cryptoCode} price from public.pairs: ${price} ${toCurrency}`)
+      // Store in in-memory cache
+      rateCache.set(cacheKey, {
+        rate: price,
+        timestamp: Date.now(),
+        source: 'pairs'
+      })
+      return price
+    }
 
-    // 3. If primary fails, try alternative API
+    // 3. Try crypto_rates_valid view (secondary cached source)
+    const dbCached = await getCachedRateFromDatabase(cryptoCodeUpper, toCurrencyUpper)
+    if (dbCached) {
+      price = dbCached.rate
+      console.log(`✓ Got ${cryptoCode} price from database cache: ${price} ${toCurrency}`)
+      // Store in in-memory cache
+      rateCache.set(cacheKey, {
+        rate: price,
+        timestamp: Date.now(),
+        source: 'database'
+      })
+      return price
+    }
+
+    // 4. Try primary API (CoinGecko) with retry logic
+    price = await getCoinGeckoPrice(cryptoCode, toCurrency)
+
+    // 5. If primary fails, try alternative API
     if (!price) {
       console.warn(`CoinGecko failed for ${cryptoCode}, trying alternative API...`)
       price = await getAlternativeCryptoPrice(cryptoCode, toCurrency)
     }
 
-    // 4. If both APIs fail, try database cache
-    if (!price) {
-      console.warn(`Both APIs failed for ${cryptoCode}, checking database cache...`)
-      const dbCached = await getCachedRateFromDatabase(cryptoCode, toCurrency)
-      if (dbCached) {
-        price = dbCached.rate
-        console.log(`Using database cached price for ${cryptoCode}: ${price} ${toCurrency}`)
-      }
-    }
-
-    // 5. Store successful fetch in database for future fallback
+    // 6. Store successful fetch in database for future fallback
     if (price) {
       // Store in in-memory cache
       rateCache.set(cacheKey, {
@@ -206,16 +226,46 @@ export async function getCryptoPrice(cryptoCode, toCurrency = 'PHP') {
       return price
     }
 
-    // 6. Last resort: return stale cache
+    // 7. Last resort: return stale cache
     const staleCache = rateCache.get(cacheKey)
     if (staleCache) {
-      console.warn(`Using stale in-memory cache for ${cryptoCode}: ${staleCache.rate} ${toCurrency}`)
+      console.warn(`⚠ Using stale in-memory cache for ${cryptoCode}: ${staleCache.rate} ${toCurrency}`)
       return staleCache.rate
     }
 
+    console.warn(`✗ Could not fetch price for ${cryptoCode}/${toCurrency} from any source`)
     return null
   } catch (error) {
     console.error(`Unexpected error fetching ${cryptoCode} price:`, error.message)
+    return null
+  }
+}
+
+/**
+ * Fetch crypto rate directly from public.pairs table
+ */
+async function getPriceFromPairs(cryptoCode, toCurrency) {
+  try {
+    const { data, error } = await supabase
+      .from('pairs')
+      .select('rate, updated_at')
+      .eq('from_currency', cryptoCode)
+      .eq('to_currency', toCurrency)
+      .single()
+
+    if (error) {
+      console.debug(`No pair found in public.pairs for ${cryptoCode}/${toCurrency}`)
+      return null
+    }
+
+    if (data && typeof data.rate === 'number' && isFinite(data.rate) && data.rate > 0) {
+      return data.rate
+    }
+
+    console.warn(`Invalid rate from public.pairs for ${cryptoCode}/${toCurrency}:`, data?.rate)
+    return null
+  } catch (err) {
+    console.debug(`Error fetching from public.pairs for ${cryptoCode}/${toCurrency}:`, err.message)
     return null
   }
 }
