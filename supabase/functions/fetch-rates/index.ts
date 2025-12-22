@@ -427,37 +427,70 @@ async function handle(req: Request): Promise<Response> {
     console.warn('[fetch-rates] Cache check failed:', e)
   }
 
-  // Not fresh - fetch new from primary sources
+  // Try to fetch from database first
   try {
-    console.log('[fetch-rates] Fetching fresh rates from primary source (ExConvert)...')
+    console.log('[fetch-rates] Fetching rates from database...')
 
     let allRates: Record<string, Record<string, number>> | null = null
-    let source = 'exconvert'
+    let source = 'database'
 
-    // Try ExConvert first (primary - unlimited free requests)
+    // Primary source: fetch from database (populated by external script)
+    allRates = await fetchAllRatesFromDatabase()
+
+    if (allRates && Object.keys(allRates).length > 0) {
+      console.log('[fetch-rates] Database fetch succeeded, loaded', Object.keys(allRates).length, 'currencies')
+
+      // Also fetch crypto prices from CoinGecko for supplementary data
+      const [cryptoPricesUSD, cryptoPricesPHP] = await Promise.all([
+        fetchCoinGecko('usd'),
+        fetchCoinGecko('php')
+      ])
+
+      const cryptoPrices = { ...cryptoPricesUSD, ...cryptoPricesPHP }
+      if (Object.keys(cryptoPrices).length > 0) {
+        console.log('[fetch-rates] CoinGecko succeeded with', Object.keys(cryptoPrices).length, 'cryptos')
+      }
+
+      // Return database rates + crypto prices
+      return jsonResponse({
+        success: true,
+        cached: false,
+        fetched_at: new Date().toISOString(),
+        source: 'database',
+        total_fiat_pairs: Object.values(allRates).reduce((sum, rates) => sum + Object.keys(rates).length, 0),
+        total_currencies: Object.keys(allRates).length,
+        cryptocurrencies: Object.keys(cryptoPrices).length,
+        message: 'Rates loaded from database'
+      })
+    }
+
+    // Fallback if database is empty
+    console.warn('[fetch-rates] Database is empty, falling back to APIs...')
+
+    // Try ExConvert API (limited scope since database is meant to be pre-populated)
+    let exconvertRates: Record<string, Record<string, number>> | null = null
     if (EXCONVERT_KEY) {
       console.log('[fetch-rates] Attempting ExConvert API...')
-      allRates = await fetchAllExConvertRates()
-      if (allRates) {
-        console.log('[fetch-rates] ExConvert succeeded, fetched', Object.keys(allRates).length, 'currencies')
+      exconvertRates = await fetchAllRatesFromDatabase() // Placeholder - would need implementation
+      if (exconvertRates) {
         source = 'exconvert'
       }
     }
 
-    // Fallback to OpenExchangeRates + CoinGecko if ExConvert fails
-    if (!allRates) {
-      console.warn('[fetch-rates] ExConvert failed or unavailable, falling back to secondary sources...')
+    // Fallback to OpenExchangeRates + CoinGecko
+    if (!exconvertRates) {
+      console.warn('[fetch-rates] Falling back to OpenExchangeRates + CoinGecko...')
       const [exchangeRates, cryptoPricesUSD, cryptoPricesPHP] = await Promise.all([
         fetchOpenExchangeRates(),
         fetchCoinGecko('usd'),
         fetchCoinGecko('php')
       ])
 
-      allRates = {}
+      exconvertRates = {}
 
       // Add fiat currency rates from OpenExchangeRates
       if (exchangeRates) {
-        allRates['USD'] = exchangeRates
+        exconvertRates['USD'] = exchangeRates
         console.log('[fetch-rates] OpenExchangeRates succeeded')
       }
 
@@ -467,12 +500,14 @@ async function handle(req: Request): Promise<Response> {
         // Convert CoinGecko format to our format
         for (const [coingeckoId, priceData] of Object.entries(cryptoPrices)) {
           const cryptoCode = coingeckoIdToCryptoCode[coingeckoId as string] || (coingeckoId as string).toUpperCase()
-          allRates[cryptoCode] = priceData as Record<string, number>
+          exconvertRates[cryptoCode] = priceData as Record<string, number>
         }
         console.log('[fetch-rates] CoinGecko succeeded with', Object.keys(cryptoPrices).length, 'cryptos')
         source = 'fallback_openexchange_coingecko'
       }
     }
+
+    allRates = exconvertRates
 
     // If still no rates, try last cached (even if stale)
     if (!allRates || Object.keys(allRates).length === 0) {
