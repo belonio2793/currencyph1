@@ -148,6 +148,15 @@ export const walletService = {
         }
       })
 
+      console.debug('Wallets after transformation:', {
+        count: wallets.length,
+        walletDetails: wallets.map(w => ({
+          code: w.currency_code,
+          type: w.currency_type,
+          id: w.id
+        }))
+      })
+
       return wallets
     } catch (err) {
       console.warn('Failed to fetch user wallets with details:', err)
