@@ -682,7 +682,7 @@ export default function ReceiveMoney({ userId, globalCurrency = 'PHP' }) {
                   ))}
                 </div>
 
-                <form onSubmit={handleCreateTransfer} className="space-y-6">
+                <form onSubmit={isRequestMode && requestMode === 'custom_payment' ? handleGenerateCustomPayment : handleCreateTransfer} className="space-y-6">
                   {/* Step 1: Select Recipient & Enter Amount */}
                   {step === 1 && (
                     <div className="space-y-4">
