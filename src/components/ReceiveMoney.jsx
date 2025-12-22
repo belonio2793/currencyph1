@@ -734,14 +734,28 @@ export default function ReceiveMoney({ userId, globalCurrency = 'PHP' }) {
 
                         {/* Conversion Display */}
                         {selectedWalletData && selectedCurrency !== selectedWalletData.currency_code && amount && (
-                          <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
-                            <p className="text-xs text-blue-700 font-medium mb-2">Conversion</p>
-                            <div className="flex justify-between items-center">
+                          <div className={`rounded-lg p-3 border ${
+                            CRYPTO_CURRENCY_CODES.includes(selectedCurrency.toUpperCase())
+                              ? 'bg-orange-50 border-orange-200'
+                              : 'bg-blue-50 border-blue-200'
+                          }`}>
+                            <p className={`text-xs font-medium mb-2 ${
+                              CRYPTO_CURRENCY_CODES.includes(selectedCurrency.toUpperCase())
+                                ? 'text-orange-700'
+                                : 'text-blue-700'
+                            }`}>
+                              Conversion
+                            </p>
+                            <div className="flex justify-between items-center gap-2">
                               <span className="text-sm text-slate-700">
                                 {amount} {selectedCurrency} equals
                               </span>
-                              <span className="text-lg font-semibold text-blue-600">
-                                {conversionLoading ? 'Loading...' : formatNumber(convertedAmount)} {selectedWalletData.currency_code}
+                              <span className={`text-lg font-semibold ${
+                                CRYPTO_CURRENCY_CODES.includes(selectedCurrency.toUpperCase())
+                                  ? 'text-orange-600'
+                                  : 'text-blue-600'
+                              }`}>
+                                {cryptoConversionLoading || conversionLoading ? 'Loading...' : formatNumber(convertedAmount)} {selectedWalletData.currency_code}
                               </span>
                             </div>
                             {conversionRate && (
