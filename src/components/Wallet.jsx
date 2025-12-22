@@ -45,20 +45,13 @@ export default function Wallet({ userId, globalCurrency = 'PHP' }) {
       const preferences = await getWalletDisplayPreferences(userId)
       setSelectedCurrencies(preferences || ['PHP'])
 
-      // Fetch wallets for all selected currencies
-      const { data: userWallets, error: fetchError } = await supabase
-        .from('wallets')
-        .select('*')
-        .eq('user_id', userId)
-        .order('created_at', { ascending: false })
+      // Fetch wallets with full details (including currency info)
+      const allWallets = await walletService.getUserWalletsWithDetails(userId)
 
-      if (fetchError && fetchError.code !== 'PGRST116') {
-        console.error('Error fetching wallets:', fetchError?.message || JSON.stringify(fetchError))
-        setError(`Failed to load wallets: ${fetchError?.message || 'Unknown error'}`)
+      if (!allWallets) {
+        setError('Failed to load wallets')
         return
       }
-
-      const allWallets = userWallets || []
 
       // Filter to only selected currencies
       const filteredWallets = allWallets.filter(w =>
