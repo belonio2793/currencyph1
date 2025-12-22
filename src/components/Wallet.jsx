@@ -267,7 +267,7 @@ export default function Wallet({ userId, globalCurrency = 'PHP' }) {
                                 {wallet.currency_code}
                               </p>
                               <p className="text-2xl font-light text-slate-900">
-                                ₿
+                                🪙
                               </p>
                             </div>
                             {wallet.is_active && (
