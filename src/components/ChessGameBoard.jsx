@@ -130,17 +130,48 @@ export default function ChessGameBoard({ game, userId, userEmail, onClose }) {
             setCurrentGame(prev => ({ ...prev, fen: newFen, moves: updatedMoves }))
           } else {
             setCurrentGame(prev => ({ ...prev, fen: newFen, moves: updatedMoves }))
-            setTimeout(() => {
+            setAiThinking(true)
+
+            // Clear previous timeout if it exists
+            if (aiTimeoutRef.current) clearTimeout(aiTimeoutRef.current)
+
+            // Set timeout for AI calculation (5 seconds max)
+            aiTimeoutRef.current = setTimeout(() => {
+              console.warn('AI move calculation timed out, using fallback move')
+              const fallbackEngine = new ChessEngine(newFen)
+              const legalMoves = fallbackEngine.getLegalMoves()
+              if (legalMoves.length > 0) {
+                const randomMove = legalMoves[Math.floor(Math.random() * legalMoves.length)]
+                fallbackEngine.makeMove(randomMove)
+                const fallbackFen = fallbackEngine.getFen()
+                const aiMoves = [...updatedMoves, { ...randomMove, by: 'computer', timestamp: new Date().toISOString() }]
+                setCurrentGame(prev => ({ ...prev, fen: fallbackFen, moves: aiMoves }))
+                setLastMove(randomMove)
+                setGameStatus(fallbackEngine.getGameStatus())
+              }
+              setAiThinking(false)
+            }, 5000)
+
+            // Calculate AI move immediately
+            try {
               const aiMove = getBestMove(newFen, currentGame.difficulty || 'medium')
-              if (!aiMove) return
-              const aiEngine = new ChessEngine(newFen)
-              aiEngine.makeMove(aiMove)
-              const aiFen = aiEngine.getFen()
-              const aiMoves = [...updatedMoves, { ...aiMove, by: 'computer', timestamp: new Date().toISOString() }]
-              setCurrentGame(prev => ({ ...prev, fen: aiFen, moves: aiMoves }))
-              setLastMove(aiMove)
-              setGameStatus(aiEngine.getGameStatus())
-            }, 200)
+              if (aiMove) {
+                // Clear timeout since we got a result
+                if (aiTimeoutRef.current) clearTimeout(aiTimeoutRef.current)
+
+                const aiEngine = new ChessEngine(newFen)
+                aiEngine.makeMove(aiMove)
+                const aiFen = aiEngine.getFen()
+                const aiMoves = [...updatedMoves, { ...aiMove, by: 'computer', timestamp: new Date().toISOString() }]
+                setCurrentGame(prev => ({ ...prev, fen: aiFen, moves: aiMoves }))
+                setLastMove(aiMove)
+                setGameStatus(aiEngine.getGameStatus())
+              }
+              setAiThinking(false)
+            } catch (aiErr) {
+              console.error('Error calculating AI move:', aiErr)
+              setAiThinking(false)
+            }
           }
 
           setLastMove(move)
