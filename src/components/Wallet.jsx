@@ -82,6 +82,15 @@ export default function Wallet({ userId, globalCurrency = 'PHP' }) {
       // Fetch wallets with full details (including currency info)
       const allWallets = await walletService.getUserWalletsWithDetails(userId)
 
+      console.debug('Wallet component received allWallets:', {
+        count: allWallets.length,
+        wallets: allWallets.map(w => ({
+          code: w.currency_code,
+          type: w.currency_type,
+          id: w.id
+        }))
+      })
+
       if (!allWallets) {
         setError('Failed to load wallets')
         return
@@ -89,6 +98,7 @@ export default function Wallet({ userId, globalCurrency = 'PHP' }) {
 
       // Determine available wallet types based on user's wallets
       const types = new Set(allWallets.map(w => w.currency_type))
+      console.debug('Available types detected:', Array.from(types))
       const availableTypesList = ['all']
       if (types.has('fiat')) availableTypesList.push('currency')
       if (types.has('crypto')) availableTypesList.push('cryptocurrency')
@@ -96,9 +106,15 @@ export default function Wallet({ userId, globalCurrency = 'PHP' }) {
       setAvailableTypes(availableTypesList)
 
       // Filter to only selected currencies
+      console.debug('Wallet display preferences:', preferences)
       const filteredWallets = allWallets.filter(w =>
         preferences?.includes(w.currency_code)
       )
+
+      console.debug('Filtered wallets:', {
+        count: filteredWallets.length,
+        wallets: filteredWallets.map(w => w.currency_code)
+      })
 
       // Ensure PHP wallet exists and is in the list
       const hasPHP = filteredWallets.some(w => w.currency_code === 'PHP')
