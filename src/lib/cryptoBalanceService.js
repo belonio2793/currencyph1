@@ -7,9 +7,9 @@ export async function getCryptoWallets(userId) {
   try {
     const { data, error } = await supabase
       .from('wallets')
-      .select('id, user_id, currency_code, balance, wallet_type, created_at, updated_at')
+      .select('id, user_id, currency_code, balance, type, created_at, updated_at')
       .eq('user_id', userId)
-      .eq('wallet_type', 'crypto')
+      .eq('type', 'crypto')
       .order('currency_code', { ascending: true })
 
     if (error) {
