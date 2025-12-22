@@ -119,6 +119,13 @@ export default function HomePage({ userId, userEmail, globalCurrency = 'PHP', se
     }
   }, [userId])
 
+  // Update parent App with total crypto balance
+  useEffect(() => {
+    if (onSetTotalCryptoBalance) {
+      onSetTotalCryptoBalance(totalCryptoBalancePHP)
+    }
+  }, [totalCryptoBalancePHP, onSetTotalCryptoBalance])
+
   // Load quick access preferences from database on mount and when userId changes
   useEffect(() => {
     const loadQuickAccessFromDB = async () => {
