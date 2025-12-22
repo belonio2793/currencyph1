@@ -239,8 +239,19 @@ export default function PokerGameModal({ open, onClose, table, userId, userEmail
     try {
       const targetSeat = seatNumber || (seats.length + 1)
 
-      const { data: wallets } = await supabase.from('wallets').select('*').eq('user_id', userId)
-      const currentBalance = wallets && wallets.length > 0 ? Number(wallets[0].balance) : 0
+      // Fetch user's wallet balance
+      const { data: wallets, error: walletError } = await supabase
+        .from('wallets')
+        .select('balance')
+        .eq('user_id', userId)
+        .limit(1)
+
+      if (walletError) {
+        console.error('Wallet fetch error:', walletError)
+        throw new Error(walletError.message || 'Failed to load wallet')
+      }
+
+      const currentBalance = wallets && wallets.length > 0 ? Number(wallets[0].balance || 0) : 0
 
       const anonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
       const res = await fetch(FUNCTIONS_BASE + '/join_table', {
@@ -253,18 +264,21 @@ export default function PokerGameModal({ open, onClose, table, userId, userEmail
       })
 
       if (!res.ok) {
-        let errorMsg = 'Failed to sit'
+        let errorMsg = 'Failed to join table'
         try {
           const json = await res.json()
-          errorMsg = json.error || errorMsg
-        } catch (e) {}
+          errorMsg = json.error || json.message || errorMsg
+        } catch (e) {
+          console.warn('Could not parse error response:', e)
+        }
         throw new Error(errorMsg)
       }
 
       await loadGameData()
       setError(null)
     } catch (err) {
-      setError(err.message || 'Could not join table')
+      const errorMessage = err?.message || String(err) || 'Could not join table'
+      setError(errorMessage)
       console.error('Error sitting at table:', err)
     } finally {
       setLoading(false)
