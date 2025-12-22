@@ -215,10 +215,10 @@ export default function Wallet({ userId, globalCurrency = 'PHP' }) {
               <div className="mb-6 flex gap-2 border-b border-slate-200">
                 {availableTypes.map(type => {
                   const typeConfig = {
-                    all: { label: 'All Wallets', color: 'slate' },
-                    currency: { label: 'Fiat Currency', color: 'blue' },
-                    cryptocurrency: { label: 'Cryptocurrency', color: 'orange' },
-                    wire: { label: 'Wire Transfer', color: 'purple' }
+                    all: { label: 'All Wallets', activeClass: 'border-slate-600 text-slate-600' },
+                    currency: { label: 'Fiat Currency', activeClass: 'border-blue-600 text-blue-600' },
+                    cryptocurrency: { label: 'Cryptocurrency', activeClass: 'border-orange-600 text-orange-600' },
+                    wire: { label: 'Wire Transfer', activeClass: 'border-purple-600 text-purple-600' }
                   }
                   const config = typeConfig[type]
 
@@ -228,8 +228,8 @@ export default function Wallet({ userId, globalCurrency = 'PHP' }) {
                       onClick={() => setActiveType(type)}
                       className={`px-4 py-3 font-medium text-sm border-b-2 transition-colors ${
                         activeType === type
-                          ? `border-${config.color}-600 text-${config.color}-600`
-                          : `border-transparent text-slate-600 hover:text-slate-900`
+                          ? config.activeClass
+                          : 'border-transparent text-slate-600 hover:text-slate-900'
                       }`}
                     >
                       {config.label}
