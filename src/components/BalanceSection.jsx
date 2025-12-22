@@ -14,15 +14,15 @@ export default function BalanceSection({ balance }) {
     },
     {
       label: 'Bitcoin Equivalent',
-      value: `₿${balance.btc.toFixed(6)}`,
+      value: `BTC${balance.btc.toFixed(6)}`,
       color: 'bg-orange-50 border-orange-200',
-      icon: '₿'
+      icon: '🪙'
     },
     {
       label: 'Ethereum Equivalent',
-      value: `Ξ${balance.eth.toFixed(4)}`,
+      value: `ETH${balance.eth.toFixed(4)}`,
       color: 'bg-purple-50 border-purple-200',
-      icon: 'Ξ'
+      icon: '🪙'
     }
   ]
 
