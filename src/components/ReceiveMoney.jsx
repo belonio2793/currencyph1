@@ -245,15 +245,22 @@ export default function ReceiveMoney({ userId, globalCurrency = 'PHP' }) {
       setLoading(true)
       setError('')
 
+      console.debug('ReceiveMoney loadData started:', { userId, isGuest: userId?.includes('guest') })
+
       if (userId && !userId.includes('guest')) {
         try {
+          console.debug('Loading wallets for user:', userId)
           const userWallets = await walletService.getUserWalletsWithDetails(userId)
+          console.debug('Wallets loaded:', { count: userWallets?.length || 0, wallets: userWallets })
           if (userWallets && userWallets.length > 0) {
             setWallets(userWallets)
             setSelectedWallet(userWallets[0].id)
+          } else {
+            console.warn('No wallets found for user:', userId)
           }
         } catch (err) {
           console.warn('Error loading wallets:', err)
+          setError('Failed to load wallets: ' + (err?.message || 'Unknown error'))
         }
 
         await loadUserProfile()
@@ -266,12 +273,16 @@ export default function ReceiveMoney({ userId, globalCurrency = 'PHP' }) {
             .order('created_at', { ascending: false })
             .limit(10)
 
-          if (!depositsError && userDeposits) {
+          if (depositsError) {
+            console.warn('Error loading deposits:', depositsError)
+          } else if (userDeposits) {
             setDeposits(userDeposits)
           }
         } catch (err) {
           console.warn('Error loading deposits:', err)
         }
+      } else {
+        console.debug('Skipping data load - user is guest or no userId')
       }
     } catch (err) {
       console.error('Error loading data:', err)
