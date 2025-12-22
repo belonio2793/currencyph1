@@ -109,34 +109,39 @@ async function fetchExConvertRates(fromCurrency: string, toCurrencies: string[])
 async function fetchAllExConvertRates() {
   const allRates: Record<string, Record<string, number>> = {}
 
-  // Since ExConvert charges per request and we make individual API calls,
-  // we'll be selective about which currencies we fetch
-  const majorCurrencies = ['USD', 'EUR', 'GBP', 'JPY', 'AUD', 'CAD', 'CHF', 'PHP', 'SGD', 'HKD']
-  const targetCurrencies = ['USD', 'PHP', 'EUR', 'GBP']
+  console.log('[ExConvert] Starting comprehensive fetch of all fiat currencies')
+  console.log('[ExConvert] Total currencies to fetch:', WORLD_CURRENCIES.length)
+  console.log('[ExConvert] Total API requests:', WORLD_CURRENCIES.length * (WORLD_CURRENCIES.length - 1))
 
-  console.log('[ExConvert] Fetching major currency pairs to minimize API calls')
-  console.log('[ExConvert] From currencies:', majorCurrencies.length, 'To currencies:', targetCurrencies.length)
+  let totalFetched = 0
+  let requestCount = 0
+  const startTime = Date.now()
 
-  // Fetch major currency pairs (limited scope for API efficiency)
-  for (const fromCurrency of majorCurrencies) {
-    const targetForThisCurrency = targetCurrencies.filter(c => c !== fromCurrency)
-    if (targetForThisCurrency.length === 0) continue
+  // Fetch everything-to-everything for all fiat currencies
+  for (let i = 0; i < WORLD_CURRENCIES.length; i++) {
+    const fromCurrency = WORLD_CURRENCIES[i]
+    const targetCurrencies = WORLD_CURRENCIES.filter((c, idx) => idx !== i)
 
-    console.log(`[ExConvert] Fetching ${fromCurrency} to [${targetForThisCurrency.join(',')}]`)
-    const rates = await fetchExConvertRates(fromCurrency, targetForThisCurrency)
+    // Batch fetch to avoid overwhelming the system
+    const rates = await fetchExConvertRates(fromCurrency, targetCurrencies)
     if (rates) {
       allRates[fromCurrency] = rates
+      totalFetched += Object.keys(rates).length
+    }
+
+    requestCount += targetCurrencies.length
+
+    // Progress logging
+    if ((i + 1) % 10 === 0) {
+      const elapsed = ((Date.now() - startTime) / 1000).toFixed(1)
+      const avgTime = (elapsed / (i + 1)).toFixed(2)
+      console.log(`[ExConvert] Progress: ${i + 1}/${WORLD_CURRENCIES.length} (${totalFetched} rates, ${elapsed}s, avg ${avgTime}s/currency)`)
     }
   }
 
-  // Fetch cryptocurrencies to major currencies
-  console.log('[ExConvert] Fetching', CRYPTO_SYMBOLS.length, 'cryptocurrencies')
-  for (const cryptoSymbol of CRYPTO_SYMBOLS) {
-    const rates = await fetchExConvertRates(cryptoSymbol, targetCurrencies)
-    if (rates) {
-      allRates[cryptoSymbol] = rates
-    }
-  }
+  const totalTime = ((Date.now() - startTime) / 1000).toFixed(1)
+  console.log(`[ExConvert] Completed all fiat currencies in ${totalTime}s`)
+  console.log(`[ExConvert] Total rates fetched: ${totalFetched}`)
 
   return Object.keys(allRates).length > 0 ? allRates : null
 }
