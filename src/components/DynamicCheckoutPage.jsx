@@ -84,18 +84,25 @@ export default function DynamicCheckoutPage() {
     try {
       setError('')
       setSubmitting(true)
-      
+
       if (!transfer) {
         setError('Transfer not found')
         return
       }
-      
+
       // Check if user is the recipient
       if (transfer.to_user_id !== currentUser?.id) {
         setError('Only the payment recipient can confirm this transfer')
         return
       }
-      
+
+      // Validate transfer before processing
+      const validation = await paymentTransferService.validateTransfer(transfer.id)
+      if (!validation.valid) {
+        setError(validation.error || 'Transfer validation failed')
+        return
+      }
+
       // Complete the transfer
       const result = await paymentTransferService.completeTransfer(transfer.id, {
         payment_method: paymentMethod,
@@ -103,7 +110,7 @@ export default function DynamicCheckoutPage() {
         confirmed_by: currentUser.id,
         confirmed_at: new Date().toISOString()
       })
-      
+
       if (result.success) {
         setSuccess(true)
         setTransfer(result.transfer)
