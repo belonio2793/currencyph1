@@ -238,44 +238,47 @@ const coingeckoIdToCryptoCode = {
   'sky': 'SKY'
 }
 
-async function storeCryptoPricesInDatabase(cryptoPrices, toCurrency = 'php') {
+async function storeAllRatesInDatabase(allRates: Record<string, Record<string, number>>, source = 'exconvert') {
   try {
-    const toCurrencyUpper = toCurrency.toUpperCase()
-    const records = []
+    const records: any[] = []
     const updatedAt = new Date().toISOString()
+    const expiresAt = new Date(Date.now() + 3600000).toISOString() // 1 hour
 
-    for (const [coingeckoId, priceData] of Object.entries(cryptoPrices)) {
-      const cryptoCode = coingeckoIdToCryptoCode[coingeckoId] || coingeckoId.toUpperCase()
-      const price = priceData[toCurrency] || priceData['php'] || priceData['usd']
-
-      if (price) {
-        records.push({
-          from_currency: cryptoCode,
-          to_currency: toCurrencyUpper,
-          rate: price.toString(),
-          source: 'coingecko',
-          updated_at: updatedAt,
-          expires_at: new Date(Date.now() + 3600000).toISOString() // 1 hour
-        })
+    for (const [fromCurrency, ratesMap] of Object.entries(allRates)) {
+      for (const [toCurrency, rate] of Object.entries(ratesMap)) {
+        if (typeof rate === 'number' && rate > 0) {
+          records.push({
+            from_currency: fromCurrency.toUpperCase(),
+            to_currency: toCurrency.toUpperCase(),
+            rate: rate.toString(),
+            source,
+            updated_at: updatedAt,
+            expires_at: expiresAt
+          })
+        }
       }
     }
 
     if (records.length > 0) {
+      console.log(`[Database] Storing ${records.length} rate records...`)
+
       const { error } = await supabase
         .from('crypto_rates')
         .upsert(records, { onConflict: 'from_currency,to_currency' })
 
       if (error) {
-        console.warn('Failed to store crypto prices in database:', error)
+        console.warn('[Database] Failed to store rates:', error)
+        return 0
       } else {
-        console.log(`Stored ${records.length} crypto rates in database`)
+        console.log(`[Database] Successfully stored ${records.length} rates`)
+        return records.length
       }
     }
 
-    return records
+    return 0
   } catch (e) {
-    console.warn('storeCryptoPricesInDatabase failed:', e?.message || e)
-    return []
+    console.warn('[Database] storeAllRatesInDatabase failed:', e?.message || e)
+    return 0
   }
 }
 
