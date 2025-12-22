@@ -599,6 +599,19 @@ export default function Rates() {
                 {rates.length} currencies tracked
               </p>
             </div>
+
+            <div className="pt-2 border-t border-slate-200">
+              <p className="text-xs text-slate-600 font-medium mb-1">Last Updated</p>
+              <p className="text-xs text-slate-500">
+                {lastUpdated.toLocaleString(undefined, {
+                  year: 'numeric',
+                  month: 'short',
+                  day: 'numeric',
+                  hour: '2-digit',
+                  minute: '2-digit'
+                })}
+              </p>
+            </div>
           </div>
 
           {/* Quick Stats */}
