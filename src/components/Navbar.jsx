@@ -33,28 +33,36 @@ const currencyLabels = {
   'AED': 'UAE Dirham'
 }
 
-function NavbarComponent({ activeTab, onTabChange, globalCurrency, setGlobalCurrency, globalCryptocurrency, setGlobalCryptocurrency, userEmail, userId, totalBalancePHP, totalBalanceConverted, totalDebtConverted, totalNet, onShowAuth, onSignOut }) {
+function NavbarComponent({ activeTab, onTabChange, globalCurrency, setGlobalCurrency, globalCryptocurrency, setGlobalCryptocurrency, userEmail, userId, totalBalancePHP, totalBalanceConverted, totalDebtConverted, totalNet, totalCryptoBalancePHP = 0, onShowAuth, onSignOut }) {
   const { isMobile, isTablet } = useDevice()
   const [showCurrencyModal, setShowCurrencyModal] = useState(false)
-  const [cryptoBalance, setCryptoBalance] = useState(null)
-  const [loadingCrypto, setLoadingCrypto] = useState(false)
+  const [consolidatedHoldingsInCrypto, setConsolidatedHoldingsInCrypto] = useState(null)
+  const [loadingConsolidated, setLoadingConsolidated] = useState(false)
 
-  // Always fetch crypto balance for dual display
+  // Convert consolidated balance (fiat + crypto) to selected cryptocurrency
   useEffect(() => {
-    if (userEmail && totalBalanceConverted && globalCryptocurrency && globalCurrency) {
-      setLoadingCrypto(true)
-      convertFiatToCryptoDb(totalBalanceConverted, globalCurrency, globalCryptocurrency)
+    if (userEmail && globalCryptocurrency && globalCurrency) {
+      setLoadingConsolidated(true)
+      // Total assets = fiat (already in display currency) + crypto (in PHP, need to convert to display currency first)
+      const totalAssets = Number(totalBalanceConverted || 0) + Number(totalCryptoBalancePHP || 0)
+      if (totalAssets === 0) {
+        setConsolidatedHoldingsInCrypto(0)
+        setLoadingConsolidated(false)
+        return
+      }
+
+      convertFiatToCryptoDb(totalAssets, globalCurrency, globalCryptocurrency)
         .then(balance => {
-          setCryptoBalance(balance)
-          setLoadingCrypto(false)
+          setConsolidatedHoldingsInCrypto(balance)
+          setLoadingConsolidated(false)
         })
         .catch(error => {
-          console.error('Failed to fetch crypto balance:', error)
-          setCryptoBalance(null)
-          setLoadingCrypto(false)
+          console.error('Failed to convert consolidated holdings:', error)
+          setConsolidatedHoldingsInCrypto(null)
+          setLoadingConsolidated(false)
         })
     }
-  }, [totalBalanceConverted, globalCurrency, globalCryptocurrency, userEmail])
+  }, [totalBalanceConverted, totalCryptoBalancePHP, globalCurrency, globalCryptocurrency, userEmail])
 
 
   return (
