@@ -911,33 +911,106 @@ export default function ReceiveMoney({ userId, globalCurrency = 'PHP' }) {
                               </p>
                             </div>
                           ) : (
-                            <div className="space-y-3">
-                              {wallets.map(wallet => (
-                                <button
-                                  key={wallet.id}
-                                  type="button"
-                                  onClick={() => setSelectedWallet(wallet.id)}
-                                  className={`w-full text-left p-4 rounded-lg border-2 transition-all ${
-                                    selectedWallet === wallet.id
-                                      ? 'border-blue-600 bg-blue-50'
-                                      : 'border-slate-200 hover:border-slate-300'
-                                  }`}
-                                >
-                                  <div className="font-medium text-slate-900 mb-2">{wallet.currency_code}</div>
-                                  <div className="text-sm text-slate-600 mb-3">
-                                    Balance: {getCurrencySymbol(wallet.currency_code)}{formatNumber(wallet.balance)}
-                                  </div>
-                                  <div className="bg-white/50 rounded p-2 mb-2 border border-slate-200">
-                                    <p className="text-xs text-slate-600 font-semibold mb-1">Wallet ID</p>
-                                    <p className="text-xs font-mono text-slate-900 break-all">{wallet.id}</p>
-                                  </div>
-                                  {wallet.account_number && (
-                                    <div className="text-xs text-slate-600">
-                                      Account: {wallet.account_number}
+                            <div className="relative" ref={walletDropdownRef}>
+                              {/* Search Input */}
+                              <input
+                                type="text"
+                                value={walletSearch}
+                                onChange={(e) => {
+                                  setWalletSearch(e.target.value)
+                                  setShowWalletDropdown(true)
+                                }}
+                                onFocus={() => setShowWalletDropdown(true)}
+                                placeholder="Search by currency, balance, or account..."
+                                className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent mb-3"
+                              />
+
+                              {/* Dropdown Results */}
+                              {showWalletDropdown && (
+                                <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-slate-200 rounded-lg shadow-lg z-50 max-h-64 overflow-y-auto">
+                                  {filteredWallets.length === 0 ? (
+                                    <div className="px-4 py-3 text-sm text-slate-500 text-center">
+                                      No wallets match your search
                                     </div>
+                                  ) : (
+                                    filteredWallets.map(wallet => {
+                                      const isSelected = selectedWallet === wallet.id
+                                      return (
+                                        <button
+                                          key={wallet.id}
+                                          type="button"
+                                          onClick={() => {
+                                            setSelectedWallet(wallet.id)
+                                            setWalletSearch('')
+                                            setShowWalletDropdown(false)
+                                          }}
+                                          className={`w-full text-left px-4 py-3 border-b border-slate-100 last:border-b-0 transition-colors ${
+                                            isSelected
+                                              ? 'bg-blue-50 hover:bg-blue-100'
+                                              : 'hover:bg-slate-50'
+                                          }`}
+                                        >
+                                          <div className="flex items-start justify-between gap-3">
+                                            <div className="flex-1">
+                                              <div className="font-semibold text-slate-900">{wallet.currency_code}</div>
+                                              {wallet.currency_name && (
+                                                <div className="text-xs text-slate-600">{wallet.currency_name}</div>
+                                              )}
+                                              <div className="text-sm text-slate-700 mt-1">
+                                                Balance: {getCurrencySymbol(wallet.currency_code)}{formatNumber(wallet.balance)}
+                                              </div>
+                                              {wallet.account_number && (
+                                                <div className="text-xs text-slate-600 mt-1">
+                                                  Account: {wallet.account_number}
+                                                </div>
+                                              )}
+                                            </div>
+                                            {isSelected && (
+                                              <div className="text-blue-600 font-semibold mt-1">✓</div>
+                                            )}
+                                          </div>
+                                        </button>
+                                      )
+                                    })
                                   )}
-                                </button>
-                              ))}
+                                </div>
+                              )}
+
+                              {/* Selected Wallet Display */}
+                              {selectedWallet && !showWalletDropdown && (
+                                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                                  {(() => {
+                                    const selected = wallets.find(w => w.id === selectedWallet)
+                                    return selected ? (
+                                      <div className="space-y-2">
+                                        <div className="flex items-center justify-between">
+                                          <div>
+                                            <div className="font-semibold text-slate-900">{selected.currency_code}</div>
+                                            {selected.currency_name && (
+                                              <div className="text-xs text-slate-600">{selected.currency_name}</div>
+                                            )}
+                                          </div>
+                                          <button
+                                            type="button"
+                                            onClick={() => setShowWalletDropdown(true)}
+                                            className="text-sm text-blue-600 hover:text-blue-700 font-medium underline"
+                                          >
+                                            Change
+                                          </button>
+                                        </div>
+                                        <div className="text-sm font-medium text-slate-700">
+                                          Balance: {getCurrencySymbol(selected.currency_code)}{formatNumber(selected.balance)}
+                                        </div>
+                                        {selected.account_number && (
+                                          <div className="text-xs text-slate-600">
+                                            Account: {selected.account_number}
+                                          </div>
+                                        )}
+                                      </div>
+                                    ) : null
+                                  })()}
+                                </div>
+                              )}
                             </div>
                           )}
                         </div>
