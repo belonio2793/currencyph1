@@ -508,22 +508,49 @@ export const currencyAPI = {
     if (!from || !to) return null
     if (from === to) return 1
 
+    const fromCode = from.toUpperCase()
+    const toCode = to.toUpperCase()
+
     try {
-      // Try DB first (currency_rates table)
+      // Try public.pairs first (unified rate table for all currencies and cryptos)
       const { data, error } = await supabase
-        .from('currency_rates')
+        .from('pairs')
         .select('rate')
-        .eq('from_currency', from)
-        .eq('to_currency', to)
+        .eq('from_currency', fromCode)
+        .eq('to_currency', toCode)
         .maybeSingle()
 
       if (!error && data && typeof data.rate !== 'undefined') {
         const rate = Number(data.rate)
         // Validate rate is not 0.00 or NaN
         if (isFinite(rate) && rate > 0) {
+          console.debug(`Rate from public.pairs: ${fromCode}/${toCode} = ${rate}`)
           return rate
         } else {
-          console.warn(`Invalid rate from DB for ${from}/${to}: ${rate}`)
+          console.warn(`Invalid rate from public.pairs for ${fromCode}/${toCode}: ${rate}`)
+        }
+      }
+    } catch (e) {
+      console.warn('Error fetching from public.pairs:', e.message)
+    }
+
+    try {
+      // Fallback: Try currency_rates table for fiat currencies
+      const { data, error } = await supabase
+        .from('currency_rates')
+        .select('rate')
+        .eq('from_currency', fromCode)
+        .eq('to_currency', toCode)
+        .maybeSingle()
+
+      if (!error && data && typeof data.rate !== 'undefined') {
+        const rate = Number(data.rate)
+        // Validate rate is not 0.00 or NaN
+        if (isFinite(rate) && rate > 0) {
+          console.debug(`Rate from currency_rates: ${fromCode}/${toCode} = ${rate}`)
+          return rate
+        } else {
+          console.warn(`Invalid rate from currency_rates for ${fromCode}/${toCode}: ${rate}`)
         }
       }
     } catch (e) {
@@ -531,20 +558,23 @@ export const currencyAPI = {
     }
 
     try {
-      const conv = await currencyConverter.convert(1, from, to)
+      // Fallback: Try converter API
+      const conv = await currencyConverter.convert(1, fromCode, toCode)
       if (conv && conv.rate) {
         const rate = Number(conv.rate)
         // Validate rate is not 0.00 or NaN
         if (isFinite(rate) && rate > 0) {
+          console.debug(`Rate from converter: ${fromCode}/${toCode} = ${rate}`)
           return rate
         } else {
-          console.warn(`Invalid rate from converter for ${from}/${to}: ${rate}`)
+          console.warn(`Invalid rate from converter for ${fromCode}/${toCode}: ${rate}`)
         }
       }
     } catch (e) {
-      console.warn('Failed to compute exchange rate via currencyAPI', e)
+      console.warn('Failed to compute exchange rate via currencyAPI', e.message)
     }
 
+    console.warn(`Could not fetch rate for ${fromCode}/${toCode} from any source`)
     return null
   },
 
