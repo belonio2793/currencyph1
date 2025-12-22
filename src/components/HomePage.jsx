@@ -435,16 +435,16 @@ export default function HomePage({ userId, userEmail, globalCurrency = 'PHP', se
             </p>
           </div>
 
-          {/* Total Cryptocurrency Balance in PHP */}
+          {/* Total Cryptocurrency Balance in Selected Cryptocurrency */}
           <div className="bg-gradient-to-br from-orange-50 to-orange-100 rounded-xl p-4 sm:p-6 border border-orange-200">
             <p className="text-xs sm:text-sm text-orange-600 font-medium uppercase tracking-wider mb-2">Cryptocurrency Balance</p>
             <p className="text-lg sm:text-2xl font-light text-orange-900">
-              {loadingCryptoWallets ? (
+              {loadingCryptoHoldingsConversion ? (
                 <span className="italic text-orange-500">loading...</span>
               ) : cryptoWallets.length > 0 ? (
-                formatNumber(totalCryptoBalancePHP) + ' ' + globalCurrency
+                formatNumber(totalCryptoInSelectedCrypto.toFixed(8)) + ' ' + globalCryptocurrency
               ) : (
-                '0 ' + globalCurrency
+                '0 ' + globalCryptocurrency
               )}
             </p>
             <p className="text-xs sm:text-sm font-light text-orange-700 mt-1">
