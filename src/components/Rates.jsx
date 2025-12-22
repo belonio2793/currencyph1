@@ -140,7 +140,7 @@ export default function Rates() {
         }
       })
 
-      // Find rates against PHP (base currency)
+      // Find rates against PHP (base currency) from pairs table
       pairsData?.forEach(pair => {
         if (pair.updated_at) {
           timestamps.push(new Date(pair.updated_at))
@@ -160,6 +160,20 @@ export default function Rates() {
                 ratesByCode[pair.from_currency].updatedAt = pair.updated_at || new Date().toISOString()
               }
             }
+          }
+        }
+      })
+
+      // Add rates from crypto_rates table (direct rates per crypto)
+      cryptoRatesData?.forEach(cryptoRate => {
+        if (cryptoRate.updated_at) {
+          timestamps.push(new Date(cryptoRate.updated_at))
+        }
+
+        if (cryptoRate.code && ratesByCode[cryptoRate.code]) {
+          if (!ratesByCode[cryptoRate.code].rate && cryptoRate.rate && isFinite(Number(cryptoRate.rate)) && Number(cryptoRate.rate) > 0) {
+            ratesByCode[cryptoRate.code].rate = Number(cryptoRate.rate)
+            ratesByCode[cryptoRate.code].updatedAt = cryptoRate.updated_at || new Date().toISOString()
           }
         }
       })
