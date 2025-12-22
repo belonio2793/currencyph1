@@ -198,13 +198,38 @@ export default function Wallet({ userId, globalCurrency = 'PHP' }) {
 
             {wallets.length === 0 ? (
               <div className="bg-white border border-slate-200 rounded-lg p-8 text-center">
-                <p className="text-slate-500 mb-4">No wallets available yet</p>
-                <button
-                  onClick={() => setShowCustomizer(true)}
-                  className="inline-block px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
-                >
-                  Add a Currency
-                </button>
+                {!authStatus?.authenticated ? (
+                  <>
+                    <p className="text-slate-600 mb-6 font-medium">You need to be logged in to see your wallets</p>
+                    <p className="text-slate-500 text-sm mb-6">
+                      Create an account or log in to view and manage your multi-currency wallets.
+                    </p>
+                    <div className="flex gap-4 justify-center">
+                      <button
+                        onClick={() => window.location.href = '/login'}
+                        className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
+                      >
+                        Log In
+                      </button>
+                      <button
+                        onClick={() => window.location.href = '/register'}
+                        className="px-6 py-2 border border-blue-600 text-blue-600 rounded-lg hover:bg-blue-50 transition-colors font-medium"
+                      >
+                        Create Account
+                      </button>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <p className="text-slate-500 mb-4">No wallets available yet</p>
+                    <button
+                      onClick={() => setShowCustomizer(true)}
+                      className="inline-block px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
+                    >
+                      Add a Currency
+                    </button>
+                  </>
+                )}
               </div>
             ) : viewMode === 'grid' ? (
               // Grid View
