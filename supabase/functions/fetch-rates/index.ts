@@ -280,13 +280,17 @@ async function storeAllRatesInDatabase(allRates: Record<string, Record<string, n
     const pairsRecords: any[] = []
     const updatedAt = new Date().toISOString()
     const expiresAt = new Date(Date.now() + 3600000).toISOString() // 1 hour
+    const invalidRates: { pair: string; rate: number }[] = []
 
     for (const [fromCurrency, ratesMap] of Object.entries(allRates)) {
       for (const [toCurrency, rate] of Object.entries(ratesMap)) {
-        if (typeof rate === 'number' && rate > 0) {
+        const numRate = typeof rate === 'number' ? rate : parseFloat(rate as unknown as string)
+
+        // Validate rate is a valid number and > 0 (not 0.00 or NaN)
+        if (typeof numRate === 'number' && isFinite(numRate) && numRate > 0) {
           const fromUpper = fromCurrency.toUpperCase()
           const toUpper = toCurrency.toUpperCase()
-          const rateStr = rate.toString()
+          const rateStr = numRate.toString()
 
           // Record for crypto_rates table
           cryptoRatesRecords.push({
@@ -302,12 +306,25 @@ async function storeAllRatesInDatabase(allRates: Record<string, Record<string, n
           pairsRecords.push({
             from_currency: fromUpper,
             to_currency: toUpper,
-            rate: rate,
+            rate: numRate,
             source_table: source,
             updated_at: updatedAt
           })
+        } else {
+          // Track invalid rates for logging
+          const fromUpper = fromCurrency.toUpperCase()
+          const toUpper = toCurrency.toUpperCase()
+          invalidRates.push({
+            pair: `${fromUpper}/${toUpper}`,
+            rate: numRate
+          })
         }
       }
+    }
+
+    if (invalidRates.length > 0) {
+      console.warn(`[Database] Filtered out ${invalidRates.length} invalid rates (0.00 or NaN):`,
+        invalidRates.map(r => `${r.pair}=${r.rate}`).join(', '))
     }
 
     if (cryptoRatesRecords.length === 0) {
