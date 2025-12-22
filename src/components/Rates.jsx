@@ -32,7 +32,7 @@ export default function Rates() {
       setLoading(true)
       setError(null)
 
-      // Fetch all rates from pairs table (unified source)
+      // 1. Fetch all pairs from pairs table
       const pairsRes = await supabase
         .from('pairs')
         .select('from_currency,to_currency,rate,source_table,updated_at')
@@ -42,196 +42,99 @@ export default function Rates() {
         throw new Error(`Failed to load rates: ${pairsRes.error.message}`)
       }
 
-      let pairsData = pairsRes.data || []
+      const pairsData = pairsRes.data || []
       console.log(`✅ Loaded ${pairsData.length} rate pairs from pairs table`)
 
-      // If pairs table is empty or all rates are null, fall back to legacy tables
-      const hasValidRates = pairsData.some(p => p.rate != null && p.rate !== '')
-      if (pairsData.length === 0 || !hasValidRates) {
-        console.warn('⚠️ Pairs table is empty or has no valid rates, falling back to currency_rates and cryptocurrency_rates')
-
-        const [currencyRatesRes, cryptoRatesRes] = await Promise.all([
-          supabase
-            .from('currency_rates')
-            .select('from_currency,to_currency,rate,updated_at'),
-          supabase
-            .from('cryptocurrency_rates')
-            .select('from_currency,to_currency,rate,updated_at')
-        ])
-
-        const fallbackData = []
-        if (currencyRatesRes.data) {
-          fallbackData.push(...currencyRatesRes.data.map(r => ({
-            ...r,
-            source_table: 'currency_rates'
-          })))
-        }
-        if (cryptoRatesRes.data) {
-          fallbackData.push(...cryptoRatesRes.data.map(r => ({
-            ...r,
-            source_table: 'cryptocurrency_rates'
-          })))
-        }
-        pairsData = fallbackData
-        console.log(`✅ Loaded ${pairsData.length} rates from fallback tables`)
-      }
-
-      // Extract all unique currencies and cryptocurrencies from pairs table
+      // 2. Extract all unique currencies and cryptocurrencies from pairs
       const uniqueCodes = new Set()
       pairsData.forEach(pair => {
-        uniqueCodes.add(pair.from_currency)
-        uniqueCodes.add(pair.to_currency)
+        if (pair.from_currency) uniqueCodes.add(pair.from_currency)
+        if (pair.to_currency) uniqueCodes.add(pair.to_currency)
       })
 
-      // Fetch metadata for all unique codes
       const codesArray = Array.from(uniqueCodes)
-      let currencyMetadata = {}
-      let cryptoMetadata = {}
+      console.log(`📊 Found ${codesArray.length} unique currency codes in pairs table`)
 
+      // 3. Fetch metadata for all currencies and cryptocurrencies in pairs
+      let allMetadata = {}
       if (codesArray.length > 0) {
         const [currenciesRes, cryptosRes] = await Promise.all([
           supabase
             .from('currencies')
-            .select('code,name,type,symbol,decimals,is_default,active')
-            .in('code', codesArray),
+            .select('code,name,type,symbol,decimals,is_default,active'),
           supabase
             .from('cryptocurrencies')
             .select('code,name,coingecko_id')
-            .in('code', codesArray)
         ])
 
         if (currenciesRes.data) {
           currenciesRes.data.forEach(c => {
-            currencyMetadata[c.code] = c
+            allMetadata[c.code] = { ...c, type: 'currency' }
           })
         }
 
         if (cryptosRes.data) {
           cryptosRes.data.forEach(c => {
-            cryptoMetadata[c.code] = c
+            allMetadata[c.code] = { ...c, type: 'cryptocurrency' }
           })
         }
       }
 
-      setCurrencies({ ...currencyMetadata, ...cryptoMetadata })
+      setCurrencies(allMetadata)
+      console.log(`📋 Loaded metadata for ${Object.keys(allMetadata).length} currencies/cryptos`)
 
+      // 4. Build rates list with all unique currencies from pairs
       const ratesByCode = {}
-      const allPairsByCode = {} // Store all pairs for cross-rate calculation
 
-      // First pass: Process all rate pairs to normalize to PHP
-      pairsData.forEach(pair => {
-        let targetCode = null
-        let normalizedRate = null
-
-        if (pair.from_currency === 'PHP') {
-          targetCode = pair.to_currency
-          normalizedRate = Number(pair.rate)
-        } else if (pair.to_currency === 'PHP') {
-          targetCode = pair.from_currency
-          normalizedRate = pair.rate > 0 ? 1 / Number(pair.rate) : 0
-        }
-
-        if (targetCode && !ratesByCode[targetCode]) {
-          const currMeta = currencyMetadata[targetCode]
-          const cryptoMeta = cryptoMetadata[targetCode]
-
-          const type = cryptoMeta ? 'cryptocurrency' : (currMeta?.type || 'currency')
-          const metadata = {
-            code: targetCode,
-            name: currMeta?.name || cryptoMeta?.name || targetCode,
-            type: type,
-            symbol: currMeta?.symbol || '',
-            decimals: type === 'cryptocurrency' ? 8 : (currMeta?.decimals || 2)
-          }
-
-          ratesByCode[targetCode] = {
-            code: targetCode,
-            rate: normalizedRate,
-            metadata: metadata,
-            source: pair.source_table || 'pairs',
-            updatedAt: pair.updated_at || new Date().toISOString()
-          }
-        }
-
-        // Store all pairs for potential cross-rate calculation
-        if (!allPairsByCode[pair.from_currency]) {
-          allPairsByCode[pair.from_currency] = []
-        }
-        allPairsByCode[pair.from_currency].push(pair)
-      })
-
-      // Add all currencies/cryptos from pairs
+      // Add all unique codes with their rates and metadata
       uniqueCodes.forEach(code => {
-        if (!ratesByCode[code]) {
-          const currMeta = currencyMetadata[code]
-          const cryptoMeta = cryptoMetadata[code]
+        const metadata = allMetadata[code] || {
+          code: code,
+          name: code,
+          type: 'currency',
+          symbol: '',
+          decimals: 2
+        }
 
-          const type = cryptoMeta ? 'cryptocurrency' : (currMeta?.type || 'currency')
-          const metadata = {
-            code: code,
-            name: currMeta?.name || cryptoMeta?.name || code,
-            type: type,
-            symbol: currMeta?.symbol || '',
-            decimals: type === 'cryptocurrency' ? 8 : (currMeta?.decimals || 2)
-          }
+        // Find the first pair that references this code to get rate info
+        const relatedPair = pairsData.find(p => p.from_currency === code || p.to_currency === code)
+        const rate = relatedPair ? Number(relatedPair.rate) : null
 
-          ratesByCode[code] = {
-            code: code,
-            rate: null,
-            metadata: metadata,
-            source: 'pairs',
-            updatedAt: new Date().toISOString()
-          }
+        ratesByCode[code] = {
+          code: code,
+          rate: isFinite(rate) && rate > 0 ? rate : null,
+          metadata: metadata,
+          source: relatedPair?.source_table || 'pairs',
+          updatedAt: relatedPair?.updated_at || new Date().toISOString()
         }
       })
 
-      // Get the most recent timestamp from all pairs
+      // 5. Get the most recent timestamp
       let mostRecentTimestamp = new Date()
       if (pairsData.length > 0) {
         const timestamps = pairsData
-          .map(p => p.updated_at ? new Date(p.updated_at) : new Date())
+          .filter(p => p.updated_at)
+          .map(p => new Date(p.updated_at))
           .sort((a, b) => b - a)
-        mostRecentTimestamp = timestamps[0] || new Date()
+        if (timestamps.length > 0) {
+          mostRecentTimestamp = timestamps[0]
+        }
       }
 
-      // Separate rates with values from rates without values
+      // 6. Sort: rates with values first, then without
       const ratesWithValues = Object.values(ratesByCode)
-        .filter(r => isFinite(r.rate) && r.rate > 0)
+        .filter(r => r.rate !== null && isFinite(r.rate) && r.rate > 0)
         .sort((a, b) => a.code.localeCompare(b.code))
 
       const ratesWithoutValues = Object.values(ratesByCode)
-        .filter(r => !isFinite(r.rate) || r.rate <= 0)
+        .filter(r => r.rate === null || !isFinite(r.rate) || r.rate <= 0)
         .sort((a, b) => a.code.localeCompare(b.code))
 
-      // Combine: rates with values first, then rates without
       const validRates = [...ratesWithValues, ...ratesWithoutValues]
-
-      // Ensure PHP is first
-      const phpRate = validRates.find(r => r.code === 'PHP')
-      if (phpRate) {
-        validRates.splice(validRates.indexOf(phpRate), 1)
-        phpRate.rate = 1
-        phpRate.source = 'base'
-        validRates.unshift(phpRate)
-      } else {
-        // If PHP not in pairs, add it as base
-        validRates.unshift({
-          code: 'PHP',
-          rate: 1,
-          metadata: currencyMetadata['PHP'] || {
-            code: 'PHP',
-            name: 'Philippine Peso',
-            type: 'currency',
-            symbol: '₱',
-            decimals: 2
-          },
-          source: 'base',
-          updatedAt: new Date().toISOString()
-        })
-      }
 
       setRates(validRates)
       setLastUpdated(mostRecentTimestamp)
+      console.log(`✅ Final rates list: ${validRates.length} items (${ratesWithValues.length} with values)`)
     } catch (err) {
       const errorMsg = err?.message || String(err) || 'Unknown error'
       console.error('Error loading rates:', errorMsg, err)
