@@ -5,8 +5,19 @@ export const currencySymbols = {
   GBP: '£'
 }
 
+// Common fiat currencies
+const fiatCurrencies = ['PHP', 'USD', 'EUR', 'GBP', 'JPY', 'CNY', 'INR', 'AUD', 'CAD', 'SGD', 'HKD', 'NZD', 'MYR', 'THB', 'IDR', 'VND', 'KRW']
+
 export function getCurrencySymbol(code) {
   return currencySymbols[code] || ''
+}
+
+export function isFiatCurrency(code) {
+  return fiatCurrencies.includes(code?.toUpperCase())
+}
+
+export function isCryptoCurrency(code) {
+  return !isFiatCurrency(code) && code?.length > 0
 }
 
 export function formatNumber(amount) {
