@@ -391,22 +391,7 @@ export default function HomePage({ userId, userEmail, globalCurrency = 'PHP', se
         )}
 
         {/* Quick Stats */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-4 mb-6 sm:mb-8">
-          {/* Cryptocurrency Holdings (in selected crypto) */}
-          <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl p-4 sm:p-6 border border-purple-200">
-            <p className="text-xs sm:text-sm text-purple-600 font-medium uppercase tracking-wider mb-2">Consolidated Holdings</p>
-            <p className="text-lg sm:text-2xl font-light text-purple-900">
-              {loadingCryptoConversion ? (
-                <span className="italic text-purple-500">loading...</span>
-              ) : (
-                formatNumber(totalBalanceInCrypto.toFixed(8)) + ' ' + globalCryptocurrency
-              )}
-            </p>
-            <p className="text-xs sm:text-sm font-light text-purple-700 mt-1">
-              in {globalCryptocurrency}
-            </p>
-          </div>
-
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6 sm:mb-8">
           {/* Total Currency Balance */}
           <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-4 sm:p-6 border border-blue-200">
             <p className="text-xs sm:text-sm text-blue-600 font-medium uppercase tracking-wider mb-2">Currency Balance</p>
