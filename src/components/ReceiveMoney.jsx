@@ -64,6 +64,12 @@ export default function ReceiveMoney({ userId, globalCurrency = 'PHP' }) {
   const [sendChatMessage, setSendChatMessage] = useState(true) // Optional setting for step 3
   const [recipientOnlineStatus, setRecipientOnlineStatus] = useState(null)
 
+  // State: Custom Payment
+  const [customPaymentLink, setCustomPaymentLink] = useState(null)
+  const [customPaymentDescription, setCustomPaymentDescription] = useState('')
+  const [customPaymentEmail, setCustomPaymentEmail] = useState('')
+  const [generatingPayment, setGeneratingPayment] = useState(false)
+
   const searchInputRef = useRef(null)
 
   // Helper function to extract crypto code from currency name
