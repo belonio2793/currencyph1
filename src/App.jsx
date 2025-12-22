@@ -693,7 +693,7 @@ export default function App() {
                   <Suspense fallback={<PageLoader />}>
                     {(activeTab === 'home' || showAuth) && (
                       <>
-                        {!showAuth && <HomePage userId={userId} userEmail={userEmail} globalCurrency={globalCurrency} setGlobalCurrency={setGlobalCurrency} globalCryptocurrency={globalCryptocurrency} setGlobalCryptocurrency={setGlobalCryptocurrency} onTabChange={setActiveTab} onShowAuth={(tab) => { setAuthInitialTab(tab || 'login'); setShowAuth(true) }} />}
+                        {!showAuth && <HomePage userId={userId} userEmail={userEmail} globalCurrency={globalCurrency} setGlobalCurrency={setGlobalCurrency} globalCryptocurrency={globalCryptocurrency} setGlobalCryptocurrency={setGlobalCryptocurrency} onTabChange={setActiveTab} onSetTotalCryptoBalance={setTotalCryptoBalancePHP} onShowAuth={(tab) => { setAuthInitialTab(tab || 'login'); setShowAuth(true) }} />}
                       </>
                     )}
                     {showAuth ? (
