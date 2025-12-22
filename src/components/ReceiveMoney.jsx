@@ -154,6 +154,22 @@ export default function ReceiveMoney({ userId, globalCurrency = 'PHP' }) {
     }
   }, [amount, selectedCurrency, selectedWallet])
 
+  // Filter wallets based on search input
+  useEffect(() => {
+    if (!walletSearch.trim()) {
+      setFilteredWallets(wallets)
+    } else {
+      const searchLower = walletSearch.toLowerCase()
+      const filtered = wallets.filter(wallet =>
+        wallet.currency_code.toLowerCase().includes(searchLower) ||
+        wallet.currency_name?.toLowerCase().includes(searchLower) ||
+        wallet.account_number?.toLowerCase().includes(searchLower) ||
+        formatNumber(wallet.balance).includes(searchLower)
+      )
+      setFilteredWallets(filtered)
+    }
+  }, [walletSearch, wallets])
+
   const fetchConversionRate = async (from, to) => {
     setConversionLoading(true)
     setConversionError('')
