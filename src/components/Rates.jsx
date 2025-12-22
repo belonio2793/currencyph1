@@ -409,19 +409,24 @@ export default function Rates() {
 
           {/* Rates Table */}
           <div className="bg-white rounded-2xl shadow-lg p-6 sm:p-8 border border-slate-200">
+            {/* Last Updated Info Banner */}
+            <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+              <p className="text-sm text-blue-900">
+                <span className="font-semibold">Last Fetched Rates:</span>{' '}
+                {lastUpdated.toLocaleString(undefined, {
+                  year: 'numeric',
+                  month: 'short',
+                  day: 'numeric',
+                  hour: '2-digit',
+                  minute: '2-digit',
+                  second: '2-digit'
+                })}
+              </p>
+            </div>
+
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
               <div>
                 <h2 className="text-xl sm:text-2xl font-semibold text-slate-900">All Rates</h2>
-                <p className="text-xs text-slate-500 mt-1">
-                  Last updated: {lastUpdated.toLocaleString(undefined, {
-                    year: 'numeric',
-                    month: 'short',
-                    day: 'numeric',
-                    hour: '2-digit',
-                    minute: '2-digit',
-                    second: '2-digit'
-                  })}
-                </p>
               </div>
               <div className="flex items-center gap-4">
                 <div className="text-sm text-slate-500">
