@@ -320,13 +320,56 @@ export default function ReceiveMoney({ userId, globalCurrency = 'PHP' }) {
 
   const sendPaymentRequestMessage = async (recipient, transfer, amount, currency) => {
     try {
-      const checkoutLink = `${window.location.origin}/checkout?transferId=${transfer.id}`
-      
-      const messageText = `Payment Request: ${getCurrencySymbol(currency)}${formatNumber(amount)} - ${selectedWalletData?.full_name || 'User'} is requesting payment. ${checkoutLink}`
+      if (!userId) {
+        console.warn('Cannot send message - no authenticated user')
+        return
+      }
 
-      // Create chat message (you'll need to implement this based on your chat system)
-      // This is a placeholder for the chat functionality
-      console.log('Payment request message:', messageText)
+      // Import conversations helper
+      const { createConversation, addParticipantToConversation } = await import('../lib/conversations')
+
+      const paymentLink = `${window.location.origin}/payment/${transfer.id}`
+      const messageContent = `Payment Request: ${getCurrencySymbol(currency)}${formatNumber(amount)} from ${userProfile?.full_name || userProfile?.email || 'User'}. View and confirm: ${paymentLink}`
+
+      try {
+        // Create conversation with recipient
+        const conversation = await createConversation(
+          userId,
+          `Payment Request: ${getCurrencySymbol(currency)}${formatNumber(amount)}`,
+          [recipient.id]
+        )
+
+        // Send payment request message
+        const { error: messageError } = await supabase
+          .from('messages')
+          .insert([
+            {
+              conversation_id: conversation.id,
+              sender_id: userId,
+              content: messageContent,
+              message_type: 'payment_request',
+              metadata: {
+                payment_request: {
+                  transfer_id: transfer.id,
+                  amount: amount,
+                  currency: currency,
+                  from_user_id: userId,
+                  to_user_id: recipient.id,
+                  payment_link: paymentLink,
+                  created_at: new Date().toISOString()
+                }
+              }
+            }
+          ])
+
+        if (messageError) {
+          console.warn('Could not send message:', messageError)
+        } else {
+          console.log('Payment request message sent successfully')
+        }
+      } catch (convErr) {
+        console.warn('Could not create conversation:', convErr)
+      }
     } catch (err) {
       console.warn('Error sending payment request message:', err)
     }
