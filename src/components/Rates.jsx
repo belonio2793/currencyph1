@@ -134,7 +134,7 @@ export default function Rates() {
             rate: normalizedRate,
             metadata: metadata,
             source: 'cryptocurrency_rates',
-            updatedAt: pair.updated_at || new Date().toISOString()
+            updatedAt: new Date().toISOString()
           }
         }
       })
