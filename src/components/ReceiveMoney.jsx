@@ -6,6 +6,7 @@ import { CRYPTOCURRENCY_DEPOSITS } from '../data/cryptoDeposits'
 import FiatCryptoToggle from './FiatCryptoToggle'
 import receiveMoneyService from '../lib/receiveMoneyService'
 import customPaymentService from '../lib/customPaymentService'
+import { walletService } from '../lib/walletService'
 
 // List of common cryptocurrencies that we accept
 const CRYPTO_CURRENCY_CODES = [
