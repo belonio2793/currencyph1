@@ -97,7 +97,8 @@ export const walletService = {
 
       console.debug('Wallets fetched successfully:', {
         count: walletData.length,
-        walletCodes: walletData.map(w => w.currency_code)
+        walletCodes: walletData.map(w => w.currency_code),
+        walletTypes: walletData.map(w => ({ code: w.currency_code, type: w.type }))
       })
 
       // Now fetch currency details separately
