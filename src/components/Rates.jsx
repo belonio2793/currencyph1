@@ -383,8 +383,20 @@ export default function Rates() {
 
           {/* Rates Table */}
           <div className="bg-white rounded-2xl shadow-lg p-6 sm:p-8 border border-slate-200">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl sm:text-2xl font-semibold text-slate-900">All Rates</h2>
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+              <div>
+                <h2 className="text-xl sm:text-2xl font-semibold text-slate-900">All Rates</h2>
+                <p className="text-xs text-slate-500 mt-1">
+                  Last updated: {lastUpdated.toLocaleString(undefined, {
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit'
+                  })}
+                </p>
+              </div>
               <div className="text-sm text-slate-500">
                 {filteredRates.length} currency pair{filteredRates.length !== 1 ? 's' : ''}
               </div>
