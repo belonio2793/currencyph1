@@ -977,8 +977,18 @@ export default function ReceiveMoney({ userId, globalCurrency = 'PHP' }) {
                       )}
 
                       {/* Summary */}
-                      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 space-y-3">
-                        <p className="text-sm font-medium text-slate-900">Payment Details</p>
+                      <div className={`rounded-lg p-4 space-y-3 border ${
+                        selectedMethod === 'crypto'
+                          ? 'bg-orange-50 border-orange-200'
+                          : 'bg-blue-50 border-blue-200'
+                      }`}>
+                        <p className={`text-sm font-medium ${
+                          selectedMethod === 'crypto'
+                            ? 'text-orange-900'
+                            : 'text-slate-900'
+                        }`}>
+                          Payment Details
+                        </p>
                         <div className="space-y-2 text-sm">
                           <div className="flex justify-between">
                             <span className="text-slate-700">From:</span>
@@ -986,16 +996,18 @@ export default function ReceiveMoney({ userId, globalCurrency = 'PHP' }) {
                           </div>
                           <div className="flex justify-between">
                             <span className="text-slate-700">Amount:</span>
-                            <span className="font-medium text-slate-900">
+                            <span className={`font-medium ${
+                              selectedMethod === 'crypto' ? 'text-orange-600' : 'text-blue-600'
+                            }`}>
                               {getCurrencySymbol(selectedWalletData?.currency_code || selectedCurrency)}{formatNumber(convertedAmount || amount)}
                             </span>
                           </div>
                           <div className="flex justify-between">
                             <span className="text-slate-700">Method:</span>
                             <span className="font-medium text-slate-900">
-                              {selectedMethod === 'gcash' && 'GCash'}
-                              {selectedMethod === 'bank' && 'Bank Transfer'}
-                              {selectedMethod === 'crypto' && selectedCryptoNetwork}
+                              {selectedMethod === 'gcash' && '💰 GCash'}
+                              {selectedMethod === 'bank' && '🏦 Bank Transfer'}
+                              {selectedMethod === 'crypto' && `₿ ${selectedCryptoNetwork}`}
                             </span>
                           </div>
                         </div>
