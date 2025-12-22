@@ -574,7 +574,7 @@ export default function ReceiveMoney({ userId, globalCurrency = 'PHP' }) {
                       </div>
 
                       <div className="grid grid-cols-1 gap-3">
-                        {activeType === 'fiat' && Object.values(FIAT_METHODS).map(method => (
+                        {activeType === 'fiat' && availableMethods.fiat.map(method => (
                           <button
                             key={method.id}
                             type="button"
@@ -586,26 +586,29 @@ export default function ReceiveMoney({ userId, globalCurrency = 'PHP' }) {
                             }`}
                           >
                             <div className="font-medium text-slate-900">
-                              {method.icon} {method.name}
+                              {method.name}
                             </div>
                             <div className="text-sm text-slate-600 mt-1">{method.description}</div>
                           </button>
                         ))}
 
-                        {activeType === 'crypto' && (
+                        {activeType === 'crypto' && availableMethods.crypto.map(method => (
                           <button
+                            key={method.id}
                             type="button"
-                            onClick={() => setSelectedMethod('crypto')}
+                            onClick={() => setSelectedMethod(method.id)}
                             className={`p-4 rounded-lg border-2 transition-all text-left ${
-                              selectedMethod === 'crypto'
+                              selectedMethod === method.id
                                 ? 'border-blue-600 bg-blue-50'
                                 : 'border-slate-200 hover:border-slate-300'
                             }`}
                           >
-                            <div className="font-medium text-slate-900">₿ Cryptocurrency</div>
-                            <div className="text-sm text-slate-600 mt-1">Bitcoin, Ethereum, and more</div>
+                            <div className="font-medium text-slate-900">
+                              {method.name}
+                            </div>
+                            <div className="text-sm text-slate-600 mt-1">{method.description}</div>
                           </button>
-                        )}
+                        ))}
                       </div>
 
                       <div className="flex space-x-4">
