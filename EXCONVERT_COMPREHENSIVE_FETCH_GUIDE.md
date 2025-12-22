@@ -79,12 +79,34 @@ Edit the script to adjust:
 ```javascript
 // scripts/fetch-all-exconvert-rates.js
 
+// Cryptocurrencies to fetch (31 supported)
+const CRYPTO_CURRENCIES = [
+  'BTC', 'ETH', 'LTC', 'DOGE', 'XRP', 'ADA', 'SOL', 'AVAX', 'DOT', 'LINK',
+  'UNI', 'AAVE', 'USDC', 'BNB', 'XLM', 'TRX', 'HBAR', 'BCH', 'SHIB', 'OP',
+  'NEAR', 'ICP', 'FIL', 'APT', 'ATOM', 'AUCTION', 'AVA', 'AXS', 'BAKE', 'BAND', 'BHD'
+]
+
+// Major fiat currencies to convert cryptos to
+const majorFiats = ['USD', 'EUR', 'GBP', 'JPY', 'PHP', 'SGD', 'HKD', 'CAD', 'AUD', 'NZD', 'CHF', 'CNY', 'INR', 'BRL', 'MXN']
+
 // Delay between requests (milliseconds)
 await new Promise(resolve => setTimeout(resolve, 150)) // Adjust this
 
 // Database batch size
 const batchSize = 5000 // Adjust if you get transaction errors
 ```
+
+## Supported Cryptocurrencies
+
+ExConvert supports these 31 cryptocurrencies:
+
+```
+BTC, ETH, LTC, DOGE, XRP, ADA, SOL, AVAX, DOT, LINK, UNI, AAVE, USDC,
+BNB, XLM, TRX, HBAR, BCH, SHIB, OP, NEAR, ICP, FIL, APT, ATOM, AUCTION,
+AVA, AXS, BAKE, BAND, BHD
+```
+
+All 31 are included in the comprehensive fetch.
 
 ## Scheduling (Optional)
 
