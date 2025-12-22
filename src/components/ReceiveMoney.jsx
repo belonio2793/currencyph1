@@ -74,7 +74,13 @@ export default function ReceiveMoney({ userId, globalCurrency = 'PHP' }) {
   const [authStatus, setAuthStatus] = useState(null)
   const [showDiagnostics, setShowDiagnostics] = useState(true)
 
+  // State: Wallet search
+  const [walletSearch, setWalletSearch] = useState('')
+  const [showWalletDropdown, setShowWalletDropdown] = useState(false)
+  const [filteredWallets, setFilteredWallets] = useState([])
+
   const searchInputRef = useRef(null)
+  const walletDropdownRef = useRef(null)
 
   // Helper function to extract crypto code from currency name
   const extractCryptoCode = (currencyName) => {
