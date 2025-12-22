@@ -27,6 +27,8 @@ export default function Rates() {
   const [customizationOpen, setCustomizationOpen] = useState(false)
   const [displayFormat, setDisplayFormat] = useState('code-symbol')
   const [showSymbolInConverter, setShowSymbolInConverter] = useState(true)
+  const [availableFiats, setAvailableFiats] = useState([])
+  const [availableCryptos, setAvailableCryptos] = useState([])
 
   // Helper to get currency symbol from metadata or fallback
   const getSymbolForCurrency = (code, metadata) => {
