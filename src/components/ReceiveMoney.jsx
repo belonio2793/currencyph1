@@ -1031,7 +1031,7 @@ export default function ReceiveMoney({ userId, globalCurrency = 'PHP' }) {
                               : 'border-slate-200 text-slate-700 hover:border-slate-300'
                           }`}
                         >
-                          ₿ Cryptocurrency
+                          🪙 Cryptocurrency
                         </button>
                       </div>
 
