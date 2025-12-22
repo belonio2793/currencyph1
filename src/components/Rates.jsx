@@ -470,10 +470,7 @@ export default function Rates() {
                   {filteredRates.map(currency => (
                     <tr key={currency.code} className="border-b border-slate-100 hover:bg-slate-50 transition">
                       <td className="py-3 px-4">
-                        <div className="flex items-center gap-3">
-                          <span className="text-xl">{currency.metadata?.symbol || getCurrencyIcon(currency.metadata?.type)}</span>
-                          <span className="font-semibold text-slate-900">{currency.code}</span>
-                        </div>
+                        <span className="font-semibold text-slate-900">{currency.code}</span>
                       </td>
                       <td className="py-3 px-4 text-slate-600">{currency.metadata?.name || currency.code}</td>
                       <td className="py-3 px-4">
