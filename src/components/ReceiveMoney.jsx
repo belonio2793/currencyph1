@@ -40,6 +40,7 @@ export default function ReceiveMoney({ userId, globalCurrency = 'PHP' }) {
   // State: Flow control
   const [step, setStep] = useState(1) // 1: recipient+amount, 2: method, 3: finalization
   const [activeType, setActiveType] = useState('fiat')
+  const [requestMode, setRequestMode] = useState('recipient') // 'recipient' or 'custom_payment'
 
   // State: Payment method
   const [selectedMethod, setSelectedMethod] = useState(null)
