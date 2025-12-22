@@ -366,36 +366,43 @@ export default function HomePage({ userId, userEmail, globalCurrency = 'PHP', se
         )}
 
         {/* Quick Stats */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 mb-6 sm:mb-8">
-          {/* Total Balance */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6 sm:mb-8">
+          {/* Total Fiat Balance */}
           <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-4 sm:p-6 border border-blue-200">
-            <p className="text-xs sm:text-sm text-blue-600 font-medium uppercase tracking-wider mb-2">Total Balance</p>
+            <p className="text-xs sm:text-sm text-blue-600 font-medium uppercase tracking-wider mb-2">Fiat Balance</p>
             <p className="text-lg sm:text-2xl font-light text-blue-900">
               {formatNumber(totalBalanceConverted != null ? totalBalanceConverted : getTotalBalance())} {globalCurrency}
             </p>
             <p className="text-xs sm:text-sm font-light text-blue-700 mt-1">
-              {loadingCrypto ? (
-                <span className="italic text-blue-500">loading {globalCryptocurrency}...</span>
-              ) : cryptoBalance !== null ? (
-                <>{cryptoBalance.toFixed(8)} {globalCryptocurrency}</>
+              Cash & fiat wallets
+            </p>
+          </div>
+
+          {/* Total Crypto Balance in PHP */}
+          <div className="bg-gradient-to-br from-orange-50 to-orange-100 rounded-xl p-4 sm:p-6 border border-orange-200">
+            <p className="text-xs sm:text-sm text-orange-600 font-medium uppercase tracking-wider mb-2">Crypto Balance</p>
+            <p className="text-lg sm:text-2xl font-light text-orange-900">
+              {loadingCryptoWallets ? (
+                <span className="italic text-orange-500">loading...</span>
+              ) : cryptoWallets.length > 0 ? (
+                formatNumber(totalCryptoBalancePHP) + ' ' + globalCurrency
               ) : (
-                <span className="italic text-blue-500">crypto unavailable</span>
+                '0 ' + globalCurrency
               )}
+            </p>
+            <p className="text-xs sm:text-sm font-light text-orange-700 mt-1">
+              {cryptoWallets.length > 0 ? `${cryptoWallets.length} holding${cryptoWallets.length !== 1 ? 's' : ''}` : 'No holdings'}
             </p>
           </div>
 
           {/* Net (Balance - Debt) */}
           <div className={`rounded-xl p-4 sm:p-6 border ${isNegativeNet ? 'bg-gradient-to-br from-rose-50 to-rose-100 border-rose-200' : 'bg-gradient-to-br from-emerald-50 to-emerald-100 border-emerald-200'}`}>
-            <p className={`text-xs sm:text-sm font-medium uppercase tracking-wider mb-2 ${isNegativeNet ? 'text-rose-600' : 'text-emerald-600'}`}>Net</p>
-            <p className={`text-lg sm:text-2xl font-light ${isNegativeNet ? 'text-rose-900' : 'text-emerald-900'}`}>{formatNumber(netDisplay)} {globalCurrency}</p>
+            <p className={`text-xs sm:text-sm font-medium uppercase tracking-wider mb-2 ${isNegativeNet ? 'text-rose-600' : 'text-emerald-600'}`}>Total Net</p>
+            <p className={`text-lg sm:text-2xl font-light ${isNegativeNet ? 'text-rose-900' : 'text-emerald-900'}`}>
+              {formatNumber(netDisplay)} {globalCurrency}
+            </p>
             <p className={`text-xs sm:text-sm font-light mt-1 ${isNegativeNet ? 'text-rose-700' : 'text-emerald-700'}`}>
-              {loadingCrypto ? (
-                <span className={`italic ${isNegativeNet ? 'text-rose-500' : 'text-emerald-500'}`}>loading {globalCryptocurrency}...</span>
-              ) : cryptoBalance !== null && cryptoDebt !== null ? (
-                <>{(cryptoBalance - cryptoDebt).toFixed(8)} {globalCryptocurrency}</>
-              ) : (
-                <span className={`italic ${isNegativeNet ? 'text-rose-500' : 'text-emerald-500'}`}>crypto unavailable</span>
-              )}
+              Fiat + Crypto - Debt
             </p>
           </div>
 
@@ -404,13 +411,7 @@ export default function HomePage({ userId, userEmail, globalCurrency = 'PHP', se
             <p className="text-xs sm:text-sm text-red-600 font-medium uppercase tracking-wider mb-2">Total Debt</p>
             <p className="text-lg sm:text-2xl font-light text-red-900">{formatNumber(totalDebtConverted != null ? totalDebtConverted : getTotalDebt())} {globalCurrency}</p>
             <p className="text-xs sm:text-sm font-light text-red-700 mt-1">
-              {loadingCrypto ? (
-                <span className="italic text-red-500">loading {globalCryptocurrency}...</span>
-              ) : cryptoDebt !== null ? (
-                <>{cryptoDebt.toFixed(8)} {globalCryptocurrency}</>
-              ) : (
-                <span className="italic text-red-500">crypto unavailable</span>
-              )}
+              Active loans
             </p>
           </div>
         </div>
