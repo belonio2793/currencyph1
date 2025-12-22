@@ -208,6 +208,29 @@ export default function HomePage({ userId, userEmail, globalCurrency = 'PHP', se
     convertToSelectedCrypto()
   }, [totalBalanceConverted, totalCryptoBalancePHP, globalCryptocurrency, globalCurrency, userEmail])
 
+  // Convert crypto holdings to selected cryptocurrency for card display
+  useEffect(() => {
+    const convertCryptoHoldings = async () => {
+      if (!globalCryptocurrency || !globalCurrency || !userEmail || totalCryptoBalancePHP === 0) {
+        setTotalCryptoInSelectedCrypto(0)
+        return
+      }
+
+      setLoadingCryptoHoldingsConversion(true)
+      try {
+        const converted = await convertFiatToCryptoDb(totalCryptoBalancePHP, globalCurrency, globalCryptocurrency)
+        setTotalCryptoInSelectedCrypto(converted || 0)
+      } catch (error) {
+        console.error('Failed to convert crypto holdings to selected cryptocurrency:', error)
+        setTotalCryptoInSelectedCrypto(0)
+      } finally {
+        setLoadingCryptoHoldingsConversion(false)
+      }
+    }
+
+    convertCryptoHoldings()
+  }, [totalCryptoBalancePHP, globalCryptocurrency, globalCurrency, userEmail])
+
   const convertTotals = useCallback(async (w = wallets, l = loans) => {
     try {
       // Collect unique currencies that need conversion
