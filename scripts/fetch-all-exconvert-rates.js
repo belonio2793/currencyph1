@@ -40,7 +40,7 @@ const WORLD_CURRENCIES = [
   'YER', 'ZAR', 'ZMW', 'ZWL'
 ]
 
-async function fetchSingleRate(fromCurrency: string, toCurrency: string): Promise<number | null> {
+async function fetchSingleRate(fromCurrency, toCurrency) {
   try {
     const url = `https://api.exconvert.com/convert?access_key=${EXCONVERT_KEY}&from=${fromCurrency}&to=${toCurrency}&amount=1`
     
@@ -66,7 +66,7 @@ async function fetchSingleRate(fromCurrency: string, toCurrency: string): Promis
   }
 }
 
-async function storeRatesInDatabase(rates: any[]) {
+async function storeRatesInDatabase(rates) {
   if (rates.length === 0) return 0
 
   console.log(`💾 Storing ${rates.length} rates in database...`)
@@ -104,7 +104,7 @@ async function storeRatesInDatabase(rates: any[]) {
           rate: r.rate.toString(),
           source: 'exconvert',
           updated_at: new Date().toISOString(),
-          expires_at: new Date(Date.now() + 86400000).toISOString() // 24 hours
+          expires_at: new Date(Date.now() + 86400000).toISOString()
         })), { onConflict: 'from_currency,to_currency' })
 
       if (cryptoError) {
@@ -140,7 +140,7 @@ async function fetchAllRates() {
     const fromCurrency = WORLD_CURRENCIES[i]
 
     for (let j = 0; j < WORLD_CURRENCIES.length; j++) {
-      if (i === j) continue // Skip same currency
+      if (i === j) continue
 
       const toCurrency = WORLD_CURRENCIES[j]
       const rate = await fetchSingleRate(fromCurrency, toCurrency)
@@ -156,20 +156,16 @@ async function fetchAllRates() {
         failureCount++
       }
 
-      // Small delay between requests
       await new Promise(resolve => setTimeout(resolve, 150))
     }
 
-    // Progress logging
     const elapsed = ((Date.now() - startTime) / 1000).toFixed(1)
     const pairsProcessed = i + 1
     console.log(`⏳ Progress: ${pairsProcessed}/${WORLD_CURRENCIES.length} currencies (${successCount} success, ${failureCount} failed, ${elapsed}s)`)
   }
 
-  // Store all rates in database
   const stored = await storeRatesInDatabase(rates)
 
-  // Summary
   const totalTime = ((Date.now() - startTime) / 1000 / 60).toFixed(2)
   console.log(`\n✨ Fetch Complete!\n`)
   console.log(`📈 Results:`)
