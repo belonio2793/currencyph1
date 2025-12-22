@@ -26,7 +26,11 @@ import PaymentsHub from './PaymentsHub'
 export default function HomePage({ userId, userEmail, globalCurrency = 'PHP', setGlobalCurrency, globalCryptocurrency = 'BTC', setGlobalCryptocurrency, onTabChange, onShowAuth }) {
   const [wallets, setWallets] = useState([])
   const [loans, setLoans] = useState([])
+  const [cryptoWallets, setCryptoWallets] = useState([])
+  const [totalCryptoBalancePHP, setTotalCryptoBalancePHP] = useState(0)
+  const [cryptoPrices, setCryptoPrices] = useState({})
   const [loading, setLoading] = useState(true)
+  const [loadingCryptoWallets, setLoadingCryptoWallets] = useState(false)
   const [totalBalanceConverted, setTotalBalanceConverted] = useState(null)
   const [totalDebtConverted, setTotalDebtConverted] = useState(null)
   const [cryptoBalance, setCryptoBalance] = useState(null)
