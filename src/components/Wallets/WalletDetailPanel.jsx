@@ -68,7 +68,7 @@ export default function WalletDetailPanel({ wallet, userId, globalCurrency, onCl
           <div className="flex items-center gap-4">
             <div className={`p-4 rounded-lg ${isCrypto ? 'bg-orange-100' : 'bg-blue-100'}`}>
               <span className={`text-3xl ${isCrypto ? 'text-orange-600' : 'text-blue-600'}`}>
-                {isCrypto ? '₿' : '💵'}
+                {isCrypto ? '🪙' : '💵'}
               </span>
             </div>
             <div>
