@@ -549,7 +549,47 @@ export default function ReceiveMoney({ userId, globalCurrency = 'PHP' }) {
   if (loading) {
     return (
       <div className="max-w-7xl mx-auto px-6 py-6">
-        <div className="text-center text-slate-500">Loading...</div>
+        {!authStatus?.authenticated && userId && !userId.includes('guest') ? (
+          <div className="bg-amber-50 border border-amber-200 rounded-lg p-8 text-center">
+            <p className="text-amber-800 font-medium mb-4">Loading authentication status...</p>
+            <p className="text-sm text-amber-700 mb-6">Please wait while we verify your session.</p>
+            <button
+              onClick={() => {
+                setShowDiagnostics(!showDiagnostics)
+              }}
+              className="text-xs text-amber-700 underline"
+            >
+              {showDiagnostics ? 'Hide' : 'Show'} details
+            </button>
+            {showDiagnostics && (
+              <div className="mt-4 text-xs text-amber-700 font-mono text-left bg-white p-3 rounded border border-amber-100 inline-block">
+                <div>Auth Status: {authStatus?.authenticated ? 'Authenticated' : 'Not Authenticated'}</div>
+                <div>User ID: {userId}</div>
+              </div>
+            )}
+          </div>
+        ) : !authStatus?.authenticated ? (
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-8 text-center">
+            <p className="text-blue-800 font-medium mb-4">You need to be logged in</p>
+            <p className="text-sm text-blue-700 mb-6">Create an account or log in to use the receive money feature.</p>
+            <div className="flex gap-4 justify-center">
+              <button
+                onClick={() => window.location.href = '/login'}
+                className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
+              >
+                Log In
+              </button>
+              <button
+                onClick={() => window.location.href = '/register'}
+                className="px-6 py-2 border border-blue-600 text-blue-600 rounded-lg hover:bg-blue-50 transition-colors font-medium"
+              >
+                Create Account
+              </button>
+            </div>
+          </div>
+        ) : (
+          <div className="text-center text-slate-500">Loading...</div>
+        )}
       </div>
     )
   }
