@@ -384,23 +384,35 @@ export default function ReceiveMoney({ userId, globalCurrency = 'PHP' }) {
       const selectedWalletData = wallets.find(w => w.id === selectedWallet)
       const finalAmount = convertedAmount || parseFloat(amount)
       const finalCurrency = selectedWalletData?.currency_code || selectedCurrency
+      const recipientUserId = selectedGuestProfile?.id || selectedWallet
 
-      // Create transfer record
+      // Determine recipient - either guest profile or wallet user
+      const toUserId = selectedGuestProfile?.id || (selectedWalletData?.user_id || userId)
+      const fromUserId = userId || null
+
+      // Create transfer record with proper schema columns
       const transferData = {
-        user_id: userId || null,
-        guest_user_id: selectedGuestProfile?.id || null,
-        guest_name: selectedGuestProfile?.name || null,
-        wallet_id: selectedWallet,
-        amount: finalAmount,
-        currency: finalCurrency,
-        original_amount: parseFloat(amount),
-        original_currency: selectedCurrency,
-        conversion_rate: conversionRate,
-        method: selectedMethod,
-        crypto_network: selectedCryptoNetwork || null,
-        crypto_address: selectedDepositAddress?.address || null,
+        from_user_id: fromUserId,
+        to_user_id: toUserId,
+        from_wallet_id: selectedWallet || null,
+        to_wallet_id: selectedWallet || null,
+        sender_amount: parseFloat(amount),
+        sender_currency: selectedCurrency,
+        recipient_amount: finalAmount,
+        recipient_currency: finalCurrency,
+        exchange_rate: conversionRate || 1,
+        rate_source: 'manual',
+        rate_fetched_at: new Date().toISOString(),
         status: 'pending',
-        created_at: new Date().toISOString()
+        fee: 0,
+        description: selectedMethod === 'crypto' ? `Crypto deposit via ${selectedCryptoNetwork}` : `Payment via ${selectedMethod}`,
+        metadata: {
+          payment_method: selectedMethod,
+          crypto_network: selectedCryptoNetwork || null,
+          crypto_address: selectedDepositAddress?.address || null,
+          guest_name: selectedGuestProfile?.name || null,
+          guest_profile_id: selectedGuestProfile?.id || null
+        }
       }
 
       // Insert into public.transfers
