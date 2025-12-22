@@ -1,10 +1,14 @@
 # Exchange Rates Architecture & System-Wide Sync
 
-## Status: ⚠️ PARTIALLY SETUP (Missing Sync Trigger Added)
+## Status: ✅ COMPLETE - Direct ExConvert Integration
 
-You asked: *"are these rates and scripts and functions already setup to adjust all of the pairs as well across all the sql?"*
+You asked: *"setup crypto_rates to fetch directly from exconvert and also make sure its listed as exconvert if sourced"*
 
-**Short Answer:** Almost. The edge function fetches rates, but they weren't syncing to the `pairs` table (used by wallets, deposits, etc). I've added the missing migration to fix this.
+**Done!** Edge function now:
+- ✅ Fetches from ExConvert API (primary source)
+- ✅ Stores directly in BOTH `crypto_rates` AND `pairs` tables
+- ✅ Marks source as `'exconvert'` in both tables
+- ✅ No triggers needed (direct insertion only)
 
 ---
 
