@@ -42,8 +42,39 @@ export default function Rates() {
         throw new Error(`Failed to load rates: ${pairsRes.error.message}`)
       }
 
-      const pairsData = pairsRes.data || []
+      let pairsData = pairsRes.data || []
       console.log(`✅ Loaded ${pairsData.length} rate pairs from pairs table`)
+
+      // If pairs table is empty or all rates are null, fall back to legacy tables
+      const hasValidRates = pairsData.some(p => p.rate != null && p.rate !== '')
+      if (pairsData.length === 0 || !hasValidRates) {
+        console.warn('⚠️ Pairs table is empty or has no valid rates, falling back to currency_rates and cryptocurrency_rates')
+
+        const [currencyRatesRes, cryptoRatesRes] = await Promise.all([
+          supabase
+            .from('currency_rates')
+            .select('from_currency,to_currency,rate,updated_at'),
+          supabase
+            .from('cryptocurrency_rates')
+            .select('from_currency,to_currency,rate,updated_at')
+        ])
+
+        const fallbackData = []
+        if (currencyRatesRes.data) {
+          fallbackData.push(...currencyRatesRes.data.map(r => ({
+            ...r,
+            source_table: 'currency_rates'
+          })))
+        }
+        if (cryptoRatesRes.data) {
+          fallbackData.push(...cryptoRatesRes.data.map(r => ({
+            ...r,
+            source_table: 'cryptocurrency_rates'
+          })))
+        }
+        pairsData = fallbackData
+        console.log(`✅ Loaded ${pairsData.length} rates from fallback tables`)
+      }
 
       // Extract all unique currencies and cryptocurrencies from pairs table
       const uniqueCodes = new Set()
