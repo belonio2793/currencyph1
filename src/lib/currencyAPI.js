@@ -77,7 +77,11 @@ export const currencyAPI = {
           new Promise((_, reject) => setTimeout(() => reject(new Error('Edge function timeout')), 7000))
         ])
         clearTimeout(timeout)
-        if (!error && data && data.exchangeRates) {
+
+        // Check if service is unavailable
+        if (data && data.service_status === 'unavailable') {
+          console.warn('Rate service is unavailable')
+        } else if (!error && data && data.exchangeRates) {
           const now = new Date()
           const rates = {}
           CURRENCIES.forEach(currency => {
@@ -86,7 +90,9 @@ export const currencyAPI = {
               return
             }
             const rateVal = data.exchangeRates[currency.code]
-            rates[currency.code] = { ...currency, rate: typeof rateVal === 'number' ? rateVal : 0, lastUpdated: now }
+            // Validate rate is > 0 and finite
+            const validRate = typeof rateVal === 'number' && isFinite(rateVal) && rateVal > 0 ? rateVal : 0
+            rates[currency.code] = { ...currency, rate: validRate, lastUpdated: now }
           })
           return rates
         }
