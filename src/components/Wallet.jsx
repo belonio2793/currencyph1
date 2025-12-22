@@ -194,7 +194,7 @@ export default function Wallet({ userId, globalCurrency = 'PHP' }) {
                                 {wallet.currency_code}
                               </p>
                               <p className="text-2xl font-light text-slate-900">
-                                {wallet.currency_code === 'PHP' ? '₱' : wallet.currency_code === 'USD' ? '$' : wallet.currency_code === 'EUR' ? '€' : wallet.currency_code === 'GBP' ? '£' : wallet.currency_code}
+                                {wallet.symbol || (wallet.currency_code === 'PHP' ? '₱' : wallet.currency_code === 'USD' ? '$' : wallet.currency_code === 'EUR' ? '€' : wallet.currency_code === 'GBP' ? '£' : wallet.currency_code)}
                               </p>
                             </div>
                             {wallet.is_active && (
