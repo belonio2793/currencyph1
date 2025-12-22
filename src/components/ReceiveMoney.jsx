@@ -49,29 +49,7 @@ export default function ReceiveMoney({ userId, globalCurrency = 'PHP' }) {
 
   const searchInputRef = useRef(null)
 
-  const FIAT_METHODS = {
-    gcash: {
-      id: 'gcash',
-      name: 'GCash',
-      icon: '📱',
-      description: 'Mobile wallet payment'
-    },
-    bank: {
-      id: 'bank',
-      name: 'Bank Transfer',
-      icon: '🏦',
-      description: 'Direct bank transfer'
-    }
-  }
-
-  const CRYPTO_METHODS = {
-    crypto: {
-      id: 'crypto',
-      name: 'Cryptocurrency',
-      icon: '₿',
-      description: 'Bitcoin, Ethereum, and more'
-    }
-  }
+  const [availableMethods, setAvailableMethods] = useState({ fiat: [], crypto: [] })
 
   // Load initial data
   useEffect(() => {
