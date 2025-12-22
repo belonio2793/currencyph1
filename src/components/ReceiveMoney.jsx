@@ -907,7 +907,9 @@ export default function ReceiveMoney({ userId, globalCurrency = 'PHP' }) {
                   {/* Step 2: Payment Method */}
                   {step === 2 && (
                     <div className="space-y-6">
-                      <h3 className="text-lg font-medium text-slate-900">How will the payment be sent?</h3>
+                      <h3 className="text-lg font-medium text-slate-900">
+                        {isRequestMode && requestMode === 'custom_payment' ? 'How will guests pay?' : 'How will the payment be sent?'}
+                      </h3>
 
                       <div className="flex gap-4">
                         <button
