@@ -120,7 +120,7 @@ function SearchableCryptoSelect({ value, onChange, options, prices, label }) {
                     value === crypto ? 'bg-orange-50 text-orange-900 font-medium' : 'text-slate-700'
                   }`}
                 >
-                  {crypto} - {prices[crypto]?.toFixed(2) || '0.00'}
+                  {crypto} - {prices[crypto] && prices[crypto] > 0 ? prices[crypto].toFixed(2) : 'Service unavailable'}
                 </button>
               ))}
               {filtered.length === 0 && (
