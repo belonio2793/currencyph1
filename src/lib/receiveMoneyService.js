@@ -6,6 +6,103 @@ import { supabase } from './supabaseClient'
  */
 export const receiveMoneyService = {
   /**
+   * Search user profiles by email, phone, or name
+   * Returns non-sensitive profile data
+   */
+  async searchProfiles(searchQuery) {
+    try {
+      if (!searchQuery || searchQuery.trim().length < 2) {
+        return []
+      }
+
+      const query = searchQuery.toLowerCase().trim()
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('id, user_id, full_name, phone_number, profile_picture_url, created_at')
+        .or(`full_name.ilike.%${query}%,phone_number.ilike.%${query}%`)
+        .limit(10)
+
+      if (error) {
+        console.warn('Error searching profiles:', error)
+        return []
+      }
+
+      // Also search by email in auth if possible (via users table if accessible)
+      let emailResults = []
+      try {
+        const { data: users, error: userError } = await supabase
+          .from('users')
+          .select('id, email')
+          .ilike('email', `%${query}%`)
+          .limit(5)
+
+        if (!userError && users) {
+          emailResults = users
+        }
+      } catch (err) {
+        console.warn('Could not search users by email:', err)
+      }
+
+      // Merge results
+      const mergedResults = [
+        ...data.map(p => ({
+          id: p.user_id,
+          name: p.full_name,
+          phone: p.phone_number,
+          avatar: p.profile_picture_url,
+          source: 'profile'
+        })),
+        ...emailResults.filter(u => !data.find(p => p.user_id === u.id)).map(u => ({
+          id: u.id,
+          email: u.email,
+          name: u.email,
+          source: 'email'
+        }))
+      ]
+
+      return mergedResults
+    } catch (error) {
+      console.error('Error in searchProfiles:', error)
+      return []
+    }
+  },
+
+  /**
+   * Get available GCash and crypto deposit methods
+   */
+  async getAvailableDepositMethods() {
+    try {
+      // Get crypto addresses from wallets_house
+      const { data: cryptoAddresses, error: cryptoError } = await supabase
+        .from('wallets_house')
+        .select('id, currency, network, address, provider, metadata')
+        .eq('wallet_type', 'crypto')
+        .order('currency', { ascending: true })
+
+      if (cryptoError) {
+        console.warn('Error fetching crypto addresses:', cryptoError)
+      }
+
+      // Get GCash deposit methods (if stored in wallets_house or public.deposits)
+      const { data: gcashMethods, error: gcashError } = await supabase
+        .from('public.deposits')
+        .select('*')
+        .or('method.eq.gcash,method.eq.bank_transfer')
+
+      if (gcashError) {
+        console.warn('Error fetching GCash methods:', gcashError)
+      }
+
+      return {
+        crypto: cryptoAddresses || [],
+        fiat: gcashMethods || []
+      }
+    } catch (error) {
+      console.error('Error getting deposit methods:', error)
+      return { crypto: [], fiat: [] }
+    }
+  },
+  /**
    * Create a deposit record and optionally credit wallet
    */
   async recordDeposit(depositData) {
