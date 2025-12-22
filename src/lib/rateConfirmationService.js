@@ -35,6 +35,12 @@ export async function getLatestRateWithConfirmation(fromCurrency, toCurrency = '
     const rate = parseFloat(data.rate)
     const updatedAt = new Date(data.updated_at)
 
+    // Check if rate is valid (not 0.00 or NaN)
+    if (!isFinite(rate) || rate <= 0) {
+      console.warn(`Invalid rate returned for ${fromCurrency}/${toCurrency}: ${rate}`)
+      return null
+    }
+
     return {
       from_currency: fromCurrency,
       to_currency: toCurrency,
