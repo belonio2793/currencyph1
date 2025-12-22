@@ -1420,13 +1420,6 @@ export default function ReceiveMoney({ userId, globalCurrency = 'PHP' }) {
                     <p className="text-xs text-slate-600">Mobile wallet</p>
                   </div>
                 </div>
-                <div className="flex gap-2">
-                  <div className="flex-shrink-0 w-8 h-8 bg-green-100 rounded-full flex items-center justify-center text-sm font-semibold text-green-700">🏦</div>
-                  <div>
-                    <p className="font-medium text-slate-900">Bank Transfer</p>
-                    <p className="text-xs text-slate-600">Direct bank deposit</p>
-                  </div>
-                </div>
               </div>
             </div>
 
