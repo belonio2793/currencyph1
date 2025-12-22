@@ -259,5 +259,64 @@ export const preferencesManager = {
     } catch (e) {
       console.warn('Failed to save currency preferences:', e)
     }
+  },
+
+  // Default popular currencies and cryptos for rates page
+  getDefaultTrackedCurrencies: () => {
+    return {
+      fiat: ['PHP', 'USD', 'EUR', 'GBP', 'JPY', 'SGD', 'HKD', 'AUD', 'CAD', 'CHF'],
+      crypto: ['BTC', 'ETH', 'USDC', 'USDT', 'BNB', 'XRP', 'SOL', 'ADA', 'DOGE', 'MATIC']
+    }
+  },
+
+  // Get rates currencies preferences (which currencies user wants to track)
+  getRatesCurrencyPreferences: (userId) => {
+    try {
+      const key = userId ? `rates_currencies_${userId}` : 'rates_currencies_guest'
+      const stored = localStorage.getItem(key)
+      if (stored) {
+        return JSON.parse(stored)
+      }
+      return preferencesManager.getDefaultTrackedCurrencies()
+    } catch (e) {
+      console.warn('Failed to read rates currency preferences:', e)
+      return preferencesManager.getDefaultTrackedCurrencies()
+    }
+  },
+
+  // Set rates currencies preferences
+  setRatesCurrencyPreferences: async (userId, fiatCurrencies, cryptoCurrencies) => {
+    try {
+      const prefs = {
+        fiat: fiatCurrencies,
+        crypto: cryptoCurrencies,
+        updatedAt: new Date().toISOString()
+      }
+
+      const key = userId ? `rates_currencies_${userId}` : 'rates_currencies_guest'
+      localStorage.setItem(key, JSON.stringify(prefs))
+
+      // If logged in, also sync to database
+      if (userId && /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(userId)) {
+        const { error } = await supabase
+          .from('user_preferences')
+          .update({
+            other_preferences: {
+              ratesCurrencies: {
+                fiat: fiatCurrencies,
+                crypto: cryptoCurrencies
+              }
+            },
+            updated_at: new Date().toISOString()
+          })
+          .eq('user_id', userId)
+
+        if (error) {
+          console.warn('Failed to sync rates currency preferences to DB:', error)
+        }
+      }
+    } catch (e) {
+      console.warn('Failed to save rates currency preferences:', e)
+    }
   }
 }
