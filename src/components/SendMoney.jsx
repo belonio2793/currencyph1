@@ -136,6 +136,7 @@ export default function SendMoney({ userId }) {
   const handleAddBeneficiary = async (e) => {
     e.preventDefault()
     setError('')
+    setSuccess('')
 
     if (!selectedRecipient) {
       setError('Please select a recipient from the search results')
@@ -143,19 +144,26 @@ export default function SendMoney({ userId }) {
     }
 
     try {
-      await currencyAPI.addBeneficiary(userId, {
+      const result = await currencyAPI.addBeneficiary(userId, {
+        recipient_id: selectedRecipient.id,
         recipient_email: selectedRecipient.email,
         recipient_name: selectedRecipient.full_name || selectedRecipient.email.split('@')[0],
-        recipient_id: selectedRecipient.id,
-        country_code: 'PH'
+        recipient_phone: selectedRecipient.phone_number || null,
+        country_code: selectedRecipient.country_code || 'PH',
+        relationship: 'Other',
+        is_favorite: false
       })
-      setSuccess('Recipient saved!')
-      setTimeout(() => {
-        setSuccess('')
-        loadData()
-      }, 2000)
+
+      if (result) {
+        setSuccess('Recipient saved successfully!')
+        setTimeout(() => {
+          setSuccess('')
+          loadData()
+        }, 2000)
+      }
     } catch (err) {
       setError(err.message || 'Failed to save recipient')
+      console.error('Add beneficiary error:', err)
     }
   }
 
