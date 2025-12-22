@@ -537,17 +537,21 @@ async function handle(req: Request): Promise<Response> {
           cached: true,
           fetched_at: last.fetched_at,
           total_rates: Object.keys(last.exchange_rates || {}).length + Object.keys(last.crypto_prices || {}).length,
-          warning: 'Using stale cached data - APIs currently unavailable'
+          warning: 'Using stale cached data - APIs currently unavailable',
+          service_status: 'degraded',
+          message: 'Service temporarily unavailable - using cached rates'
         })
       }
-      // fallback to empty
+      // fallback to empty - service is unavailable
       await upsertCachedRates({}, {}, 'fallback')
       return jsonResponse({
         exchangeRates: {},
         cryptoPrices: {},
         cached: false,
-        error: 'All APIs failed and no cached data available'
-      }, 500)
+        error: 'Service is temporarily unavailable - please try again later',
+        service_status: 'unavailable',
+        message: 'Rate conversion service unavailable'
+      }, 503)
     }
 
     // Store all rates in database
