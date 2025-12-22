@@ -1037,55 +1037,182 @@ export default function ReceiveMoney({ userId, globalCurrency = 'PHP' }) {
                       )}
 
                       {isRequestMode && (
-                        <div>
-                          <label className="block text-sm font-medium text-slate-700 mb-2">Search User Profile</label>
-                          <div className="relative">
-                            <input
-                              ref={searchInputRef}
-                              type="text"
-                              value={guestSearch}
-                              onChange={e => setGuestSearch(e.target.value)}
-                              onFocus={() => guestSearch.length > 0 && setShowSearchResults(true)}
-                              placeholder="Search by name, email, or phone"
-                              className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent"
-                            />
+                        <div className="space-y-4">
+                          {/* Wallet Selection for Request Mode */}
+                          <div>
+                            <label className="block text-sm font-medium text-slate-700 mb-3">Select Wallet to Receive Into</label>
+                            {wallets.length === 0 ? (
+                              <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
+                                <p className="text-sm text-amber-800">
+                                  No wallets found.{' '}
+                                  <a href="/wallets" className="font-medium underline">
+                                    Create a wallet
+                                  </a>{' '}
+                                  first.
+                                </p>
+                              </div>
+                            ) : (
+                              <div className="relative" ref={walletDropdownRef}>
+                                {/* Search Input */}
+                                <input
+                                  type="text"
+                                  value={walletSearch}
+                                  onChange={(e) => {
+                                    setWalletSearch(e.target.value)
+                                    setShowWalletDropdown(true)
+                                  }}
+                                  onFocus={() => setShowWalletDropdown(true)}
+                                  placeholder="Search by currency, balance, or account..."
+                                  className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent"
+                                />
 
-                            {showSearchResults && guestSearchResults.length > 0 && (
-                              <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-slate-200 rounded-lg shadow-lg z-50 max-h-64 overflow-y-auto">
-                                {guestSearchResults.map((profile, idx) => (
-                                  <button
-                                    key={idx}
-                                    type="button"
-                                    onClick={() => handleSelectGuestProfile(profile)}
-                                    className="w-full text-left px-4 py-3 hover:bg-blue-50 border-b border-slate-100 last:border-b-0 transition-colors"
-                                  >
-                                    <div className="font-medium text-slate-900">{profile.name}</div>
-                                    <div className="text-xs text-slate-500 mt-1">
-                                      {profile.email}
-                                    </div>
-                                  </button>
-                                ))}
+                                {/* Dropdown Results */}
+                                {showWalletDropdown && (
+                                  <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-slate-300 rounded-lg shadow-xl z-50 max-h-72 overflow-y-auto animate-in fade-in slide-in-from-top-2">
+                                    {filteredWallets.length === 0 ? (
+                                      <div className="px-4 py-6 text-sm text-slate-500 text-center">
+                                        <p className="font-medium mb-1">No wallets found</p>
+                                        <p className="text-xs">Try a different search term</p>
+                                      </div>
+                                    ) : (
+                                      <div className="py-1">
+                                        <p className="px-4 py-2 text-xs font-semibold text-slate-500 uppercase tracking-wide">
+                                          {filteredWallets.length} {filteredWallets.length === 1 ? 'wallet' : 'wallets'} found
+                                        </p>
+                                        {filteredWallets.map(wallet => {
+                                          const isSelected = selectedWallet === wallet.id
+                                          return (
+                                            <button
+                                              key={wallet.id}
+                                              type="button"
+                                              onClick={() => {
+                                                setSelectedWallet(wallet.id)
+                                                setWalletSearch('')
+                                                setShowWalletDropdown(false)
+                                              }}
+                                              className={`w-full text-left px-4 py-3 transition-colors ${
+                                                isSelected
+                                                  ? 'bg-blue-100 border-l-4 border-blue-600'
+                                                  : 'border-l-4 border-transparent hover:bg-slate-50'
+                                              }`}
+                                            >
+                                              <div className="flex items-start justify-between gap-3">
+                                                <div className="flex-1 min-w-0">
+                                                  <div className="font-semibold text-slate-900">{wallet.currency_code}</div>
+                                                  {wallet.currency_name && (
+                                                    <div className="text-xs text-slate-600">{wallet.currency_name}</div>
+                                                  )}
+                                                  <div className="text-sm text-slate-700 mt-1 font-medium">
+                                                    {getCurrencySymbol(wallet.currency_code)}{formatNumber(wallet.balance)}
+                                                  </div>
+                                                  {wallet.account_number && (
+                                                    <div className="text-xs text-slate-500 mt-1">
+                                                      Acct: {wallet.account_number}
+                                                    </div>
+                                                  )}
+                                                </div>
+                                                {isSelected && (
+                                                  <div className="text-blue-600 font-bold text-lg mt-1 flex-shrink-0">✓</div>
+                                                )}
+                                              </div>
+                                            </button>
+                                          )
+                                        })}
+                                      </div>
+                                    )}
+                                  </div>
+                                )}
+
+                                {/* Selected Wallet Display */}
+                                {selectedWallet && !showWalletDropdown && (
+                                  <div className="mt-2 bg-blue-50 border border-blue-200 rounded-lg p-4">
+                                    {(() => {
+                                      const selected = wallets.find(w => w.id === selectedWallet)
+                                      return selected ? (
+                                        <div className="space-y-2">
+                                          <div className="flex items-center justify-between">
+                                            <div>
+                                              <div className="font-semibold text-slate-900">{selected.currency_code}</div>
+                                              {selected.currency_name && (
+                                                <div className="text-xs text-slate-600">{selected.currency_name}</div>
+                                              )}
+                                            </div>
+                                            <button
+                                              type="button"
+                                              onClick={() => setShowWalletDropdown(true)}
+                                              className="text-sm text-blue-600 hover:text-blue-700 font-medium underline"
+                                            >
+                                              Change
+                                            </button>
+                                          </div>
+                                          <div className="text-sm font-medium text-slate-700">
+                                            Balance: {getCurrencySymbol(selected.currency_code)}{formatNumber(selected.balance)}
+                                          </div>
+                                          {selected.account_number && (
+                                            <div className="text-xs text-slate-600">
+                                              Account: {selected.account_number}
+                                            </div>
+                                          )}
+                                        </div>
+                                      ) : null
+                                    })()}
+                                  </div>
+                                )}
                               </div>
                             )}
                           </div>
 
-                          {selectedGuestProfile && (
-                            <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-                              <div className="flex justify-between items-start">
-                                <div>
-                                  <p className="font-medium text-slate-900">{selectedGuestProfile.name}</p>
-                                  <p className="text-sm text-slate-600 mt-1">{selectedGuestProfile.email}</p>
+                          {/* Guest Profile Search */}
+                          <div>
+                            <label className="block text-sm font-medium text-slate-700 mb-2">Who is requesting from you?</label>
+                            <div className="relative">
+                              <input
+                                ref={searchInputRef}
+                                type="text"
+                                value={guestSearch}
+                                onChange={e => setGuestSearch(e.target.value)}
+                                onFocus={() => guestSearch.length > 0 && setShowSearchResults(true)}
+                                placeholder="Search by name, email, or phone"
+                                className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent"
+                              />
+
+                              {showSearchResults && guestSearchResults.length > 0 && (
+                                <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-slate-200 rounded-lg shadow-lg z-50 max-h-64 overflow-y-auto">
+                                  {guestSearchResults.map((profile, idx) => (
+                                    <button
+                                      key={idx}
+                                      type="button"
+                                      onClick={() => handleSelectGuestProfile(profile)}
+                                      className="w-full text-left px-4 py-3 hover:bg-blue-50 border-b border-slate-100 last:border-b-0 transition-colors"
+                                    >
+                                      <div className="font-medium text-slate-900">{profile.name}</div>
+                                      <div className="text-xs text-slate-500 mt-1">
+                                        {profile.email}
+                                      </div>
+                                    </button>
+                                  ))}
                                 </div>
-                                <button
-                                  type="button"
-                                  onClick={() => setSelectedGuestProfile(null)}
-                                  className="text-xs px-3 py-1 border border-slate-300 rounded hover:bg-slate-100"
-                                >
-                                  Change
-                                </button>
-                              </div>
+                              )}
                             </div>
-                          )}
+
+                            {selectedGuestProfile && (
+                              <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                                <div className="flex justify-between items-start">
+                                  <div>
+                                    <p className="font-medium text-slate-900">{selectedGuestProfile.name}</p>
+                                    <p className="text-sm text-slate-600 mt-1">{selectedGuestProfile.email}</p>
+                                  </div>
+                                  <button
+                                    type="button"
+                                    onClick={() => setSelectedGuestProfile(null)}
+                                    className="text-xs px-3 py-1 border border-slate-300 rounded hover:bg-slate-100"
+                                  >
+                                    Change
+                                  </button>
+                                </div>
+                              </div>
+                            )}
+                          </div>
                         </div>
                       )}
 
