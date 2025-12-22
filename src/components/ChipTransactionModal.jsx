@@ -128,14 +128,20 @@ export default function ChipTransactionModal({ open, onClose, userId, onTransact
             <div>
               <h3 className="text-sm font-semibold text-slate-900 mb-3">Available Packages</h3>
               <div className={`grid ${isMobile ? 'grid-cols-2' : 'grid-cols-3'} gap-2`}>
-                {packages.slice(0, 6).map((pkg) => (
-                  <div key={pkg.id} className="border border-slate-200 rounded p-2 text-center text-xs">
-                    <div className="font-semibold text-slate-900">
-                      {(Number(pkg.chip_amount) + Number(pkg.bonus_chips || 0)).toLocaleString()}
+                {packages.slice(0, 6).map((pkg) => {
+                  if (!pkg || !pkg.id) return null
+                  const chipAmount = Number(pkg.chip_amount || 0)
+                  const bonusAmount = Number(pkg.bonus_chips || 0)
+                  const totalChips = chipAmount + bonusAmount
+                  return (
+                    <div key={pkg.id} className="border border-slate-200 rounded p-2 text-center text-xs">
+                      <div className="font-semibold text-slate-900">
+                        {totalChips.toLocaleString()}
+                      </div>
+                      <div className="text-slate-600">chips</div>
                     </div>
-                    <div className="text-slate-600">chips</div>
-                  </div>
-                ))}
+                  )
+                })}
               </div>
             </div>
           )}
