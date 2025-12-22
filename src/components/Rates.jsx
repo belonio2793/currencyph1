@@ -1,12 +1,11 @@
 import { useState, useEffect, useMemo } from 'react'
 import { supabase } from '../lib/supabaseClient'
-import { preferencesManager } from '../lib/preferencesManager'
 import { formatLastUpdated, formatFullDateTime } from '../lib/dateTimeUtils'
-import { getCurrencySymbol } from '../lib/currencyManager'
 import CurrencyCryptoToggle from './FiatCryptoToggle'
 
 export default function Rates() {
   const [currencies, setCurrencies] = useState({})
+  const [allPairs, setAllPairs] = useState([])
   const [rates, setRates] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
@@ -23,165 +22,60 @@ export default function Rates() {
   const [sortBy, setSortBy] = useState('code')
   const [sortDirection, setSortDirection] = useState('asc')
   const [favorites, setFavorites] = useState(['PHP', 'USD', 'EUR', 'BTC', 'ETH'])
-  const [trackedCurrencies, setTrackedCurrencies] = useState(preferencesManager.getDefaultTrackedCurrencies())
-  const [customizationOpen, setCustomizationOpen] = useState(false)
-  const [displayFormat, setDisplayFormat] = useState('code-symbol')
-  const [showSymbolInConverter, setShowSymbolInConverter] = useState(true)
-  const [availableFiats, setAvailableFiats] = useState([])
-  const [availableCryptos, setAvailableCryptos] = useState([])
 
-  // Helper to get currency symbol from metadata or fallback
-  const getSymbolForCurrency = (code, metadata) => {
-    return metadata?.symbol || getCurrencySymbol(code) || '$'
-  }
-
-  // Format currency display based on selected format
-  const formatCurrencyDisplay = (code, metadata) => {
-    const symbol = getSymbolForCurrency(code, metadata)
-    const name = metadata?.name || code
-
-    switch (displayFormat) {
-      case 'code-only':
-        return code
-      case 'code-symbol':
-        return `${code} ${symbol}`
-      case 'code-name':
-        return `${code} - ${name}`
-      case 'symbol-name':
-        return `${symbol} ${name}`
-      default:
-        return code
-    }
-  }
-
-  // Format for converter dropdown (shorter format)
-  const formatConverterDisplay = (code, metadata) => {
-    const symbol = getSymbolForCurrency(code, metadata)
-    return showSymbolInConverter ? `${code} ${symbol}` : code
-  }
-
-  // Load all available currencies from pairs table
-  useEffect(() => {
-    const loadAvailableCurrencies = async () => {
-      try {
-        const { data, error } = await supabase
-          .from('pairs')
-          .select('from_currency, to_currency')
-
-        if (error) throw error
-
-        const codes = new Set()
-        if (data) {
-          data.forEach(pair => {
-            if (pair.from_currency) codes.add(pair.from_currency)
-            if (pair.to_currency) codes.add(pair.to_currency)
-          })
-        }
-
-        const fiats = []
-        const cryptos = []
-
-        const codeArray = Array.from(codes)
-
-        const [currenciesRes, cryptosRes] = await Promise.all([
-          supabase
-            .from('currencies')
-            .select('code')
-            .in('code', codeArray),
-          supabase
-            .from('cryptocurrencies')
-            .select('code')
-            .in('code', codeArray)
-        ])
-
-        if (currenciesRes.data) {
-          fiats.push(...currenciesRes.data.map(c => c.code).sort())
-        }
-
-        if (cryptosRes.data) {
-          cryptos.push(...cryptosRes.data.map(c => c.code).sort())
-        }
-
-        setAvailableFiats(fiats)
-        setAvailableCryptos(cryptos)
-      } catch (err) {
-        console.error('Error loading available currencies:', err)
-      }
-    }
-
-    loadAvailableCurrencies()
-  }, [])
-
-  // Load saved preferences on mount
-  useEffect(() => {
-    const saved = preferencesManager.getRatesCurrencyPreferences(null)
-    setTrackedCurrencies(saved)
-  }, [])
-
+  // Load all pairs from public.pairs table
   useEffect(() => {
     loadData()
     const interval = setInterval(loadData, 5 * 60 * 1000)
     return () => clearInterval(interval)
-  }, [trackedCurrencies])
+  }, [])
 
   const loadData = async () => {
     try {
       setLoading(true)
       setError(null)
 
-      const trackedArray = Array.from(new Set([...trackedCurrencies.fiat, ...trackedCurrencies.crypto]))
-      console.log(`📥 Fetching rates for ${trackedArray.length} tracked currencies...`)
+      // Fetch all pairs from the pairs table
+      const { data: pairsData, error: pairsError } = await supabase
+        .from('pairs')
+        .select('from_currency, to_currency, rate, updated_at')
 
-      if (trackedArray.length === 0) {
+      if (pairsError) throw pairsError
+
+      console.log(`📥 Fetched ${pairsData?.length || 0} pairs from database`)
+      setAllPairs(pairsData || [])
+
+      // Get unique currency codes from pairs
+      const codes = new Set()
+      if (pairsData) {
+        pairsData.forEach(pair => {
+          if (pair.from_currency) codes.add(pair.from_currency)
+          if (pair.to_currency) codes.add(pair.to_currency)
+        })
+      }
+
+      const codeArray = Array.from(codes)
+      console.log(`📊 Found ${codeArray.length} unique currencies/cryptos`)
+
+      if (codeArray.length === 0) {
         setRates([])
-        setError('No currencies selected. Please customize tracked currencies.')
+        setError('No currency pairs available in database.')
         setLoading(false)
         return
       }
 
-      const [pairsFromRes, pairstoRes] = await Promise.all([
-        supabase
-          .from('pairs')
-          .select('from_currency,to_currency,rate,source_table,updated_at')
-          .in('from_currency', trackedArray),
-        supabase
-          .from('pairs')
-          .select('from_currency,to_currency,rate,source_table,updated_at')
-          .in('to_currency', trackedArray)
-      ])
-
-      if (pairsFromRes.error) {
-        console.error('❌ pairs query failed:', pairsFromRes.error.message)
-        throw new Error(`Failed to fetch rates: ${pairsFromRes.error.message}`)
-      }
-
-      const pairsMap = new Map()
-      const processedPairs = [
-        ...(pairsFromRes.data || []),
-        ...(pairstoRes.data || [])
-      ]
-
-      processedPairs.forEach(pair => {
-        const key = `${pair.from_currency}-${pair.to_currency}`
-        if (!pairsMap.has(key)) {
-          pairsMap.set(key, pair)
-        }
-      })
-
-      const allPairs = Array.from(pairsMap.values())
-      console.log(`✅ Fetched ${allPairs.length} pairs for tracked currencies`)
-
+      // Fetch metadata for all codes
       let allMetadata = {}
 
       const [currenciesRes, cryptosRes] = await Promise.all([
         supabase
           .from('currencies')
           .select('code,name,type,symbol,decimals,is_default,active')
-          .in('code', trackedArray),
+          .in('code', codeArray),
         supabase
           .from('cryptocurrencies')
           .select('code,name,coingecko_id')
-          .in('code', trackedArray)
+          .in('code', codeArray)
       ])
 
       if (currenciesRes.data) {
@@ -196,13 +90,13 @@ export default function Rates() {
         })
       }
 
-      trackedArray.forEach(code => {
+      // Add entries for codes without metadata
+      codeArray.forEach(code => {
         if (!allMetadata[code]) {
-          const type = trackedCurrencies.crypto.includes(code) ? 'cryptocurrency' : 'currency'
           allMetadata[code] = {
             code,
             name: code,
-            type,
+            type: 'unknown',
             symbol: '',
             decimals: 2
           }
@@ -210,31 +104,32 @@ export default function Rates() {
       })
 
       setCurrencies(allMetadata)
-      console.log(`📋 Loaded metadata for ${Object.keys(allMetadata).length} currencies`)
+      console.log(`📋 Loaded metadata for ${Object.keys(allMetadata).length} currencies/cryptos`)
 
+      // Build rates list - one entry per unique currency/crypto code
       const ratesByCode = {}
+      const timestamps = []
 
-      trackedArray.forEach(code => {
-        if (!ratesByCode[code]) {
-          ratesByCode[code] = {
+      codeArray.forEach(code => {
+        ratesByCode[code] = {
+          code,
+          rate: null,
+          metadata: allMetadata[code] || {
             code,
-            rate: null,
-            metadata: allMetadata[code] || {
-              code,
-              name: code,
-              type: trackedCurrencies.crypto.includes(code) ? 'cryptocurrency' : 'currency',
-              symbol: '',
-              decimals: 2
-            },
-            source: 'pairs',
-            updatedAt: new Date().toISOString()
-          }
+            name: code,
+            type: 'unknown',
+            symbol: '',
+            decimals: 2
+          },
+          updatedAt: new Date().toISOString()
         }
       })
 
-      let timestamps = []
-      allPairs.forEach(pair => {
-        if (pair.updated_at) timestamps.push(new Date(pair.updated_at))
+      // Find rates against PHP (base currency)
+      pairsData?.forEach(pair => {
+        if (pair.updated_at) {
+          timestamps.push(new Date(pair.updated_at))
+        }
 
         if (pair.rate && isFinite(Number(pair.rate)) && Number(pair.rate) > 0) {
           if (pair.from_currency === 'PHP' && pair.to_currency && ratesByCode[pair.to_currency]) {
@@ -254,12 +149,14 @@ export default function Rates() {
         }
       })
 
+      // Get the most recent timestamp
       let mostRecentTimestamp = new Date()
       if (timestamps.length > 0) {
         timestamps.sort((a, b) => b - a)
         mostRecentTimestamp = timestamps[0]
       }
 
+      // Sort: rates with values first, then without
       const ratesWithValues = Object.values(ratesByCode)
         .filter(r => r.rate !== null && isFinite(r.rate) && r.rate > 0)
         .sort((a, b) => a.code.localeCompare(b.code))
@@ -272,14 +169,13 @@ export default function Rates() {
 
       setRates(validRates)
       setLastUpdated(mostRecentTimestamp)
-      console.log(`✅ Final rates list: ${validRates.length} unique items (${ratesWithValues.length} with rates)`)
+      console.log(`✅ Final rates list: ${validRates.length} items (${ratesWithValues.length} with rates)`)
     } catch (err) {
       const errorMsg = err?.message || String(err) || 'Unknown error'
       console.error('❌ Error loading rates:', errorMsg)
-      console.error('Full error object:', err)
 
       if (err.message?.includes('Failed to fetch')) {
-        setError(`Network error - could not connect to database. Please check your internet connection.`)
+        setError(`Network error - could not connect to database.`)
       } else if (err.message?.includes('CORS')) {
         setError(`CORS error - check Supabase configuration`)
       } else {
@@ -293,6 +189,7 @@ export default function Rates() {
   const filteredRates = useMemo(() => {
     let filtered = rates
 
+    // Filter out currencies without rate values
     filtered = filtered.filter(r => r.rate !== null && isFinite(r.rate) && r.rate > 0)
 
     if (typeFilter !== 'all') {
@@ -376,40 +273,12 @@ export default function Rates() {
     setTypeFilter(type)
   }
 
-  const toggleCurrencyTracking = (code) => {
-    const newTracked = { ...trackedCurrencies }
-    if (trackedCurrencies.fiat.includes(code)) {
-      newTracked.fiat = newTracked.fiat.filter(c => c !== code)
-    } else if (trackedCurrencies.crypto.includes(code)) {
-      newTracked.crypto = newTracked.crypto.filter(c => c !== code)
-    } else {
-      const defaultCryptos = preferencesManager.getDefaultTrackedCurrencies().crypto
-      if (defaultCryptos.includes(code)) {
-        newTracked.crypto = [...newTracked.crypto, code]
-      } else {
-        newTracked.fiat = [...newTracked.fiat, code]
-      }
-    }
-    setTrackedCurrencies(newTracked)
-    preferencesManager.setRatesCurrencyPreferences(null, newTracked.fiat, newTracked.crypto)
-  }
-
-  const resetToDefaults = () => {
-    const defaults = preferencesManager.getDefaultTrackedCurrencies()
-    setTrackedCurrencies(defaults)
-    preferencesManager.setRatesCurrencyPreferences(null, defaults.fiat, defaults.crypto)
-  }
-
   const formatNumber = (num, decimals = 2) => {
     if (num == null || !isFinite(num) || num <= 0) return '—'
     return Number(num).toLocaleString(undefined, {
       minimumFractionDigits: Math.min(decimals, 2),
       maximumFractionDigits: Math.max(decimals, 6)
     })
-  }
-
-  const getCurrencyIcon = (type) => {
-    return type === 'cryptocurrency' ? '₿' : '$'
   }
 
   if (loading) {
@@ -469,7 +338,7 @@ export default function Rates() {
                     >
                       {rates.map(r => (
                         <option key={r.code} value={r.code}>
-                          {formatConverterDisplay(r.code, r.metadata)} - {r.metadata?.name || r.code}
+                          {r.code} - {r.metadata?.name || r.code}
                         </option>
                       ))}
                     </select>
@@ -499,7 +368,7 @@ export default function Rates() {
                     >
                       {rates.map(r => (
                         <option key={r.code} value={r.code}>
-                          {formatConverterDisplay(r.code, r.metadata)} - {r.metadata?.name || r.code}
+                          {r.code} - {r.metadata?.name || r.code}
                         </option>
                       ))}
                     </select>
@@ -510,10 +379,10 @@ export default function Rates() {
                     <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg p-6 border border-blue-200">
                       <p className="text-sm text-slate-600 mb-2">Result</p>
                       <div className="text-4xl font-bold text-blue-600 mb-2">
-                        {result.amount} {showSymbolInConverter && toCurrency ? getSymbolForCurrency(selectedTo, toCurrency.metadata) : selectedTo}
+                        {result.amount} {selectedTo}
                       </div>
                       <p className="text-sm text-slate-600">
-                        1 {formatConverterDisplay(selectedFrom, fromCurrency?.metadata)} = {formatNumber(result.rate, toCurrency?.metadata?.decimals || 2)} {showSymbolInConverter && toCurrency ? getSymbolForCurrency(selectedTo, toCurrency.metadata) : selectedTo}
+                        1 {selectedFrom} = {formatNumber(result.rate, toCurrency?.metadata?.decimals || 2)} {selectedTo}
                       </p>
                     </div>
                   )}
@@ -672,182 +541,6 @@ export default function Rates() {
 
             {/* Right Column - Favorites and Info */}
             <div className="lg:col-span-1 space-y-6">
-              {/* Display Customization Card */}
-              <div className="bg-white rounded-2xl shadow-lg p-6 border border-slate-200">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-lg font-semibold text-slate-900">Display Settings</h3>
-                  <button
-                    onClick={() => setCustomizationOpen(!customizationOpen)}
-                    className="text-sm px-3 py-1 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition font-medium"
-                  >
-                    {customizationOpen ? 'Done' : 'Configure'}
-                  </button>
-                </div>
-
-                {customizationOpen ? (
-                  <div className="space-y-5">
-                    {/* Currency Display Format */}
-                    <div className="border-b border-slate-200 pb-4">
-                      <label className="block text-sm font-medium text-slate-700 mb-3">Currency Display Format</label>
-                      <div className="space-y-2">
-                        <label className="flex items-center gap-2 p-2 rounded hover:bg-slate-50 cursor-pointer">
-                          <input
-                            type="radio"
-                            name="displayFormat"
-                            value="code-only"
-                            checked={displayFormat === 'code-only'}
-                            onChange={(e) => setDisplayFormat(e.target.value)}
-                            className="w-4 h-4 text-blue-600"
-                          />
-                          <span className="text-sm text-slate-700">Code only</span>
-                          <span className="text-xs text-slate-500 ml-auto">(USD)</span>
-                        </label>
-                        <label className="flex items-center gap-2 p-2 rounded hover:bg-slate-50 cursor-pointer">
-                          <input
-                            type="radio"
-                            name="displayFormat"
-                            value="code-symbol"
-                            checked={displayFormat === 'code-symbol'}
-                            onChange={(e) => setDisplayFormat(e.target.value)}
-                            className="w-4 h-4 text-blue-600"
-                          />
-                          <span className="text-sm text-slate-700">Code + Symbol</span>
-                          <span className="text-xs text-slate-500 ml-auto">(USD $)</span>
-                        </label>
-                        <label className="flex items-center gap-2 p-2 rounded hover:bg-slate-50 cursor-pointer">
-                          <input
-                            type="radio"
-                            name="displayFormat"
-                            value="code-name"
-                            checked={displayFormat === 'code-name'}
-                            onChange={(e) => setDisplayFormat(e.target.value)}
-                            className="w-4 h-4 text-blue-600"
-                          />
-                          <span className="text-sm text-slate-700">Code + Name</span>
-                          <span className="text-xs text-slate-500 ml-auto">(USD - US Dollar)</span>
-                        </label>
-                        <label className="flex items-center gap-2 p-2 rounded hover:bg-slate-50 cursor-pointer">
-                          <input
-                            type="radio"
-                            name="displayFormat"
-                            value="symbol-name"
-                            checked={displayFormat === 'symbol-name'}
-                            onChange={(e) => setDisplayFormat(e.target.value)}
-                            className="w-4 h-4 text-blue-600"
-                          />
-                          <span className="text-sm text-slate-700">Symbol + Name</span>
-                          <span className="text-xs text-slate-500 ml-auto">($ US Dollar)</span>
-                        </label>
-                      </div>
-                    </div>
-
-                    {/* Converter Display */}
-                    <div className="border-b border-slate-200 pb-4">
-                      <label className="flex items-center gap-2 p-2 rounded hover:bg-slate-50 cursor-pointer">
-                        <input
-                          type="checkbox"
-                          checked={showSymbolInConverter}
-                          onChange={(e) => setShowSymbolInConverter(e.target.checked)}
-                          className="w-4 h-4 text-blue-600 rounded"
-                        />
-                        <span className="text-sm font-medium text-slate-700">Show symbols in converter</span>
-                      </label>
-                    </div>
-
-                    {/* Tracked Currencies Section */}
-                    <div>
-                      <label className="block text-sm font-medium text-slate-700 mb-2">Fiat Currencies</label>
-                      <div className="grid grid-cols-2 gap-2 max-h-64 overflow-y-auto">
-                        {availableFiats.length > 0 ? (
-                          availableFiats.map(code => (
-                            <label key={code} className="flex items-center gap-2 p-2 rounded hover:bg-slate-50 cursor-pointer">
-                              <input
-                                type="checkbox"
-                                checked={trackedCurrencies.fiat.includes(code)}
-                                onChange={() => toggleCurrencyTracking(code)}
-                                className="w-4 h-4 text-blue-600 rounded"
-                              />
-                              <span className="text-sm text-slate-700">{code}</span>
-                            </label>
-                          ))
-                        ) : (
-                          <p className="text-xs text-slate-500">Loading currencies...</p>
-                        )}
-                      </div>
-                    </div>
-
-                    <div className="border-t border-slate-200 pt-4">
-                      <label className="block text-sm font-medium text-slate-700 mb-2">Cryptocurrencies</label>
-                      <div className="grid grid-cols-2 gap-2 max-h-64 overflow-y-auto">
-                        {availableCryptos.length > 0 ? (
-                          availableCryptos.map(code => (
-                            <label key={code} className="flex items-center gap-2 p-2 rounded hover:bg-slate-50 cursor-pointer">
-                              <input
-                                type="checkbox"
-                                checked={trackedCurrencies.crypto.includes(code)}
-                                onChange={() => toggleCurrencyTracking(code)}
-                                className="w-4 h-4 text-blue-600 rounded"
-                              />
-                              <span className="text-sm text-slate-700">{code}</span>
-                            </label>
-                          ))
-                        ) : (
-                          <p className="text-xs text-slate-500">Loading cryptocurrencies...</p>
-                        )}
-                      </div>
-                    </div>
-
-                    <button
-                      onClick={resetToDefaults}
-                      className="w-full mt-4 px-4 py-2 text-sm bg-slate-100 text-slate-700 rounded-lg hover:bg-slate-200 transition font-medium"
-                    >
-                      Reset to Defaults
-                    </button>
-                  </div>
-                ) : (
-                  <div className="space-y-3">
-                    <div>
-                      <p className="text-xs text-slate-600 font-medium mb-2">Display Format</p>
-                      <span className="inline-block px-2 py-1 bg-blue-100 text-blue-700 text-xs rounded-full">
-                        {displayFormat === 'code-only' && 'Code only'}
-                        {displayFormat === 'code-symbol' && 'Code + Symbol'}
-                        {displayFormat === 'code-name' && 'Code + Name'}
-                        {displayFormat === 'symbol-name' && 'Symbol + Name'}
-                      </span>
-                    </div>
-                    <div className="border-t border-slate-200 pt-3">
-                      <p className="text-xs text-slate-600 font-medium">Tracked Currencies</p>
-                      <p className="text-xs text-slate-600 font-medium mt-2">Fiat ({trackedCurrencies.fiat.length})</p>
-                      <div className="flex flex-wrap gap-1 mb-2">
-                        {trackedCurrencies.fiat.slice(0, 6).map(code => (
-                          <span key={code} className="px-2 py-1 bg-blue-100 text-blue-700 text-xs rounded-full">
-                            {code}
-                          </span>
-                        ))}
-                        {trackedCurrencies.fiat.length > 6 && (
-                          <span className="px-2 py-1 bg-slate-100 text-slate-600 text-xs rounded-full">
-                            +{trackedCurrencies.fiat.length - 6}
-                          </span>
-                        )}
-                      </div>
-                      <p className="text-xs text-slate-600 font-medium">Crypto ({trackedCurrencies.crypto.length})</p>
-                      <div className="flex flex-wrap gap-1">
-                        {trackedCurrencies.crypto.slice(0, 6).map(code => (
-                          <span key={code} className="px-2 py-1 bg-orange-100 text-orange-700 text-xs rounded-full">
-                            {code}
-                          </span>
-                        ))}
-                        {trackedCurrencies.crypto.length > 6 && (
-                          <span className="px-2 py-1 bg-slate-100 text-slate-600 text-xs rounded-full">
-                            +{trackedCurrencies.crypto.length - 6}
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </div>
-
               {/* Favorites Card */}
               <div className="bg-white rounded-2xl shadow-lg p-6 border border-slate-200">
                 <h3 className="text-lg font-semibold text-slate-900 mb-4">Favorite Rates</h3>
@@ -861,7 +554,7 @@ export default function Rates() {
                       >
                         <div className="flex items-center justify-between mb-2">
                           <div>
-                            <div className="font-semibold text-slate-900">{curr.code} {getSymbolForCurrency(curr.code, curr.metadata)}</div>
+                            <div className="font-semibold text-slate-900">{curr.code}</div>
                             <div className="text-xs text-slate-500">{curr.metadata?.name}</div>
                           </div>
                           <button
@@ -893,7 +586,7 @@ export default function Rates() {
                   <div className="pb-4 border-b border-slate-200">
                     <p className="text-xs text-slate-600 font-medium mb-1">Base Currency</p>
                     <p className="text-sm font-semibold text-slate-900">{fromCurrency.metadata?.name}</p>
-                    <p className="text-xs text-slate-500 mt-1">{fromCurrency.code} {getSymbolForCurrency(fromCurrency.code, fromCurrency.metadata)}</p>
+                    <p className="text-xs text-slate-500 mt-1">{fromCurrency.code}</p>
                   </div>
                 )}
 
@@ -901,7 +594,7 @@ export default function Rates() {
                   <div className="pb-4 border-b border-slate-200">
                     <p className="text-xs text-slate-600 font-medium mb-1">Target Currency</p>
                     <p className="text-sm font-semibold text-slate-900">{toCurrency.metadata?.name}</p>
-                    <p className="text-xs text-slate-500 mt-1">{toCurrency.code} {getSymbolForCurrency(toCurrency.code, toCurrency.metadata)}</p>
+                    <p className="text-xs text-slate-500 mt-1">{toCurrency.code}</p>
                   </div>
                 )}
 
