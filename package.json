@@ -86,6 +86,8 @@
     "delete-bucket": "node scripts/delete-bucket.js",
     "migrate-rides": "node scripts/run-ride-migrations.js",
     "test": "vitest",
+    "test:fetch-rates": "node scripts/test-fetch-rates.js",
+    "check:rates-status": "node scripts/check-rates-status.js",
     "seed-currency-rates": "node scripts/seed-currency-rates.js",
     "populate-cryptos-and-rates": "node scripts/populate-cryptos-and-rates.js",
     "seed-all-rates": "npm run seed-currency-rates && npm run populate-cryptos-and-rates",
