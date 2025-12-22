@@ -1299,7 +1299,7 @@ export default function Nearby({ userId, setActiveTab, setCurrentListingSlug }) 
                     </div>
 
                     <div className="text-xs text-slate-400">
-                      {new Date(listing.created_at).toLocaleDateString()}
+                      {formatDateOnly(listing.created_at)}
                     </div>
                   </div>
 
