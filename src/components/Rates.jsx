@@ -35,15 +35,23 @@ export default function Rates() {
       setLoading(true)
       setError(null)
 
-      // Fetch all pairs from the pairs table
-      const { data: pairsData, error: pairsError } = await supabase
-        .from('pairs')
-        .select('from_currency, to_currency, rate, updated_at')
+      // Fetch all pairs and crypto rates from both tables
+      const [pairsRes, cryptoRatesRes] = await Promise.all([
+        supabase
+          .from('pairs')
+          .select('from_currency, to_currency, rate, updated_at'),
+        supabase
+          .from('crypto_rates')
+          .select('code, rate, updated_at')
+      ])
 
-      if (pairsError) throw pairsError
+      if (pairsRes.error) throw pairsRes.error
 
-      console.log(`📥 Fetched ${pairsData?.length || 0} pairs from database`)
-      setAllPairs(pairsData || [])
+      const pairsData = pairsRes.data || []
+      const cryptoRatesData = cryptoRatesRes.data || []
+
+      console.log(`📥 Fetched ${pairsData.length} pairs and ${cryptoRatesData.length} crypto rates`)
+      setAllPairs(pairsData)
 
       // Get unique currency codes from pairs
       const codes = new Set()
@@ -51,6 +59,13 @@ export default function Rates() {
         pairsData.forEach(pair => {
           if (pair.from_currency) codes.add(pair.from_currency)
           if (pair.to_currency) codes.add(pair.to_currency)
+        })
+      }
+
+      // Add crypto codes from crypto_rates table
+      if (cryptoRatesData) {
+        cryptoRatesData.forEach(rate => {
+          if (rate.code) codes.add(rate.code)
         })
       }
 
