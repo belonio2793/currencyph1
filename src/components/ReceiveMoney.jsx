@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect, useMemo, useRef } from 'react'
 import { supabase } from '../lib/supabaseClient'
 import { currencyAPI } from '../lib/payments'
 import { formatNumber, getCurrencySymbol } from '../lib/currency'
@@ -9,19 +9,24 @@ import receiveMoneyService from '../lib/receiveMoneyService'
 export default function ReceiveMoney({ userId, globalCurrency = 'PHP' }) {
   // State: User/Guest info
   const [isGuest, setIsGuest] = useState(!userId || userId.includes('guest'))
-  const [guestEmail, setGuestEmail] = useState('')
+  const [guestSearch, setGuestSearch] = useState('')
+  const [guestSearchResults, setGuestSearchResults] = useState([])
+  const [showSearchResults, setShowSearchResults] = useState(false)
+  const [selectedGuestProfile, setSelectedGuestProfile] = useState(null)
+
   const [wallets, setWallets] = useState([])
   const [selectedWallet, setSelectedWallet] = useState(null)
 
   // State: Amount & currency
   const [amount, setAmount] = useState('')
   const [selectedCurrency, setSelectedCurrency] = useState(globalCurrency)
-  const [step, setStep] = useState(1) // 1: select wallet, 2: select method, 3: details, 4: confirmation
+  const [step, setStep] = useState(1) // 1: select wallet/guest, 2: method, 3: amount, 4: confirmation, 5: success
   const [activeType, setActiveType] = useState('fiat') // 'fiat' or 'crypto'
 
   // State: Payment method selection
   const [selectedMethod, setSelectedMethod] = useState(null) // 'gcash', 'bank', 'crypto'
   const [selectedCryptoNetwork, setSelectedCryptoNetwork] = useState(null)
+  const [selectedDepositAddress, setSelectedDepositAddress] = useState(null)
 
   // State: Exchange rates
   const [exchangeRates, setExchangeRates] = useState({})
@@ -29,7 +34,7 @@ export default function ReceiveMoney({ userId, globalCurrency = 'PHP' }) {
 
   // State: Crypto deposits
   const [cryptoAddresses, setCryptoAddresses] = useState({}) // { 'BTC': [...addresses] }
-  const [selectedCryptoAddress, setSelectedCryptoAddress] = useState(null)
+  const [depositMethods, setDepositMethods] = useState({ crypto: [], fiat: [] })
 
   // State: Processing
   const [loading, setLoading] = useState(true)
@@ -41,6 +46,8 @@ export default function ReceiveMoney({ userId, globalCurrency = 'PHP' }) {
 
   // State: Deposit history
   const [deposits, setDeposits] = useState([])
+
+  const searchInputRef = useRef(null)
 
   const FIAT_METHODS = {
     gcash: {
@@ -68,7 +75,7 @@ export default function ReceiveMoney({ userId, globalCurrency = 'PHP' }) {
 
   // Load initial data
   useEffect(() => {
-    // Set crypto addresses immediately (synchronous)
+    // Set crypto addresses immediately
     const addressesByCode = {}
     try {
       if (CRYPTOCURRENCY_DEPOSITS && CRYPTOCURRENCY_DEPOSITS.length > 0) {
@@ -95,9 +102,42 @@ export default function ReceiveMoney({ userId, globalCurrency = 'PHP' }) {
       setSelectedCryptoNetwork(firstCryptoCode)
     }
 
+    // Load deposit methods
+    loadDepositMethods()
+
     // Load wallets and deposits asynchronously
     loadData()
   }, [userId])
+
+  // Search profiles when guest search changes
+  useEffect(() => {
+    if (guestSearch.trim().length >= 2) {
+      searchUserProfiles()
+    } else {
+      setGuestSearchResults([])
+      setShowSearchResults(false)
+    }
+  }, [guestSearch])
+
+  const searchUserProfiles = async () => {
+    try {
+      const results = await receiveMoneyService.searchProfiles(guestSearch)
+      setGuestSearchResults(results)
+      setShowSearchResults(true)
+    } catch (err) {
+      console.error('Error searching profiles:', err)
+      setGuestSearchResults([])
+    }
+  }
+
+  const loadDepositMethods = async () => {
+    try {
+      const methods = await receiveMoneyService.getAvailableDepositMethods()
+      setDepositMethods(methods)
+    } catch (err) {
+      console.warn('Error loading deposit methods:', err)
+    }
+  }
 
   // Fetch exchange rates
   useEffect(() => {
@@ -146,8 +186,6 @@ export default function ReceiveMoney({ userId, globalCurrency = 'PHP' }) {
           console.warn('Error loading deposits:', err)
         }
       }
-
-      // Crypto addresses already set in useEffect
     } catch (err) {
       console.error('Error loading data:', err)
       setError('Some data could not be loaded, but you can still use the page')
@@ -181,13 +219,19 @@ export default function ReceiveMoney({ userId, globalCurrency = 'PHP' }) {
     }
   }
 
+  const handleSelectGuestProfile = (profile) => {
+    setSelectedGuestProfile(profile)
+    setGuestSearch('')
+    setShowSearchResults(false)
+  }
+
   const handleCreateReceiveLink = async (e) => {
     e.preventDefault()
     setError('')
     setSuccess('')
 
-    if (!selectedWallet && !guestEmail) {
-      setError('Please select a wallet or enter guest email')
+    if (!selectedWallet && !selectedGuestProfile) {
+      setError('Please select a wallet or guest profile')
       return
     }
 
@@ -198,13 +242,14 @@ export default function ReceiveMoney({ userId, globalCurrency = 'PHP' }) {
       const linkData = {
         id: linkId,
         user_id: userId || null,
-        guest_email: isGuest ? guestEmail : null,
+        guest_user_id: selectedGuestProfile?.id || null,
+        guest_name: selectedGuestProfile?.name || null,
         wallet_id: selectedWallet,
         amount: amount ? parseFloat(amount) : null,
         currency: selectedCurrency,
         method: selectedMethod,
         crypto_network: selectedCryptoNetwork || null,
-        crypto_address: selectedCryptoAddress?.address || null,
+        crypto_address: selectedDepositAddress?.address || null,
         status: 'active',
         created_at: new Date().toISOString()
       }
@@ -212,9 +257,9 @@ export default function ReceiveMoney({ userId, globalCurrency = 'PHP' }) {
       // Create receive link record in database
       await receiveMoneyService.createReceiveLink(linkData)
 
-      // If amount specified and it's crypto, pre-calculate PHP equivalent
-      if (amount && selectedMethod === 'crypto') {
-        const phpAmount = await receiveMoneyService.convertCryptoToPhp(amount, selectedCryptoNetwork)
+      // If crypto deposit, pre-calculate PHP equivalent
+      if (amount && selectedMethod === 'crypto' && exchangeRates[selectedCryptoNetwork]) {
+        const phpAmount = parseFloat(amount) * exchangeRates[selectedCryptoNetwork]
         linkData.expected_php_amount = phpAmount
       }
 
@@ -224,7 +269,7 @@ export default function ReceiveMoney({ userId, globalCurrency = 'PHP' }) {
       setTimeout(() => {
         setAmount('')
         setSelectedWallet(null)
-        setGuestEmail('')
+        setSelectedGuestProfile(null)
         setSelectedMethod(null)
         setReceiveLink(null)
         setSuccess('')
@@ -292,6 +337,12 @@ export default function ReceiveMoney({ userId, globalCurrency = 'PHP' }) {
                     <span className="text-sm font-medium text-slate-700">Link ID:</span>
                     <span className="font-mono text-sm text-slate-600 text-right break-all">{receiveLink.id}</span>
                   </div>
+                  {receiveLink.guest_name && (
+                    <div className="flex justify-between items-start">
+                      <span className="text-sm font-medium text-slate-700">Receiving As:</span>
+                      <span className="text-slate-600">{receiveLink.guest_name}</span>
+                    </div>
+                  )}
                   {receiveLink.amount && (
                     <div className="flex justify-between items-start">
                       <span className="text-sm font-medium text-slate-700">Amount:</span>
@@ -308,6 +359,12 @@ export default function ReceiveMoney({ userId, globalCurrency = 'PHP' }) {
                       {receiveLink.method === 'crypto' && `${receiveLink.crypto_network}`}
                     </span>
                   </div>
+                  {receiveLink.expected_php_amount && (
+                    <div className="flex justify-between items-start">
+                      <span className="text-sm font-medium text-slate-700">Expected PHP:</span>
+                      <span className="font-semibold text-emerald-600">₱{formatNumber(receiveLink.expected_php_amount)}</span>
+                    </div>
+                  )}
                 </div>
 
                 {/* Copy Link */}
@@ -345,18 +402,18 @@ export default function ReceiveMoney({ userId, globalCurrency = 'PHP' }) {
                 </div>
 
                 <form onSubmit={handleCreateReceiveLink} className="space-y-6">
-                  {/* Step 1: Select Wallet */}
+                  {/* Step 1: Select Wallet or Guest Profile */}
                   {step === 1 && (
                     <div className="space-y-4">
-                      <h3 className="text-lg font-medium text-slate-900">Select Receiving Wallet</h3>
+                      <h3 className="text-lg font-medium text-slate-900">Who is receiving funds?</h3>
 
-                      {/* Guest or User Toggle */}
+                      {/* Toggle between My Wallets and Guest */}
                       <div className="flex gap-4 mb-6">
                         <button
                           type="button"
                           onClick={() => {
                             setIsGuest(false)
-                            setGuestEmail('')
+                            setSelectedGuestProfile(null)
                           }}
                           className={`flex-1 px-4 py-3 rounded-lg border-2 transition-all ${
                             !isGuest
@@ -368,29 +425,77 @@ export default function ReceiveMoney({ userId, globalCurrency = 'PHP' }) {
                         </button>
                         <button
                           type="button"
-                          onClick={() => setIsGuest(true)}
+                          onClick={() => {
+                            setIsGuest(true)
+                            setSelectedWallet(null)
+                          }}
                           className={`flex-1 px-4 py-3 rounded-lg border-2 transition-all ${
                             isGuest
                               ? 'border-blue-600 bg-blue-50 text-blue-700 font-medium'
                               : 'border-slate-200 text-slate-700 hover:border-slate-300'
                           }`}
                         >
-                          Guest Checkout
+                          Guest Profile
                         </button>
                       </div>
 
-                      {/* Guest Email */}
+                      {/* Guest Profile Search */}
                       {isGuest && (
                         <div>
-                          <label className="block text-sm font-medium text-slate-700 mb-2">Email Address</label>
-                          <input
-                            type="email"
-                            value={guestEmail}
-                            onChange={e => setGuestEmail(e.target.value)}
-                            placeholder="Enter email to receive funds"
-                            className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent"
-                            required={isGuest}
-                          />
+                          <label className="block text-sm font-medium text-slate-700 mb-2">Search User Profile</label>
+                          <div className="relative">
+                            <input
+                              ref={searchInputRef}
+                              type="text"
+                              value={guestSearch}
+                              onChange={e => setGuestSearch(e.target.value)}
+                              onFocus={() => guestSearch.length > 0 && setShowSearchResults(true)}
+                              placeholder="Search by name, email, or phone"
+                              className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent"
+                            />
+
+                            {showSearchResults && guestSearchResults.length > 0 && (
+                              <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-slate-200 rounded-lg shadow-lg z-50 max-h-64 overflow-y-auto">
+                                {guestSearchResults.map((profile, idx) => (
+                                  <button
+                                    key={idx}
+                                    type="button"
+                                    onClick={() => handleSelectGuestProfile(profile)}
+                                    className="w-full text-left px-4 py-3 hover:bg-blue-50 border-b border-slate-100 last:border-b-0 transition-colors"
+                                  >
+                                    <div className="font-medium text-slate-900">{profile.name}</div>
+                                    <div className="text-xs text-slate-500 mt-1">
+                                      {profile.phone && `📱 ${profile.phone}`}
+                                      {profile.email && ` 📧 ${profile.email}`}
+                                    </div>
+                                  </button>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+
+                          {selectedGuestProfile && (
+                            <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                              <div className="flex justify-between items-start">
+                                <div>
+                                  <p className="font-medium text-slate-900">{selectedGuestProfile.name}</p>
+                                  {selectedGuestProfile.phone && (
+                                    <p className="text-sm text-slate-600 mt-1">📱 {selectedGuestProfile.phone}</p>
+                                  )}
+                                  {selectedGuestProfile.email && (
+                                    <p className="text-sm text-slate-600 mt-1">📧 {selectedGuestProfile.email}</p>
+                                  )}
+                                </div>
+                                <button
+                                  type="button"
+                                  onClick={() => setSelectedGuestProfile(null)}
+                                  className="text-xs px-3 py-1 border border-slate-300 rounded hover:bg-slate-100"
+                                >
+                                  Change
+                                </button>
+                              </div>
+                            </div>
+                          )}
                         </div>
                       )}
 
@@ -402,7 +507,7 @@ export default function ReceiveMoney({ userId, globalCurrency = 'PHP' }) {
                             <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
                               <p className="text-sm text-amber-800">
                                 No wallets found.{' '}
-                                <a href="/deposit" className="font-medium underline">
+                                <a href="/wallets" className="font-medium underline">
                                   Create a wallet
                                 </a>{' '}
                                 first.
@@ -425,9 +530,6 @@ export default function ReceiveMoney({ userId, globalCurrency = 'PHP' }) {
                                   <div className="text-sm text-slate-600 mt-1">
                                     Balance: {getCurrencySymbol(wallet.currency_code)}{formatNumber(wallet.balance)}
                                   </div>
-                                  <div className="text-xs text-slate-500 mt-2">
-                                    ID: {wallet.id} {wallet.account_number && `• Account: ${wallet.account_number}`}
-                                  </div>
                                 </button>
                               ))}
                             </div>
@@ -438,7 +540,7 @@ export default function ReceiveMoney({ userId, globalCurrency = 'PHP' }) {
                       <button
                         type="button"
                         onClick={() => setStep(2)}
-                        disabled={!selectedWallet && !guestEmail}
+                        disabled={(!selectedWallet && !selectedGuestProfile) || loading}
                         className="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
                       >
                         Next
@@ -556,7 +658,13 @@ export default function ReceiveMoney({ userId, globalCurrency = 'PHP' }) {
                               <button
                                 key={crypto.code}
                                 type="button"
-                                onClick={() => setSelectedCryptoNetwork(crypto.code)}
+                                onClick={() => {
+                                  setSelectedCryptoNetwork(crypto.code)
+                                  // Auto-select first address
+                                  if (crypto.addresses.length > 0) {
+                                    setSelectedDepositAddress(crypto.addresses[0])
+                                  }
+                                }}
                                 className={`w-full p-3 rounded-lg border-2 transition-all text-left ${
                                   selectedCryptoNetwork === crypto.code
                                     ? 'border-blue-600 bg-blue-50'
@@ -573,96 +681,20 @@ export default function ReceiveMoney({ userId, globalCurrency = 'PHP' }) {
                         </div>
                       )}
 
-                      {/* Summary */}
-                      <div className="bg-slate-50 rounded-lg p-4 space-y-2">
-                        <p className="text-sm font-medium text-slate-700">Summary</p>
-                        {selectedWalletData && (
-                          <div className="text-sm text-slate-600">
-                            Wallet: <span className="font-medium text-slate-900">{selectedWalletData.currency_code}</span>
-                          </div>
-                        )}
-                        {guestEmail && (
-                          <div className="text-sm text-slate-600">
-                            Guest: <span className="font-medium text-slate-900">{guestEmail}</span>
-                          </div>
-                        )}
-                        <div className="text-sm text-slate-600">
-                          Method:{' '}
-                          <span className="font-medium text-slate-900">
-                            {selectedMethod === 'gcash' && 'GCash'}
-                            {selectedMethod === 'bank' && 'Bank Transfer'}
-                            {selectedMethod === 'crypto' && `${selectedCryptoNetwork}`}
-                          </span>
-                        </div>
-                      </div>
-
-                      <div className="flex space-x-4">
-                        <button
-                          type="button"
-                          onClick={() => setStep(2)}
-                          className="flex-1 px-4 py-3 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors font-medium"
-                        >
-                          Back
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => setStep(4)}
-                          className="flex-1 bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium"
-                        >
-                          Next
-                        </button>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Step 4: Confirmation */}
-                  {step === 4 && (
-                    <div className="space-y-4">
-                      <h3 className="text-lg font-medium text-slate-900">Confirm Details</h3>
-
-                      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 space-y-3 text-sm">
-                        <p className="font-medium text-slate-900">Receive Details</p>
-                        {selectedWalletData && (
-                          <div className="flex justify-between">
-                            <span className="text-slate-700">Wallet:</span>
-                            <span className="font-medium text-slate-900">{selectedWalletData.currency_code}</span>
-                          </div>
-                        )}
-                        {guestEmail && (
-                          <div className="flex justify-between">
-                            <span className="text-slate-700">Guest Email:</span>
-                            <span className="font-medium text-slate-900">{guestEmail}</span>
-                          </div>
-                        )}
-                        <div className="flex justify-between">
-                          <span className="text-slate-700">Method:</span>
-                          <span className="font-medium text-slate-900">
-                            {selectedMethod === 'gcash' && 'GCash'}
-                            {selectedMethod === 'bank' && 'Bank Transfer'}
-                            {selectedMethod === 'crypto' && selectedCryptoNetwork}
-                          </span>
-                        </div>
-                        {amount && (
-                          <div className="flex justify-between">
-                            <span className="text-slate-700">Amount:</span>
-                            <span className="font-medium text-slate-900">
-                              {getCurrencySymbol(selectedCurrency)}{formatNumber(amount)}
-                            </span>
-                          </div>
-                        )}
-                      </div>
-
+                      {/* Crypto Address Selection */}
                       {selectedMethod === 'crypto' && selectedCryptoNetwork && selectedCryptoAddresses.length > 0 && (
                         <div>
-                          <p className="text-sm font-medium text-slate-700 mb-3">Receive Address</p>
-                          <div className="space-y-2">
+                          <label className="block text-sm font-medium text-slate-700 mb-3">
+                            Select Receive Address
+                          </label>
+                          <div className="space-y-2 max-h-48 overflow-y-auto">
                             {selectedCryptoAddresses.map((addr, idx) => (
                               <button
                                 key={idx}
                                 type="button"
-                                onClick={() => setSelectedCryptoAddress(addr)}
+                                onClick={() => setSelectedDepositAddress(addr)}
                                 className={`w-full p-3 rounded-lg border-2 transition-all text-left ${
-                                  selectedCryptoAddress === addr
+                                  selectedDepositAddress === addr
                                     ? 'border-blue-600 bg-blue-50'
                                     : 'border-slate-200 hover:border-slate-300'
                                 }`}
@@ -678,6 +710,93 @@ export default function ReceiveMoney({ userId, globalCurrency = 'PHP' }) {
                       <div className="flex space-x-4">
                         <button
                           type="button"
+                          onClick={() => setStep(2)}
+                          className="flex-1 px-4 py-3 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors font-medium"
+                        >
+                          Back
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setStep(4)}
+                          disabled={selectedMethod === 'crypto' && !selectedDepositAddress}
+                          className="flex-1 bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                          Review
+                        </button>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Step 4: Confirmation */}
+                  {step === 4 && (
+                    <div className="space-y-4">
+                      <h3 className="text-lg font-medium text-slate-900">Confirm Details</h3>
+
+                      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 space-y-3 text-sm">
+                        <p className="font-medium text-slate-900">Receive Details</p>
+
+                        {selectedWalletData && (
+                          <div className="flex justify-between">
+                            <span className="text-slate-700">Receiving Wallet:</span>
+                            <span className="font-medium text-slate-900">{selectedWalletData.currency_code}</span>
+                          </div>
+                        )}
+
+                        {selectedGuestProfile && (
+                          <div className="flex justify-between">
+                            <span className="text-slate-700">Guest Profile:</span>
+                            <span className="font-medium text-slate-900">{selectedGuestProfile.name}</span>
+                          </div>
+                        )}
+
+                        <div className="flex justify-between">
+                          <span className="text-slate-700">Method:</span>
+                          <span className="font-medium text-slate-900">
+                            {selectedMethod === 'gcash' && 'GCash'}
+                            {selectedMethod === 'bank' && 'Bank Transfer'}
+                            {selectedMethod === 'crypto' && selectedCryptoNetwork}
+                          </span>
+                        </div>
+
+                        {amount && (
+                          <div className="flex justify-between">
+                            <span className="text-slate-700">Amount:</span>
+                            <span className="font-medium text-slate-900">
+                              {getCurrencySymbol(selectedCurrency)}{formatNumber(amount)}
+                            </span>
+                          </div>
+                        )}
+
+                        {selectedMethod === 'crypto' && amount && exchangeRates[selectedCryptoNetwork] && (
+                          <div className="flex justify-between">
+                            <span className="text-slate-700">Expected PHP:</span>
+                            <span className="font-medium text-emerald-600">
+                              ₱{formatNumber(parseFloat(amount) * exchangeRates[selectedCryptoNetwork])}
+                            </span>
+                          </div>
+                        )}
+                      </div>
+
+                      {selectedMethod === 'crypto' && selectedDepositAddress && (
+                        <div className="bg-slate-50 rounded-lg p-4 space-y-2">
+                          <p className="text-sm font-medium text-slate-700 mb-2">Send to this address:</p>
+                          <div className="bg-white border border-slate-300 rounded p-3">
+                            <div className="text-xs font-medium text-slate-700 mb-2">{selectedDepositAddress.network}</div>
+                            <div className="text-xs font-mono text-slate-900 break-all mb-3">{selectedDepositAddress.address}</div>
+                            <button
+                              type="button"
+                              onClick={() => copyToClipboard(selectedDepositAddress.address, 'Address copied!')}
+                              className="w-full text-xs px-3 py-2 bg-blue-100 text-blue-700 rounded hover:bg-blue-200 transition-colors"
+                            >
+                              {copyFeedback === 'Address copied!' ? '✓ Copied' : 'Copy Address'}
+                            </button>
+                          </div>
+                        </div>
+                      )}
+
+                      <div className="flex space-x-4">
+                        <button
+                          type="button"
                           onClick={() => setStep(3)}
                           className="flex-1 px-4 py-3 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors font-medium"
                         >
@@ -685,7 +804,7 @@ export default function ReceiveMoney({ userId, globalCurrency = 'PHP' }) {
                         </button>
                         <button
                           type="submit"
-                          disabled={submitting || (selectedMethod === 'crypto' && !selectedCryptoAddress)}
+                          disabled={submitting || (selectedMethod === 'crypto' && !selectedDepositAddress)}
                           className="flex-1 bg-emerald-600 text-white py-3 rounded-lg hover:bg-emerald-700 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                           {submitting ? 'Creating...' : 'Create Receive Link'}
@@ -701,7 +820,7 @@ export default function ReceiveMoney({ userId, globalCurrency = 'PHP' }) {
 
         {/* Sidebar */}
         <div className="space-y-6">
-          {/* Receive Instructions */}
+          {/* How It Works */}
           <div className="bg-white border border-slate-200 rounded-xl p-6 space-y-4">
             <h3 className="text-lg font-medium text-slate-900">How It Works</h3>
             <ol className="space-y-3 text-sm text-slate-700">
@@ -709,7 +828,7 @@ export default function ReceiveMoney({ userId, globalCurrency = 'PHP' }) {
                 <span className="flex-shrink-0 w-6 h-6 bg-blue-100 text-blue-700 rounded-full flex items-center justify-center text-xs font-semibold">
                   1
                 </span>
-                <span>Select the wallet to receive funds</span>
+                <span>Select receiving wallet or guest profile</span>
               </li>
               <li className="flex gap-3">
                 <span className="flex-shrink-0 w-6 h-6 bg-blue-100 text-blue-700 rounded-full flex items-center justify-center text-xs font-semibold">
@@ -721,13 +840,13 @@ export default function ReceiveMoney({ userId, globalCurrency = 'PHP' }) {
                 <span className="flex-shrink-0 w-6 h-6 bg-blue-100 text-blue-700 rounded-full flex items-center justify-center text-xs font-semibold">
                   3
                 </span>
-                <span>Share the unique link with the sender</span>
+                <span>Enter amount (optional) and select details</span>
               </li>
               <li className="flex gap-3">
                 <span className="flex-shrink-0 w-6 h-6 bg-blue-100 text-blue-700 rounded-full flex items-center justify-center text-xs font-semibold">
                   4
                 </span>
-                <span>Funds are credited when payment is verified</span>
+                <span>Share the unique link with the sender</span>
               </li>
             </ol>
           </div>
@@ -750,7 +869,7 @@ export default function ReceiveMoney({ userId, globalCurrency = 'PHP' }) {
                       </div>
                       <span
                         className={`text-xs font-semibold px-2 py-1 rounded ${
-                          deposit.status === 'confirmed'
+                          deposit.status === 'approved'
                             ? 'bg-emerald-100 text-emerald-700'
                             : deposit.status === 'pending'
                             ? 'bg-amber-100 text-amber-700'
@@ -768,7 +887,7 @@ export default function ReceiveMoney({ userId, globalCurrency = 'PHP' }) {
 
           {/* Payment Methods Info */}
           <div className="bg-white border border-slate-200 rounded-xl p-6 space-y-4">
-            <h3 className="text-lg font-medium text-slate-900">Payment Methods</h3>
+            <h3 className="text-lg font-medium text-slate-900">Accepted Methods</h3>
             <div className="space-y-2 text-sm">
               <div className="flex gap-2">
                 <span className="text-lg">📱</span>
