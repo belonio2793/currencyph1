@@ -113,44 +113,20 @@ export default function ReceiveMoney({ userId, globalCurrency = 'PHP' }) {
 
   const loadDepositMethods = async () => {
     try {
-      // Fetch all transfer methods from public.transfers
-      const { data: transfers, error } = await supabase
-        .from('transfers')
-        .select('id, name, type')
-        .eq('active', true)
-
-      if (error) throw error
-
-      // Organize methods by type and filter out bank transfers
-      const fiat = []
-      const crypto = []
-
-      if (transfers) {
-        transfers.forEach(transfer => {
-          // Skip bank transfer method
-          if (transfer.name?.toLowerCase() === 'bank transfer' || transfer.name?.toLowerCase() === 'bank') {
-            return
-          }
-
-          const method = {
-            id: transfer.id || transfer.name?.toLowerCase(),
-            name: transfer.name,
-            description: transfer.type || ''
-          }
-
-          if (transfer.type?.toLowerCase() === 'crypto' || transfer.name?.toLowerCase().includes('crypto')) {
-            crypto.push(method)
-          } else {
-            fiat.push(method)
-          }
-        })
-      }
+      // Default payment methods (no need to fetch from DB)
+      const fiat = [
+        { id: 'gcash', name: 'GCash', description: 'Mobile wallet' },
+        { id: 'bank', name: 'Bank Transfer', description: 'Direct bank deposit' }
+      ]
+      const crypto = [
+        { id: 'crypto', name: 'Cryptocurrency', description: '50+ cryptocurrencies' }
+      ]
 
       setAvailableMethods({ fiat, crypto })
       setDepositMethods({ fiat, crypto })
     } catch (err) {
       console.warn('Error loading deposit methods:', err)
-      // Fallback to default GCash only if no data
+      // Fallback to default GCash only if error
       setAvailableMethods({ fiat: [{ id: 'gcash', name: 'GCash', description: 'Mobile wallet' }], crypto: [] })
     }
   }
