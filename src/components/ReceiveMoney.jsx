@@ -33,6 +33,8 @@ export default function ReceiveMoney({ userId, globalCurrency = 'PHP' }) {
   const [convertedAmount, setConvertedAmount] = useState(null)
   const [conversionRate, setConversionRate] = useState(null)
   const [conversionLoading, setConversionLoading] = useState(false)
+  const [cryptoConversionRate, setCryptoConversionRate] = useState(null)
+  const [cryptoConversionLoading, setCryptoConversionLoading] = useState(false)
 
   // State: Flow control
   const [step, setStep] = useState(1) // 1: recipient+amount, 2: method, 3: finalization
