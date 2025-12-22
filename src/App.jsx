@@ -633,6 +633,7 @@ export default function App() {
                   totalBalanceConverted={totalBalanceConverted}
                   totalDebtConverted={totalDebtConverted}
                   totalNet={totalNet}
+                  totalCryptoBalancePHP={totalCryptoBalancePHP}
                   onShowAuth={(tab) => {
                     setAuthInitialTab(tab || 'login')
                     setShowAuth(true)
