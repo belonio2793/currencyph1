@@ -1,5 +1,5 @@
 // Payment Methods Integration
-// Supports Gcash, Cryptocurrency, Bank Transfer, and Partner payments
+// Supports Gcash, Cryptocurrency, and Partner payments
 
 export const paymentMethods = {
   wallet: {
