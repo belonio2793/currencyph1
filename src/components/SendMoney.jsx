@@ -89,6 +89,16 @@ export default function SendMoney({ userId }) {
     }
   }
 
+  const getWalletsByType = () => {
+    const fiatWallets = wallets.filter(w => isFiatCurrency(w.currency_code))
+    const cryptoWallets = wallets.filter(w => isCryptoCurrency(w.currency_code))
+    return { fiatWallets, cryptoWallets }
+  }
+
+  const getWalletByCurrency = (code) => {
+    return wallets.find(w => w.currency_code === code)
+  }
+
   useEffect(() => {
     if (!showSearchDropdown) return
     const q = searchQuery.trim()
