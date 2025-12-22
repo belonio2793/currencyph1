@@ -585,6 +585,37 @@ export default function ReceiveMoney({ userId, globalCurrency = 'PHP' }) {
                       <h3 className="text-lg font-medium text-slate-900">Verify Profile</h3>
                       <p className="text-sm text-slate-600 mb-4">Review the receiving profile details to ensure the match is correct before proceeding</p>
 
+                      {/* User Profile Details */}
+                      {userProfile && (
+                        <div className="bg-gradient-to-br from-slate-50 to-slate-100 border border-slate-300 rounded-lg p-6 space-y-3">
+                          <div className="text-center">
+                            <p className="text-xs font-semibold text-slate-700 uppercase tracking-wider mb-2">Your Profile</p>
+                            <p className="text-2xl font-light text-slate-900 mb-1">{userProfile.full_name || userProfile.email || 'User'}</p>
+                          </div>
+
+                          <div className="border-t border-slate-200 pt-4 space-y-2 text-sm">
+                            {userProfile.email && (
+                              <div className="flex justify-between items-start">
+                                <span className="text-slate-700">Email:</span>
+                                <span className="text-slate-900 font-medium">{userProfile.email}</span>
+                              </div>
+                            )}
+                            {userProfile.phone && (
+                              <div className="flex justify-between items-start">
+                                <span className="text-slate-700">Phone:</span>
+                                <span className="text-slate-900 font-medium">{userProfile.phone}</span>
+                              </div>
+                            )}
+                            {userProfile.address && (
+                              <div className="flex justify-between items-start">
+                                <span className="text-slate-700">Address:</span>
+                                <span className="text-slate-900 font-medium text-right break-all">{userProfile.address}</span>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      )}
+
                       {selectedWalletData ? (
                         <div className="bg-gradient-to-br from-blue-50 to-blue-100 border border-blue-300 rounded-lg p-6 space-y-4">
                           <div className="text-center">
