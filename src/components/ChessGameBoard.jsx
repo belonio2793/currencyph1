@@ -26,6 +26,9 @@ export default function ChessGameBoard({ game, userId, userEmail, onClose }) {
     return (times[timeControl] || 10) * 60
   }
 
+  const [aiThinking, setAiThinking] = useState(false)
+  const aiTimeoutRef = useRef(null)
+
   const engine = new ChessEngine(currentGame.fen)
   const isVsComputer = currentGame?.mode === 'computer' || !currentGame?.id
   const isWhitePlayer = isVsComputer ? true : currentGame.white_player_id === userId
