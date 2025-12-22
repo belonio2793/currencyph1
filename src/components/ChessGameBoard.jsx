@@ -346,6 +346,9 @@ export default function ChessGameBoard({ game, userId, userEmail, onClose }) {
               <div>
                 <p className="text-white font-semibold">{currentGame.white_player_email}</p>
                 <p className="text-xs text-slate-300 mt-1">White</p>
+                {isVsComputer && aiThinking && !engine.isWhiteTurn() && (
+                  <p className="text-xs text-amber-400 mt-1 animate-pulse">🤖 Computer thinking...</p>
+                )}
               </div>
               <div className={`text-2xl font-mono font-bold ${whiteTime !== null && whiteTime < 60 ? 'text-red-400' : 'text-white'}`}>
                 {formatTime(whiteTime)}
