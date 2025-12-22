@@ -157,16 +157,25 @@ export default function CurrencyRates() {
                   <p className="text-gray-600 text-xs">{currency.name}</p>
                 </div>
               </div>
-              <p className="text-lg font-bold text-black">
-                {currency.symbol}{currency.rate.toLocaleString('en-US', {
-                  maximumFractionDigits: currency.code === 'JPY' || currency.code === 'KRW' || currency.code === 'IDR' ? 0 : 2
-                })}
-              </p>
-              <p className="text-xs text-gray-500 mt-2">
-                {currency.rate > 0.1 && currency.rate < 10 ? 
-                  `${(1 / currency.rate).toFixed(4)} ${currency.code}/USD` : 
-                  ''}
-              </p>
+              {currency.rate && currency.rate > 0 ? (
+                <>
+                  <p className="text-lg font-bold text-black">
+                    {currency.symbol}{currency.rate.toLocaleString('en-US', {
+                      maximumFractionDigits: currency.code === 'JPY' || currency.code === 'KRW' || currency.code === 'IDR' ? 0 : 2
+                    })}
+                  </p>
+                  <p className="text-xs text-gray-500 mt-2">
+                    {currency.rate > 0.1 && currency.rate < 10 ?
+                      `${(1 / currency.rate).toFixed(4)} ${currency.code}/USD` :
+                      ''}
+                  </p>
+                </>
+              ) : (
+                <div className="bg-red-50 border border-red-200 p-2 rounded">
+                  <p className="text-xs text-red-700 font-semibold">Service unavailable</p>
+                  <p className="text-xs text-red-600">Rate not available</p>
+                </div>
+              )}
             </div>
           ))}
         </div>
