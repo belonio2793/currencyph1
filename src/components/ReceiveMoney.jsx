@@ -1163,9 +1163,11 @@ export default function ReceiveMoney({ userId, globalCurrency = 'PHP' }) {
                   )}
 
                   {/* Step 3: Finalization with Profile & Payment Link */}
-                  {step === 3 && (
+                  {step === 3 && !customPaymentLink && (
                     <div className="space-y-4">
-                      <h3 className="text-lg font-medium text-slate-900">Finalize Request</h3>
+                      <h3 className="text-lg font-medium text-slate-900">
+                        {isRequestMode && requestMode === 'custom_payment' ? 'Review Payment Link' : 'Finalize Request'}
+                      </h3>
 
                       {/* Your Profile */}
                       {userProfile && (
