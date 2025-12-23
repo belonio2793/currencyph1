@@ -1152,7 +1152,7 @@ export default function PlanningChat() {
       {/* Commitment Widget Section */}
       <div className={`${isMobile ? 'px-3 py-4' : 'px-6 py-4'} bg-slate-800 border-b border-slate-700`}>
         <div className={`${isMobile ? 'max-w-full' : 'max-w-2xl mx-auto'}`}>
-          <CommitmentWidget />
+          <CommitmentWidget onSignInRequired={() => setShowAuthModalOnDemand(true)} />
         </div>
       </div>
 
