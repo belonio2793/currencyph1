@@ -268,8 +268,8 @@ export default function CommitmentMarketplace({ userId, isAuthenticated, onAuthS
         </p>
       </div>
 
-      {/* Form */}
-      <div className={`max-w-4xl mx-auto bg-gradient-to-br from-slate-800 to-slate-900 rounded-xl border border-slate-700 p-6 md:p-8 space-y-6`}>
+      {/* Dual Column Layout */}
+      <div className={`max-w-7xl mx-auto bg-gradient-to-br from-slate-800 to-slate-900 rounded-xl border border-slate-700 p-6 md:p-8`}>
         {error && (
         <div className="p-4 bg-red-900/30 border border-red-700/50 rounded-lg text-red-200 text-sm mb-4">
           <p className="flex items-center gap-2"><span>❌</span> {error}</p>
