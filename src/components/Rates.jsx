@@ -263,14 +263,23 @@ export default function Rates() {
       const fromRate = rates.find(r => r.code === selectedFrom)
       const toRate = rates.find(r => r.code === selectedTo)
 
+      // Check if rates exist
+      if (!fromRate || !toRate) {
+        setResult({
+          error: 'Rate not available',
+          message: `Exchange rate for ${!fromRate ? selectedFrom : selectedTo} is not available.`
+        })
+        return
+      }
+
       // Check if rates are valid (not 0.00 or invalid)
-      const fromRateValid = fromRate && isFinite(fromRate.rate) && fromRate.rate > 0
-      const toRateValid = toRate && isFinite(toRate.rate) && toRate.rate > 0
+      const fromRateValid = isFinite(fromRate.rate) && fromRate.rate > 0
+      const toRateValid = isFinite(toRate.rate) && toRate.rate > 0
 
       if (!fromRateValid || !toRateValid) {
         setResult({
-          error: 'Service unavailable',
-          message: 'Exchange rate service is temporarily unavailable. Please try again in a few moments.'
+          error: 'Rate not available',
+          message: 'Exchange rate data is not available for the selected currencies.'
         })
         return
       }
