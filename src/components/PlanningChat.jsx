@@ -1044,16 +1044,17 @@ export default function PlanningChat() {
     )
   }
 
-  const showAuthModal = !isAuthenticated
-
   return (
     <div className="min-h-screen bg-slate-900 flex flex-col">
       {/* Header */}
       <div className={`bg-slate-800 border-b border-slate-700 ${isMobile ? 'px-4 py-3' : 'px-6 py-4'}}`}>
         <div className={`flex ${isMobile ? 'flex-col gap-3' : 'items-center justify-between mb-3'}`}>
           <div>
-            <h1 className={`font-bold text-white ${isMobile ? 'text-lg' : 'text-2xl'}`}>Planning Group</h1>
-            <p className={`text-slate-400 ${isMobile ? 'text-xs' : 'text-sm'}`}>Strategic partner coordination for manufacturing & distribution</p>
+            <div className="flex items-center gap-3 mb-2">
+              <h1 className={`font-bold text-white ${isMobile ? 'text-lg' : 'text-2xl'}`}>🥥 Coconuts.com.ph</h1>
+              <span className="inline-block px-2 py-1 bg-amber-700 text-amber-100 text-xs font-semibold rounded">Partnership Network</span>
+            </div>
+            <p className={`text-slate-400 ${isMobile ? 'text-xs' : 'text-sm'}`}>Transparent supply chain coordination & collaborative commerce with currency.ph integration</p>
           </div>
           {isAuthenticated && (
             <div className={`flex ${isMobile ? 'items-center justify-between w-full' : 'items-center gap-4'}`}>
