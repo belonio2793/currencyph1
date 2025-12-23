@@ -687,6 +687,51 @@ export default function CommitmentMarketplace({ userId, isAuthenticated, onAuthS
                         </p>
                       </div>
                     )}
+
+                    {entry.social_media && Object.values(entry.social_media).some(v => v) && (
+                      <div className="space-y-1">
+                        <p className="text-slate-400 text-xs font-semibold uppercase tracking-wide">
+                          🔗 Connect
+                        </p>
+                        <div className="flex flex-wrap gap-2">
+                          {entry.social_media.twitter && (
+                            <a href={`https://twitter.com/${entry.social_media.twitter.replace('@', '')}`} target="_blank" rel="noopener noreferrer" className="text-blue-400 text-xs hover:underline">
+                              Twitter
+                            </a>
+                          )}
+                          {entry.social_media.linkedin && (
+                            <a href={`https://linkedin.com/in/${entry.social_media.linkedin}`} target="_blank" rel="noopener noreferrer" className="text-blue-400 text-xs hover:underline">
+                              LinkedIn
+                            </a>
+                          )}
+                          {entry.social_media.instagram && (
+                            <a href={`https://instagram.com/${entry.social_media.instagram.replace('@', '')}`} target="_blank" rel="noopener noreferrer" className="text-blue-400 text-xs hover:underline">
+                              Instagram
+                            </a>
+                          )}
+                          {entry.social_media.facebook && (
+                            <a href={`https://facebook.com/${entry.social_media.facebook}`} target="_blank" rel="noopener noreferrer" className="text-blue-400 text-xs hover:underline">
+                              Facebook
+                            </a>
+                          )}
+                          {entry.social_media.telegram && (
+                            <a href={`https://t.me/${entry.social_media.telegram.replace('@', '')}`} target="_blank" rel="noopener noreferrer" className="text-blue-400 text-xs hover:underline">
+                              Telegram
+                            </a>
+                          )}
+                          {entry.social_media.whatsapp && (
+                            <a href={`https://wa.me/${entry.social_media.whatsapp.replace(/[^\d+]/g, '')}`} target="_blank" rel="noopener noreferrer" className="text-green-400 text-xs hover:underline">
+                              WhatsApp
+                            </a>
+                          )}
+                          {entry.social_media.viber && (
+                            <span className="text-purple-400 text-xs">
+                              Viber: {entry.social_media.viber}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    )}
                   </div>
 
                   {/* Action Button */}
