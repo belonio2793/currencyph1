@@ -2064,11 +2064,11 @@ export default function PlanningChat() {
               {/* Action Buttons */}
               <div className="flex gap-3 pt-2">
                 <button
-                  type="button"
-                  onClick={() => setShowAuthModalOnDemand(true)}
-                  className="flex-1 px-4 py-2 bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 text-white font-semibold rounded-lg transition-all transform hover:scale-105 text-sm"
+                  type="submit"
+                  disabled={contributionSubmitting}
+                  className="flex-1 px-4 py-2 bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 disabled:from-amber-800 disabled:to-orange-800 disabled:opacity-50 text-white font-semibold rounded-lg transition-all transform hover:scale-105 text-sm"
                 >
-                  ✓ Sign & Submit
+                  {contributionSubmitting ? '⏳ Submitting...' : '✓ Sign & Submit'}
                 </button>
                 <button
                   type="reset"
