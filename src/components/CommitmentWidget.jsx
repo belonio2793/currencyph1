@@ -2,14 +2,13 @@ import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabaseClient'
 import Auth from './Auth'
 
-export default function CommitmentWidget() {
+export default function CommitmentWidget({ onSignInRequired }) {
   const [session, setSession] = useState(null)
   const [isLoading, setIsLoading] = useState(false)
   const [isOnline, setIsOnline] = useState(typeof navigator !== 'undefined' ? navigator.onLine : true)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
-  const [showAuthModal, setShowAuthModal] = useState(false)
   
   const [formData, setFormData] = useState({
     item_type: 'coconut',
