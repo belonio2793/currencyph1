@@ -15,47 +15,33 @@ import { supabase } from './supabaseClient'
 /**
  * Get latest rate with timestamp for user confirmation
  * Returns rate data that can be displayed with time/date info
- * Checks public.pairs first, then falls back to crypto_rates_valid
+ * Fetches from public.pairs (unified source for all rates)
  */
 export async function getLatestRateWithConfirmation(fromCurrency, toCurrency = 'PHP') {
   try {
     const fromCode = fromCurrency.toUpperCase()
     const toCode = toCurrency.toUpperCase()
-    let data = null
-    let source = null
 
-    // Try public.pairs first (primary source for all rates)
-    const { data: pairsData, error: pairsError } = await supabase
+    // Fetch from public.pairs (unified source for all rates - fiat and crypto)
+    const { data, error } = await supabase
       .from('pairs')
       .select('rate, source_table, updated_at')
       .eq('from_currency', fromCode)
       .eq('to_currency', toCode)
       .single()
 
-    if (!pairsError && pairsData && typeof pairsData.rate === 'number' && isFinite(pairsData.rate) && pairsData.rate > 0) {
-      data = pairsData
-      source = pairsData.source_table || 'pairs'
-    } else {
-      // Fallback to crypto_rates_valid
-      const { data: cryptoData, error: cryptoError } = await supabase
-        .from('crypto_rates_valid')
-        .select('rate, source, updated_at')
-        .eq('from_currency', fromCode)
-        .eq('to_currency', toCode)
-        .order('updated_at', { ascending: false })
-        .limit(1)
-        .single()
-
-      if (!cryptoError && cryptoData) {
-        data = cryptoData
-        source = cryptoData.source || 'crypto_rates_valid'
-      }
-    }
-
-    if (!data) {
+    if (error || !data) {
       console.warn(`No rate found for ${fromCode}/${toCode}`)
       return null
     }
+
+    // Validate rate is valid
+    if (!(typeof data.rate === 'number' && isFinite(data.rate) && data.rate > 0)) {
+      console.warn(`Invalid rate returned for ${fromCode}/${toCode}: ${data.rate}`)
+      return null
+    }
+
+    const source = data.source_table || 'pairs'
 
     const rate = parseFloat(data.rate)
     const updatedAt = new Date(data.updated_at)
