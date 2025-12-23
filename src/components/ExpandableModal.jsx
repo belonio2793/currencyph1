@@ -127,7 +127,7 @@ export default function ExpandableModal({
         {/* Header with collapse button */}
         {title && (
           <div
-            className={`${headerPaddingClasses} border-b border-slate-200 flex items-center justify-between sticky top-0 bg-white z-20`}
+            className={`${headerPaddingClasses} border-b border-slate-200 flex items-center justify-between sticky top-0 bg-white z-50`}
           >
             <div className="flex items-center gap-2 flex-1">
               {icon && <span className="text-2xl">{icon}</span>}
