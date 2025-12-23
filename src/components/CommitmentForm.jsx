@@ -579,8 +579,13 @@ export default function CommitmentForm({ isOpen, onClose, onCommitmentSaved, use
           </div>
 
           {/* Section 5: Summary & Totals */}
-          <div className="border-t border-slate-600 pt-6 space-y-4 bg-slate-750 rounded-lg p-6">
-            <h3 className="text-lg font-semibold text-white">💡 Summary</h3>
+          <div className="border-t border-slate-600 pt-6 space-y-4 bg-gradient-to-br from-blue-900/30 to-cyan-900/30 rounded-xl p-6 border border-blue-700/30">
+            <div className="flex items-center gap-3 pb-3">
+              <div className="bg-gradient-to-r from-emerald-600 to-cyan-600 rounded-lg w-10 h-10 flex items-center justify-center text-lg font-bold">
+                💡
+              </div>
+              <h3 className="text-lg font-bold text-white">Commitment Summary</h3>
+            </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
               <div className="flex justify-between items-center p-3 bg-slate-700 rounded">
                 <span className="text-slate-300">Item Total (Qty × Price × Intervals)</span>
