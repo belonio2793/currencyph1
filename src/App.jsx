@@ -254,8 +254,8 @@ export default function App() {
       setShowAuth(false)
     }
 
-    // Direct /planning route should activate planning tab
-    if (path === '/planning') {
+    // Direct /coconuts route should activate planning tab
+    if (path === '/coconuts') {
       setActiveTab('planning')
       setShowAuth(false)
     }
