@@ -207,12 +207,13 @@ export default function PokerPage({ userId, userEmail, onShowAuth }) {
         })
 
         if (!res.ok) {
-          let errorMsg = 'Failed to sit'
+          let errorMsg = 'Failed to sit at table'
           try {
             const json = await res.json()
-            errorMsg = json.error || errorMsg
-          } catch (e) {
+            errorMsg = json.error || json.message || errorMsg
+          } catch (parseErr) {
             // Could not parse JSON error response
+            errorMsg = res.statusText || errorMsg
           }
           throw new Error(errorMsg)
         }
@@ -224,8 +225,10 @@ export default function PokerPage({ userId, userEmail, onShowAuth }) {
           await openTable(table)
         }
       }
-    } catch (e) {
-      setError(`Could not join table: ${e.message || e}`)
+    } catch (err) {
+      const errorMessage = err?.message || String(err) || 'Could not join table'
+      setError(errorMessage)
+      console.error('Error joining table:', err)
     }
   }
 
