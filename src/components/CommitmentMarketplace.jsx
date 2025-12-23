@@ -635,9 +635,18 @@ export default function CommitmentMarketplace({ userId, isAuthenticated, onAuthS
                       <p className="text-white font-semibold text-sm">
                         {entry.contact_name || 'Anonymous'}
                       </p>
-                      <p className="text-slate-400 text-xs">
-                        {entry.contact_email}
-                      </p>
+                      <div className="mt-1 space-y-1">
+                        {entry.contact_email && (
+                          <p className="text-slate-400 text-xs">
+                            ✉️ {entry.contact_email}
+                          </p>
+                        )}
+                        {entry.contact_phone && (
+                          <p className="text-slate-400 text-xs">
+                            📱 {entry.contact_phone}
+                          </p>
+                        )}
+                      </div>
                     </div>
                     <span className="text-xs text-slate-500 whitespace-nowrap">
                       {new Date(entry.created_at).toLocaleDateString()}
