@@ -604,6 +604,13 @@ export default function App() {
             </Suspense>
           )}
 
+          {/* Partnership Hero - Full page partnership network */}
+          {activeTab === 'partnership' && (
+            <Suspense fallback={<PageLoader />}>
+              <PartnershipHero userId={userId} userEmail={userEmail} isAuthenticated={!!userId} />
+            </Suspense>
+          )}
+
           {activeTab === 'checkout' && (
             <Suspense fallback={<PageLoader />}>
               <PaymentCheckoutPage userId={userId} globalCurrency={globalCurrency} />
