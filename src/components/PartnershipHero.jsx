@@ -94,8 +94,46 @@ export default function PartnershipHero({ userId, userEmail, isAuthenticated, on
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-6xl mx-auto space-y-12">
+    <div className="min-h-screen bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 flex flex-col">
+      {/* Navigation Header */}
+      <div className="bg-slate-800 border-b border-slate-700 px-4 sm:px-6 lg:px-8 py-4">
+        <div className="max-w-6xl mx-auto flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <h1 className="text-2xl font-bold text-white">🥥 Coconuts.com.ph</h1>
+            <span className="px-3 py-1 bg-amber-700 text-amber-100 text-xs font-semibold rounded">Partnership Network</span>
+          </div>
+          <div className="flex items-center gap-3">
+            {!isAuthenticated && (
+              <>
+                <button
+                  onClick={() => onAuthRequired && onAuthRequired('login')}
+                  className="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white font-medium rounded-lg transition-colors text-sm"
+                >
+                  Sign In
+                </button>
+                <button
+                  onClick={() => onAuthRequired && onAuthRequired('register')}
+                  className="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white font-medium rounded-lg transition-colors text-sm"
+                >
+                  Create Account
+                </button>
+              </>
+            )}
+            {isAuthenticated && (
+              <button
+                onClick={() => onNavigate && onNavigate('home')}
+                className="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white font-medium rounded-lg transition-colors text-sm"
+              >
+                ← Back to Home
+              </button>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Main Content */}
+      <div className="flex-1 py-12 px-4 sm:px-6 lg:px-8 overflow-auto">
+        <div className="max-w-6xl mx-auto space-y-12">
         {/* Partnership Form Section */}
         <div className="max-w-2xl mx-auto">
           <PartnershipForm
@@ -244,6 +282,7 @@ export default function PartnershipHero({ userId, userEmail, isAuthenticated, on
             <div className="text-slate-400 text-sm">Partnership Types</div>
           </div>
         </div>
+      </div>
       </div>
     </div>
   )
