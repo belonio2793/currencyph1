@@ -77,7 +77,17 @@ export default function CommitmentWidget() {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-    
+
+    // If offline, show demo message
+    if (!isOnline) {
+      setSuccess('✅ Demo Mode: Your commitment would be recorded as:\n' +
+        `${formData.quantity} ${formData.quantity_unit} of ${formData.item_type}\n` +
+        `@ ${formData.currency} ${formData.unit_price}/${formData.quantity_unit}\n\n` +
+        'Sign in when online to save it to the ecosystem.')
+      setTimeout(() => setSuccess(''), 8000)
+      return
+    }
+
     if (!session?.user?.id) {
       setShowAuthModal(true)
       return
