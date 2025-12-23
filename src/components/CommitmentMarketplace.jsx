@@ -11,6 +11,7 @@ export default function CommitmentMarketplace({ userId, isAuthenticated, onAuthS
 
   // Simple form data
   const [name, setName] = useState('')
+  const [username, setUsername] = useState('')
   const [email, setEmail] = useState('')
   const [phone, setPhone] = useState('')
   const [whatICanOffer, setWhatICanOffer] = useState('')
