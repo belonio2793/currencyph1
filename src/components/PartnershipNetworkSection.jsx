@@ -219,60 +219,142 @@ export default function PartnershipNetworkSection({ isAuthenticated, userId }) {
   }
 
   return (
-    <div className={`rounded-lg border border-slate-700 bg-slate-800 flex flex-col overflow-hidden ${isMobile ? 'w-full' : 'w-full'}`}>
-      {/* Header Section */}
-      <div className={`bg-slate-700 border-b border-slate-600 ${isMobile ? 'px-3 py-3' : 'px-6 py-4'}`}>
-        <div className={`flex ${isMobile ? 'flex-col gap-2' : 'items-center justify-between'} mb-4`}>
-          <div className="flex items-center gap-2">
-            <h2 className={`font-bold text-white ${isMobile ? 'text-lg' : 'text-xl'}`}>
-              🤝 Partnership Network
-            </h2>
-          </div>
-          <div className={`flex ${isMobile ? 'flex-col gap-2 w-full' : 'items-center gap-4'}`}>
-            <div className="flex items-center gap-2 text-sm text-slate-300">
-              <span className="font-semibold">{partnerCount}</span>
-              <span className="text-xs">Partners</span>
-            </div>
-            <div className="flex items-center gap-2 text-sm text-slate-300">
-              <span className="font-semibold">₱{totalCommitmentValue.toLocaleString('en-US', { maximumFractionDigits: 0 })}</span>
-              <span className="text-xs">Total Value</span>
-            </div>
-          </div>
+    <div className={`rounded-lg border border-slate-700 bg-gradient-to-br from-slate-800 via-slate-800 to-slate-900 flex flex-col overflow-hidden ${isMobile ? 'w-full' : 'w-full'}`}>
+      {/* Hero Header Section */}
+      <div className={`relative bg-gradient-to-r from-blue-700 via-blue-600 to-cyan-600 border-b border-blue-500 overflow-hidden ${isMobile ? 'px-3 py-4' : 'px-6 py-6'}`}>
+        {/* Decorative background elements */}
+        <div className="absolute inset-0 opacity-20">
+          <div className="absolute -top-4 -right-4 w-32 h-32 bg-cyan-400 rounded-full blur-3xl"></div>
+          <div className="absolute -bottom-4 -left-4 w-40 h-40 bg-blue-500 rounded-full blur-3xl"></div>
         </div>
 
-        {/* Search and Filter */}
-        <div className={`flex flex-col gap-3 ${isMobile ? '' : ''}`}>
+        <div className="relative z-10">
+          <div className={`flex ${isMobile ? 'flex-col gap-3' : 'items-center justify-between'} mb-4`}>
+            <div className="flex items-center gap-3">
+              <span className={`${isMobile ? 'text-2xl' : 'text-3xl'}`}>🥥</span>
+              <div>
+                <h2 className={`font-bold text-white ${isMobile ? 'text-lg' : 'text-2xl'}`}>
+                  Partnership Network
+                </h2>
+                <p className="text-blue-100 text-xs">Coconuts.com.ph - Building Together</p>
+              </div>
+            </div>
+
+            {/* Stats Cards */}
+            <div className={`flex gap-3 ${isMobile ? 'w-full justify-between' : 'items-center'}`}>
+              <div className="bg-white/10 backdrop-blur px-4 py-2 rounded-lg border border-white/20">
+                <p className="text-blue-100 text-xs">Active Partners</p>
+                <p className="text-white font-bold text-lg">{partnerCount}</p>
+              </div>
+              <div className="bg-white/10 backdrop-blur px-4 py-2 rounded-lg border border-white/20">
+                <p className="text-blue-100 text-xs">Total Committed</p>
+                <p className="text-white font-bold text-lg">₱{(totalCommitmentValue / 1000000).toFixed(1)}M</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Tagline */}
+          <p className="text-blue-50 text-sm font-light">Transparent supply chain coordination & collaborative commerce with currency.ph integration</p>
+        </div>
+      </div>
+
+      {/* User Contribution Section */}
+      {isAuthenticated && userProfile && (
+        <div className={`bg-gradient-to-r from-emerald-900/30 to-cyan-900/30 border-b border-emerald-700/50 ${isMobile ? 'px-3 py-3' : 'px-6 py-4'}`}>
+          <div className={`flex items-center ${isMobile ? 'flex-col gap-3' : 'justify-between gap-4'}`}>
+            <div className="flex items-center gap-3">
+              <div className={`rounded-full flex items-center justify-center font-bold text-white ${getAchievementLevel(userTotalValue).color} ${isMobile ? 'w-12 h-12 text-lg' : 'w-14 h-14 text-xl'}`}>
+                {getAchievementLevel(userTotalValue).level === 'bronze' ? '🥉' :
+                 getAchievementLevel(userTotalValue).level === 'silver' ? '🥈' :
+                 getAchievementLevel(userTotalValue).level === 'gold' ? '🥇' :
+                 getAchievementLevel(userTotalValue).level === 'platinum' ? '💎' : '✨'}
+              </div>
+              <div className="flex-1">
+                <p className="text-slate-300 text-xs">Your Contribution Level</p>
+                <p className={`font-bold text-white ${isMobile ? 'text-base' : 'text-lg'}`}>
+                  {getAchievementLevel(userTotalValue).label}
+                </p>
+                <p className="text-slate-400 text-xs mt-0.5">
+                  ₱{userTotalValue.toLocaleString('en-US', { maximumFractionDigits: 0 })} committed
+                </p>
+              </div>
+            </div>
+
+            {/* Action Buttons */}
+            <div className={`flex gap-2 ${isMobile ? 'w-full' : ''}`}>
+              <button
+                onClick={() => setShowCommitmentForm(true)}
+                className={`flex-1 px-4 py-2 bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-600 hover:to-cyan-600 text-white font-semibold rounded-lg transition-all transform hover:scale-105 flex items-center justify-center gap-2 ${isMobile ? 'text-sm' : 'text-base'}`}
+              >
+                <span>➕</span>
+                <span>{isMobile ? 'Add' : 'Add Contribution'}</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Commitment History */}
+          {userCommitments.length > 0 && (
+            <div className={`mt-4 pt-4 border-t border-emerald-700/30 ${isMobile ? 'space-y-2' : 'space-y-2'}`}>
+              <p className="text-slate-400 text-xs font-semibold">Your Active Contributions</p>
+              <div className={`grid gap-2 ${isMobile ? 'grid-cols-1' : 'grid-cols-2 lg:grid-cols-3'}`}>
+                {userCommitments.slice(0, 3).map(commitment => (
+                  <div key={commitment.id} className="bg-slate-800/50 rounded px-3 py-2 flex items-center justify-between">
+                    <div className="flex-1 min-w-0">
+                      <p className="text-slate-300 text-xs font-medium truncate">{commitment.item_type}</p>
+                      <p className="text-slate-500 text-xs">₱{(commitment.grand_total || 0).toLocaleString('en-US', { maximumFractionDigits: 0 })}</p>
+                    </div>
+                    <button
+                      onClick={() => handleDeleteCommitment(commitment.id)}
+                      className="text-red-400 hover:text-red-300 ml-2 flex-shrink-0"
+                      title="Remove contribution"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                ))}
+              </div>
+              {userCommitments.length > 3 && (
+                <p className="text-slate-500 text-xs">+{userCommitments.length - 3} more</p>
+              )}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Search and Filter */}
+      <div className={`bg-slate-700/50 border-b border-slate-600 ${isMobile ? 'px-3 py-3' : 'px-6 py-4'}`}>
+        <div className={`flex flex-col gap-3`}>
           <input
             type="text"
-            placeholder="Search partners..."
+            placeholder="Search partners by name, location, or business type..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className={`w-full bg-slate-600 border border-slate-500 rounded text-white placeholder-slate-400 focus:outline-none focus:border-blue-500 ${isMobile ? 'px-2 py-2 text-xs' : 'px-3 py-2 text-sm'}`}
+            className={`w-full bg-slate-600 border border-slate-500 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-400/30 transition-all ${isMobile ? 'px-3 py-2 text-xs' : 'px-4 py-2 text-sm'}`}
           />
 
-          <div className={`flex ${isMobile ? 'flex-wrap gap-1' : 'items-center gap-1 overflow-x-auto pb-1'}`}>
+          <div className={`flex ${isMobile ? 'flex-wrap gap-2' : 'items-center gap-2 overflow-x-auto pb-1'}`}>
             <button
               onClick={() => setSelectedBusinessType('')}
-              className={`px-3 py-1 rounded text-xs font-medium whitespace-nowrap transition-colors ${
+              className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-all ${
                 selectedBusinessType === ''
-                  ? 'bg-blue-600 text-white'
+                  ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/50'
                   : 'bg-slate-600 hover:bg-slate-500 text-slate-300'
               }`}
             >
-              All
+              All Types
             </button>
             {BUSINESS_TYPES.map(type => (
               <button
                 key={type}
                 onClick={() => setSelectedBusinessType(type)}
-                className={`px-3 py-1 rounded text-xs font-medium whitespace-nowrap transition-colors ${
+                className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-all ${
                   selectedBusinessType === type
-                    ? 'bg-blue-600 text-white'
+                    ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/50'
                     : 'bg-slate-600 hover:bg-slate-500 text-slate-300'
                 }`}
                 title={type}
               >
-                {BUSINESS_TYPE_EMOJIS[type]} {type}
+                {BUSINESS_TYPE_EMOJIS[type]}
               </button>
             ))}
           </div>
