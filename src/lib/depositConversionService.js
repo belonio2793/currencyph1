@@ -38,41 +38,20 @@ export class DepositConversionService {
       const fromCode = deposit.currency_code.toUpperCase()
       const toCode = wallet.currency_code.toUpperCase()
 
-      // Try public.pairs first (primary source for all rates)
-      let rateData = null
-      let rateSource = null
-
-      const { data: pairsData, error: pairsError } = await this.supabase
+      // Fetch rate from public.pairs (unified source for all rates)
+      const { data: rateData, error: pairsError } = await this.supabase
         .from('pairs')
         .select('rate, source_table, updated_at')
         .eq('from_currency', fromCode)
         .eq('to_currency', toCode)
         .single()
 
-      if (!pairsError && pairsData && typeof pairsData.rate === 'number' && isFinite(pairsData.rate) && pairsData.rate > 0) {
-        rateData = pairsData
-        rateSource = 'pairs'
-      } else {
-        // Fallback to crypto_rates_valid
-        const { data: cryptoRatesData, error: cryptoError } = await this.supabase
-          .from('crypto_rates_valid')
-          .select('rate, source, updated_at')
-          .eq('from_currency', fromCode)
-          .eq('to_currency', toCode)
-          .order('updated_at', { ascending: false })
-          .limit(1)
-          .single()
-
-        if (!cryptoError && cryptoRatesData) {
-          rateData = cryptoRatesData
-          rateSource = 'crypto_rates_valid'
-        }
-      }
-
-      if (!rateData) {
+      if (pairsError || !rateData || !(typeof rateData.rate === 'number' && isFinite(rateData.rate) && rateData.rate > 0)) {
         console.warn(`No exchange rate available for ${fromCode}/${toCode}`)
         return null
       }
+
+      const rateSource = 'pairs'
 
       const exchangeRate = parseFloat(rateData.rate)
       const convertedAmount = deposit.amount * exchangeRate
