@@ -2638,6 +2638,305 @@ export default function PlanningChat() {
           </div>
         </div>
       )}
+
+      {/* Coconuts.com.ph Promotional Sections */}
+      <div className="mt-24 border-t-8 border-amber-600">
+        {/* Market Opportunity */}
+        <section className="py-24 px-4 sm:px-6 lg:px-8 bg-gray-50">
+          <div className="max-w-7xl mx-auto">
+            <div className="mb-16">
+              <div className="inline-block mb-4 px-4 py-2 bg-amber-100 text-amber-700 rounded-full text-sm font-semibold">
+                🥥 COCONUTS.COM.PH
+              </div>
+              <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+                Global Coconut Enterprise. Massive Market Opportunity.
+              </h2>
+            </div>
+
+            <div className="grid md:grid-cols-2 gap-12 mb-12">
+              <div className="bg-white rounded-xl p-10 border border-gray-200">
+                <h3 className="text-2xl font-bold text-gray-900 mb-8 flex items-center gap-3">
+                  <span className="text-3xl">📊</span>
+                  Market Size & Growth
+                </h3>
+                <div className="space-y-6">
+                  <div className="border-b border-gray-200 pb-6">
+                    <p className="text-gray-600 font-medium mb-2">Global Coconut Water Market</p>
+                    <p className="text-3xl font-bold text-amber-600">$3.2B</p>
+                    <p className="text-gray-600 text-sm mt-2">CAGR: 12.3% through 2030</p>
+                  </div>
+                  <div className="border-b border-gray-200 pb-6">
+                    <p className="text-gray-600 font-medium mb-2">Virgin Coconut Oil Market</p>
+                    <p className="text-3xl font-bold text-amber-600">$2.8B</p>
+                    <p className="text-gray-600 text-sm mt-2">CAGR: 14.1% through 2030</p>
+                  </div>
+                  <div className="border-b border-gray-200 pb-6">
+                    <p className="text-gray-600 font-medium mb-2">Natural Cosmetics Market</p>
+                    <p className="text-3xl font-bold text-amber-600">$18.7B</p>
+                    <p className="text-gray-600 text-sm mt-2">CAGR: 9.8% (coconut segment growing faster)</p>
+                  </div>
+                  <div>
+                    <p className="text-gray-600 font-medium mb-2">Functional Foods & Superfoods</p>
+                    <p className="text-3xl font-bold text-amber-600">$24.3B</p>
+                    <p className="text-gray-600 text-sm mt-2">Coconut products = fastest growing category</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-white rounded-xl p-10 border border-gray-200">
+                <h3 className="text-2xl font-bold text-gray-900 mb-8 flex items-center gap-3">
+                  <span className="text-3xl">🎯</span>
+                  Strategic Advantages
+                </h3>
+                <div className="space-y-4">
+                  {[
+                    { title: 'Geographic Advantage', desc: 'Philippines = #1 coconut producer (40% global share)' },
+                    { title: 'Cost Efficiency', desc: 'Labor costs 70% lower than competitors; land availability' },
+                    { title: 'Quality Control', desc: 'Direct source control eliminates middleman contamination' },
+                    { title: 'Market Timing', desc: 'Explosive growth in health/wellness, vegan, clean beauty trends' },
+                    { title: 'Sustainability Focus', desc: 'Premium positioning for eco-conscious consumers' },
+                    { title: 'Vertical Integration', desc: 'Control entire supply chain = margin protection' }
+                  ].map((item, i) => (
+                    <div key={i} className="p-4 bg-gradient-to-r from-amber-50 to-white rounded-lg border border-amber-200">
+                      <p className="font-semibold text-gray-900">{item.title}</p>
+                      <p className="text-gray-600 text-sm mt-1">{item.desc}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-gradient-to-r from-amber-600 to-orange-600 text-white rounded-xl p-12">
+              <h3 className="text-3xl font-bold mb-6">Products & Economics</h3>
+              <div className="grid md:grid-cols-3 gap-6 mb-8">
+                <div className="bg-white/10 p-6 rounded-lg">
+                  <p className="text-amber-100 font-semibold mb-3">💧 Coconut Water</p>
+                  <p className="text-amber-50 text-sm mb-3">45-60% retail margins. Global market $3.2B growing 12.3% annually.</p>
+                  <p className="font-bold text-amber-100">Cold-pressed, pasteurized</p>
+                </div>
+                <div className="bg-white/10 p-6 rounded-lg">
+                  <p className="text-amber-100 font-semibold mb-3">🫒 Virgin Coconut Oil</p>
+                  <p className="text-amber-50 text-sm mb-3">55-70% retail margins. Market $2.8B growing 14.1% annually.</p>
+                  <p className="font-bold text-amber-100">Cold-pressed, organic certified</p>
+                </div>
+                <div className="bg-white/10 p-6 rounded-lg">
+                  <p className="text-amber-100 font-semibold mb-3">✨ Coconut Skincare</p>
+                  <p className="text-amber-50 text-sm mb-3">65-75% retail margins. Part of $18.7B natural cosmetics market.</p>
+                  <p className="font-bold text-amber-100">100% natural, dermatologist tested</p>
+                </div>
+              </div>
+
+              <div className="grid md:grid-cols-3 gap-8 text-center">
+                <div>
+                  <p className="text-amber-100 font-semibold mb-2">Year 5 Revenue Projection</p>
+                  <p className="text-4xl font-bold">$142.7M</p>
+                  <p className="text-amber-50 text-sm mt-2">From 38.5M units annually</p>
+                </div>
+                <div>
+                  <p className="text-amber-100 font-semibold mb-2">Gross Profit Margin</p>
+                  <p className="text-4xl font-bold">51.8%</p>
+                  <p className="text-amber-50 text-sm mt-2">EBITDA margin by year 5</p>
+                </div>
+                <div>
+                  <p className="text-amber-100 font-semibold mb-2">5-Year Total ROI</p>
+                  <p className="text-4xl font-bold">350%</p>
+                  <p className="text-amber-50 text-sm mt-2">On $9.08M initial investment</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Partnership Ecosystem */}
+        <section className="py-24 px-4 sm:px-6 lg:px-8 bg-white">
+          <div className="max-w-7xl mx-auto">
+            <div className="mb-16">
+              <div className="inline-block mb-4 px-4 py-2 bg-amber-100 text-amber-700 rounded-full text-sm font-semibold">
+                PARTNERSHIP NETWORK
+              </div>
+              <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+                A Growing Collaborative Community
+              </h2>
+              <p className="text-xl text-gray-600 max-w-3xl">
+                We're building a transparent ecosystem where farmers, manufacturers, distributors, and impact investors all participate in governance and share proportional returns.
+              </p>
+            </div>
+
+            <div className="grid md:grid-cols-3 gap-8">
+              {[
+                {
+                  title: '🌾 Coconut Farmers & Landowners',
+                  description: 'Supply the foundation of our operation',
+                  benefits: [
+                    'Guaranteed purchase agreements (12-24 months)',
+                    'Fair-market pricing + 5% sustainability premium',
+                    'Direct currency.ph payment access',
+                    'Profit sharing above baseline (2-5%)',
+                    'Weather insurance & crop protection'
+                  ],
+                  role: '35% of equity'
+                },
+                {
+                  title: '🏭 Equipment & Machinery Providers',
+                  description: 'Enable processing at scale',
+                  benefits: [
+                    'Long-term equipment leasing',
+                    'Maintenance contracts with margins',
+                    'Equity stake (5-10%)',
+                    'Performance-based bonuses',
+                    'Joint R&D opportunities'
+                  ],
+                  role: '10% of equity'
+                },
+                {
+                  title: '📦 Distribution & Logistics Partners',
+                  description: 'Connect us to global markets',
+                  benefits: [
+                    'Exclusive regional distribution rights',
+                    'Margin sharing: 12-18% wholesale',
+                    'Co-marketing fund (3% sales)',
+                    'Real-time tracking tech platform',
+                    'Equity participation (5-8%)'
+                  ],
+                  role: '15% of equity'
+                }
+              ].map((group, i) => (
+                <div key={i} className="bg-gradient-to-br from-amber-50 to-white rounded-xl p-10 border border-gray-200 hover:shadow-lg transition-shadow">
+                  <h3 className="text-2xl font-bold text-gray-900 mb-3">{group.title}</h3>
+                  <p className="text-gray-600 mb-6">{group.description}</p>
+                  <div className="space-y-3 mb-6">
+                    {group.benefits.map((benefit, j) => (
+                      <div key={j} className="flex items-start gap-3">
+                        <span className="text-amber-600 font-bold">✓</span>
+                        <p className="text-gray-700 text-sm">{benefit}</p>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="pt-6 border-t border-gray-200">
+                    <p className="font-semibold text-amber-600">{group.role}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Impact & Beneficiaries */}
+        <section className="py-24 px-4 sm:px-6 lg:px-8 bg-gray-50">
+          <div className="max-w-7xl mx-auto">
+            <div className="mb-16">
+              <div className="inline-block mb-4 px-4 py-2 bg-amber-100 text-amber-700 rounded-full text-sm font-semibold">
+                IMPACT & CHANGE
+              </div>
+              <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+                Economic Prosperity for Philippine Communities
+              </h2>
+            </div>
+
+            <div className="grid md:grid-cols-2 gap-12 mb-12">
+              <div className="bg-gradient-to-br from-green-50 to-white rounded-xl p-12 border border-green-200">
+                <h3 className="text-2xl font-bold text-gray-900 mb-8">By Year 5:</h3>
+                <div className="space-y-4">
+                  {[
+                    { icon: '👥', text: 'Create 10,000+ direct jobs' },
+                    { icon: '🌾', text: 'Partner with 5,000+ farming families' },
+                    { icon: '💰', text: 'Generate $450M+ community income' },
+                    { icon: '🎓', text: 'Fund 5,000 educational scholarships' },
+                    { icon: '🏥', text: 'Support healthcare in 50+ barangays' },
+                    { icon: '♀️', text: '40% leadership roles for women' },
+                    { icon: '🌱', text: 'Restore 10,000 hectares of forest' },
+                    { icon: '🌍', text: 'Reduce agricultural poverty by 35%' }
+                  ].map((item, i) => (
+                    <div key={i} className="flex items-start gap-4 p-4 bg-white rounded-lg border border-green-200">
+                      <span className="text-3xl">{item.icon}</span>
+                      <p className="text-gray-700 font-medium leading-relaxed">{item.text}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="space-y-6">
+                <div className="bg-white rounded-xl p-10 border border-gray-200">
+                  <h3 className="text-2xl font-bold text-gray-900 mb-6">Primary Beneficiaries</h3>
+                  <div className="space-y-4">
+                    {[
+                      {
+                        group: 'Coconut Farming Communities',
+                        description: 'Income increase of 3-4x through fair contracts and profit sharing',
+                        region: 'Quezon, Davao, Pangasinan'
+                      },
+                      {
+                        group: 'Manufacturing Workforce',
+                        description: 'Skilled factory jobs with benefits, training, profit sharing',
+                        region: 'Central processing locations'
+                      },
+                      {
+                        group: 'Logistics & Distribution',
+                        description: 'Business ownership, jobs, equity stakes',
+                        region: 'Port cities & hubs'
+                      },
+                      {
+                        group: 'Women Entrepreneurs',
+                        description: '40%+ representation, microfinance, leadership development',
+                        region: 'Nationwide'
+                      }
+                    ].map((item, i) => (
+                      <div key={i} className="p-4 bg-gradient-to-r from-green-50 to-white rounded-lg border border-green-200">
+                        <p className="font-bold text-gray-900">{item.group}</p>
+                        <p className="text-gray-700 text-sm mt-2">{item.description}</p>
+                        <p className="text-green-700 font-semibold text-sm mt-2">📍 {item.region}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="bg-amber-100 rounded-xl p-10 border-2 border-amber-600">
+                  <h3 className="text-xl font-bold text-gray-900 mb-4">SDG Alignment</h3>
+                  <p className="text-gray-700 mb-4">Advancing UN Sustainable Development Goals:</p>
+                  <div className="space-y-2 text-sm text-gray-700">
+                    <p>✓ SDG 1: No Poverty (income generation)</p>
+                    <p>✓ SDG 5: Gender Equality (40% women in leadership)</p>
+                    <p>✓ SDG 8: Decent Work (fair wages, jobs)</p>
+                    <p>✓ SDG 12: Responsible Consumption (100% natural products)</p>
+                    <p>✓ SDG 13: Climate Action (forest restoration, carbon neutral 2030)</p>
+                    <p>✓ SDG 15: Life on Land (ecosystem restoration)</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Call to Action */}
+        <section className="py-24 px-4 sm:px-6 lg:px-8 bg-gradient-to-r from-amber-600 to-orange-600 text-white">
+          <div className="max-w-4xl mx-auto text-center">
+            <h2 className="text-5xl md:text-6xl font-bold mb-6">
+              Join a Movement Transforming Philippine Agriculture
+            </h2>
+            <p className="text-xl text-amber-50 mb-12 leading-relaxed max-w-2xl mx-auto">
+              Whether you're a farmer seeking fair pricing, an investor looking for impact returns, a partner building networks, or a technology provider—Coconuts.com.ph is built for your contribution and success.
+            </p>
+
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <button className="px-10 py-4 bg-white text-amber-600 rounded-lg hover:bg-gray-100 font-bold text-lg transition-colors">
+                Get Started Now →
+              </button>
+              <button className="px-10 py-4 border-2 border-white text-white rounded-lg hover:bg-white/10 font-bold text-lg transition-colors">
+                Learn More
+              </button>
+            </div>
+
+            <div className="mt-16 pt-8 border-t border-white/30">
+              <p className="text-amber-50 text-sm">
+                Coconuts.com.ph | Transforming Philippine Agriculture through Technology, Transparency & Community
+              </p>
+              <p className="text-amber-100 text-sm mt-4">
+                Contact: partnerships@coconuts.com.ph | +63 (2) 1234-5678
+              </p>
+            </div>
+          </div>
+        </section>
+      </div>
     </div>
   )
 }
