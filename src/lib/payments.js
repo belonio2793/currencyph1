@@ -488,7 +488,7 @@ export const currencyAPI = {
     const toCode = to.toUpperCase()
 
     try {
-      // Try public.pairs first (unified rate table for all currencies and cryptos)
+      // Fetch from public.pairs (unified rate table for all currencies and cryptos)
       const { data, error } = await supabase
         .from('pairs')
         .select('rate')
@@ -508,29 +508,6 @@ export const currencyAPI = {
       }
     } catch (e) {
       console.warn('Error fetching from public.pairs:', e.message)
-    }
-
-    try {
-      // Fallback: Try currency_rates table for fiat currencies
-      const { data, error } = await supabase
-        .from('currency_rates')
-        .select('rate')
-        .eq('from_currency', fromCode)
-        .eq('to_currency', toCode)
-        .maybeSingle()
-
-      if (!error && data && typeof data.rate !== 'undefined') {
-        const rate = Number(data.rate)
-        // Validate rate is not 0.00 or NaN
-        if (isFinite(rate) && rate > 0) {
-          console.debug(`Rate from currency_rates: ${fromCode}/${toCode} = ${rate}`)
-          return rate
-        } else {
-          console.warn(`Invalid rate from currency_rates for ${fromCode}/${toCode}: ${rate}`)
-        }
-      }
-    } catch (e) {
-      // ignore and fallback
     }
 
     try {
@@ -557,12 +534,12 @@ export const currencyAPI = {
   async getAllExchangeRates() {
     try {
       const { data, error } = await supabase
-        .from('currency_rates')
+        .from('pairs')
         .select('from_currency,to_currency,rate')
 
       if (!error && data) return data
     } catch (e) {
-      console.warn('Failed to fetch currency_rates from DB', e)
+      console.warn('Failed to fetch pairs from DB', e)
     }
 
     // Fallback: build from currencyAPI global rates
