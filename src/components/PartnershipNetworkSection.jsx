@@ -495,6 +495,16 @@ export default function PartnershipNetworkSection({ isAuthenticated, userId }) {
           </button>
         </div>
       )}
+
+      {/* Commitment Form Modal */}
+      <CommitmentForm
+        isOpen={showCommitmentForm}
+        onClose={() => setShowCommitmentForm(false)}
+        onCommitmentSaved={handleCommitmentSaved}
+        userId={userId}
+        profileId={userProfile?.id}
+        isAuthenticated={isAuthenticated}
+      />
     </div>
   )
 }
