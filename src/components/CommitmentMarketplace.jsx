@@ -845,6 +845,7 @@ export default function CommitmentMarketplace({ userId, isAuthenticated, onAuthS
                       setShowPasswordModal(false)
                       setPassword('')
                       setConfirmPassword('')
+                      setUsername('')
                       setPasswordError('')
                     }}
                     className="flex-1 px-4 py-2.5 bg-slate-700 hover:bg-slate-600 text-white font-semibold rounded-lg transition-all"
