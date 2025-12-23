@@ -268,8 +268,9 @@ export default function PokerGameModal({ open, onClose, table, userId, userEmail
         try {
           const json = await res.json()
           errorMsg = json.error || json.message || errorMsg
-        } catch (e) {
-          console.warn('Could not parse error response:', e)
+        } catch (parseErr) {
+          console.warn('Could not parse error response:', parseErr)
+          errorMsg = res.statusText || errorMsg
         }
         throw new Error(errorMsg)
       }
