@@ -29,6 +29,24 @@ const BUSINESS_TYPE_EMOJIS = {
   'other': '💼'
 }
 
+// Achievement badges based on contribution
+const ACHIEVEMENT_LEVELS = [
+  { level: 'bronze', minValue: 0, label: '🥉 Bronze', color: 'bg-amber-900', textColor: 'text-amber-300' },
+  { level: 'silver', minValue: 50000, label: '🥈 Silver', color: 'bg-slate-600', textColor: 'text-slate-200' },
+  { level: 'gold', minValue: 250000, label: '🥇 Gold', color: 'bg-yellow-700', textColor: 'text-yellow-200' },
+  { level: 'platinum', minValue: 1000000, label: '💎 Platinum', color: 'bg-cyan-700', textColor: 'text-cyan-200' },
+  { level: 'diamond', minValue: 5000000, label: '✨ Diamond Elite', color: 'bg-purple-700', textColor: 'text-purple-200' }
+]
+
+const getAchievementLevel = (totalValue) => {
+  for (let i = ACHIEVEMENT_LEVELS.length - 1; i >= 0; i--) {
+    if (totalValue >= ACHIEVEMENT_LEVELS[i].minValue) {
+      return ACHIEVEMENT_LEVELS[i]
+    }
+  }
+  return ACHIEVEMENT_LEVELS[0]
+}
+
 export default function PartnershipNetworkSection({ isAuthenticated, userId }) {
   const { isMobile } = useDevice()
   const [partnerships, setPartnerships] = useState([])
