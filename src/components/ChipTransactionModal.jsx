@@ -25,6 +25,7 @@ export default function ChipTransactionModal({ open, onClose, userId, onPurchase
     if (open && userId) {
       loadPokerProducts()
       loadUserData()
+      loadExchangeRate()
       if (!isGuestLocal) {
         loadUserWallets()
       }
