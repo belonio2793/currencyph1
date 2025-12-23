@@ -3596,7 +3596,7 @@ export default function PlanningChat() {
               {[
                 {
                   q: 'What\'s the minimum investment amount?',
-                  a: 'We accept investments starting at $50,000 for impact investors. Farmer contributions can start from land/equipment value at much lower entry points. Strategic partnerships have custom structures.'
+                  a: 'We accept investments starting at $50,000 for impact investors. Farmer contributions can start from land/equipment value at much lower entry points. Strategic partnerships have custom structures. Equity tokens can be as small as 0.1% stakes.'
                 },
                 {
                   q: 'How are dividends distributed?',
