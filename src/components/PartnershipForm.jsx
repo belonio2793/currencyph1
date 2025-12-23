@@ -60,7 +60,13 @@ const CONTRIBUTION_TYPE_CONFIG = {
   }
 }
 
-export default function PartnershipForm({ userId, userEmail, isAuthenticated, onSubmitSuccess = null }) {
+export default function PartnershipForm({
+  userId,
+  userEmail,
+  isAuthenticated,
+  onSubmitSuccess = null,
+  onAuthRequired = null
+}) {
   const [formData, setFormData] = useState({
     partnerType: '',
     businessName: '',
@@ -155,7 +161,10 @@ export default function PartnershipForm({ userId, userEmail, isAuthenticated, on
     }
 
     if (!isAuthenticated || !userId) {
-      setError('Please sign in to submit your partnership contribution')
+      // Trigger auth modal
+      if (onAuthRequired) {
+        onAuthRequired('login')
+      }
       return
     }
 
