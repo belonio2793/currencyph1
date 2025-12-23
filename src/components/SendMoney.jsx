@@ -101,6 +101,23 @@ export default function SendMoney({ userId }) {
     return wallets.find(w => w.currency_code === code)
   }
 
+  const fetchRecipientWallets = async (recipientUserId) => {
+    if (!recipientUserId) return
+    setLoadingRecipientWallets(true)
+    try {
+      const walletsData = await currencyAPI.getWallets(recipientUserId)
+      setRecipientWallets(walletsData)
+      // Default to PHP wallet if available
+      const phpWallet = walletsData.find(w => w.currency_code === 'PHP')
+      setRecipientCurrency(phpWallet ? 'PHP' : (walletsData[0]?.currency_code || ''))
+    } catch (err) {
+      console.warn('Failed to load recipient wallets:', err)
+      setRecipientWallets([])
+    } finally {
+      setLoadingRecipientWallets(false)
+    }
+  }
+
   useEffect(() => {
     if (!showSearchDropdown) return
     const q = searchQuery.trim()
@@ -127,12 +144,13 @@ export default function SendMoney({ userId }) {
     }
   }, [searchQuery, showSearchDropdown])
 
-  const handleSelectRecipient = (user) => {
+  const handleSelectRecipient = async (user) => {
     setSelectedRecipient(user)
     setRecipientEmail(user.email)
     setSearchQuery('')
     setSearchResults([])
     setShowSearchDropdown(false)
+    await fetchRecipientWallets(user.id)
   }
 
   const handleAddBeneficiary = async (e) => {
