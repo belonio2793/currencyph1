@@ -422,26 +422,61 @@ export default function ChipTransactionModal({ open, onClose, userId, onPurchase
 
           {/* Wallet Selection for Authenticated Users */}
           {!isGuestLocal && userWallets.length > 0 && (
-            <div>
-              <h3 className="text-sm font-semibold text-slate-900 mb-3">Select Payment Wallet</h3>
-              <div className="space-y-2">
-                {userWallets.map((wallet) => (
-                  <label key={wallet.id} className="flex items-center p-3 border border-slate-200 rounded-lg cursor-pointer hover:bg-blue-50 transition">
-                    <input
-                      type="radio"
-                      name="wallet"
-                      value={wallet.id}
-                      checked={selectedWalletId === wallet.id}
-                      onChange={() => setSelectedWalletId(wallet.id)}
-                      className="mr-3"
-                    />
-                    <div className="flex-1">
-                      <div className="font-medium text-slate-900">{wallet.currency_code}</div>
-                      <div className="text-sm text-slate-600">Balance: ${Number(wallet.balance || 0).toFixed(2)}</div>
-                    </div>
-                  </label>
-                ))}
-              </div>
+            <div className="bg-white border border-slate-200 rounded-lg p-6 hover:shadow-lg transition-all">
+              <label className="block text-sm font-semibold text-slate-700 mb-4 uppercase tracking-wide">
+                Select Payment Wallet
+              </label>
+              <select
+                value={selectedWalletId || ''}
+                onChange={(e) => setSelectedWalletId(e.target.value)}
+                className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-slate-900 font-medium"
+              >
+                <option value="">Choose a wallet...</option>
+                {fiatWallets.length > 0 && (
+                  <optgroup label="💳 Fiat Wallets">
+                    {fiatWallets.map(wallet => (
+                      <option key={wallet.id} value={wallet.id}>
+                        {wallet.currency_code} - Balance: {formatNumber(Number(wallet.balance || 0))}
+                      </option>
+                    ))}
+                  </optgroup>
+                )}
+                {cryptoWallets.length > 0 && (
+                  <optgroup label="₿ Cryptocurrency">
+                    {cryptoWallets.map(wallet => (
+                      <option key={wallet.id} value={wallet.id}>
+                        {wallet.currency_code} - Balance: {formatNumber(Number(wallet.balance || 0))}
+                      </option>
+                    ))}
+                  </optgroup>
+                )}
+              </select>
+
+              {selectedWalletId && (
+                <div className="mt-4 space-y-3">
+                  {(() => {
+                    const selectedWallet = userWallets.find(w => w.id === selectedWalletId)
+                    return selectedWallet ? (
+                      <>
+                        <div className="bg-slate-50 rounded-lg p-4">
+                          <p className="text-xs text-slate-600 font-semibold mb-2 uppercase tracking-wider">Current Balance</p>
+                          <p className="text-xl font-light text-slate-900 font-mono">
+                            {formatNumber(Number(selectedWallet.balance || 0))} {selectedWallet.currency_code}
+                          </p>
+                        </div>
+                        <div className="bg-blue-50 rounded-lg p-4 border border-blue-200">
+                          <p className="text-xs text-blue-700 font-medium mb-2 uppercase tracking-wider">Wallet ID</p>
+                          <p className="font-mono text-xs text-slate-900 break-all">{selectedWallet.id}</p>
+                        </div>
+                        <div className="bg-blue-50 rounded-lg p-4 border border-blue-200">
+                          <p className="text-xs text-blue-700 font-medium mb-2 uppercase tracking-wider">Account Number</p>
+                          <p className="font-mono text-xs text-slate-900">{formatAccountNumber(selectedWallet.account_number)}</p>
+                        </div>
+                      </>
+                    ) : null
+                  })()}
+                </div>
+              )}
             </div>
           )}
 
