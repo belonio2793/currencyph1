@@ -180,6 +180,5 @@ export default {
   getAllCryptoRates,
   getCryptoRateWithTimestamp,
   areCachedRatesFresh,
-  getCacheLastUpdateTime,
-  getCachedRates
+  getCacheLastUpdateTime
 }
