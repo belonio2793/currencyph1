@@ -168,6 +168,7 @@ export default function PlanningChat() {
   const [showMarkerTypeModal, setShowMarkerTypeModal] = useState(false)
   const [pendingMarkerType, setPendingMarkerType] = useState(null)
   const [selectedExistingLocationId, setSelectedExistingLocationId] = useState('')
+  const [showAuthModalOnDemand, setShowAuthModalOnDemand] = useState(false)
 
   const messagesEndRef = useRef(null)
   const mapRef = useRef(null)
