@@ -283,49 +283,30 @@ export default function CommitmentMarketplace({ userId, isAuthenticated, onAuthS
         // User doesn't exist, proceed with signup
       }
 
-      // Register user with Supabase Auth
-      const { data, error: signUpError } = await supabase.auth.signUp({
-        email: newUserEmail,
-        password: password,
-        options: {
-          emailRedirectTo: window.location.origin
-        }
+      // Register user with flexible auth (no email verification required)
+      const signupResult = await flexibleAuthClient.signUp(newUserEmail, password, {
+        full_name: tempFormData.name || newUserEmail
       })
 
-      if (signUpError) {
-        // Better error messaging
-        if (signUpError.message?.includes('already registered')) {
-          setPasswordError('This email is already registered. Please sign in instead.')
-        } else if (signUpError.message?.includes('Database error')) {
-          setPasswordError('Account creation requires email verification. Please check your email shortly, or try again in a moment.')
-        } else {
-          setPasswordError(signUpError.message || 'Registration failed. Please try again.')
-        }
+      if (signupResult.error) {
+        setPasswordError(signupResult.error || 'Registration failed. Please try again.')
         setPasswordLoading(false)
         return
       }
 
-      if (!data.user) {
+      if (!signupResult.user) {
         throw new Error('User registration failed')
       }
 
-      const userId = data.user.id
+      const userId = signupResult.user.id
 
-      // Try to auto sign in the newly created user
-      try {
-        const { error: signInError } = await supabase.auth.signInWithPassword({
-          email: newUserEmail,
-          password: password
-        })
-
-        if (signInError) {
-          // Sign in failed but user was created - show helpful message
-          setPasswordError('Account created! Please check your email to verify your account, then sign in.')
-          setPasswordLoading(false)
-          return
-        }
-      } catch (signInErr) {
-        // Fallback: still proceed if user was created
+      // Auto sign in the newly created user using flexible auth
+      const signInResult = await flexibleAuthClient.signInWithIdentifier(newUserEmail, password)
+      if (signInResult.error) {
+        // User was created but sign-in failed - this is unusual
+        setPasswordError('Account created successfully! You can now sign in with your credentials.')
+        setPasswordLoading(false)
+        return
       }
 
       // Close modal
