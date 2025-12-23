@@ -71,6 +71,13 @@ export default function CoconutsLanding() {
         </div>
       </section>
 
+      {/* Commitment Widget Section */}
+      <section className="py-16 px-4 sm:px-6 lg:px-8 bg-white">
+        <div className="max-w-2xl mx-auto">
+          <CommitmentWidget />
+        </div>
+      </section>
+
       {/* Highlights Stats */}
       <section className="bg-white py-16 border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
