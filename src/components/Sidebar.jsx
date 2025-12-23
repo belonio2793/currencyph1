@@ -87,7 +87,8 @@ function SidebarComponent({ activeTab, onTabChange, userEmail, onShowAuth, onSig
       items: [
         { id: 'online-users', label: 'Online Users', auth: true },
         { id: 'messages', label: 'Messages', auth: true },
-        { id: 'investments', label: 'Market Opportunities', auth: true }
+        { id: 'investments', label: 'Market Opportunities', auth: true },
+        { id: 'commitments', label: '🥥 Partnership Network', auth: true }
       ]
     },
     {
