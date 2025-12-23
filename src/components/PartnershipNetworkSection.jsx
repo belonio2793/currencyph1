@@ -136,6 +136,70 @@ export default function PartnershipNetworkSection({ isAuthenticated, userId }) {
     setFilteredPartnerships(filtered)
   }
 
+  const loadUserProfile = async () => {
+    if (!userId) return
+
+    try {
+      const { data: profileData } = await supabase
+        .from('commitment_profiles')
+        .select('*')
+        .eq('user_id', userId)
+        .single()
+
+      if (profileData) {
+        setUserProfile(profileData)
+        loadUserCommitments(profileData.id)
+      }
+    } catch (error) {
+      console.error('Error loading user profile:', error)
+    }
+  }
+
+  const loadUserCommitments = async (profileId) => {
+    try {
+      const { data: commitments = [] } = await supabase
+        .from('commitments')
+        .select('*')
+        .eq('commitment_profile_id', profileId)
+        .eq('status', 'active')
+        .order('created_at', { ascending: false })
+
+      setUserCommitments(commitments)
+
+      const total = commitments.reduce((sum, c) => sum + (c.grand_total || 0), 0)
+      setUserTotalValue(total)
+    } catch (error) {
+      console.error('Error loading user commitments:', error)
+    }
+  }
+
+  const handleDeleteCommitment = async (commitmentId) => {
+    if (!window.confirm('Are you sure you want to remove this contribution?')) return
+
+    try {
+      const { error } = await supabase
+        .from('commitments')
+        .delete()
+        .eq('id', commitmentId)
+
+      if (!error) {
+        setUserCommitments(userCommitments.filter(c => c.id !== commitmentId))
+        const total = userCommitments
+          .filter(c => c.id !== commitmentId)
+          .reduce((sum, c) => sum + (c.grand_total || 0), 0)
+        setUserTotalValue(total)
+      }
+    } catch (error) {
+      console.error('Error deleting commitment:', error)
+    }
+  }
+
+  const handleCommitmentSaved = async () => {
+    if (userProfile) {
+      await loadUserCommitments(userProfile.id)
+    }
+  }
+
   return (
     <div className={`rounded-lg border border-slate-700 bg-slate-800 flex flex-col overflow-hidden ${isMobile ? 'w-full' : 'w-full'}`}>
       {/* Header Section */}
