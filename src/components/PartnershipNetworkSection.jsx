@@ -218,6 +218,24 @@ export default function PartnershipNetworkSection({ isAuthenticated, userId }) {
     }
   }
 
+  const handleAuthSuccess = async (newUserId) => {
+    // Reload user profile and partnerships after successful registration
+    if (newUserId) {
+      const { data: profileData } = await supabase
+        .from('commitment_profiles')
+        .select('*')
+        .eq('user_id', newUserId)
+        .single()
+
+      if (profileData) {
+        setUserProfile(profileData)
+        await loadUserCommitments(profileData.id)
+      }
+    }
+    // Reload partnerships to show the new user's profile
+    await loadPartnerships()
+  }
+
   return (
     <div className={`rounded-lg border border-slate-700 bg-gradient-to-br from-slate-800 via-slate-800 to-slate-900 flex flex-col overflow-hidden ${isMobile ? 'w-full' : 'w-full'}`}>
       {/* Hero Header Section */}
