@@ -242,26 +242,20 @@ export const receiveMoneyService = {
    */
   async convertCryptoToPhp(amount, cryptoCode) {
     try {
+      const cryptoCodeUpper = cryptoCode.toUpperCase()
       const { data, error } = await supabase
-        .from('cached_rates')
-        .select('crypto_prices')
-        .order('fetched_at', { ascending: false })
-        .limit(1)
+        .from('pairs')
+        .select('rate')
+        .eq('from_currency', cryptoCodeUpper)
+        .eq('to_currency', 'PHP')
         .single()
 
-      if (error || !data?.crypto_prices) {
-        console.warn('Could not fetch crypto rates:', error)
+      if (error || !data || !(typeof data.rate === 'number' && isFinite(data.rate) && data.rate > 0)) {
+        console.warn(`Could not fetch PHP rate for ${cryptoCode}:`, error)
         return null
       }
 
-      const cryptoPricePhp = data.crypto_prices[cryptoCode.toLowerCase()]?.php
-
-      if (!cryptoPricePhp) {
-        console.warn(`No PHP rate found for ${cryptoCode}`)
-        return null
-      }
-
-      return parseFloat(amount) * cryptoPricePhp
+      return parseFloat(amount) * parseFloat(data.rate)
     } catch (error) {
       console.error('Error converting crypto to PHP:', error)
       return null
