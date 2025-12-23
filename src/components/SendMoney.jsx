@@ -10,6 +10,7 @@ export default function SendMoney({ userId }) {
   const [selectedSender, setSelectedSender] = useState('')
   const [recipientEmail, setRecipientEmail] = useState('')
   const [selectedRecipient, setSelectedRecipient] = useState(null)
+  const [recipientWallets, setRecipientWallets] = useState([])
   const [searchQuery, setSearchQuery] = useState('')
   const [searchResults, setSearchResults] = useState([])
   const [searching, setSearching] = useState(false)
@@ -22,6 +23,7 @@ export default function SendMoney({ userId }) {
   const [sending, setSending] = useState(false)
   const [step, setStep] = useState(1)
   const [showSearchDropdown, setShowSearchDropdown] = useState(false)
+  const [loadingRecipientWallets, setLoadingRecipientWallets] = useState(false)
 
   useEffect(() => {
     loadData()
