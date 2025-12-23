@@ -425,68 +425,42 @@ export default function SendMoney({ userId }) {
 
                   {/* Recipient Currency */}
                   <div className="space-y-6">
-                    <h4 className="text-lg font-medium text-slate-900">Recipient Currency</h4>
+                    <h4 className="text-lg font-medium text-slate-900">How Should Recipient Receive Funds?</h4>
                     {wallets.length === 0 ? (
                       <div className="bg-slate-50 border border-slate-300 rounded-lg p-3 text-sm text-slate-600">
                         No wallets available
                       </div>
                     ) : (
-                      <div className="space-y-6">
-                        {/* Fiat Currencies Section */}
-                        {(() => {
-                          const { fiatWallets } = getWalletsByType()
-                          return fiatWallets.length > 0 ? (
-                            <div>
-                              <label className="block text-sm font-medium text-slate-700 mb-3">Fiat Currency</label>
-                              <select
-                                value={recipientCurrency}
-                                onChange={(e) => setRecipientCurrency(e.target.value)}
-                                className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent bg-white"
-                              >
-                                {fiatWallets.map(wallet => (
-                                  <option key={wallet.id} value={wallet.currency_code}>
-                                    {wallet.currency_code} ({getCurrencySymbol(wallet.currency_code)})
-                                  </option>
-                                ))}
-                              </select>
-                            </div>
-                          ) : null
-                        })()}
-
-                        {/* Cryptocurrency Section */}
-                        {(() => {
-                          const { cryptoWallets } = getWalletsByType()
-                          return cryptoWallets.length > 0 ? (
-                            <div>
-                              <label className="block text-sm font-medium text-slate-700 mb-3">Cryptocurrency</label>
-                              <select
-                                value={recipientCurrency}
-                                onChange={(e) => setRecipientCurrency(e.target.value)}
-                                className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent bg-white"
-                              >
-                                {cryptoWallets.map(wallet => (
-                                  <option key={wallet.id} value={wallet.currency_code}>
-                                    {wallet.currency_code}
-                                  </option>
-                                ))}
-                              </select>
-                            </div>
-                          ) : null
-                        })()}
+                      <div className="space-y-4">
+                        <div>
+                          <label className="block text-sm font-medium text-slate-700 mb-3">Select Receive Currency</label>
+                          <select
+                            value={recipientCurrency}
+                            onChange={(e) => setRecipientCurrency(e.target.value)}
+                            className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent bg-white"
+                          >
+                            <option value="">Choose currency...</option>
+                            {wallets.map(wallet => (
+                              <option key={wallet.id} value={wallet.currency_code}>
+                                {wallet.currency_code} ({getCurrencySymbol(wallet.currency_code)})
+                              </option>
+                            ))}
+                          </select>
+                        </div>
 
                         {/* Selected Currency Details */}
                         {recipientCurrency && (() => {
                           const wallet = getWalletByCurrency(recipientCurrency)
                           return wallet ? (
                             <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-4">
-                              <h5 className="text-sm font-semibold text-slate-900 mb-3">Recipient Receives In</h5>
+                              <h5 className="text-sm font-semibold text-slate-900 mb-3">Recipient Will Receive</h5>
                               <div className="space-y-2 text-sm">
                                 <div className="flex justify-between">
                                   <span className="text-slate-600">Currency</span>
                                   <span className="font-medium text-slate-900">{wallet.currency_code} ({getCurrencySymbol(wallet.currency_code)})</span>
                                 </div>
-                                <div className="text-xs text-emerald-700">
-                                  Recipient will receive funds in {wallet.currency_code}
+                                <div className="text-xs text-emerald-700 mt-2">
+                                  ✓ Recipient will receive funds in {wallet.currency_code}
                                 </div>
                               </div>
                             </div>
