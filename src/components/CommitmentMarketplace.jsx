@@ -794,6 +794,19 @@ export default function CommitmentMarketplace({ userId, isAuthenticated, onAuthS
                   />
                 </div>
 
+                {/* Username */}
+                <div>
+                  <label className="block text-slate-300 text-sm mb-2">Username</label>
+                  <input
+                    type="text"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                    placeholder="Choose a username"
+                    className="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-2.5 text-white placeholder-slate-500 focus:outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-400/30 transition-all"
+                    disabled={passwordLoading}
+                  />
+                </div>
+
                 {/* Password */}
                 <div>
                   <label className="block text-slate-300 text-sm mb-2">Password</label>
