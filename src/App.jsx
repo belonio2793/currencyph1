@@ -256,9 +256,9 @@ export default function App() {
       setShowAuth(false)
     }
 
-    // Direct /coconuts route should activate planning tab
+    // Direct /coconuts route should activate coconuts landing tab
     if (path === '/coconuts') {
-      setActiveTab('planning')
+      setActiveTab('coconuts')
       setShowAuth(false)
     }
 
