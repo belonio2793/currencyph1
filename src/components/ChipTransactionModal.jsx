@@ -138,13 +138,31 @@ export default function ChipTransactionModal({ open, onClose, userId, onPurchase
     }
   }
 
+  async function loadExchangeRate() {
+    try {
+      const { data } = await supabase
+        .from('currency_rates')
+        .select('rate')
+        .eq('from_currency', 'USD')
+        .eq('to_currency', 'PHP')
+        .single()
+
+      if (data) {
+        setExchangeRate(Number(data.rate) || 1)
+      }
+    } catch (err) {
+      console.error('Error loading exchange rate:', err)
+      setExchangeRate(1)
+    }
+  }
+
   async function loadUserWallets() {
     if (isGuestLocal) return
 
     try {
       const { data: walletsData, error: walletsErr } = await supabase
         .from('wallets')
-        .select('id, user_id, currency_code, balance, is_active')
+        .select('id, user_id, currency_code, balance, is_active, account_number')
         .eq('user_id', userId)
         .eq('is_active', true)
 
