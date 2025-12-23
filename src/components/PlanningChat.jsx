@@ -2936,6 +2936,708 @@ export default function PlanningChat() {
             </div>
           </div>
         </section>
+
+        {/* Capital & Equipment Breakdown */}
+        <section className="py-24 px-4 sm:px-6 lg:px-8 bg-white">
+          <div className="max-w-7xl mx-auto">
+            <div className="mb-16">
+              <div className="inline-block mb-4 px-4 py-2 bg-amber-100 text-amber-700 rounded-full text-sm font-semibold">
+                DETAILED INVESTMENT BREAKDOWN
+              </div>
+              <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+                Equipment Costs, Facility Development & Operational Setup
+              </h2>
+            </div>
+
+            <div className="grid md:grid-cols-2 gap-12 mb-12">
+              <div className="bg-gradient-to-br from-amber-50 to-white rounded-xl p-10 border border-gray-200">
+                <h3 className="text-2xl font-bold text-gray-900 mb-6">🏭 Manufacturing Facility</h3>
+                <div className="space-y-4">
+                  {[
+                    { item: 'Cold-press extraction units (3)', cost: '$450K', spec: '5-ton/day capacity each' },
+                    { item: 'Pasteurization & bottling line', cost: '$380K', spec: 'Aseptic filling, 10K units/hour' },
+                    { item: 'Oil refining & filtration', cost: '$290K', spec: 'Multi-stage purification' },
+                    { item: 'Quality control lab', cost: '$180K', spec: 'Full testing equipment' },
+                    { item: 'Storage & refrigeration', cost: '$240K', spec: '500-ton cold storage' },
+                    { item: 'Building & infrastructure', cost: '$1.2M', spec: '8,000 sqm facility' },
+                    { item: 'Power & utilities setup', cost: '$160K', spec: 'Solar + grid hybrid' }
+                  ].map((item, i) => (
+                    <div key={i} className="flex items-center justify-between p-4 bg-white rounded-lg border border-amber-200">
+                      <div>
+                        <p className="font-semibold text-gray-900">{item.item}</p>
+                        <p className="text-xs text-gray-600 mt-1">{item.spec}</p>
+                      </div>
+                      <p className="text-lg font-bold text-amber-600 text-right">{item.cost}</p>
+                    </div>
+                  ))}
+                  <div className="pt-4 border-t-2 border-amber-300 flex items-center justify-between font-bold">
+                    <p className="text-gray-900">Manufacturing Subtotal</p>
+                    <p className="text-2xl text-amber-600">$3.49M</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-gradient-to-br from-blue-50 to-white rounded-xl p-10 border border-gray-200">
+                <h3 className="text-2xl font-bold text-gray-900 mb-6">📦 Logistics & Distribution</h3>
+                <div className="space-y-4">
+                  {[
+                    { item: 'Port warehouse (1,500 sqm)', cost: '$280K', spec: 'Climate controlled' },
+                    { item: 'Logistics management system', cost: '$95K', spec: 'Real-time tracking' },
+                    { item: 'Refrigerated transport fleet', cost: '$620K', spec: '15x vehicles, GPS tracked' },
+                    { item: 'Container handling equipment', cost: '$210K', spec: 'Forklifts, palletizers' },
+                    { item: 'Export packaging lines', cost: '$150K', spec: 'Custom design capability' },
+                    { item: 'Shipping container deposits', cost: '$180K', spec: '100x 40ft containers' },
+                    { item: 'Distribution partner setup', cost: '$85K', spec: 'Regional hubs (4)' }
+                  ].map((item, i) => (
+                    <div key={i} className="flex items-center justify-between p-4 bg-white rounded-lg border border-blue-200">
+                      <div>
+                        <p className="font-semibold text-gray-900">{item.item}</p>
+                        <p className="text-xs text-gray-600 mt-1">{item.spec}</p>
+                      </div>
+                      <p className="text-lg font-bold text-blue-600 text-right">{item.cost}</p>
+                    </div>
+                  ))}
+                  <div className="pt-4 border-t-2 border-blue-300 flex items-center justify-between font-bold">
+                    <p className="text-gray-900">Logistics Subtotal</p>
+                    <p className="text-2xl text-blue-600">$1.62M</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-gradient-to-br from-green-50 to-white rounded-xl p-10 border border-gray-200">
+              <h3 className="text-2xl font-bold text-gray-900 mb-6">👥 Year 1 Labor & Operations</h3>
+              <div className="grid md:grid-cols-2 gap-8">
+                <div>
+                  <p className="font-semibold text-gray-900 mb-4">Workforce Composition (200+ staff)</p>
+                  <div className="space-y-3">
+                    {[
+                      { role: 'Processing & QA staff (85)', salary: '$1,800/mo', cost: '$1.83M/year' },
+                      { role: 'Logistics & packaging (55)', salary: '$1,600/mo', cost: '$1.06M/year' },
+                      { role: 'Management (12)', salary: '$4,500/mo', cost: '$0.65M/year' },
+                      { role: 'Sales & partnerships (20)', salary: '$3,000/mo', cost: '$0.72M/year' },
+                      { role: 'Technology & systems (15)', salary: '$5,000/mo', cost: '$0.90M/year' },
+                      { role: 'Finance & admin (13)', salary: '$2,500/mo', cost: '$0.39M/year' }
+                    ].map((item, i) => (
+                      <div key={i} className="p-3 bg-white rounded-lg border border-green-200">
+                        <p className="font-medium text-gray-900">{item.role}</p>
+                        <div className="flex justify-between text-sm text-gray-600 mt-1">
+                          <span>{item.salary} base</span>
+                          <span className="font-semibold text-green-600">{item.cost}</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="mt-4 p-4 bg-green-100 rounded-lg border-2 border-green-600">
+                    <p className="font-bold text-gray-900">Total Labor Cost (Year 1)</p>
+                    <p className="text-2xl font-bold text-green-600">$5.55M</p>
+                  </div>
+                </div>
+
+                <div>
+                  <p className="font-semibold text-gray-900 mb-4">Operational Expenses (Year 1)</p>
+                  <div className="space-y-3">
+                    {[
+                      { item: 'Utilities (power, water, gas)', cost: '$180K' },
+                      { item: 'Raw material farmer advances', cost: '$800K', note: '12-month supply buffer' },
+                      { item: 'Maintenance & repairs', cost: '$120K' },
+                      { item: 'Marketing & brand launch', cost: '$250K', note: 'Digital + events' },
+                      { item: 'Certifications & compliance', cost: '$95K', note: 'Organic, Fair Trade, etc' },
+                      { item: 'Insurance & security', cost: '$140K' },
+                      { item: 'Legal & professional services', cost: '$85K' },
+                      { item: 'Contingency & reserves (10%)', cost: '$165K' }
+                    ].map((item, i) => (
+                      <div key={i} className="p-3 bg-white rounded-lg border border-green-200">
+                        <div className="flex justify-between items-start">
+                          <div className="flex-1">
+                            <p className="font-medium text-gray-900">{item.item}</p>
+                            {item.note && <p className="text-xs text-gray-600 mt-1">{item.note}</p>}
+                          </div>
+                          <p className="font-semibold text-gray-700 ml-2">{item.cost}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="mt-4 p-4 bg-green-100 rounded-lg border-2 border-green-600">
+                    <p className="font-bold text-gray-900">Total Operating Costs (Year 1)</p>
+                    <p className="text-2xl font-bold text-green-600">$1.83M</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-8 bg-amber-100 p-8 rounded-xl border-2 border-amber-600">
+              <h3 className="text-2xl font-bold text-gray-900 mb-4">💰 Total Initial Investment Summary</h3>
+              <div className="grid md:grid-cols-4 gap-6">
+                <div className="bg-white p-4 rounded-lg">
+                  <p className="text-sm text-gray-600 font-semibold">Manufacturing</p>
+                  <p className="text-3xl font-bold text-amber-600">$3.49M</p>
+                </div>
+                <div className="bg-white p-4 rounded-lg">
+                  <p className="text-sm text-gray-600 font-semibold">Logistics</p>
+                  <p className="text-3xl font-bold text-blue-600">$1.62M</p>
+                </div>
+                <div className="bg-white p-4 rounded-lg">
+                  <p className="text-sm text-gray-600 font-semibold">Year 1 Labor</p>
+                  <p className="text-3xl font-bold text-green-600">$5.55M</p>
+                </div>
+                <div className="bg-white p-4 rounded-lg">
+                  <p className="text-sm text-gray-600 font-semibold">Operations</p>
+                  <p className="text-3xl font-bold text-orange-600">$1.83M</p>
+                </div>
+              </div>
+              <div className="mt-6 p-4 bg-gradient-to-r from-amber-600 to-orange-600 text-white rounded-lg">
+                <p className="font-bold text-lg mb-2">TOTAL: $12.49M for Full Year 1 Operation</p>
+                <p className="text-sm text-amber-100">Structured as: $9.08M equity + $3.41M working capital facility</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Detailed Financial Projections */}
+        <section className="py-24 px-4 sm:px-6 lg:px-8 bg-gray-50">
+          <div className="max-w-7xl mx-auto">
+            <div className="mb-16">
+              <div className="inline-block mb-4 px-4 py-2 bg-amber-100 text-amber-700 rounded-full text-sm font-semibold">
+                COMPREHENSIVE FINANCIAL MODEL
+              </div>
+              <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+                5-Year Detailed Projections
+              </h2>
+            </div>
+
+            <div className="bg-white rounded-xl p-8 border border-gray-200 overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b-2 border-gray-300">
+                    <th className="text-left py-4 px-4 font-bold text-gray-900">Financial Metric</th>
+                    <th className="text-center py-4 px-4 font-bold text-gray-900">Year 1</th>
+                    <th className="text-center py-4 px-4 font-bold text-gray-900">Year 2</th>
+                    <th className="text-center py-4 px-4 font-bold text-gray-900">Year 3</th>
+                    <th className="text-center py-4 px-4 font-bold text-gray-900">Year 4</th>
+                    <th className="text-center py-4 px-4 font-bold text-gray-900">Year 5</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {[
+                    { metric: 'Units Produced (millions)', data: ['2.4M', '6.8M', '14.2M', '24.6M', '38.5M'], category: 'Volume' },
+                    { metric: 'Average Price per Unit', data: ['$3.40', '$3.45', '$3.50', '$3.55', '$3.60'], category: 'Volume' },
+                    { metric: 'Total Revenue', data: ['$8.16M', '$23.46M', '$49.70M', '$87.43M', '$138.60M'], category: 'Revenue' },
+                    { metric: 'Cost of Goods Sold (35%)', data: ['$2.86M', '$8.21M', '$17.40M', '$30.60M', '$48.51M'], category: 'Costs' },
+                    { metric: 'Gross Profit', data: ['$5.30M', '$15.25M', '$32.30M', '$56.83M', '$90.09M'], category: 'Costs' },
+                    { metric: 'Gross Margin %', data: ['65%', '65%', '65%', '65%', '65%'], category: 'Costs' },
+                    { metric: 'Operating Expenses', data: ['$7.38M', '$9.84M', '$14.42M', '$19.60M', '$24.80M'], category: 'Expenses' },
+                    { metric: 'EBITDA', data: ['-$2.08M', '$5.41M', '$17.88M', '$37.23M', '$65.29M'], category: 'Expenses' },
+                    { metric: 'EBITDA Margin %', data: ['-25%', '23%', '36%', '43%', '47%'], category: 'Expenses' },
+                    { metric: 'Depreciation & Amortization', data: ['$840K', '$840K', '$840K', '$560K', '$560K'], category: 'Depreciation' },
+                    { metric: 'EBIT (Operating Income)', data: ['-$2.92M', '$4.57M', '$17.04M', '$36.67M', '$64.73M'], category: 'Profit' },
+                    { metric: 'Interest Expense', data: ['$180K', '$140K', '$100K', '$50K', '$0K'], category: 'Profit' },
+                    { metric: 'Pre-tax Income', data: ['-$3.10M', '$4.43M', '$16.94M', '$36.62M', '$64.73M'], category: 'Profit' },
+                    { metric: 'Tax (30% rate)', data: ['$0', '$1.33M', '$5.08M', '$10.99M', '$19.42M'], category: 'Profit' },
+                    { metric: 'Net Income', data: ['-$3.10M', '$3.10M', '$11.86M', '$25.63M', '$45.31M'], category: 'Profit' },
+                    { metric: 'Net Profit Margin %', data: ['-38%', '13%', '24%', '29%', '33%'], category: 'Profit' }
+                  ].map((row, i) => {
+                    const isTotal = row.metric.includes('Total') || row.metric.includes('Net Income');
+                    const bgClass = isTotal ? 'bg-amber-50' : i % 2 === 0 ? 'bg-white' : 'bg-gray-50';
+                    return (
+                      <tr key={i} className={bgClass + ' border-b border-gray-200'}>
+                        <td className={'py-4 px-4 font-semibold text-gray-900 ' + (isTotal ? 'font-bold' : '')}>{row.metric}</td>
+                        {row.data.map((value, j) => (
+                          <td key={j} className="py-4 px-4 text-center text-gray-700 font-medium">{value}</td>
+                        ))}
+                      </tr>
+                    )
+                  })}
+                </tbody>
+              </table>
+            </div>
+
+            <div className="mt-12 grid md:grid-cols-3 gap-8">
+              <div className="bg-white rounded-xl p-10 border border-gray-200">
+                <h3 className="font-bold text-gray-900 mb-4 flex items-center gap-2">🎯 Key Metrics</h3>
+                <div className="space-y-4">
+                  <div className="flex justify-between items-center p-3 bg-gray-50 rounded">
+                    <p className="text-gray-700">Breakeven (units/month)</p>
+                    <p className="font-bold text-gray-900">Month 18</p>
+                  </div>
+                  <div className="flex justify-between items-center p-3 bg-gray-50 rounded">
+                    <p className="text-gray-700">Payback Period</p>
+                    <p className="font-bold text-gray-900">3.2 years</p>
+                  </div>
+                  <div className="flex justify-between items-center p-3 bg-blue-50 rounded border border-blue-200">
+                    <p className="text-gray-700">Year 5 IRR</p>
+                    <p className="font-bold text-blue-600">32.4%</p>
+                  </div>
+                  <div className="flex justify-between items-center p-3 bg-blue-50 rounded border border-blue-200">
+                    <p className="text-gray-700">5-Year CAGR Revenue</p>
+                    <p className="font-bold text-blue-600">85%</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-white rounded-xl p-10 border border-gray-200">
+                <h3 className="font-bold text-gray-900 mb-4 flex items-center gap-2">💵 Return Scenarios</h3>
+                <div className="space-y-3">
+                  <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
+                    <p className="text-sm text-gray-600 font-semibold">Conservative (8x EBITDA multiple)</p>
+                    <p className="text-2xl font-bold text-green-600">$522M Exit</p>
+                    <p className="text-xs text-gray-600 mt-1">5.7x initial investment</p>
+                  </div>
+                  <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                    <p className="text-sm text-gray-600 font-semibold">Base Case (10x EBITDA multiple)</p>
+                    <p className="text-2xl font-bold text-blue-600">$653M Exit</p>
+                    <p className="text-xs text-gray-600 mt-1">7.2x initial investment</p>
+                  </div>
+                  <div className="p-4 bg-purple-50 border border-purple-200 rounded-lg">
+                    <p className="text-sm text-gray-600 font-semibold">Optimistic (12x EBITDA multiple)</p>
+                    <p className="text-2xl font-bold text-purple-600">$783M Exit</p>
+                    <p className="text-xs text-gray-600 mt-1">8.6x initial investment</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-white rounded-xl p-10 border border-gray-200">
+                <h3 className="font-bold text-gray-900 mb-4 flex items-center gap-2">📈 Equity Distribution</h3>
+                <div className="space-y-3">
+                  {[
+                    { group: 'Farmers & Landowners', pct: '35%', amt: '$3.18M' },
+                    { group: 'Equipment Partners', pct: '10%', amt: '$908K' },
+                    { group: 'Logistics Partners', pct: '15%', amt: '$1.36M' },
+                    { group: 'Impact Investors', pct: '25%', amt: '$2.27M' },
+                    { group: 'Strategic Investors', pct: '15%', amt: '$1.36M' }
+                  ].map((item, i) => (
+                    <div key={i} className="p-3 bg-gray-50 rounded border border-gray-200">
+                      <div className="flex justify-between items-center mb-2">
+                        <p className="font-medium text-gray-900">{item.group}</p>
+                        <p className="font-bold text-amber-600">{item.pct}</p>
+                      </div>
+                      <p className="text-sm text-gray-600">{item.amt} initial valuation</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Implementation Roadmap */}
+        <section className="py-24 px-4 sm:px-6 lg:px-8 bg-white">
+          <div className="max-w-7xl mx-auto">
+            <div className="mb-16">
+              <div className="inline-block mb-4 px-4 py-2 bg-amber-100 text-amber-700 rounded-full text-sm font-semibold">
+                EXECUTION TIMELINE
+              </div>
+              <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+                12-Month Implementation Roadmap
+              </h2>
+            </div>
+
+            <div className="space-y-6">
+              {[
+                {
+                  phase: 'Phase 1: Foundation (Months 1-3)',
+                  activities: [
+                    'Secure initial capital ($3M seed round)',
+                    'Acquire 500 hectares of coconut plantation rights',
+                    'Begin facility construction (Laguna)',
+                    'Establish farmer partnerships (500+ families)',
+                    'Order manufacturing equipment',
+                    'Set up currency.ph integration & governance'
+                  ],
+                  milestone: 'Capital raised, land secured, construction 50% complete'
+                },
+                {
+                  phase: 'Phase 2: Development (Months 4-6)',
+                  activities: [
+                    'Complete facility construction & equipment installation',
+                    'Establish quality control lab with certifications',
+                    'First batch of farmer contracts signed',
+                    'Logistics partnerships finalized',
+                    'Regulatory approvals & food safety certifications',
+                    'Launch currency.ph transparency platform'
+                  ],
+                  milestone: 'Manufacturing facility operational, first production run'
+                },
+                {
+                  phase: 'Phase 3: Launch (Months 7-9)',
+                  activities: [
+                    'Commence commercial production (2.4M units/year)',
+                    'Export first container shipments',
+                    'Onboard distribution partners in 5 countries',
+                    'Launch marketing campaign (Asia + Americas)',
+                    'Expand farmer network to 2,000 families',
+                    'Quarterly impact & financial reporting'
+                  ],
+                  milestone: 'First revenue ($500K+), partnerships signed'
+                },
+                {
+                  phase: 'Phase 4: Scale (Months 10-12)',
+                  activities: [
+                    'Ramp to full production capacity',
+                    'Expand to 8 target export markets',
+                    'Recruit additional manufacturing staff (100+ hires)',
+                    'Establish 2nd processing facility planning',
+                    'Women entrepreneur program launch',
+                    'Complete Year 1 audit & transparent reporting'
+                  ],
+                  milestone: 'Year 1 revenue $8.2M, 200+ staff, profitability path clear'
+                }
+              ].map((phase, i) => (
+                <div key={i} className="bg-gradient-to-r from-amber-50 to-white rounded-xl p-10 border-l-4 border-amber-600">
+                  <h3 className="text-2xl font-bold text-gray-900 mb-4">{phase.phase}</h3>
+                  <div className="grid md:grid-cols-2 gap-8">
+                    <div>
+                      <p className="text-sm font-semibold text-gray-600 mb-3">Key Activities:</p>
+                      <ul className="space-y-2">
+                        {phase.activities.map((activity, j) => (
+                          <li key={j} className="flex items-start gap-3 text-gray-700">
+                            <span className="text-amber-600 font-bold mt-1">▸</span>
+                            {activity}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                    <div className="bg-amber-100 p-6 rounded-lg border border-amber-300">
+                      <p className="text-sm font-semibold text-amber-700 mb-2">🎯 PHASE MILESTONE</p>
+                      <p className="text-gray-900 font-bold text-lg">{phase.milestone}</p>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Technology & Platform */}
+        <section className="py-24 px-4 sm:px-6 lg:px-8 bg-gray-50">
+          <div className="max-w-7xl mx-auto">
+            <div className="mb-16">
+              <div className="inline-block mb-4 px-4 py-2 bg-amber-100 text-amber-700 rounded-full text-sm font-semibold">
+                TECHNOLOGY FOUNDATION
+              </div>
+              <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+                Transparent, Integrated, Real-Time Systems
+              </h2>
+            </div>
+
+            <div className="grid md:grid-cols-2 gap-12">
+              <div className="bg-white rounded-xl p-10 border border-gray-200">
+                <h3 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+                  <span className="text-3xl">⚙️</span>
+                  Supply Chain Management
+                </h3>
+                <div className="space-y-4">
+                  {[
+                    {
+                      feature: 'Blockchain Verification',
+                      desc: 'Immutable record of coconut sourcing, processing, shipping'
+                    },
+                    {
+                      feature: 'Real-time GPS Tracking',
+                      desc: 'Every shipment tracked from farm to retail'
+                    },
+                    {
+                      feature: 'Farmer Mobile App',
+                      desc: 'Direct market updates, pricing, payment notifications'
+                    },
+                    {
+                      feature: 'QR Code Product Identity',
+                      desc: 'Retailers & consumers verify authenticity & origin'
+                    },
+                    {
+                      feature: 'Automated Invoicing',
+                      desc: 'Instant payment processing via currency.ph'
+                    },
+                    {
+                      feature: 'Sustainability Dashboard',
+                      desc: 'Track carbon footprint, water usage, forest impact'
+                    }
+                  ].map((item, i) => (
+                    <div key={i} className="p-4 bg-gradient-to-r from-blue-50 to-white rounded-lg border border-blue-200">
+                      <p className="font-bold text-gray-900">{item.feature}</p>
+                      <p className="text-gray-600 text-sm mt-2">{item.desc}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="bg-white rounded-xl p-10 border border-gray-200">
+                <h3 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+                  <span className="text-3xl">💰</span>
+                  Currency.ph Financial Integration
+                </h3>
+                <div className="space-y-4">
+                  {[
+                    {
+                      feature: 'Automated Payments',
+                      desc: 'Farmers paid within 24 hours of delivery verification'
+                    },
+                    {
+                      feature: 'Currency Conversion & Hedging',
+                      desc: 'Lock rates for international payments, minimize volatility'
+                    },
+                    {
+                      feature: 'Equity Ownership Tracking',
+                      desc: 'Transparent record of all stakeholder equity positions'
+                    },
+                    {
+                      feature: 'Dividend Distribution',
+                      desc: 'Automatic quarterly profit distributions to token holders'
+                    },
+                    {
+                      feature: 'Voting Rights Management',
+                      desc: 'Token-based governance voting on major decisions'
+                    },
+                    {
+                      feature: 'Multi-Currency Wallets',
+                      desc: 'USD, PHP, EUR, crypto - seamless conversion'
+                    }
+                  ].map((item, i) => (
+                    <div key={i} className="p-4 bg-gradient-to-r from-green-50 to-white rounded-lg border border-green-200">
+                      <p className="font-bold text-gray-900">{item.feature}</p>
+                      <p className="text-gray-600 text-sm mt-2">{item.desc}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-12 bg-gradient-to-r from-blue-600 to-green-600 text-white rounded-xl p-10">
+              <h3 className="text-2xl font-bold mb-6">🔐 Security & Compliance</h3>
+              <div className="grid md:grid-cols-3 gap-8">
+                <div>
+                  <p className="font-semibold mb-3">Data Protection</p>
+                  <p className="text-sm text-blue-100">Bank-grade encryption (AES-256), SOC 2 Type II compliant, GDPR aligned</p>
+                </div>
+                <div>
+                  <p className="font-semibold mb-3">Financial Compliance</p>
+                  <p className="text-sm text-blue-100">Philippines BIR approved, RCBC banking partner, monthly audits</p>
+                </div>
+                <div>
+                  <p className="font-semibold mb-3">Supply Chain Integrity</p>
+                  <p className="text-sm text-blue-100">Blockchain immutability, ISO 22000 food safety, FDA compliance</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Governance & Transparency */}
+        <section className="py-24 px-4 sm:px-6 lg:px-8 bg-white">
+          <div className="max-w-7xl mx-auto">
+            <div className="mb-16">
+              <div className="inline-block mb-4 px-4 py-2 bg-amber-100 text-amber-700 rounded-full text-sm font-semibold">
+                GOVERNANCE STRUCTURE
+              </div>
+              <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+                Community-Driven Decision Making
+              </h2>
+            </div>
+
+            <div className="grid md:grid-cols-2 gap-12 mb-12">
+              <div className="bg-gradient-to-br from-amber-50 to-white rounded-xl p-10 border border-gray-200">
+                <h3 className="text-2xl font-bold text-gray-900 mb-6">Board of Directors (7 Members)</h3>
+                <div className="space-y-4">
+                  {[
+                    { role: 'Executive Chairman', rep: 'Founder/CEO', tenure: 'Permanent' },
+                    { role: 'Farmer Representative', rep: 'Elected from farmer networks', tenure: '2-year term' },
+                    { role: 'Investor Director (2)', rep: 'Largest institutional investors', tenure: '2-year term' },
+                    { role: 'Equipment Partner Rep', rep: 'Logistics/supply chain sector', tenure: '2-year term' },
+                    { role: 'Impact Director', rep: 'NGO/development sector', tenure: '2-year term' },
+                    { role: 'Independent Director', rep: 'External governance expert', tenure: '2-year term' }
+                  ].map((item, i) => (
+                    <div key={i} className="p-4 bg-white border border-amber-200 rounded-lg">
+                      <p className="font-bold text-gray-900">{item.role}</p>
+                      <p className="text-sm text-gray-600 mt-1">{item.rep}</p>
+                      <p className="text-xs text-amber-700 font-semibold mt-2">{item.tenure}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="bg-gradient-to-br from-blue-50 to-white rounded-xl p-10 border border-gray-200">
+                <h3 className="text-2xl font-bold text-gray-900 mb-6">Stakeholder Council (Quarterly)</h3>
+                <p className="text-gray-700 mb-6 leading-relaxed">All equity stakeholders participate in quarterly council meetings. Voting power proportional to equity stake (minimum 1% threshold).</p>
+                <div className="space-y-3">
+                  <div className="p-4 bg-white border border-blue-200 rounded-lg">
+                    <p className="font-bold text-gray-900">Quorum Requirements</p>
+                    <p className="text-sm text-gray-600 mt-2">Minimum 60% of voting stake present to pass resolutions</p>
+                  </div>
+                  <div className="p-4 bg-white border border-blue-200 rounded-lg">
+                    <p className="font-bold text-gray-900">Voting Thresholds</p>
+                    <p className="text-sm text-gray-600 mt-2">Simple majority (50%+) for operational decisions; 66% for strategic changes</p>
+                  </div>
+                  <div className="p-4 bg-white border border-blue-200 rounded-lg">
+                    <p className="font-bold text-gray-900">Veto Rights</p>
+                    <p className="text-sm text-gray-600 mt-2">Farmer collective can veto changes affecting pricing or terms</p>
+                  </div>
+                  <div className="p-4 bg-white border border-blue-200 rounded-lg">
+                    <p className="font-bold text-gray-900">Transparency Mandate</p>
+                    <p className="text-sm text-gray-600 mt-2">All votes and decisions published on currency.ph within 48 hours</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-gradient-to-r from-amber-600 to-orange-600 text-white rounded-xl p-12">
+              <h3 className="text-2xl font-bold mb-6 flex items-center gap-2">📊 Transparency Requirements</h3>
+              <div className="grid md:grid-cols-4 gap-6">
+                <div className="bg-white/10 p-6 rounded-lg backdrop-blur-sm">
+                  <p className="font-semibold mb-3">Monthly Reports</p>
+                  <p className="text-sm text-amber-50">Production volume, farmer payments, inventory, shipments</p>
+                </div>
+                <div className="bg-white/10 p-6 rounded-lg backdrop-blur-sm">
+                  <p className="font-semibold mb-3">Quarterly Financials</p>
+                  <p className="text-sm text-amber-50">Full P&L, balance sheet, cash flow, audited by independent firm</p>
+                </div>
+                <div className="bg-white/10 p-6 rounded-lg backdrop-blur-sm">
+                  <p className="font-semibold mb-3">Annual Impact Report</p>
+                  <p className="text-sm text-amber-50">Jobs created, income generated, carbon impact, SDG metrics</p>
+                </div>
+                <div className="bg-white/10 p-6 rounded-lg backdrop-blur-sm">
+                  <p className="font-semibold mb-3">Live Dashboard</p>
+                  <p className="text-sm text-amber-50">Real-time operations visible to all stakeholders 24/7</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Sustainability Commitments */}
+        <section className="py-24 px-4 sm:px-6 lg:px-8 bg-gray-50">
+          <div className="max-w-7xl mx-auto">
+            <div className="mb-16">
+              <div className="inline-block mb-4 px-4 py-2 bg-green-100 text-green-700 rounded-full text-sm font-semibold">
+                ENVIRONMENTAL & SOCIAL
+              </div>
+              <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+                Sustainability at the Core
+              </h2>
+            </div>
+
+            <div className="grid md:grid-cols-2 gap-12 mb-12">
+              <div className="bg-white rounded-xl p-10 border border-gray-200">
+                <h3 className="text-2xl font-bold text-gray-900 mb-6">🌱 Environmental Commitments</h3>
+                <div className="space-y-4">
+                  {[
+                    { goal: 'Carbon Neutral by 2030', target: 'Scope 1-3 emissions offset', progress: 'Year 3 target: -50% baseline' },
+                    { goal: 'Zero Waste Production', target: 'Coconut shells → biochar, husks → fiber', progress: 'By Year 2: 95% utilization' },
+                    { goal: 'Forest Restoration', target: '1% annual profit to reforestation', progress: '10,000 hectares by Year 5' },
+                    { goal: 'Water Conservation', target: 'Closed-loop processing systems', progress: '60% water reduction by Year 3' },
+                    { goal: 'Renewable Energy', target: '100% facility solar powered', progress: '2.5MW solar installation' },
+                    { goal: 'Biodiversity Protection', target: 'Shade-grown coconut farming', progress: 'Protects native species in Mindanao' }
+                  ].map((item, i) => (
+                    <div key={i} className="p-4 bg-gradient-to-r from-green-50 to-white rounded-lg border border-green-200">
+                      <p className="font-bold text-gray-900">{item.goal}</p>
+                      <p className="text-sm text-gray-600 mt-1">{item.target}</p>
+                      <p className="text-xs text-green-700 font-semibold mt-2">📈 {item.progress}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="bg-white rounded-xl p-10 border border-gray-200">
+                <h3 className="text-2xl font-bold text-gray-900 mb-6">👥 Social Impact Commitments</h3>
+                <div className="space-y-4">
+                  {[
+                    { goal: 'Women Empowerment', target: '40% management roles filled by women', progress: 'By Year 2: 50% leadership' },
+                    { goal: 'Educational Access', target: '5,000 scholarships for farming family children', progress: '$5M/year education fund' },
+                    { goal: 'Healthcare Programs', target: 'Free health clinics in 50+ barangays', progress: 'Preventive care + emergency support' },
+                    { goal: 'Fair Wages', target: '150% of regional minimum wage + benefits', progress: '$1,800+/month base salary' },
+                    { goal: 'Skills Development', target: 'Training programs for 5,000+ farmers', progress: 'Yield optimization, technology' },
+                    { goal: 'Poverty Reduction', target: '35% reduction in agricultural poverty', progress: 'In target regions by Year 5' }
+                  ].map((item, i) => (
+                    <div key={i} className="p-4 bg-gradient-to-r from-purple-50 to-white rounded-lg border border-purple-200">
+                      <p className="font-bold text-gray-900">{item.goal}</p>
+                      <p className="text-sm text-gray-600 mt-1">{item.target}</p>
+                      <p className="text-xs text-purple-700 font-semibold mt-2">📈 {item.progress}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-white rounded-xl p-12 border border-gray-200">
+              <h3 className="text-2xl font-bold text-gray-900 mb-8">🏆 Certifications & Compliance</h3>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+                {[
+                  { cert: '✓ Organic Certified', org: 'USDA & EU Standards' },
+                  { cert: '✓ Fair Trade Certified', org: 'International Fair Trade Association' },
+                  { cert: '✓ B-Corp Certification', org: 'Benefit Corporation Status' },
+                  { cert: '✓ ISO 22000', org: 'Food Safety Management' },
+                  { cert: '✓ HACCP Compliant', org: 'Hazard Analysis System' },
+                  { cert: '✓ Carbon Neutral', org: 'Verified Offsetting' },
+                  { cert: '✓ Rainforest Alliance', org: 'Sustainable Agriculture' },
+                  { cert: '✓ BIR Approved', org: 'Philippines Tax Compliant' }
+                ].map((item, i) => (
+                  <div key={i} className="p-4 bg-gradient-to-br from-green-50 to-white rounded-lg border border-green-200 text-center">
+                    <p className="font-bold text-green-700 text-lg">{item.cert}</p>
+                    <p className="text-xs text-gray-600 mt-2">{item.org}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* FAQ Section */}
+        <section className="py-24 px-4 sm:px-6 lg:px-8 bg-white">
+          <div className="max-w-4xl mx-auto">
+            <div className="mb-16 text-center">
+              <div className="inline-block mb-4 px-4 py-2 bg-amber-100 text-amber-700 rounded-full text-sm font-semibold">
+                FREQUENTLY ASKED QUESTIONS
+              </div>
+              <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+                Common Questions About Coconuts.com.ph
+              </h2>
+            </div>
+
+            <div className="space-y-6">
+              {[
+                {
+                  q: 'What\'s the minimum investment amount?',
+                  a: 'We accept investments starting at $50,000 for impact investors. Farmer contributions can start from land/equipment value at much lower entry points. Strategic partnerships have custom structures.'
+                },
+                {
+                  q: 'How are dividends distributed?',
+                  a: 'Quarterly dividends calculated on net profit after operational expenses. Distributed automatically via currency.ph wallets within 15 days of quarter-end. Farmers receive monthly advance payments from purchases.'
+                },
+                {
+                  q: 'What happens if we don\'t meet production targets?',
+                  a: 'Projections are conservative (2.4M units Year 1). Even at 70% capacity, unit economics remain solid. Investor agreements include downside protection clauses. Farmer contracts have minimum price floors regardless of volume.'
+                },
+                {
+                  q: 'Who controls the company?',
+                  a: 'Founder retains 5% with veto rights on core governance. Equity distributed per stakeholder investment. Board of 7 with farmer, impact, and investor representatives. All major decisions voted on by stakeholder council (quarterly).'
+                },
+                {
+                  q: 'Can I sell my equity stake?',
+                  a: 'Yes. Secondary market available on currency.ph platform. First refusal rights given to existing stakeholders. Annual liquidity windows after Year 2. Strategic exit or buyback options in years 5-7.'
+                },
+                {
+                  q: 'What if political/economic conditions change?',
+                  a: 'We have diversified geographic exposure (50+ export markets). Long-term farmer contracts are inflation-adjusted. Currency.ph integration provides hedging on forex volatility. 5-year conservative business model accounts for cycles.'
+                },
+                {
+                  q: 'How do I track my returns transparently?',
+                  a: 'Real-time dashboard on currency.ph shows: your equity %, monthly production, revenue, expenses, profit allocation. Monthly investor reports + quarterly audited financials. Live supply chain tracking on blockchain.'
+                },
+                {
+                  q: 'What\'s the exit timeline?',
+                  a: 'No forced exit. Strategic acquisition most likely Year 5-7 (typical food/beverage multiples 8-12x EBITDA). IPO possible given scale. Dividend streams sustainable indefinitely. Buyback program from cash flows starting Year 3.'
+                }
+              ].map((item, i) => (
+                <details key={i} className="group border-b border-gray-200 pb-6">
+                  <summary className="cursor-pointer flex items-start gap-4 font-bold text-lg text-gray-900 hover:text-amber-600 transition">
+                    <span className="text-2xl group-open:rotate-180 transition-transform">+</span>
+                    {item.q}
+                  </summary>
+                  <p className="mt-4 ml-12 text-gray-700 leading-relaxed">{item.a}</p>
+                </details>
+              ))}
+            </div>
+          </div>
+        </section>
       </div>
     </div>
   )
