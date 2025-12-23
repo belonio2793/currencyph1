@@ -200,41 +200,45 @@ export const currencyAPI = {
         }
       }
 
-      // Fallback: Try to fetch from cached_rates table in database
-      console.warn('Edge function failed, trying database fallback:', error?.message)
+      // Fallback: Try to fetch from public.pairs table
+      console.warn('Edge function failed, trying public.pairs fallback:', error?.message)
       try {
-        const { data: cachedData, error: cacheError } = await supabase
-          .from('cached_rates')
-          .select('crypto_prices, fetched_at')
-          .order('fetched_at', { ascending: false })
-          .limit(1)
-          .single()
+        const { data: pairsData, error: pairsError } = await supabase
+          .from('pairs')
+          .select('from_currency, to_currency, rate, updated_at')
 
-        if (!cacheError && cachedData?.crypto_prices) {
-          console.log('Using cached crypto prices from database')
+        if (!pairsError && pairsData && pairsData.length > 0) {
+          console.log('Using crypto prices from public.pairs table')
+          const lastUpdated = new Date(pairsData[0].updated_at || Date.now())
+
+          // Extract crypto prices from pairs (e.g., BTC-USD, ETH-USD)
+          const btcUsd = pairsData.find(p => p.from_currency === 'BTC' && p.to_currency === 'USD')
+          const ethUsd = pairsData.find(p => p.from_currency === 'ETH' && p.to_currency === 'USD')
+          const dogeUsd = pairsData.find(p => p.from_currency === 'DOGE' && p.to_currency === 'USD')
+
           return {
             BTC: {
               name: 'Bitcoin',
               symbol: 'BTC',
-              prices: cachedData.crypto_prices.bitcoin || {},
-              lastUpdated: new Date(cachedData.fetched_at)
+              prices: { usd: btcUsd?.rate || 0 },
+              lastUpdated
             },
             ETH: {
               name: 'Ethereum',
               symbol: 'ETH',
-              prices: cachedData.crypto_prices.ethereum || {},
-              lastUpdated: new Date(cachedData.fetched_at)
+              prices: { usd: ethUsd?.rate || 0 },
+              lastUpdated
             },
             DOGE: {
               name: 'Dogecoin',
               symbol: 'DOGE',
-              prices: cachedData.crypto_prices.dogecoin || {},
-              lastUpdated: new Date(cachedData.fetched_at)
+              prices: { usd: dogeUsd?.rate || 0 },
+              lastUpdated
             }
           }
         }
-      } catch (cacheErr) {
-        console.warn('Database fallback also failed:', cacheErr?.message)
+      } catch (pairsErr) {
+        console.warn('Public.pairs fallback also failed:', pairsErr?.message)
       }
 
       return null
