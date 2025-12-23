@@ -862,7 +862,7 @@ export default function App() {
                         <button onClick={() => setActiveTab('about')} className="text-slate-600 hover:text-slate-900 transition-colors font-medium">
                           About
                         </button>
-                        <button onClick={() => window.history.pushState(null, '\', \'/coconuts\'); setActiveTab(\'planning')} className="text-slate-600 hover:text-slate-900 transition-colors font-medium">
+                        <button onClick={() => { window.history.pushState(null, '', '/coconuts'); setActiveTab('planning'); }} className="text-slate-600 hover:text-slate-900 transition-colors font-medium">
                           Coconuts
                         </button>
                         <a href="#" className="text-slate-600 hover:text-slate-900 transition-colors font-medium">Privacy Policy</a>
