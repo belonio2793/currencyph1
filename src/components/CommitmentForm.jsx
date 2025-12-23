@@ -1,284 +1,619 @@
-import { useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabaseClient'
-import { BUSINESS_TYPES } from '../lib/commitmentCalculatorService'
+import { useDevice } from '../context/DeviceContext'
 
-export default function CommitmentForm({ userId, onProfileComplete, initialData }) {
-  const [isLoading, setIsLoading] = useState(false)
+const BUSINESS_TYPES = [
+  'farmer',
+  'vendor',
+  'wholesaler',
+  'retailer',
+  'processor',
+  'exporter',
+  'service_provider',
+  'equipment_supplier',
+  'logistics',
+  'other'
+]
+
+const ITEM_TYPES = [
+  'coconut',
+  'coconut_water',
+  'processing_equipment',
+  'machinery',
+  'warehouse_space',
+  'labour',
+  'water',
+  'processing_service',
+  'transportation',
+  'retail_space',
+  'other'
+]
+
+const QUANTITY_UNITS = [
+  'pieces',
+  'tons',
+  'kg',
+  'liters',
+  'units',
+  'hours',
+  'sq_meters',
+  'bundles'
+]
+
+const SCHEDULED_INTERVALS = [
+  { value: 'one-time', label: 'One Time' },
+  { value: 'daily', label: 'Daily' },
+  { value: 'weekly', label: 'Weekly' },
+  { value: 'bi-weekly', label: 'Bi-Weekly' },
+  { value: 'monthly', label: 'Monthly' },
+  { value: 'quarterly', label: 'Quarterly' },
+  { value: 'annual', label: 'Annual' },
+  { value: 'as-needed', label: 'As Needed' }
+]
+
+const ITEM_TYPE_ICONS = {
+  'coconut': '🥥',
+  'coconut_water': '💧',
+  'processing_equipment': '⚙️',
+  'machinery': '🏭',
+  'warehouse_space': '📦',
+  'labour': '👷',
+  'water': '💦',
+  'processing_service': '⚗️',
+  'transportation': '🚚',
+  'retail_space': '🏪',
+  'other': '📝'
+}
+
+export default function CommitmentForm({ isOpen, onClose, onCommitmentSaved, userId, profileId, isAuthenticated }) {
+  const { isMobile } = useDevice()
+  const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
-  const [formData, setFormData] = useState({
-    business_name: '',
-    business_type: 'Vendor',
-    contact_person: '',
-    email: '',
-    phone_number: '',
-    address: '',
-    city: '',
-    province: '',
-    country: 'Philippines',
-    bio: '',
-    ...initialData
+
+  // User Profile
+  const [businessType, setBusinessType] = useState('')
+  const [businessName, setBusinessName] = useState('')
+  const [contactPerson, setContactPerson] = useState('')
+  const [email, setEmail] = useState('')
+  const [bio, setBio] = useState('')
+
+  // Commitment Fields
+  const [itemType, setItemType] = useState('')
+  const [itemDescription, setItemDescription] = useState('')
+  const [quantity, setQuantity] = useState('')
+  const [quantityUnit, setQuantityUnit] = useState('pieces')
+  const [scheduledInterval, setScheduledInterval] = useState('monthly')
+  const [intervalCount, setIntervalCount] = useState(1)
+  const [unitPrice, setUnitPrice] = useState('')
+
+  // Additional Costs
+  const [requiresDelivery, setRequiresDelivery] = useState(false)
+  const [estimatedDeliveryCost, setEstimatedDeliveryCost] = useState('0')
+  const [requiresHandling, setRequiresHandling] = useState(false)
+  const [estimatedHandlingCost, setEstimatedHandlingCost] = useState('0')
+  const [requiresShipping, setRequiresShipping] = useState(false)
+  const [estimatedShippingCost, setEstimatedShippingCost] = useState('0')
+  const [notes, setNotes] = useState('')
+
+  // Calculations
+  const [calculations, setCalculations] = useState({
+    totalCommittedValue: 0,
+    totalAdditionalCosts: 0,
+    grandTotal: 0
   })
 
+  // Calculate totals whenever relevant fields change
   useEffect(() => {
-    if (initialData) {
-      setFormData(prev => ({ ...prev, ...initialData }))
-    }
-  }, [initialData])
+    calculateTotals()
+  }, [quantity, unitPrice, estimatedDeliveryCost, estimatedHandlingCost, estimatedShippingCost, intervalCount])
 
-  const handleChange = (e) => {
-    const { name, value } = e.target
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }))
+  const calculateTotals = () => {
+    const qty = parseFloat(quantity) || 0
+    const price = parseFloat(unitPrice) || 0
+    const intervals = parseInt(intervalCount) || 1
+
+    const totalCommittedValue = qty * price * intervals
+    const delivery = requiresDelivery ? parseFloat(estimatedDeliveryCost) || 0 : 0
+    const handling = requiresHandling ? parseFloat(estimatedHandlingCost) || 0 : 0
+    const shipping = requiresShipping ? parseFloat(estimatedShippingCost) || 0 : 0
+    const totalAdditionalCosts = delivery + handling + shipping
+    const grandTotal = totalCommittedValue + totalAdditionalCosts
+
+    setCalculations({
+      totalCommittedValue,
+      totalAdditionalCosts,
+      grandTotal
+    })
   }
+
+  const loadProfileData = async () => {
+    if (!profileId) return
+
+    try {
+      const { data, error } = await supabase
+        .from('commitment_profiles')
+        .select('*')
+        .eq('id', profileId)
+        .single()
+
+      if (!error && data) {
+        setBusinessType(data.business_type || '')
+        setBusinessName(data.business_name || '')
+        setContactPerson(data.contact_person || '')
+        setEmail(data.email || '')
+        setBio(data.bio || '')
+      }
+    } catch (err) {
+      console.error('Error loading profile:', err)
+    }
+  }
+
+  useEffect(() => {
+    if (isOpen && profileId) {
+      loadProfileData()
+    }
+  }, [isOpen, profileId])
 
   const handleSubmit = async (e) => {
     e.preventDefault()
+    if (!itemType || !quantity || !unitPrice) {
+      setError('Please fill in all required fields')
+      return
+    }
+
+    setLoading(true)
     setError('')
     setSuccess('')
-    setIsLoading(true)
 
     try {
-      // Get or create commitment profile
-      const { data: existingProfile, error: fetchError } = await supabase
-        .from('commitment_profiles')
-        .select('id')
-        .eq('user_id', userId)
-        .single()
+      // First, ensure profile exists or create it
+      let commitmentProfileId = profileId
 
-      let result
-      
-      if (existingProfile) {
-        // Update existing profile
-        result = await supabase
-          .from('commitment_profiles')
-          .update({
-            ...formData,
-            profile_completed: true,
-            updated_at: new Date().toISOString()
-          })
-          .eq('id', existingProfile.id)
-          .select()
-          .single()
-      } else {
-        // Create new profile
-        result = await supabase
+      if (!commitmentProfileId) {
+        const { data: profileData, error: profileError } = await supabase
           .from('commitment_profiles')
           .insert({
             user_id: userId,
-            ...formData,
+            business_type: businessType,
+            business_name: businessName,
+            contact_person: contactPerson,
+            email: email,
+            bio: bio,
             profile_completed: true
           })
           .select()
           .single()
+
+        if (profileError) throw profileError
+        commitmentProfileId = profileData.id
+      } else {
+        // Update existing profile
+        await supabase
+          .from('commitment_profiles')
+          .update({
+            business_type: businessType,
+            business_name: businessName,
+            contact_person: contactPerson,
+            email: email,
+            bio: bio,
+            profile_completed: true
+          })
+          .eq('id', commitmentProfileId)
       }
 
-      if (result.error) {
-        throw result.error
-      }
+      // Create commitment
+      const { error: commitmentError } = await supabase
+        .from('commitments')
+        .insert({
+          user_id: userId,
+          commitment_profile_id: commitmentProfileId,
+          item_type: itemType,
+          item_description: itemDescription,
+          quantity: parseFloat(quantity),
+          quantity_unit: quantityUnit,
+          scheduled_interval: scheduledInterval,
+          interval_count: parseInt(intervalCount),
+          unit_price: parseFloat(unitPrice),
+          currency: 'PHP',
+          requires_delivery: requiresDelivery,
+          estimated_delivery_cost: requiresDelivery ? parseFloat(estimatedDeliveryCost) : 0,
+          requires_handling: requiresHandling,
+          estimated_handling_cost: requiresHandling ? parseFloat(estimatedHandlingCost) : 0,
+          requires_shipping: requiresShipping,
+          estimated_shipping_cost: requiresShipping ? parseFloat(estimatedShippingCost) : 0,
+          notes: notes,
+          status: 'active'
+        })
 
-      setSuccess('Profile saved successfully!')
-      if (onProfileComplete) {
-        onProfileComplete(result.data)
-      }
+      if (commitmentError) throw commitmentError
+
+      setSuccess('Commitment added successfully!')
+      setTimeout(() => {
+        onCommitmentSaved()
+        onClose()
+      }, 1500)
     } catch (err) {
-      setError(err.message || 'Failed to save profile')
-      console.error('Profile save error:', err)
+      console.error('Error saving commitment:', err)
+      setError(err.message || 'Failed to save commitment')
     } finally {
-      setIsLoading(false)
+      setLoading(false)
     }
   }
 
+  if (!isOpen) return null
+
   return (
-    <div className="commitment-form-container bg-white rounded-lg shadow-md p-6 border border-gray-200">
-      <h2 className="text-2xl font-bold text-gray-800 mb-6">My Business Profile</h2>
-
-      {error && (
-        <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700">
-          {error}
-        </div>
-      )}
-
-      {success && (
-        <div className="mb-4 p-4 bg-green-50 border border-green-200 rounded-lg text-green-700">
-          {success}
-        </div>
-      )}
-
-      <form onSubmit={handleSubmit} className="space-y-6">
-        {/* Business Name and Type */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Business Name
-            </label>
-            <input
-              type="text"
-              name="business_name"
-              value={formData.business_name}
-              onChange={handleChange}
-              placeholder="e.g., Coconut Farm Co."
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Business Type
-            </label>
-            <select
-              name="business_type"
-              value={formData.business_type}
-              onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
-            >
-              {BUSINESS_TYPES.map(type => (
-                <option key={type} value={type}>{type}</option>
-              ))}
-            </select>
-          </div>
-        </div>
-
-        {/* Contact Information */}
-        <div className="space-y-4">
-          <h3 className="text-lg font-semibold text-gray-700">Contact Information</h3>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Contact Person
-              </label>
-              <input
-                type="text"
-                name="contact_person"
-                value={formData.contact_person}
-                onChange={handleChange}
-                placeholder="Full name"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Email Address
-              </label>
-              <input
-                type="email"
-                name="email"
-                value={formData.email}
-                onChange={handleChange}
-                placeholder="your@email.com"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Phone Number
-              </label>
-              <input
-                type="tel"
-                name="phone_number"
-                value={formData.phone_number}
-                onChange={handleChange}
-                placeholder="+63 9XX XXX XXXX"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
-            </div>
-          </div>
-        </div>
-
-        {/* Address Information */}
-        <div className="space-y-4">
-          <h3 className="text-lg font-semibold text-gray-700">Location</h3>
-          
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Address
-            </label>
-            <input
-              type="text"
-              name="address"
-              value={formData.address}
-              onChange={handleChange}
-              placeholder="Street address"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            />
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                City
-              </label>
-              <input
-                type="text"
-                name="city"
-                value={formData.city}
-                onChange={handleChange}
-                placeholder="City"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Province
-              </label>
-              <input
-                type="text"
-                name="province"
-                value={formData.province}
-                onChange={handleChange}
-                placeholder="Province"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Country
-              </label>
-              <input
-                type="text"
-                name="country"
-                value={formData.country}
-                onChange={handleChange}
-                placeholder="Country"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
-            </div>
-          </div>
-        </div>
-
-        {/* Bio */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Bio / About Your Business
-          </label>
-          <textarea
-            name="bio"
-            value={formData.bio}
-            onChange={handleChange}
-            placeholder="Tell us about your business, experience, and what you can commit to..."
-            rows={4}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
-          />
-        </div>
-
-        {/* Submit Button */}
-        <div className="flex gap-4">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 overflow-y-auto">
+      <div className={`bg-slate-800 rounded-lg border border-slate-700 ${isMobile ? 'w-full max-h-[90vh]' : 'w-full max-w-2xl max-h-[90vh]'} overflow-y-auto`}>
+        {/* Header */}
+        <div className="bg-slate-700 border-b border-slate-600 px-6 py-4 sticky top-0 flex items-center justify-between">
+          <h2 className="text-xl font-bold text-white">Add Contribution to Partnership</h2>
           <button
-            type="submit"
-            disabled={isLoading}
-            className="flex-1 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white font-semibold py-3 px-6 rounded-lg transition duration-200"
+            onClick={onClose}
+            className="text-slate-400 hover:text-white text-2xl"
           >
-            {isLoading ? 'Saving...' : 'Save Profile'}
+            ✕
           </button>
         </div>
-      </form>
+
+        {/* Content */}
+        <form onSubmit={handleSubmit} className="p-6 space-y-8">
+          {error && (
+            <div className="p-4 bg-red-900/30 border border-red-700 rounded text-red-200 text-sm">
+              {error}
+            </div>
+          )}
+
+          {success && (
+            <div className="p-4 bg-green-900/30 border border-green-700 rounded text-green-200 text-sm">
+              {success}
+            </div>
+          )}
+
+          {/* Section 1: Your Role & Business */}
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold text-white flex items-center gap-2">
+              <span>👤</span> Your Role & Business
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-slate-300 text-sm font-medium mb-2">
+                  Business Type *
+                </label>
+                <select
+                  value={businessType}
+                  onChange={(e) => setBusinessType(e.target.value)}
+                  required
+                  className="w-full bg-slate-700 border border-slate-600 rounded px-3 py-2 text-white focus:outline-none focus:border-blue-500"
+                >
+                  <option value="">Select business type</option>
+                  {BUSINESS_TYPES.map(type => (
+                    <option key={type} value={type}>
+                      {type.charAt(0).toUpperCase() + type.slice(1).replace('_', ' ')}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-slate-300 text-sm font-medium mb-2">
+                  Business Name
+                </label>
+                <input
+                  type="text"
+                  value={businessName}
+                  onChange={(e) => setBusinessName(e.target.value)}
+                  placeholder="e.g., Fresh Coconut Farm"
+                  className="w-full bg-slate-700 border border-slate-600 rounded px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-blue-500"
+                />
+              </div>
+
+              <div>
+                <label className="block text-slate-300 text-sm font-medium mb-2">
+                  Contact Person
+                </label>
+                <input
+                  type="text"
+                  value={contactPerson}
+                  onChange={(e) => setContactPerson(e.target.value)}
+                  placeholder="Your name"
+                  className="w-full bg-slate-700 border border-slate-600 rounded px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-blue-500"
+                />
+              </div>
+
+              <div>
+                <label className="block text-slate-300 text-sm font-medium mb-2">
+                  Email
+                </label>
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="your@email.com"
+                  className="w-full bg-slate-700 border border-slate-600 rounded px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-blue-500"
+                />
+              </div>
+
+              <div className="md:col-span-2">
+                <label className="block text-slate-300 text-sm font-medium mb-2">
+                  Business Description
+                </label>
+                <textarea
+                  value={bio}
+                  onChange={(e) => setBio(e.target.value)}
+                  placeholder="Tell us about your business..."
+                  rows="2"
+                  className="w-full bg-slate-700 border border-slate-600 rounded px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-blue-500"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Section 2: What Can You Contribute? */}
+          <div className="space-y-4 border-t border-slate-600 pt-6">
+            <h3 className="text-lg font-semibold text-white flex items-center gap-2">
+              <span>🎁</span> What Can You Contribute?
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-slate-300 text-sm font-medium mb-2">
+                  Item Type *
+                </label>
+                <select
+                  value={itemType}
+                  onChange={(e) => setItemType(e.target.value)}
+                  required
+                  className="w-full bg-slate-700 border border-slate-600 rounded px-3 py-2 text-white focus:outline-none focus:border-blue-500"
+                >
+                  <option value="">Select what you can provide</option>
+                  {ITEM_TYPES.map(type => (
+                    <option key={type} value={type}>
+                      {ITEM_TYPE_ICONS[type]} {type.replace(/_/g, ' ').toUpperCase()}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-slate-300 text-sm font-medium mb-2">
+                  Description
+                </label>
+                <input
+                  type="text"
+                  value={itemDescription}
+                  onChange={(e) => setItemDescription(e.target.value)}
+                  placeholder="e.g., Premium quality, Grade A"
+                  className="w-full bg-slate-700 border border-slate-600 rounded px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-blue-500"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Section 3: Quantity & Pricing Calculator */}
+          <div className="space-y-4 border-t border-slate-600 pt-6">
+            <h3 className="text-lg font-semibold text-white flex items-center gap-2">
+              <span>🧮</span> Quantity & Pricing
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div>
+                <label className="block text-slate-300 text-sm font-medium mb-2">
+                  Quantity *
+                </label>
+                <input
+                  type="number"
+                  value={quantity}
+                  onChange={(e) => setQuantity(e.target.value)}
+                  placeholder="e.g., 5000"
+                  step="0.01"
+                  min="0"
+                  required
+                  className="w-full bg-slate-700 border border-slate-600 rounded px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-blue-500"
+                />
+              </div>
+
+              <div>
+                <label className="block text-slate-300 text-sm font-medium mb-2">
+                  Unit *
+                </label>
+                <select
+                  value={quantityUnit}
+                  onChange={(e) => setQuantityUnit(e.target.value)}
+                  className="w-full bg-slate-700 border border-slate-600 rounded px-3 py-2 text-white focus:outline-none focus:border-blue-500"
+                >
+                  {QUANTITY_UNITS.map(unit => (
+                    <option key={unit} value={unit}>
+                      {unit.toUpperCase()}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-slate-300 text-sm font-medium mb-2">
+                  Unit Price (₱) *
+                </label>
+                <input
+                  type="number"
+                  value={unitPrice}
+                  onChange={(e) => setUnitPrice(e.target.value)}
+                  placeholder="e.g., 50.00"
+                  step="0.01"
+                  min="0"
+                  required
+                  className="w-full bg-slate-700 border border-slate-600 rounded px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-blue-500"
+                />
+              </div>
+            </div>
+
+            {/* Scheduling */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+              <div>
+                <label className="block text-slate-300 text-sm font-medium mb-2">
+                  Frequency
+                </label>
+                <select
+                  value={scheduledInterval}
+                  onChange={(e) => setScheduledInterval(e.target.value)}
+                  className="w-full bg-slate-700 border border-slate-600 rounded px-3 py-2 text-white focus:outline-none focus:border-blue-500"
+                >
+                  {SCHEDULED_INTERVALS.map(interval => (
+                    <option key={interval.value} value={interval.value}>
+                      {interval.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-slate-300 text-sm font-medium mb-2">
+                  Number of {scheduledInterval === 'one-time' ? 'delivery' : scheduledInterval === 'daily' ? 'days' : scheduledInterval === 'weekly' ? 'weeks' : scheduledInterval === 'bi-weekly' ? 'bi-weeks' : 'months'}
+                </label>
+                <input
+                  type="number"
+                  value={intervalCount}
+                  onChange={(e) => setIntervalCount(e.target.value)}
+                  placeholder="e.g., 1"
+                  min="1"
+                  className="w-full bg-slate-700 border border-slate-600 rounded px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-blue-500"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Section 4: Additional Costs */}
+          <div className="space-y-4 border-t border-slate-600 pt-6">
+            <h3 className="text-lg font-semibold text-white flex items-center gap-2">
+              <span>💰</span> Additional Costs (Optional)
+            </h3>
+
+            {/* Delivery */}
+            <div className="bg-slate-750 rounded p-4 space-y-3">
+              <label className="flex items-center gap-3 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={requiresDelivery}
+                  onChange={(e) => setRequiresDelivery(e.target.checked)}
+                  className="w-4 h-4 rounded"
+                />
+                <span className="text-white font-medium">Requires Delivery</span>
+              </label>
+              {requiresDelivery && (
+                <input
+                  type="number"
+                  value={estimatedDeliveryCost}
+                  onChange={(e) => setEstimatedDeliveryCost(e.target.value)}
+                  placeholder="Estimated delivery cost (₱)"
+                  step="0.01"
+                  min="0"
+                  className="w-full bg-slate-700 border border-slate-600 rounded px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-blue-500"
+                />
+              )}
+            </div>
+
+            {/* Handling */}
+            <div className="bg-slate-750 rounded p-4 space-y-3">
+              <label className="flex items-center gap-3 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={requiresHandling}
+                  onChange={(e) => setRequiresHandling(e.target.checked)}
+                  className="w-4 h-4 rounded"
+                />
+                <span className="text-white font-medium">Requires Handling/Packaging</span>
+              </label>
+              {requiresHandling && (
+                <input
+                  type="number"
+                  value={estimatedHandlingCost}
+                  onChange={(e) => setEstimatedHandlingCost(e.target.value)}
+                  placeholder="Estimated handling cost (₱)"
+                  step="0.01"
+                  min="0"
+                  className="w-full bg-slate-700 border border-slate-600 rounded px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-blue-500"
+                />
+              )}
+            </div>
+
+            {/* Shipping */}
+            <div className="bg-slate-750 rounded p-4 space-y-3">
+              <label className="flex items-center gap-3 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={requiresShipping}
+                  onChange={(e) => setRequiresShipping(e.target.checked)}
+                  className="w-4 h-4 rounded"
+                />
+                <span className="text-white font-medium">Requires Shipping</span>
+              </label>
+              {requiresShipping && (
+                <input
+                  type="number"
+                  value={estimatedShippingCost}
+                  onChange={(e) => setEstimatedShippingCost(e.target.value)}
+                  placeholder="Estimated shipping cost (₱)"
+                  step="0.01"
+                  min="0"
+                  className="w-full bg-slate-700 border border-slate-600 rounded px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-blue-500"
+                />
+              )}
+            </div>
+          </div>
+
+          {/* Section 5: Summary & Totals */}
+          <div className="border-t border-slate-600 pt-6 space-y-4 bg-slate-750 rounded-lg p-6">
+            <h3 className="text-lg font-semibold text-white">💡 Summary</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+              <div className="flex justify-between items-center p-3 bg-slate-700 rounded">
+                <span className="text-slate-300">Item Total (Qty × Price × Intervals)</span>
+                <span className="text-white font-semibold">₱{calculations.totalCommittedValue.toLocaleString('en-US', { maximumFractionDigits: 2 })}</span>
+              </div>
+
+              <div className="flex justify-between items-center p-3 bg-slate-700 rounded">
+                <span className="text-slate-300">Additional Costs</span>
+                <span className="text-white font-semibold">₱{calculations.totalAdditionalCosts.toLocaleString('en-US', { maximumFractionDigits: 2 })}</span>
+              </div>
+
+              <div className="md:col-span-2 flex justify-between items-center p-4 bg-blue-900/40 border border-blue-700 rounded-lg">
+                <span className="text-blue-200 font-semibold text-base">Total Commitment Value</span>
+                <span className="text-blue-100 font-bold text-lg">₱{calculations.grandTotal.toLocaleString('en-US', { maximumFractionDigits: 2 })}</span>
+              </div>
+            </div>
+
+            {/* Notes */}
+            <div>
+              <label className="block text-slate-300 text-sm font-medium mb-2">
+                Additional Notes
+              </label>
+              <textarea
+                value={notes}
+                onChange={(e) => setNotes(e.target.value)}
+                placeholder="Any other details about this contribution..."
+                rows="2"
+                className="w-full bg-slate-700 border border-slate-600 rounded px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-blue-500"
+              />
+            </div>
+          </div>
+
+          {/* Actions */}
+          <div className="flex gap-3 border-t border-slate-600 pt-6">
+            <button
+              type="submit"
+              disabled={loading}
+              className="flex-1 px-4 py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-slate-600 text-white font-semibold rounded transition-colors"
+            >
+              {loading ? 'Saving...' : 'Add Contribution'}
+            </button>
+            <button
+              type="button"
+              onClick={onClose}
+              className="flex-1 px-4 py-3 bg-slate-700 hover:bg-slate-600 text-white font-semibold rounded transition-colors"
+            >
+              Cancel
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
   )
 }
