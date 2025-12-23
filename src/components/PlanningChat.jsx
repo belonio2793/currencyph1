@@ -2031,6 +2031,9 @@ export default function PlanningChat() {
                   <label className="block text-sm font-semibold text-slate-200 mb-2">Price Per Unit (Optional)</label>
                   <input
                     type="number"
+                    name="pricePerUnit"
+                    value={contributionForm.pricePerUnit}
+                    onChange={handleContributionChange}
                     placeholder="0.00"
                     step="0.01"
                     className="w-full px-4 py-2 rounded-lg bg-slate-700 text-white border border-slate-600 placeholder-slate-400 focus:outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-500/50 text-sm"
@@ -2038,7 +2041,7 @@ export default function PlanningChat() {
                 </div>
                 <div>
                   <label className="block text-sm font-semibold text-slate-200 mb-2">Currency</label>
-                  <select className="w-full px-4 py-2 rounded-lg bg-slate-700 text-white border border-slate-600 focus:outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-500/50 text-sm">
+                  <select name="currency" value={contributionForm.currency} onChange={handleContributionChange} className="w-full px-4 py-2 rounded-lg bg-slate-700 text-white border border-slate-600 focus:outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-500/50 text-sm">
                     <option value="php">PHP</option>
                     <option value="usd">USD</option>
                   </select>
