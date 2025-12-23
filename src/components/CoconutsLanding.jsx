@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react'
-import { ChevronDown, ArrowRight, Leaf, TrendingUp, Users, Zap, Globe, Target, Briefcase, BarChart3, Shield, Droplets, Wind } from 'lucide-react'
 
 export default function CoconutsLanding() {
   const [scrollPosition, setScrollPosition] = useState(0)
