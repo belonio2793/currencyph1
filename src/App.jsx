@@ -261,6 +261,12 @@ export default function App() {
       setShowAuth(false)
     }
 
+    // Direct /commitments route should activate commitment manager
+    if (path === '/commitments') {
+      setActiveTab('commitments')
+      setShowAuth(false)
+    }
+
     // Direct /depots route should activate deposit tab
     if (path === '/depots') {
       setActiveTab('deposit')
