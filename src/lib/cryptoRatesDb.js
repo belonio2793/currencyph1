@@ -29,35 +29,25 @@ export async function getCryptoRateFromDb(fromCurrency, toCurrency = 'USD') {
 }
 
 /**
- * Convert fiat currency to cryptocurrency using cached database rates
- * Assumes rates in DB are: crypto_to_usd
- * So: amount_php / (usd_rate * crypto_to_usd) = crypto_amount
+ * Convert fiat currency to cryptocurrency using public.pairs rates
  */
 export async function convertFiatToCryptoDb(fiatAmount, fiatCurrency, cryptoCode) {
   try {
-    const cached = await getCachedRates()
-    if (!cached?.exchange_rates || !cached?.crypto_prices) {
-      console.warn('No cached rates available')
-      return null
-    }
-
     // First convert fiat to USD
     let usdAmount = fiatAmount
     if (fiatCurrency !== 'USD') {
-      const exchangeRates = cached.exchange_rates
-      // Open Exchange Rates format: { USD: 1, EUR: 0.85, PHP: 55.1, ... }
-      const fiatRate = exchangeRates[fiatCurrency] || exchangeRates[fiatCurrency.toUpperCase()]
+      const fiatRate = await getCryptoRateFromDb(fiatCurrency, 'USD')
       if (!fiatRate) {
-        console.warn(`Could not get ${fiatCurrency}/USD rate from cache`)
+        console.warn(`Could not get ${fiatCurrency}/USD rate`)
         return null
       }
-      usdAmount = fiatAmount / fiatRate
+      usdAmount = fiatAmount * fiatRate
     }
 
     // Then get crypto/USD rate and convert
-    const cryptoPrice = cached.crypto_prices[cryptoCode.toLowerCase()]?.usd
+    const cryptoPrice = await getCryptoRateFromDb(cryptoCode, 'USD')
     if (!cryptoPrice) {
-      console.warn(`Could not get ${cryptoCode}/USD price from cache`)
+      console.warn(`Could not get ${cryptoCode}/USD price`)
       return null
     }
 
@@ -69,38 +59,11 @@ export async function convertFiatToCryptoDb(fiatAmount, fiatCurrency, cryptoCode
 }
 
 /**
- * Fetch fiat currency exchange rate from cached rates
+ * Fetch fiat currency exchange rate from public.pairs
  */
 export async function getFiatRateFromDb(fromCurrency, toCurrency = 'USD') {
   try {
-    const cached = await getCachedRates()
-    if (!cached?.exchange_rates) {
-      console.warn('No cached exchange rates available')
-      return null
-    }
-
-    const exchangeRates = cached.exchange_rates
-    // Open Exchange Rates format: rates are relative to USD base
-    // If from=PHP and to=USD, return 1/exchangeRates['PHP']
-    if (toCurrency === 'USD') {
-      const fromRate = exchangeRates[fromCurrency] || exchangeRates[fromCurrency.toUpperCase()]
-      if (!fromRate) {
-        console.warn(`Could not get ${fromCurrency}/USD rate`)
-        return null
-      }
-      return 1 / fromRate
-    }
-
-    // For other pairs, do a cross rate conversion
-    const fromRate = exchangeRates[fromCurrency] || exchangeRates[fromCurrency.toUpperCase()]
-    const toRate = exchangeRates[toCurrency] || exchangeRates[toCurrency.toUpperCase()]
-
-    if (!fromRate || !toRate) {
-      console.warn(`Could not get ${fromCurrency}/${toCurrency} rate`)
-      return null
-    }
-
-    return fromRate / toRate
+    return await getCryptoRateFromDb(fromCurrency, toCurrency)
   } catch (error) {
     console.warn(`Error fetching fiat rate for ${fromCurrency}/${toCurrency}:`, error.message)
     return null
@@ -108,19 +71,29 @@ export async function getFiatRateFromDb(fromCurrency, toCurrency = 'USD') {
 }
 
 /**
- * Get all cryptocurrency prices from cached database
+ * Get all currency pairs from public.pairs
  */
 export async function getAllCryptoRates() {
   try {
-    const cached = await getCachedRates()
-    if (!cached?.crypto_prices) {
-      console.warn('No cached crypto prices available')
+    const { data, error } = await supabase
+      .from('pairs')
+      .select('from_currency, to_currency, rate, updated_at')
+
+    if (error || !data) {
+      console.warn('No rates available from public.pairs')
       return {}
     }
 
-    return cached.crypto_prices || {}
+    // Build a lookup structure: { "BTC_USD": 45000, ... }
+    const rates = {}
+    data.forEach(pair => {
+      const key = `${pair.from_currency}_${pair.to_currency}`
+      rates[key] = parseFloat(pair.rate)
+    })
+
+    return rates
   } catch (error) {
-    console.warn('Error fetching all crypto rates:', error.message)
+    console.warn('Error fetching all rates:', error.message)
     return {}
   }
 }
@@ -130,24 +103,24 @@ export async function getAllCryptoRates() {
  */
 export async function getCryptoRateWithTimestamp(fromCurrency, toCurrency = 'USD') {
   try {
-    const cached = await getCachedRates()
-    if (!cached?.crypto_prices) {
-      console.warn('No cached crypto prices available')
-      return null
-    }
+    const fromCode = fromCurrency.toUpperCase()
+    const toCode = toCurrency.toUpperCase()
 
-    const cryptoPrices = cached.crypto_prices
-    const cryptoKey = fromCurrency.toLowerCase()
-    const price = cryptoPrices[cryptoKey]?.[toCurrency.toLowerCase()]
+    const { data, error } = await supabase
+      .from('pairs')
+      .select('rate, updated_at')
+      .eq('from_currency', fromCode)
+      .eq('to_currency', toCode)
+      .single()
 
-    if (!price) {
-      console.warn(`Could not get ${fromCurrency}/${toCurrency} price`)
+    if (error || !data || !(typeof data.rate === 'number' && isFinite(data.rate) && data.rate > 0)) {
+      console.warn(`Could not get ${fromCurrency}/${toCurrency} rate`)
       return null
     }
 
     return {
-      rate: price,
-      updated_at: cached.fetched_at
+      rate: parseFloat(data.rate),
+      updated_at: data.updated_at
     }
   } catch (error) {
     console.warn(`Error fetching crypto rate for ${fromCurrency}/${toCurrency}:`, error.message)
@@ -156,34 +129,46 @@ export async function getCryptoRateWithTimestamp(fromCurrency, toCurrency = 'USD
 }
 
 /**
- * Check if cached rates are fresh (less than 1 hour old)
+ * Check if rates are fresh (less than 1 hour old)
  */
 export async function areCachedRatesFresh() {
   try {
-    const cached = await getCachedRates()
-    if (!cached?.fetched_at) return false
+    const { data, error } = await supabase
+      .from('pairs')
+      .select('updated_at')
+      .order('updated_at', { ascending: false })
+      .limit(1)
+      .single()
 
-    const fetchedTime = new Date(cached.fetched_at).getTime()
+    if (error || !data?.updated_at) return false
+
+    const updatedTime = new Date(data.updated_at).getTime()
     const now = Date.now()
-    const ageMs = now - fetchedTime
+    const ageMs = now - updatedTime
     const oneHourMs = 60 * 60 * 1000
 
     return ageMs < oneHourMs
   } catch (error) {
-    console.warn('Error checking cache freshness:', error.message)
+    console.warn('Error checking rate freshness:', error.message)
     return false
   }
 }
 
 /**
- * Get the last update time of cached rates
+ * Get the last update time of rates
  */
 export async function getCacheLastUpdateTime() {
   try {
-    const cached = await getCachedRates()
-    return cached?.fetched_at || null
+    const { data, error } = await supabase
+      .from('pairs')
+      .select('updated_at')
+      .order('updated_at', { ascending: false })
+      .limit(1)
+      .single()
+
+    return data?.updated_at || null
   } catch (error) {
-    console.warn('Error getting cache update time:', error.message)
+    console.warn('Error getting last update time:', error.message)
     return null
   }
 }
