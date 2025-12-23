@@ -128,8 +128,8 @@ export default function Rates() {
         }
       })
 
-      // Find rates against PHP (base currency) from merged pairs table
-      mergedPairs.forEach(pair => {
+      // Find rates against PHP (base currency) from public.pairs table
+      pairsData?.forEach(pair => {
         if (pair.updated_at) {
           timestamps.push(new Date(pair.updated_at))
         }
