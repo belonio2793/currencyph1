@@ -4973,6 +4973,95 @@ export default function PlanningChat() {
             </p>
           </div>
         </section>
+
+        {/* Coconuts.com.ph Information Section */}
+        <section id="coconuts-info" className="py-24 px-4 sm:px-6 lg:px-8 bg-gray-50">
+          <div className="max-w-7xl mx-auto">
+            <div className="mb-16">
+              <div className="inline-block mb-4 px-4 py-2 bg-amber-100 text-amber-700 rounded-full text-sm font-semibold">
+                THE VISION
+              </div>
+              <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+                A Complete Value Chain from Land to Global Distribution
+              </h2>
+              <p className="text-xl text-gray-600 max-w-3xl leading-relaxed">
+                Coconuts.com.ph is a revolutionary integrated platform that connects Philippine coconut farmers, landowners, and manufacturers with global markets. We're building an entire ecosystem—from acquisition through processing to international distribution—all transparently managed through our currency.ph integration.
+              </p>
+            </div>
+
+            <div className="grid md:grid-cols-3 gap-8 mt-12">
+              {[
+                {
+                  icon: '🌾',
+                  title: 'Farming & Acquisition',
+                  description: 'Direct partnerships with Philippine coconut farmers and landowners. Fair-price contracts with transparent pricing mechanisms and currency hedging through exconvert integration.'
+                },
+                {
+                  icon: '⚡',
+                  title: 'Manufacturing & Processing',
+                  description: 'State-of-the-art facilities for 100% pure product extraction and processing. Zero additives, zero preservatives—just pure coconut goodness at scale.'
+                },
+                {
+                  icon: '🌍',
+                  title: 'Global Distribution',
+                  description: 'Strategic logistics partnerships, port management, and direct-to-retailer distribution channels across 50+ countries with real-time tracking.'
+                }
+              ].map((item, i) => (
+                <div key={i} className="bg-white rounded-xl p-8 shadow-sm border border-gray-200 hover:shadow-lg transition-shadow">
+                  <div className="text-4xl mb-4">{item.icon}</div>
+                  <h3 className="text-2xl font-bold text-gray-900 mb-4">{item.title}</h3>
+                  <p className="text-gray-600 leading-relaxed">{item.description}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <section className="py-24 px-4 sm:px-6 lg:px-8 bg-gradient-to-r from-amber-600 to-orange-600 text-white">
+          <div className="max-w-4xl mx-auto text-center">
+            <h2 className="text-3xl md:text-5xl font-bold mb-6">Ready to Join the Movement?</h2>
+            <p className="text-xl text-amber-50 mb-8 max-w-2xl mx-auto leading-relaxed">
+              Transparent commerce with real impact. Invest in coconuts.com.ph and align your capital with sustainable growth, fair farming practices, and community development.
+            </p>
+
+            <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
+              <button
+                onClick={() => setShowAuthModalOnDemand(true)}
+                className="px-8 py-4 bg-white text-amber-600 font-bold rounded-lg hover:bg-amber-50 transition-all transform hover:scale-105 shadow-lg text-lg"
+              >
+                Register & Get Started
+              </button>
+              <button
+                onClick={() => setShowAuthModalOnDemand(true)}
+                className="px-8 py-4 bg-amber-700 hover:bg-amber-800 text-white font-bold rounded-lg transition-colors border-2 border-white text-lg"
+              >
+                Sign In to Dashboard
+              </button>
+            </div>
+
+            <div className="grid md:grid-cols-3 gap-6 mt-12">
+              <div className="bg-white/10 backdrop-blur-sm rounded-lg p-6 border border-white/20">
+                <div className="text-3xl mb-3">🌾</div>
+                <h3 className="font-bold text-white mb-2">For Farmers</h3>
+                <p className="text-amber-50 text-sm">Get guaranteed pricing, direct payments, and equity stake in the enterprise</p>
+              </div>
+              <div className="bg-white/10 backdrop-blur-sm rounded-lg p-6 border border-white/20">
+                <div className="text-3xl mb-3">💰</div>
+                <h3 className="font-bold text-white mb-2">For Investors</h3>
+                <p className="text-amber-50 text-sm">15-25% equity returns + dividends from Year 2, transparent real-time tracking</p>
+              </div>
+              <div className="bg-white/10 backdrop-blur-sm rounded-lg p-6 border border-white/20">
+                <div className="text-3xl mb-3">🤝</div>
+                <h3 className="font-bold text-white mb-2">For Partners</h3>
+                <p className="text-amber-50 text-sm">Integrated logistics, supply chain visibility, and margin-sharing opportunities</p>
+              </div>
+            </div>
+
+            <p className="mt-12 text-amber-50 text-sm">
+              Powered by <span className="font-bold text-white">currency.ph</span> for transparent multi-currency transactions and blockchain-verified supply chain integrity.
+            </p>
+          </div>
+        </section>
       </div>
     </div>
   )
