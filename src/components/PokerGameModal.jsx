@@ -378,14 +378,19 @@ export default function PokerGameModal({ open, onClose, table, userId, userEmail
 
         {/* Error Display */}
         {error && (
-          <div className="bg-red-50 border border-red-200 rounded-lg p-3">
-            <p className="text-red-700 text-sm">{error}</p>
-            <button
-              onClick={() => setError(null)}
-              className="text-xs text-red-600 hover:text-red-700 mt-1 underline"
-            >
-              Dismiss
-            </button>
+          <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+            <div className="flex items-start justify-between gap-3">
+              <div className="flex-1">
+                <p className="text-red-900 font-medium text-sm">Error</p>
+                <p className="text-red-700 text-sm mt-1 break-words">{String(error).substring(0, 200)}</p>
+              </div>
+              <button
+                onClick={() => setError(null)}
+                className="text-xs text-red-600 hover:text-red-700 whitespace-nowrap font-medium"
+              >
+                Dismiss
+              </button>
+            </div>
           </div>
         )}
 
