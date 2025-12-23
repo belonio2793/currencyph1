@@ -103,6 +103,7 @@ export default function PartnershipHero({ userId, userEmail, isAuthenticated, on
             userEmail={userEmail}
             isAuthenticated={isAuthenticated}
             onSubmitSuccess={loadPartnerships}
+            onAuthRequired={onAuthRequired}
           />
         </div>
 
