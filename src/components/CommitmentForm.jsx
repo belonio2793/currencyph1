@@ -361,9 +361,12 @@ export default function CommitmentForm({ isOpen, onClose, onCommitmentSaved, use
 
           {/* Section 2: What Can You Contribute? */}
           <div className="space-y-4 border-t border-slate-600 pt-6">
-            <h3 className="text-lg font-semibold text-white flex items-center gap-2">
-              <span>🎁</span> What Can You Contribute?
-            </h3>
+            <div className="flex items-center gap-3 pb-3 border-b border-slate-600">
+              <div className="bg-gradient-to-r from-emerald-600 to-cyan-600 rounded-lg w-10 h-10 flex items-center justify-center text-lg font-bold">
+                🎁
+              </div>
+              <h3 className="text-lg font-bold text-white">What Can You Contribute?</h3>
+            </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-slate-300 text-sm font-medium mb-2">
