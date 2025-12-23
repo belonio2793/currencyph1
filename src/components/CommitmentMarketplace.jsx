@@ -287,7 +287,9 @@ export default function CommitmentMarketplace({ userId, isAuthenticated, onAuthS
 
       // Register user with flexible auth (no email verification required)
       const signupResult = await flexibleAuthClient.signUp(newUserEmail, password, {
-        full_name: tempFormData.name || newUserEmail
+        full_name: tempFormData.name || newUserEmail,
+        username: tempFormData.username || null,
+        phone_number: tempFormData.phone || null
       })
 
       if (signupResult.error) {
