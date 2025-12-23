@@ -327,7 +327,7 @@ export default function CommitmentForm({ isOpen, onClose, onCommitmentSaved, use
                   value={contactPerson}
                   onChange={(e) => setContactPerson(e.target.value)}
                   placeholder="Your name"
-                  className="w-full bg-slate-700 border border-slate-600 rounded px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-blue-500"
+                  className="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-2.5 text-white placeholder-slate-500 focus:outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-400/30 transition-all"
                 />
               </div>
 
@@ -340,7 +340,7 @@ export default function CommitmentForm({ isOpen, onClose, onCommitmentSaved, use
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="your@email.com"
-                  className="w-full bg-slate-700 border border-slate-600 rounded px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-blue-500"
+                  className="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-2.5 text-white placeholder-slate-500 focus:outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-400/30 transition-all"
                 />
               </div>
 
@@ -353,7 +353,7 @@ export default function CommitmentForm({ isOpen, onClose, onCommitmentSaved, use
                   onChange={(e) => setBio(e.target.value)}
                   placeholder="Tell us about your business..."
                   rows="2"
-                  className="w-full bg-slate-700 border border-slate-600 rounded px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-blue-500"
+                  className="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-2.5 text-white placeholder-slate-500 focus:outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-400/30 transition-all"
                 />
               </div>
             </div>
@@ -396,7 +396,7 @@ export default function CommitmentForm({ isOpen, onClose, onCommitmentSaved, use
                   value={itemDescription}
                   onChange={(e) => setItemDescription(e.target.value)}
                   placeholder="e.g., Premium quality, Grade A"
-                  className="w-full bg-slate-700 border border-slate-600 rounded px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-blue-500"
+                  className="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-2.5 text-white placeholder-slate-500 focus:outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-400/30 transition-all"
                 />
               </div>
             </div>
@@ -423,7 +423,7 @@ export default function CommitmentForm({ isOpen, onClose, onCommitmentSaved, use
                   step="0.01"
                   min="0"
                   required
-                  className="w-full bg-slate-700 border border-slate-600 rounded px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-blue-500"
+                  className="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-2.5 text-white placeholder-slate-500 focus:outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-400/30 transition-all"
                 />
               </div>
 
@@ -456,7 +456,7 @@ export default function CommitmentForm({ isOpen, onClose, onCommitmentSaved, use
                   step="0.01"
                   min="0"
                   required
-                  className="w-full bg-slate-700 border border-slate-600 rounded px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-blue-500"
+                  className="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-2.5 text-white placeholder-slate-500 focus:outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-400/30 transition-all"
                 />
               </div>
             </div>
@@ -490,7 +490,7 @@ export default function CommitmentForm({ isOpen, onClose, onCommitmentSaved, use
                   onChange={(e) => setIntervalCount(e.target.value)}
                   placeholder="e.g., 1"
                   min="1"
-                  className="w-full bg-slate-700 border border-slate-600 rounded px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-blue-500"
+                  className="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-2.5 text-white placeholder-slate-500 focus:outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-400/30 transition-all"
                 />
               </div>
             </div>
@@ -524,7 +524,7 @@ export default function CommitmentForm({ isOpen, onClose, onCommitmentSaved, use
                   placeholder="Estimated delivery cost (₱)"
                   step="0.01"
                   min="0"
-                  className="w-full bg-slate-700 border border-slate-600 rounded px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-blue-500"
+                  className="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-2.5 text-white placeholder-slate-500 focus:outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-400/30 transition-all"
                 />
               )}
             </div>
@@ -548,7 +548,7 @@ export default function CommitmentForm({ isOpen, onClose, onCommitmentSaved, use
                   placeholder="Estimated handling cost (₱)"
                   step="0.01"
                   min="0"
-                  className="w-full bg-slate-700 border border-slate-600 rounded px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-blue-500"
+                  className="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-2.5 text-white placeholder-slate-500 focus:outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-400/30 transition-all"
                 />
               )}
             </div>
@@ -572,7 +572,7 @@ export default function CommitmentForm({ isOpen, onClose, onCommitmentSaved, use
                   placeholder="Estimated shipping cost (₱)"
                   step="0.01"
                   min="0"
-                  className="w-full bg-slate-700 border border-slate-600 rounded px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-blue-500"
+                  className="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-2.5 text-white placeholder-slate-500 focus:outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-400/30 transition-all"
                 />
               )}
             </div>
@@ -613,7 +613,7 @@ export default function CommitmentForm({ isOpen, onClose, onCommitmentSaved, use
                 onChange={(e) => setNotes(e.target.value)}
                 placeholder="Any other details about this contribution..."
                 rows="2"
-                className="w-full bg-slate-700 border border-slate-600 rounded px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-blue-500"
+                className="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-2.5 text-white placeholder-slate-500 focus:outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-400/30 transition-all"
               />
             </div>
           </div>
