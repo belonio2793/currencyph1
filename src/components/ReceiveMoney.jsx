@@ -15,6 +15,27 @@ const CRYPTO_CURRENCY_CODES = [
   'SHIB', 'PYUSD', 'WLD', 'XAUT', 'PEPE', 'ASTER', 'ENA', 'SKY', 'HYPE', 'Sui'
 ]
 
+// Helper function to determine if a wallet is cryptocurrency
+const isCryptoWallet = (wallet) => {
+  return CRYPTO_CURRENCY_CODES.includes(wallet.currency_code?.toUpperCase())
+}
+
+// Helper function to group wallets by type
+const groupWalletsByType = (walletsList) => {
+  const groups = {
+    fiat: [],
+    crypto: []
+  }
+  walletsList.forEach(wallet => {
+    if (isCryptoWallet(wallet)) {
+      groups.crypto.push(wallet)
+    } else {
+      groups.fiat.push(wallet)
+    }
+  })
+  return groups
+}
+
 export default function ReceiveMoney({ userId, globalCurrency = 'PHP' }) {
   // State: Recipient selection
   const [isRequestMode, setIsRequestMode] = useState(!userId || userId.includes('guest'))
@@ -156,18 +177,21 @@ export default function ReceiveMoney({ userId, globalCurrency = 'PHP' }) {
 
   // Filter wallets based on search input
   useEffect(() => {
-    if (!walletSearch.trim()) {
-      setFilteredWallets(wallets)
-    } else {
+    let filtered = wallets
+    if (walletSearch.trim()) {
       const searchLower = walletSearch.toLowerCase()
-      const filtered = wallets.filter(wallet =>
+      filtered = wallets.filter(wallet =>
         wallet.currency_code.toLowerCase().includes(searchLower) ||
         wallet.currency_name?.toLowerCase().includes(searchLower) ||
         wallet.account_number?.toLowerCase().includes(searchLower) ||
         formatNumber(wallet.balance).includes(searchLower)
       )
-      setFilteredWallets(filtered)
     }
+    // Always keep wallets grouped by type
+    const grouped = groupWalletsByType(filtered)
+    // Combine fiat first, then crypto
+    const combined = [...(grouped.fiat || []), ...(grouped.crypto || [])]
+    setFilteredWallets(combined)
   }, [walletSearch, wallets])
 
   // Close dropdown when clicking outside
