@@ -1193,7 +1193,7 @@ export default function PlanningChat() {
         )}
 
         {/* Map Section */}
-        <div className={`rounded-lg overflow-hidden border border-slate-700 bg-slate-800 flex flex-col ${isMobile ? 'flex-1 min-h-[calc(100vh-400px)]' : 'flex-1 min-h-[800px]'}`} style={showLocationForm ? { pointerEvents: 'none' } : {}}>
+        <div id="planning-map" className={`rounded-lg overflow-hidden border border-slate-700 bg-slate-800 flex flex-col ${isMobile ? 'flex-1 min-h-[calc(100vh-400px)]' : 'flex-1 min-h-[800px]'}`} style={showLocationForm ? { pointerEvents: 'none' } : {}}>
           {/* Map Controls */}
           {isAuthenticated && (
             <div className={`bg-slate-700 border-b border-slate-600 flex ${isMobile ? 'flex-col gap-2 px-2 py-2' : 'items-center justify-between flex-wrap gap-2 px-4 py-3'}`}>
