@@ -973,48 +973,108 @@ export default function ReceiveMoney({ userId, globalCurrency = 'PHP' }) {
                                     </div>
                                   ) : (
                                     <div className="py-1">
-                                      <p className="px-4 py-2 text-xs font-semibold text-slate-500 uppercase tracking-wide">
-                                        {filteredWallets.length} {filteredWallets.length === 1 ? 'wallet' : 'wallets'} found
-                                      </p>
-                                      {filteredWallets.map(wallet => {
-                                        const isSelected = selectedWallet === wallet.id
+                                      {(() => {
+                                        const grouped = groupWalletsByType(filteredWallets)
                                         return (
-                                          <button
-                                            key={wallet.id}
-                                            type="button"
-                                            onClick={() => {
-                                              setSelectedWallet(wallet.id)
-                                              setWalletSearch('')
-                                              setShowWalletDropdown(false)
-                                            }}
-                                            className={`w-full text-left px-4 py-3 transition-colors ${
-                                              isSelected
-                                                ? 'bg-blue-100 border-l-4 border-blue-600'
-                                                : 'border-l-4 border-transparent hover:bg-slate-50'
-                                            }`}
-                                          >
-                                            <div className="flex items-start justify-between gap-3">
-                                              <div className="flex-1 min-w-0">
-                                                <div className="font-semibold text-slate-900">{wallet.currency_code}</div>
-                                                {wallet.currency_name && (
-                                                  <div className="text-xs text-slate-600">{wallet.currency_name}</div>
-                                                )}
-                                                <div className="text-sm text-slate-700 mt-1 font-medium">
-                                                  {getCurrencySymbol(wallet.currency_code)}{formatNumber(wallet.balance)}
-                                                </div>
-                                                {wallet.account_number && (
-                                                  <div className="text-xs text-slate-500 mt-1">
-                                                    Acct: {wallet.account_number}
-                                                  </div>
-                                                )}
-                                              </div>
-                                              {isSelected && (
-                                                <div className="text-blue-600 font-bold text-lg mt-1 flex-shrink-0">✓</div>
-                                              )}
-                                            </div>
-                                          </button>
+                                          <>
+                                            {/* Currency (Fiat) Section */}
+                                            {grouped.fiat && grouped.fiat.length > 0 && (
+                                              <>
+                                                <p className="px-4 py-2 text-xs font-semibold text-slate-600 uppercase tracking-wide bg-slate-50 border-b border-slate-200">
+                                                  💵 Currency (Fiat)
+                                                </p>
+                                                {grouped.fiat.map(wallet => {
+                                                  const isSelected = selectedWallet === wallet.id
+                                                  return (
+                                                    <button
+                                                      key={wallet.id}
+                                                      type="button"
+                                                      onClick={() => {
+                                                        setSelectedWallet(wallet.id)
+                                                        setWalletSearch('')
+                                                        setShowWalletDropdown(false)
+                                                      }}
+                                                      className={`w-full text-left px-4 py-3 transition-colors ${
+                                                        isSelected
+                                                          ? 'bg-blue-100 border-l-4 border-blue-600'
+                                                          : 'border-l-4 border-transparent hover:bg-slate-50'
+                                                      }`}
+                                                    >
+                                                      <div className="flex items-start justify-between gap-3">
+                                                        <div className="flex-1 min-w-0">
+                                                          <div className="font-semibold text-slate-900">{wallet.currency_code}</div>
+                                                          {wallet.currency_name && (
+                                                            <div className="text-xs text-slate-600">{wallet.currency_name}</div>
+                                                          )}
+                                                          <div className="text-sm text-slate-700 mt-1 font-medium">
+                                                            {getCurrencySymbol(wallet.currency_code)}{formatNumber(wallet.balance)}
+                                                          </div>
+                                                          {wallet.account_number && (
+                                                            <div className="text-xs text-slate-500 mt-1">
+                                                              Acct: {wallet.account_number}
+                                                            </div>
+                                                          )}
+                                                        </div>
+                                                        {isSelected && (
+                                                          <div className="text-blue-600 font-bold text-lg mt-1 flex-shrink-0">✓</div>
+                                                        )}
+                                                      </div>
+                                                    </button>
+                                                  )
+                                                })}
+                                              </>
+                                            )}
+
+                                            {/* Cryptocurrency Section */}
+                                            {grouped.crypto && grouped.crypto.length > 0 && (
+                                              <>
+                                                <p className="px-4 py-2 text-xs font-semibold text-slate-600 uppercase tracking-wide bg-slate-50 border-b border-slate-200">
+                                                  ₿ Cryptocurrency
+                                                </p>
+                                                {grouped.crypto.map(wallet => {
+                                                  const isSelected = selectedWallet === wallet.id
+                                                  return (
+                                                    <button
+                                                      key={wallet.id}
+                                                      type="button"
+                                                      onClick={() => {
+                                                        setSelectedWallet(wallet.id)
+                                                        setWalletSearch('')
+                                                        setShowWalletDropdown(false)
+                                                      }}
+                                                      className={`w-full text-left px-4 py-3 transition-colors ${
+                                                        isSelected
+                                                          ? 'bg-blue-100 border-l-4 border-blue-600'
+                                                          : 'border-l-4 border-transparent hover:bg-slate-50'
+                                                      }`}
+                                                    >
+                                                      <div className="flex items-start justify-between gap-3">
+                                                        <div className="flex-1 min-w-0">
+                                                          <div className="font-semibold text-slate-900">{wallet.currency_code}</div>
+                                                          {wallet.currency_name && (
+                                                            <div className="text-xs text-slate-600">{wallet.currency_name}</div>
+                                                          )}
+                                                          <div className="text-sm text-slate-700 mt-1 font-medium">
+                                                            {getCurrencySymbol(wallet.currency_code)}{formatNumber(wallet.balance)}
+                                                          </div>
+                                                          {wallet.account_number && (
+                                                            <div className="text-xs text-slate-500 mt-1">
+                                                              Acct: {wallet.account_number}
+                                                            </div>
+                                                          )}
+                                                        </div>
+                                                        {isSelected && (
+                                                          <div className="text-blue-600 font-bold text-lg mt-1 flex-shrink-0">✓</div>
+                                                        )}
+                                                      </div>
+                                                    </button>
+                                                  )
+                                                })}
+                                              </>
+                                            )}
+                                          </>
                                         )
-                                      })}
+                                      })()}
                                     </div>
                                   )}
                                 </div>
