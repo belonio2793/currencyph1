@@ -4449,6 +4449,53 @@ export default function PlanningChat() {
             </div>
           </div>
         </section>
+
+        {/* Final CTA Section */}
+        <section className="py-16 px-4 sm:px-6 lg:px-8 bg-gradient-to-r from-amber-600 to-orange-600">
+          <div className="max-w-4xl mx-auto text-center">
+            <h2 className="text-3xl md:text-5xl font-bold text-white mb-6">Ready to Join the Movement?</h2>
+            <p className="text-xl text-amber-50 mb-8 max-w-2xl mx-auto leading-relaxed">
+              Transparent commerce with real impact. Invest in coconuts.com.ph and align your capital with sustainable growth, fair farming practices, and community development.
+            </p>
+
+            <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
+              <button
+                onClick={() => setShowAuthModalOnDemand(true)}
+                className="px-8 py-4 bg-white text-amber-600 font-bold rounded-lg hover:bg-amber-50 transition-all transform hover:scale-105 shadow-lg text-lg"
+              >
+                Register & Get Started
+              </button>
+              <button
+                onClick={() => setShowAuthModalOnDemand(true)}
+                className="px-8 py-4 bg-amber-700 hover:bg-amber-800 text-white font-bold rounded-lg transition-colors border-2 border-white text-lg"
+              >
+                Sign In to Dashboard
+              </button>
+            </div>
+
+            <div className="grid md:grid-cols-3 gap-6 mt-12">
+              <div className="bg-white/10 backdrop-blur-sm rounded-lg p-6 border border-white/20">
+                <div className="text-3xl mb-3">🌾</div>
+                <h3 className="font-bold text-white mb-2">For Farmers</h3>
+                <p className="text-amber-50 text-sm">Get guaranteed pricing, direct payments, and equity stake in the enterprise</p>
+              </div>
+              <div className="bg-white/10 backdrop-blur-sm rounded-lg p-6 border border-white/20">
+                <div className="text-3xl mb-3">💰</div>
+                <h3 className="font-bold text-white mb-2">For Investors</h3>
+                <p className="text-amber-50 text-sm">15-25% equity returns + dividends from Year 2, transparent real-time tracking</p>
+              </div>
+              <div className="bg-white/10 backdrop-blur-sm rounded-lg p-6 border border-white/20">
+                <div className="text-3xl mb-3">🤝</div>
+                <h3 className="font-bold text-white mb-2">For Partners</h3>
+                <p className="text-amber-50 text-sm">Integrated logistics, supply chain visibility, and margin-sharing opportunities</p>
+              </div>
+            </div>
+
+            <p className="mt-12 text-amber-50 text-sm">
+              Powered by <span className="font-bold text-white">currency.ph</span> for transparent multi-currency transactions, real-time reporting, and blockchain-verified supply chain integrity.
+            </p>
+          </div>
+        </section>
       </div>
     </div>
   )
