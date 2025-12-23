@@ -2004,7 +2004,7 @@ export default function PlanningChat() {
               </div>
             )}
           </div>
-        </div>
+          </div>
         )}
       </div>
 
