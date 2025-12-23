@@ -195,7 +195,7 @@ export default function ExpandableModal({
         {/* Footer */}
         {footer && (
           <div
-            className={`${footerPaddingClasses} border-t border-slate-200 flex items-center justify-end gap-3 sticky bottom-0 bg-slate-50 flex-wrap`}
+            className={`${footerPaddingClasses} border-t border-slate-200 flex items-center justify-end gap-3 sticky bottom-0 bg-slate-50 flex-wrap z-40`}
           >
             {footer}
           </div>
