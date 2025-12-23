@@ -27,9 +27,8 @@ export default function CommitmentMarketplace({ userId, isAuthenticated, onAuthS
   // Signatories display state
   const [signatories, setSignatories] = useState([])
   const [loadingSignatories, setLoadingSignatories] = useState(false)
-  const [editingId, setEditingId] = useState(null)
 
-  // Load user data if authenticated
+  // Load user data and signatories
   useEffect(() => {
     if (isAuthenticated && userId) {
       loadUserData()
@@ -166,6 +165,7 @@ export default function CommitmentMarketplace({ userId, isAuthenticated, onAuthS
       if (insertError) throw insertError
 
       setSuccess('🎉 Thank you! We\'re matching you with others...')
+      loadSignatories()
 
       // Reset form
       setTimeout(() => {
@@ -268,10 +268,9 @@ export default function CommitmentMarketplace({ userId, isAuthenticated, onAuthS
         </p>
       </div>
 
-      {/* Dual Column Layout */}
-      <div className={`max-w-7xl mx-auto bg-gradient-to-br from-slate-800 to-slate-900 rounded-xl border border-slate-700 p-6 md:p-8`}>
-        {error && (
-        <div className="p-4 bg-red-900/30 border border-red-700/50 rounded-lg text-red-200 text-sm mb-4">
+      {/* Error & Success Messages */}
+      {error && (
+        <div className="max-w-7xl mx-auto p-4 bg-red-900/30 border border-red-700/50 rounded-lg text-red-200 text-sm mb-4">
           <p className="flex items-center gap-2"><span>❌</span> {error}</p>
           {error.includes('marketplace_listings') && (
             <p className="text-xs mt-2 text-red-100">Setup required: Check MARKETPLACE_SETUP.md for database setup instructions.</p>
@@ -279,126 +278,213 @@ export default function CommitmentMarketplace({ userId, isAuthenticated, onAuthS
         </div>
       )}
 
-        {success && (
-          <div className="p-4 bg-emerald-900/30 border border-emerald-700/50 rounded-lg text-emerald-200 text-sm animate-pulse">
-            {success}
-          </div>
-        )}
+      {success && (
+        <div className="max-w-7xl mx-auto p-4 bg-emerald-900/30 border border-emerald-700/50 rounded-lg text-emerald-200 text-sm mb-4 animate-pulse">
+          {success}
+        </div>
+      )}
 
-        <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Contact Info - Optional */}
-          {!isAuthenticated && (
-            <div className="space-y-4 pb-4 border-b border-slate-700">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-slate-300 text-sm mb-2">
-                    Your Name <span className="text-slate-500">(optional)</span>
-                  </label>
-                  <input
-                    type="text"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    placeholder="How should we call you?"
-                    className="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-2.5 text-white placeholder-slate-500 focus:outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-400/30 transition-all"
-                  />
-                </div>
-                <div>
-                  <label className="block text-slate-300 text-sm mb-2">
-                    Your Email <span className="text-slate-500">(optional)</span>
-                  </label>
-                  <input
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="your@email.com"
-                    className="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-2.5 text-white placeholder-slate-500 focus:outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-400/30 transition-all"
-                  />
+      {/* Dual Column Layout */}
+      <div className={`max-w-7xl mx-auto grid ${isMobile ? 'grid-cols-1' : 'grid-cols-2'} gap-8`}>
+        {/* LEFT COLUMN - INPUT FORM */}
+        <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-xl border border-slate-700 p-6 md:p-8">
+          <h3 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
+            <span>✍️</span> Share Your Opportunity
+          </h3>
+
+          <form onSubmit={handleSubmit} className="space-y-6">
+            {/* Contact Info - Optional */}
+            {!isAuthenticated && (
+              <div className="space-y-4 pb-4 border-b border-slate-700">
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-slate-300 text-sm mb-2">
+                      Your Name <span className="text-slate-500">(optional)</span>
+                    </label>
+                    <input
+                      type="text"
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      placeholder="How should we call you?"
+                      className="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-2.5 text-white placeholder-slate-500 focus:outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-400/30 transition-all"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-slate-300 text-sm mb-2">
+                      Your Email <span className="text-slate-500">(optional)</span>
+                    </label>
+                    <input
+                      type="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      placeholder="your@email.com"
+                      className="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-2.5 text-white placeholder-slate-500 focus:outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-400/30 transition-all"
+                    />
+                  </div>
                 </div>
               </div>
-            </div>
-          )}
+            )}
 
-          {/* What They Can Offer */}
-          <div className="space-y-3 bg-gradient-to-br from-emerald-900/20 to-transparent rounded-lg p-4 border border-emerald-700/30">
-            <div className="flex items-center gap-2">
-              <span className="text-2xl">🎁</span>
-              <label className="block text-white font-semibold">
-                What can you offer or provide?
+            {/* What They Can Offer */}
+            <div className="space-y-3">
+              <label className="block text-white font-semibold flex items-center gap-2">
+                <span>🎁</span> What can you offer?
               </label>
+              <p className="text-slate-400 text-xs">
+                Products, services, time, skills, equipment, labor, advice...
+              </p>
+              <textarea
+                value={whatICanOffer}
+                onChange={(e) => setWhatICanOffer(e.target.value)}
+                placeholder="e.g., 1000 coconuts/month, consulting, logistics..."
+                rows={3}
+                className="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/30 transition-all resize-none"
+              />
             </div>
-            <p className="text-slate-400 text-sm">
-              💡 Anything goes: products, services, time, skills, equipment, labor, advice, connections... be creative!
-            </p>
-            <textarea
-              value={whatICanOffer}
-              onChange={(e) => setWhatICanOffer(e.target.value)}
-              placeholder="Examples: 1000 coconuts per month • Professional consulting • Logistics services • Free labor on weekends • Storage space • Technical skills • Mentorship • Quality assurance..."
-              rows={4}
-              className="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/30 transition-all resize-none"
-            />
-          </div>
 
-          {/* What They Need */}
-          <div className="space-y-3 bg-gradient-to-br from-blue-900/20 to-transparent rounded-lg p-4 border border-blue-700/30">
-            <div className="flex items-center gap-2">
-              <span className="text-2xl">🔍</span>
-              <label className="block text-white font-semibold">
-                What do you need or are looking for?
+            {/* What They Need */}
+            <div className="space-y-3">
+              <label className="block text-white font-semibold flex items-center gap-2">
+                <span>🔍</span> What do you need?
               </label>
+              <p className="text-slate-400 text-xs">
+                Buyers, suppliers, partnerships, equipment, expertise...
+              </p>
+              <textarea
+                value={whatINeed}
+                onChange={(e) => setWhatINeed(e.target.value)}
+                placeholder="e.g., Quality buyers, packaging supplier, storage space..."
+                rows={3}
+                className="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-400/30 transition-all resize-none"
+              />
             </div>
-            <p className="text-slate-400 text-sm">
-              💡 Tell us what would help you most. No request is too small or too large.
-            </p>
-            <textarea
-              value={whatINeed}
-              onChange={(e) => setWhatINeed(e.target.value)}
-              placeholder="Examples: Need buyers for my harvest • Looking for quality packaging • Want to learn marketing • Need a warehouse • Seeking partnership • Looking for equipment rental • Want to grow my network..."
-              rows={4}
-              className="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-400/30 transition-all resize-none"
-            />
-          </div>
 
-          {/* Additional Notes */}
-          <div className="space-y-3 bg-gradient-to-br from-purple-900/20 to-transparent rounded-lg p-4 border border-purple-700/30">
-            <div className="flex items-center gap-2">
-              <span className="text-2xl">💬</span>
-              <label className="block text-white font-semibold">
-                Anything else we should know?
+            {/* Additional Notes */}
+            <div className="space-y-3">
+              <label className="block text-white font-semibold flex items-center gap-2">
+                <span>💬</span> Additional details
               </label>
+              <p className="text-slate-400 text-xs">
+                Location, timing, preferences, constraints...
+              </p>
+              <textarea
+                value={notes}
+                onChange={(e) => setNotes(e.target.value)}
+                placeholder="e.g., Based in Manila, available Q2 2025..."
+                rows={2}
+                className="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:border-purple-400 focus:ring-2 focus:ring-purple-400/30 transition-all resize-none"
+              />
             </div>
-            <p className="text-slate-400 text-sm">
-              💡 Location, timing, preferences, constraints, dreams... anything helps!
-            </p>
-            <textarea
-              value={notes}
-              onChange={(e) => setNotes(e.target.value)}
-              placeholder="Location, timing, preferences, constraints, dreams... anything else!"
-              rows={3}
-              className="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:border-purple-400 focus:ring-2 focus:ring-purple-400/30 transition-all resize-none"
-            />
-          </div>
 
-          {/* Submit Button */}
-          <div className="pt-4 flex items-center gap-3">
+            {/* Submit Button */}
             <button
               type="submit"
               disabled={loading || (!whatICanOffer.trim() && !whatINeed.trim())}
-              className="flex-1 px-6 py-3 bg-gradient-to-r from-emerald-600 to-cyan-600 hover:from-emerald-700 hover:to-cyan-700 disabled:from-slate-600 disabled:to-slate-600 text-white font-bold rounded-lg transition-all transform hover:scale-105 shadow-lg shadow-emerald-600/30 flex items-center justify-center gap-2"
+              className="w-full px-6 py-3 bg-gradient-to-r from-emerald-600 to-cyan-600 hover:from-emerald-700 hover:to-cyan-700 disabled:from-slate-600 disabled:to-slate-600 text-white font-bold rounded-lg transition-all transform hover:scale-105 shadow-lg shadow-emerald-600/30 flex items-center justify-center gap-2"
             >
               <span>{loading ? '⏳' : '✨'}</span>
               {loading ? 'Connecting...' : 'Share & Connect'}
             </button>
-          </div>
 
-          {/* Info message */}
-          <p className="text-slate-400 text-xs text-center">
-            ✓ All fields are optional. Share what feels right. We'll handle the rest.
-          </p>
-        </form>
+            <p className="text-slate-400 text-xs text-center">
+              ✓ All fields are optional. Share what feels right.
+            </p>
+          </form>
+        </div>
+
+        {/* RIGHT COLUMN - SIGNATORIES TABLE */}
+        <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-xl border border-slate-700 p-6 md:p-8">
+          <h3 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
+            <span>📋</span> Active Opportunities
+            <span className="ml-auto text-sm font-normal bg-slate-700 px-3 py-1 rounded-full text-slate-300">
+              {signatories.length}
+            </span>
+          </h3>
+
+          {loadingSignatories ? (
+            <div className="flex items-center justify-center py-12">
+              <div className="text-center">
+                <p className="text-slate-400">Loading opportunities...</p>
+              </div>
+            </div>
+          ) : signatories.length === 0 ? (
+            <div className="flex items-center justify-center py-12 text-center">
+              <div>
+                <p className="text-4xl mb-3">🌱</p>
+                <p className="text-slate-400">Be the first to share an opportunity!</p>
+              </div>
+            </div>
+          ) : (
+            <div className="space-y-4 max-h-96 overflow-y-auto">
+              {signatories.map((entry) => (
+                <div
+                  key={entry.id}
+                  className="bg-slate-700/50 border border-slate-600 rounded-lg p-4 hover:border-slate-500 transition-colors"
+                >
+                  {/* Header Row */}
+                  <div className="flex items-start justify-between gap-3 mb-3 pb-3 border-b border-slate-600">
+                    <div className="flex-1">
+                      <p className="text-white font-semibold text-sm">
+                        {entry.contact_name || 'Anonymous'}
+                      </p>
+                      <p className="text-slate-400 text-xs">
+                        {entry.contact_email}
+                      </p>
+                    </div>
+                    <span className="text-xs text-slate-500 whitespace-nowrap">
+                      {new Date(entry.created_at).toLocaleDateString()}
+                    </span>
+                  </div>
+
+                  {/* Content Grid */}
+                  <div className="space-y-3">
+                    {entry.what_can_offer && (
+                      <div className="space-y-1">
+                        <p className="text-slate-400 text-xs font-semibold uppercase tracking-wide">
+                          ✨ Can Offer
+                        </p>
+                        <p className="text-slate-200 text-sm line-clamp-2">
+                          {entry.what_can_offer}
+                        </p>
+                      </div>
+                    )}
+
+                    {entry.what_need && (
+                      <div className="space-y-1">
+                        <p className="text-slate-400 text-xs font-semibold uppercase tracking-wide">
+                          🔍 Looking For
+                        </p>
+                        <p className="text-slate-200 text-sm line-clamp-2">
+                          {entry.what_need}
+                        </p>
+                      </div>
+                    )}
+
+                    {entry.notes && (
+                      <div className="space-y-1">
+                        <p className="text-slate-400 text-xs font-semibold uppercase tracking-wide">
+                          📝 Notes
+                        </p>
+                        <p className="text-slate-200 text-sm line-clamp-2">
+                          {entry.notes}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Action Button */}
+                  <button className="mt-3 w-full px-3 py-2 text-xs bg-slate-600 hover:bg-slate-500 text-white rounded transition-colors">
+                    💬 Connect with {entry.contact_name?.split(' ')[0] || 'Partner'}
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
 
       {/* How This Works */}
-      <div className={`mt-12 max-w-4xl mx-auto`}>
+      <div className={`mt-12 max-w-7xl mx-auto`}>
         <h3 className="text-2xl font-bold text-white mb-6 text-center">✨ How This Works</h3>
         <div className={`grid gap-4 ${isMobile ? 'grid-cols-1' : 'grid-cols-3'}`}>
           <div className="bg-gradient-to-br from-emerald-900/30 to-emerald-900/10 rounded-lg p-5 border border-emerald-700/30 text-center hover:border-emerald-600/50 transition-colors">
