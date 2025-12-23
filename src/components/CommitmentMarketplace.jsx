@@ -497,6 +497,89 @@ export default function CommitmentMarketplace({ userId, isAuthenticated, onAuthS
               />
             </div>
 
+            {/* Social Media Profiles */}
+            <div className="space-y-3 pb-4 border-b border-slate-700">
+              <label className="block text-white font-semibold flex items-center gap-2">
+                <span>🔗</span> Social Media Profiles
+              </label>
+              <p className="text-slate-400 text-xs">
+                Share your social media handles for easy connection (all optional)
+              </p>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-slate-400 text-xs mb-1">Twitter</label>
+                  <input
+                    type="text"
+                    value={socialMedia.twitter}
+                    onChange={(e) => setSocialMedia({ ...socialMedia, twitter: e.target.value })}
+                    placeholder="@yourhandle"
+                    className="w-full bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-400/30 transition-all"
+                  />
+                </div>
+                <div>
+                  <label className="block text-slate-400 text-xs mb-1">LinkedIn</label>
+                  <input
+                    type="text"
+                    value={socialMedia.linkedin}
+                    onChange={(e) => setSocialMedia({ ...socialMedia, linkedin: e.target.value })}
+                    placeholder="yourprofile"
+                    className="w-full bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-400/30 transition-all"
+                  />
+                </div>
+                <div>
+                  <label className="block text-slate-400 text-xs mb-1">Instagram</label>
+                  <input
+                    type="text"
+                    value={socialMedia.instagram}
+                    onChange={(e) => setSocialMedia({ ...socialMedia, instagram: e.target.value })}
+                    placeholder="@yourhandle"
+                    className="w-full bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-400/30 transition-all"
+                  />
+                </div>
+                <div>
+                  <label className="block text-slate-400 text-xs mb-1">Facebook</label>
+                  <input
+                    type="text"
+                    value={socialMedia.facebook}
+                    onChange={(e) => setSocialMedia({ ...socialMedia, facebook: e.target.value })}
+                    placeholder="yourprofile"
+                    className="w-full bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-400/30 transition-all"
+                  />
+                </div>
+                <div>
+                  <label className="block text-slate-400 text-xs mb-1">Telegram</label>
+                  <input
+                    type="text"
+                    value={socialMedia.telegram}
+                    onChange={(e) => setSocialMedia({ ...socialMedia, telegram: e.target.value })}
+                    placeholder="@yourhandle"
+                    className="w-full bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-400/30 transition-all"
+                  />
+                </div>
+                <div>
+                  <label className="block text-slate-400 text-xs mb-1">WhatsApp</label>
+                  <input
+                    type="text"
+                    value={socialMedia.whatsapp}
+                    onChange={(e) => setSocialMedia({ ...socialMedia, whatsapp: e.target.value })}
+                    placeholder="+63-9XX-XXX-XXXX"
+                    className="w-full bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-400/30 transition-all"
+                  />
+                </div>
+                <div>
+                  <label className="block text-slate-400 text-xs mb-1">Viber</label>
+                  <input
+                    type="text"
+                    value={socialMedia.viber}
+                    onChange={(e) => setSocialMedia({ ...socialMedia, viber: e.target.value })}
+                    placeholder="+63-9XX-XXX-XXXX"
+                    className="w-full bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-400/30 transition-all"
+                  />
+                </div>
+              </div>
+            </div>
+
             {/* Submit Button */}
             <button
               type="submit"
