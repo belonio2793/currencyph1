@@ -335,7 +335,7 @@ export default function PartnershipForm({
           </div>
         )}
 
-        <form className="space-y-4" onSubmit={handleSubmit}>
+        <form className={`space-y-4 ${!isAuthenticated ? 'opacity-60 pointer-events-none' : ''}`} onSubmit={handleSubmit}>
           {/* Partner Type */}
           <div>
             <label className="block text-sm font-semibold text-slate-200 mb-2">I am a... *</label>
