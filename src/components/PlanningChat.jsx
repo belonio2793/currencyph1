@@ -1093,14 +1093,14 @@ export default function PlanningChat() {
             <>
               {locations.length > 0 && (
                 <div className={`flex ${isMobile ? 'flex-col gap-1 w-full' : 'items-center gap-2'}`}>
-                  <label htmlFor="public-locations-select" className={`text-slate-300 font-medium opacity-50 ${isMobile ? 'text-xs' : 'text-sm'}`}>Locations:</label>
+                  <label htmlFor="public-locations-select" className={`text-slate-300 font-medium text-opacity-75 ${isMobile ? 'text-xs' : 'text-sm'}`}>Locations</label>
                   <select
                     id="public-locations-select"
                     value={selectedLocationId}
                     onChange={handleLocationSelect}
                     className={`rounded bg-slate-700 text-white border border-slate-600 hover:border-slate-500 transition-colors cursor-pointer focus:outline-none focus:border-blue-400 ${isMobile ? 'w-full px-2 py-1.5 text-xs' : 'px-3 py-1 text-sm'}`}
                   >
-                    <option value="">View location...</option>
+                    <option value="">— Select a location —</option>
                     {locations.map(loc => (
                       <option key={loc.id} value={loc.id}>
                         {loc.name}
@@ -1112,14 +1112,14 @@ export default function PlanningChat() {
 
               {shippingPorts.length > 0 && (
                 <div className={`flex ${isMobile ? 'flex-col gap-1 w-full' : 'items-center gap-2'}`}>
-                  <label htmlFor="shipping-ports-select" className={`text-slate-300 font-medium opacity-50 ${isMobile ? 'text-xs' : 'text-sm'}`}>Ports:</label>
+                  <label htmlFor="shipping-ports-select" className={`text-slate-300 font-medium text-opacity-75 ${isMobile ? 'text-xs' : 'text-sm'}`}>Ports</label>
                   <select
                     id="shipping-ports-select"
                     value={selectedPortId}
                     onChange={handlePortSelect}
                     className={`rounded bg-slate-700 text-white border border-slate-600 hover:border-slate-500 transition-colors cursor-pointer focus:outline-none focus:border-blue-400 ${isMobile ? 'w-full px-2 py-1.5 text-xs' : 'px-3 py-1 text-sm'}`}
                   >
-                    <option value="">View port...</option>
+                    <option value="">— Select a port —</option>
                     {shippingPorts.map(port => (
                       <option key={port.id} value={port.id}>
                         {port.name} ({port.country_code})
@@ -1130,14 +1130,14 @@ export default function PlanningChat() {
               )}
 
               <div className={`flex ${isMobile ? 'flex-col gap-1 w-full' : 'items-center gap-2'}`}>
-                <label htmlFor="cities-select" className={`text-slate-300 font-medium opacity-50 ${isMobile ? 'text-xs' : 'text-sm'}`}>Cities:</label>
+                <label htmlFor="cities-select" className={`text-slate-300 font-medium text-opacity-75 ${isMobile ? 'text-xs' : 'text-sm'}`}>Cities</label>
                 <select
                   id="cities-select"
                   value={selectedCity}
                   onChange={handleCitySelect}
                   className={`rounded bg-slate-700 text-white border border-slate-600 hover:border-slate-500 transition-colors cursor-pointer focus:outline-none focus:border-blue-400 ${isMobile ? 'w-full px-2 py-1.5 text-xs' : 'px-3 py-1 text-sm'}`}
                 >
-                  <option value="">Select a city...</option>
+                  <option value="">— Select a city —</option>
                   {PHILIPPINE_CITIES.map((city, idx) => (
                     <option key={`city-${idx}`} value={city.name}>
                       {city.name} ({city.region})
