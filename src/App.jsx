@@ -624,7 +624,7 @@ export default function App() {
           )}
 
           {/* Normal layout for all other pages */}
-          {activeTab !== 'planning-setup' && activeTab !== 'planning' && activeTab !== 'checkout' && (
+          {activeTab !== 'planning-setup' && activeTab !== 'planning' && activeTab !== 'partnership' && activeTab !== 'checkout' && (
             <div className="min-h-screen bg-slate-50 flex">
               {userId && (
                 <Sidebar
