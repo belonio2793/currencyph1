@@ -547,6 +547,82 @@ export default function PlanningChat() {
     setLocations([])
   }
 
+  const handleContributionChange = (e) => {
+    const { name, value, type, checked } = e.target
+
+    if (name === 'contributions') {
+      // Handle checkbox for contributions
+      setContributionForm(prev => ({
+        ...prev,
+        contributions: checked
+          ? [...prev.contributions, value]
+          : prev.contributions.filter(c => c !== value)
+      }))
+    } else {
+      setContributionForm(prev => ({
+        ...prev,
+        [name]: value
+      }))
+    }
+  }
+
+  const handleContributionSubmit = async (e) => {
+    e.preventDefault()
+
+    if (!isAuthenticated || !userId) {
+      setShowAuthModalOnDemand(true)
+      return
+    }
+
+    if (!contributionForm.partnerType || !contributionForm.email || contributionForm.contributions.length === 0) {
+      alert('Please fill in all required fields (Partner Type, Email, and at least one contribution type)')
+      return
+    }
+
+    setContributionSubmitting(true)
+
+    try {
+      const { error } = await supabase
+        .from('contributions')
+        .insert([{
+          user_id: userId,
+          partner_type: contributionForm.partnerType,
+          business_name: contributionForm.businessName,
+          email: contributionForm.email,
+          contribution_types: contributionForm.contributions,
+          monthly_capacity: contributionForm.monthlyCapacity ? parseFloat(contributionForm.monthlyCapacity) : null,
+          capacity_unit: contributionForm.capacityUnit,
+          location: contributionForm.location,
+          price_per_unit: contributionForm.pricePerUnit ? parseFloat(contributionForm.pricePerUnit) : null,
+          currency: contributionForm.currency,
+          notes: contributionForm.notes,
+          status: 'pending'
+        }])
+
+      if (error) throw error
+
+      // Success - reset form and show message
+      alert('✅ Thank you! Your contribution has been submitted. We\'ll review it and reach out soon.')
+      setContributionForm({
+        partnerType: '',
+        businessName: '',
+        email: userEmail,
+        contributions: [],
+        monthlyCapacity: '',
+        capacityUnit: 'tons',
+        location: '',
+        pricePerUnit: '',
+        currency: 'php',
+        notes: ''
+      })
+    } catch (err) {
+      console.error('Contribution submission error:', err)
+      alert(`Failed to submit contribution: ${err.message}`)
+    } finally {
+      setContributionSubmitting(false)
+    }
+  }
+
   const sendMessage = async () => {
     if (!messageInput.trim() || !planningUser) return
 
