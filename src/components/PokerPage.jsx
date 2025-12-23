@@ -351,10 +351,14 @@ export default function PokerPage({ userId, userEmail, onShowAuth }) {
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
       <div ref={pageRef} className="max-w-7xl mx-auto px-6 py-6">
         {error && (
-          <div className="mb-6 p-4 bg-red-900 border border-red-700 rounded-lg text-red-100">
-            <div className="font-semibold">Error:</div>
-            <div className="text-sm mt-1">{error}</div>
-            <button onClick={() => setError(null)} className="mt-2 text-xs underline">Dismiss</button>
+          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+            <div className="flex items-start justify-between gap-3">
+              <div className="flex-1">
+                <p className="text-red-900 font-semibold">Error</p>
+                <p className="text-red-700 text-sm mt-1 break-words">{String(error).substring(0, 300)}</p>
+              </div>
+              <button onClick={() => setError(null)} className="text-xs text-red-600 hover:text-red-700 font-medium whitespace-nowrap">Dismiss</button>
+            </div>
           </div>
         )}
         <div className="flex items-center justify-between mb-8">
