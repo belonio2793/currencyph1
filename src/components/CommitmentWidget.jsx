@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabaseClient'
-import Auth from './Auth'
 
 export default function CommitmentWidget({ onSignInRequired }) {
   const [session, setSession] = useState(null)
