@@ -35,59 +35,27 @@ export default function Rates() {
       setLoading(true)
       setError(null)
 
-      // Fetch all pairs from both public.pairs and public.rates tables
-      const [pairsResult, ratesResult] = await Promise.all([
-        supabase
-          .from('pairs')
-          .select('from_currency, to_currency, rate, updated_at'),
-        supabase
-          .from('rates')
-          .select('from_currency, to_currency, rate, updated_at')
-      ])
+      // Fetch all pairs from public.pairs table
+      const { data: pairsData, error: pairsError } = await supabase
+        .from('pairs')
+        .select('from_currency, to_currency, rate, updated_at')
 
-      if (pairsResult.error && ratesResult.error) {
-        throw pairsResult.error
+      if (pairsError) {
+        console.error('Error fetching pairs:', pairsError)
+        throw pairsError
       }
 
-      const pairsData = pairsResult.data || []
-      const ratesData = ratesResult.data || []
+      console.log(`📥 Fetched ${pairsData?.length || 0} pairs from public.pairs`)
+      setAllPairs(pairsData || [])
 
-      console.log(`📥 Fetched ${pairsData.length} pairs from public.pairs`)
-      console.log(`📥 Fetched ${ratesData.length} rates from public.rates`)
-
-      // Merge pairs and rates data (rates table takes precedence)
-      const mergedPairs = [...pairsData]
-
-      // Add rates from public.rates that aren't already in pairs
-      ratesData.forEach(rate => {
-        const exists = mergedPairs.some(p =>
-          p.from_currency === rate.from_currency &&
-          p.to_currency === rate.to_currency
-        )
-        if (!exists) {
-          mergedPairs.push(rate)
-        } else {
-          // If pair exists, check if rates table has newer data
-          const existingIndex = mergedPairs.findIndex(p =>
-            p.from_currency === rate.from_currency &&
-            p.to_currency === rate.to_currency
-          )
-          const existingTime = new Date(mergedPairs[existingIndex]?.updated_at || 0)
-          const ratesTime = new Date(rate.updated_at || 0)
-          if (ratesTime > existingTime) {
-            mergedPairs[existingIndex] = rate
-          }
-        }
-      })
-
-      setAllPairs(mergedPairs)
-
-      // Get unique currency codes from merged pairs
+      // Get unique currency codes from pairs
       const codes = new Set()
-      mergedPairs.forEach(pair => {
-        if (pair.from_currency) codes.add(pair.from_currency)
-        if (pair.to_currency) codes.add(pair.to_currency)
-      })
+      if (pairsData) {
+        pairsData.forEach(pair => {
+          if (pair.from_currency) codes.add(pair.from_currency)
+          if (pair.to_currency) codes.add(pair.to_currency)
+        })
+      }
 
       const codeArray = Array.from(codes)
       console.log(`📊 Found ${codeArray.length} unique currencies/cryptos`)
