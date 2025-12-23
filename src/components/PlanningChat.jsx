@@ -1048,6 +1048,21 @@ export default function PlanningChat() {
 
   return (
     <div className={`bg-slate-900 flex flex-col min-h-screen`}>
+      {/* Sticky Navigation */}
+      <div className="sticky top-0 z-50 bg-slate-800 border-b border-slate-700 px-4 py-2">
+        <div className="flex items-center gap-2 overflow-x-auto">
+          <a href="#planning-map" className="px-3 py-1 text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-700 rounded transition-colors whitespace-nowrap">
+            🗺️ Map
+          </a>
+          <a href="#planning-chat" className="px-3 py-1 text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-700 rounded transition-colors whitespace-nowrap">
+            💬 Chat
+          </a>
+          <a href="#coconuts-info" className="px-3 py-1 text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-700 rounded transition-colors whitespace-nowrap">
+            🌾 About
+          </a>
+        </div>
+      </div>
+
       {/* Header */}
       <div className={`bg-slate-800 border-b border-slate-700 ${isMobile ? 'px-4 py-2 mt-4' : 'px-6 py-3 mt-6'}`}>
         <div className={`flex ${isMobile ? 'flex-col gap-3' : 'items-center justify-between mb-3'}`}>
