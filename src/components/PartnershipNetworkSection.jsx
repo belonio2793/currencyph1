@@ -53,6 +53,7 @@ export default function PartnershipNetworkSection({ isAuthenticated, userId }) {
         .from('commitment_profiles')
         .select(`
           id,
+          user_id,
           public_name,
           business_name,
           business_type,
@@ -76,7 +77,7 @@ export default function PartnershipNetworkSection({ isAuthenticated, userId }) {
         .order('created_at', { ascending: false })
 
       if (error) {
-        console.error('Error loading partnerships:', error)
+        console.error('Error loading partnerships:', error?.message || JSON.stringify(error))
         setPartnerships([])
         return
       }
@@ -84,7 +85,7 @@ export default function PartnershipNetworkSection({ isAuthenticated, userId }) {
       if (data) {
         setPartnerships(data)
         setPartnerCount(data.length)
-        
+
         // Calculate total commitment value
         const total = data.reduce((sum, profile) => {
           const profileTotal = profile.commitments?.reduce((pSum, commitment) => {
@@ -95,7 +96,7 @@ export default function PartnershipNetworkSection({ isAuthenticated, userId }) {
         setTotalCommitmentValue(total)
       }
     } catch (error) {
-      console.error('Unexpected error loading partnerships:', error)
+      console.error('Unexpected error loading partnerships:', error?.message || String(error))
     } finally {
       setLoading(false)
     }
