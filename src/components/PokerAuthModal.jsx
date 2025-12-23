@@ -21,33 +21,26 @@ export default function PokerAuthModal({ open, onClose, onSuccess }) {
 
     try {
       if (isSignUp) {
-        const { data, error: signUpErr } = await supabase.auth.signUp({
-          email,
-          password,
-          options: {
-            emailRedirectTo: window.location.origin
-          }
+        // Use flexible auth for signup (no email verification required)
+        const result = await flexibleAuthClient.signUp(email, password, {
+          full_name: email.split('@')[0]
         })
 
-        if (signUpErr) throw signUpErr
+        if (result.error) throw new Error(result.error)
 
-        setMessage('Check your email for confirmation link')
+        setMessage('Account created successfully!')
         setEmail('')
         setPassword('')
-        
-        setTimeout(() => {
-          if (data?.user) {
-            onSuccess?.()
-            onClose()
-          }
-        }, 3000)
-      } else {
-        const { data, error: signInErr } = await supabase.auth.signInWithPassword({
-          email,
-          password
-        })
 
-        if (signInErr) throw signInErr
+        setTimeout(() => {
+          onSuccess?.()
+          onClose()
+        }, 2000)
+      } else {
+        // Use flexible auth for signin (supports email, username, phone, etc.)
+        const result = await flexibleAuthClient.signInWithIdentifier(email, password)
+
+        if (result.error) throw new Error(result.error)
 
         setEmail('')
         setPassword('')
