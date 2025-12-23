@@ -1952,35 +1952,35 @@ export default function PlanningChat() {
                 <label className="block text-sm font-semibold text-slate-200 mb-2">What Can You Contribute? *</label>
                 <div className="space-y-2">
                   <label className="flex items-center gap-3 cursor-pointer text-slate-300 hover:text-white transition-colors">
-                    <input type="checkbox" className="w-4 h-4 rounded bg-slate-700 border-slate-600 text-amber-600" />
+                    <input type="checkbox" name="contributions" value="coconuts" onChange={handleContributionChange} checked={contributionForm.contributions.includes('coconuts')} className="w-4 h-4 rounded bg-slate-700 border-slate-600 text-amber-600" />
                     <span className="text-sm">🥥 Coconuts / Harvest</span>
                   </label>
                   <label className="flex items-center gap-3 cursor-pointer text-slate-300 hover:text-white transition-colors">
-                    <input type="checkbox" className="w-4 h-4 rounded bg-slate-700 border-slate-600 text-amber-600" />
+                    <input type="checkbox" name="contributions" value="equipment" onChange={handleContributionChange} checked={contributionForm.contributions.includes('equipment')} className="w-4 h-4 rounded bg-slate-700 border-slate-600 text-amber-600" />
                     <span className="text-sm">⚙️ Equipment / Machinery</span>
                   </label>
                   <label className="flex items-center gap-3 cursor-pointer text-slate-300 hover:text-white transition-colors">
-                    <input type="checkbox" className="w-4 h-4 rounded bg-slate-700 border-slate-600 text-amber-600" />
+                    <input type="checkbox" name="contributions" value="processing" onChange={handleContributionChange} checked={contributionForm.contributions.includes('processing')} className="w-4 h-4 rounded bg-slate-700 border-slate-600 text-amber-600" />
                     <span className="text-sm">🏭 Processing / Manufacturing Services</span>
                   </label>
                   <label className="flex items-center gap-3 cursor-pointer text-slate-300 hover:text-white transition-colors">
-                    <input type="checkbox" className="w-4 h-4 rounded bg-slate-700 border-slate-600 text-amber-600" />
+                    <input type="checkbox" name="contributions" value="transportation" onChange={handleContributionChange} checked={contributionForm.contributions.includes('transportation')} className="w-4 h-4 rounded bg-slate-700 border-slate-600 text-amber-600" />
                     <span className="text-sm">🚚 Transportation / Logistics</span>
                   </label>
                   <label className="flex items-center gap-3 cursor-pointer text-slate-300 hover:text-white transition-colors">
-                    <input type="checkbox" className="w-4 h-4 rounded bg-slate-700 border-slate-600 text-amber-600" />
+                    <input type="checkbox" name="contributions" value="distribution" onChange={handleContributionChange} checked={contributionForm.contributions.includes('distribution')} className="w-4 h-4 rounded bg-slate-700 border-slate-600 text-amber-600" />
                     <span className="text-sm">🏪 Distribution / Retail Channel</span>
                   </label>
                   <label className="flex items-center gap-3 cursor-pointer text-slate-300 hover:text-white transition-colors">
-                    <input type="checkbox" className="w-4 h-4 rounded bg-slate-700 border-slate-600 text-amber-600" />
+                    <input type="checkbox" name="contributions" value="warehouse" onChange={handleContributionChange} checked={contributionForm.contributions.includes('warehouse')} className="w-4 h-4 rounded bg-slate-700 border-slate-600 text-amber-600" />
                     <span className="text-sm">📍 Warehouse / Storage Space</span>
                   </label>
                   <label className="flex items-center gap-3 cursor-pointer text-slate-300 hover:text-white transition-colors">
-                    <input type="checkbox" className="w-4 h-4 rounded bg-slate-700 border-slate-600 text-amber-600" />
+                    <input type="checkbox" name="contributions" value="consulting" onChange={handleContributionChange} checked={contributionForm.contributions.includes('consulting')} className="w-4 h-4 rounded bg-slate-700 border-slate-600 text-amber-600" />
                     <span className="text-sm">💼 Expertise / Consulting</span>
                   </label>
                   <label className="flex items-center gap-3 cursor-pointer text-slate-300 hover:text-white transition-colors">
-                    <input type="checkbox" className="w-4 h-4 rounded bg-slate-700 border-slate-600 text-amber-600" />
+                    <input type="checkbox" name="contributions" value="financial" onChange={handleContributionChange} checked={contributionForm.contributions.includes('financial')} className="w-4 h-4 rounded bg-slate-700 border-slate-600 text-amber-600" />
                     <span className="text-sm">💰 Financial / Investment</span>
                   </label>
                 </div>
