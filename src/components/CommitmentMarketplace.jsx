@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabaseClient'
+import { flexibleAuthClient } from '../lib/flexibleAuthClient'
 import { useDevice } from '../context/DeviceContext'
 
 export default function CommitmentMarketplace({ userId, isAuthenticated, onAuthSuccess }) {
