@@ -380,17 +380,15 @@ export class DepositStatusChangeService {
    */
   async _convertCurrency(fromCurrency, toCurrency, amount, depositId = null) {
     try {
-      // Get latest exchange rate from crypto_rates table
+      // Get latest exchange rate from public.pairs table
       const { data: rateData, error: rateError } = await this.supabase
-        .from('crypto_rates_valid')
-        .select('rate, source, updated_at')
+        .from('pairs')
+        .select('rate, source_table, updated_at')
         .eq('from_currency', fromCurrency)
         .eq('to_currency', toCurrency)
-        .order('updated_at', { ascending: false })
-        .limit(1)
         .single()
 
-      if (rateError || !rateData) {
+      if (rateError || !rateData || !(typeof rateData.rate === 'number' && isFinite(rateData.rate) && rateData.rate > 0)) {
         console.warn(`No exchange rate found for ${fromCurrency}/${toCurrency}`)
         return null
       }
