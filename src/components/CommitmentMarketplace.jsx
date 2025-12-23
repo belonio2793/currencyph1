@@ -335,9 +335,11 @@ export default function CommitmentMarketplace({ userId, isAuthenticated, onAuthS
         userId,
         tempFormData.name,
         tempFormData.email,
+        tempFormData.phone,
         tempFormData.whatICanOffer,
         tempFormData.whatINeed,
-        tempFormData.notes
+        tempFormData.notes,
+        tempFormData.socialMedia
       )
 
       // Reset password form
