@@ -171,7 +171,7 @@ export default function HouseBalanceTab() {
       <div className="bg-slate-800/40 border border-slate-600/30 rounded-xl backdrop-blur-sm p-8 text-white">
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-slate-300 text-sm font-semibold mb-2">🏠 House Balance</p>
+            <p className="text-slate-300 text-sm font-semibold mb-2 uppercase tracking-wide">House Balance</p>
             <h2 className="text-5xl font-bold font-mono">{formatCurrency(houseBalance)}</h2>
             <p className="text-slate-400 text-sm mt-2">{currencyFilter === 'PLAY_CHIPS' ? 'PLAY CHIPS' : currencyFilter}</p>
             {houseCryptoAddress && (
@@ -181,7 +181,6 @@ export default function HouseBalanceTab() {
               </p>
             )}
           </div>
-          <div className="text-6xl opacity-20">🎰</div>
         </div>
       </div>
 
