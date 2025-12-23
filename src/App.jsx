@@ -597,13 +597,6 @@ export default function App() {
             </Suspense>
           )}
 
-          {/* Coconuts Landing page */}
-          {activeTab === 'coconuts' && (
-            <Suspense fallback={<PageLoader />}>
-              <CoconutsLanding />
-            </Suspense>
-          )}
-
           {/* Commitment Manager - Partnership network interface */}
           {activeTab === 'commitments' && (
             <Suspense fallback={<PageLoader />}>
