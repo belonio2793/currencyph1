@@ -2007,6 +2007,11 @@ export default function PlanningChat() {
         </div>
       </div>
 
+      {/* Partnership Network Section */}
+      <div className={`${isMobile ? 'p-3' : 'p-6 pt-4'} border-t border-slate-700`}>
+        <PartnershipNetworkSection isAuthenticated={isAuthenticated} userId={userId} />
+      </div>
+
       {/* Auth Modal - On-Demand */}
       {showAuthModalOnDemand && (
         <div className="fixed inset-0 z-[9999] bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
