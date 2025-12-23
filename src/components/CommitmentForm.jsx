@@ -376,7 +376,7 @@ export default function CommitmentForm({ isOpen, onClose, onCommitmentSaved, use
                   value={itemType}
                   onChange={(e) => setItemType(e.target.value)}
                   required
-                  className="w-full bg-slate-700 border border-slate-600 rounded px-3 py-2 text-white focus:outline-none focus:border-blue-500"
+                  className="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-400/30 transition-all"
                 >
                   <option value="">Select what you can provide</option>
                   {ITEM_TYPES.map(type => (
@@ -434,7 +434,7 @@ export default function CommitmentForm({ isOpen, onClose, onCommitmentSaved, use
                 <select
                   value={quantityUnit}
                   onChange={(e) => setQuantityUnit(e.target.value)}
-                  className="w-full bg-slate-700 border border-slate-600 rounded px-3 py-2 text-white focus:outline-none focus:border-blue-500"
+                  className="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-400/30 transition-all"
                 >
                   {QUANTITY_UNITS.map(unit => (
                     <option key={unit} value={unit}>
@@ -470,7 +470,7 @@ export default function CommitmentForm({ isOpen, onClose, onCommitmentSaved, use
                 <select
                   value={scheduledInterval}
                   onChange={(e) => setScheduledInterval(e.target.value)}
-                  className="w-full bg-slate-700 border border-slate-600 rounded px-3 py-2 text-white focus:outline-none focus:border-blue-500"
+                  className="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-400/30 transition-all"
                 >
                   {SCHEDULED_INTERVALS.map(interval => (
                     <option key={interval.value} value={interval.value}>
