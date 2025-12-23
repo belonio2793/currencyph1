@@ -669,28 +669,6 @@ export default function CommitmentWidget({ onSignInRequired }) {
         )}
       </div>
 
-      {showAuthModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl max-w-md w-full">
-            <div className="flex items-center justify-between p-6 border-b border-gray-200">
-              <h2 className="text-2xl font-bold text-gray-900">Sign In</h2>
-              <button
-                onClick={() => setShowAuthModal(false)}
-                className="text-gray-400 hover:text-gray-600 text-2xl"
-              >
-                ×
-              </button>
-            </div>
-            <div className="p-6">
-              <Auth 
-                onAuthSuccess={() => {
-                  setShowAuthModal(false)
-                }}
-              />
-            </div>
-          </div>
-        </div>
-      )}
     </>
   )
 }
