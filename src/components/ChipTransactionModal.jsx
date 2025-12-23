@@ -3,6 +3,7 @@ import { supabase } from '../lib/supabaseClient'
 import { pokerPaymentService } from '../lib/pokerPaymentService'
 import ExpandableModal from './ExpandableModal'
 import { useDevice } from '../context/DeviceContext'
+import { formatNumber } from '../lib/currency'
 
 export default function ChipTransactionModal({ open, onClose, userId, onPurchaseComplete }) {
   const { isMobile } = useDevice()
@@ -17,6 +18,7 @@ export default function ChipTransactionModal({ open, onClose, userId, onPurchase
   const [selectedWalletId, setSelectedWalletId] = useState(null)
   const [processingProductId, setProcessingProductId] = useState(null)
   const [showPaymentMethods, setShowPaymentMethods] = useState({})
+  const [exchangeRate, setExchangeRate] = useState(1)
   const isGuestLocal = userId && userId.includes('guest-local')
 
   useEffect(() => {
