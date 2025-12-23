@@ -118,14 +118,14 @@ export default function CommitmentMarketplace({ userId, isAuthenticated }) {
   }
 
   return (
-    <div className={`${isMobile ? 'px-3 py-4' : 'px-6 py-8'}`}>
+    <div className={`border-t border-slate-700 ${isMobile ? 'px-3 py-4' : 'px-6 py-8'} bg-gradient-to-b from-slate-800 to-slate-900`}>
       {/* Header */}
       <div className="mb-8 text-center">
-        <h2 className="text-3xl md:text-4xl font-bold text-white mb-2">
-          🤝 Marketplace of Possibilities
+        <h2 className="text-3xl md:text-4xl font-bold text-white mb-2 flex items-center justify-center gap-2">
+          <span>🤝</span> Marketplace of Possibilities
         </h2>
         <p className="text-slate-400 max-w-2xl mx-auto">
-          Share what you have to offer. Tell us what you need. We'll connect you with people who have exactly what you're looking for.
+          Share what you have to offer. Tell us what you need. We'll match you with the right partners.
         </p>
       </div>
 
