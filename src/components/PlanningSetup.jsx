@@ -132,10 +132,10 @@ CREATE POLICY "planning_markers_can_update_own" ON planning_markers FOR UPDATE U
 
         <div className="mt-8">
           <button
-            onClick={() => window.location.href = '/planning'}
+            onClick={() => window.location.href = '/coconuts'}
             className="px-6 py-3 bg-slate-700 hover:bg-slate-600 text-white rounded-lg font-medium transition-colors"
           >
-            ← Back to Planning
+            ← Back to Coconuts
           </button>
         </div>
       </div>
