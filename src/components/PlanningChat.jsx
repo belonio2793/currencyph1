@@ -4903,20 +4903,22 @@ export default function PlanningChat() {
               Transparent commerce with real impact. Invest in coconuts.com.ph and align your capital with sustainable growth, fair farming practices, and community development.
             </p>
 
-            <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
-              <button
-                onClick={() => setShowAuthModalOnDemand(true)}
-                className="px-8 py-4 bg-white text-amber-600 font-bold rounded-lg hover:bg-amber-50 transition-all transform hover:scale-105 shadow-lg text-lg"
-              >
-                Register & Get Started
-              </button>
-              <button
-                onClick={() => setShowAuthModalOnDemand(true)}
-                className="px-8 py-4 bg-amber-700 hover:bg-amber-800 text-white font-bold rounded-lg transition-colors border-2 border-white text-lg"
-              >
-                Sign In to Dashboard
-              </button>
-            </div>
+            {!isAuthenticated && (
+              <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
+                <button
+                  onClick={() => setShowAuthModalOnDemand(true)}
+                  className="px-8 py-4 bg-white text-amber-600 font-bold rounded-lg hover:bg-amber-50 transition-all transform hover:scale-105 shadow-lg text-lg"
+                >
+                  Register & Get Started
+                </button>
+                <button
+                  onClick={() => setShowAuthModalOnDemand(true)}
+                  className="px-8 py-4 bg-amber-700 hover:bg-amber-800 text-white font-bold rounded-lg transition-colors border-2 border-white text-lg"
+                >
+                  Sign In to Dashboard
+                </button>
+              </div>
+            )}
 
             <div className="grid md:grid-cols-3 gap-6 mt-12">
               <div className="bg-white/10 backdrop-blur-sm rounded-lg p-6 border border-white/20">
