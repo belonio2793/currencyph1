@@ -222,36 +222,21 @@ export default function Auth({ onAuthSuccess, initialTab = 'login', isModal = fa
         throw new Error('Passwords do not match')
       }
 
-      // Allow a guest account with short password 'guest'
-      const normalizedEmailForCheck = normalizeIdentifier(identifier)
-      const isGuestIdentifier = (identifier === 'guest' || normalizedEmailForCheck === 'guest@currency.local')
-      if (password.length < 6 && !isGuestIdentifier) {
+      if (password.length < 6) {
         throw new Error('Password must be at least 6 characters')
       }
 
-      const email = normalizeIdentifier(identifier)
-      const effectivePassword = (identifier === 'guest' && password === 'guest') ? 'guest123' : password
-
-      const { data, error: signUpError } = await supabase.auth.signUp({
-        email,
-        password: effectivePassword,
-        options: {
-          data: {
-            full_name: fullName
-          }
-        }
+      // Use flexible auth registration - email verification will be auto-confirmed via DB trigger
+      const result = await flexibleAuthClient.signUp(identifier, password, {
+        full_name: fullName,
+        email: identifier
       })
 
-      if (signUpError) {
-        throw signUpError
+      if (result.error) {
+        throw new Error(result.error)
       }
 
-      if (data?.user?.id) {
-        // Profile creation is now handled centrally in currencyAPI.getOrCreateUser
-        // which is called by App.jsx on auth success.
-      }
-
-      setSuccess('Registration successful! Please check your email to confirm your account.')
+      setSuccess('Registration successful! You can now log in.')
       setIdentifier('')
       setPassword('')
       setConfirmPassword('')
