@@ -1802,143 +1802,115 @@ export default function PlanningChat() {
 
             {/* Chat Tabs */}
             <div className="bg-slate-700 px-4 py-2 border-b border-slate-600 flex gap-2">
-            <button
-              onClick={() => setChatTab('public')}
-              className={`px-3 py-1 rounded text-sm font-medium transition-colors ${
-                chatTab === 'public'
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-slate-600 hover:bg-slate-500 text-slate-300'
-              }`}
-            >
-              Public
-            </button>
-            <button
-              onClick={() => setChatTab('private')}
-              className={`px-3 py-1 rounded text-sm font-medium transition-colors ${
-                chatTab === 'private'
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-slate-600 hover:bg-slate-500 text-slate-300'
-              }`}
-            >
-              Private
-            </button>
-          </div>
+              <button
+                onClick={() => setChatTab('public')}
+                className={`px-3 py-1 rounded text-sm font-medium transition-colors ${
+                  chatTab === 'public'
+                    ? 'bg-blue-600 text-white'
+                    : 'bg-slate-600 hover:bg-slate-500 text-slate-300'
+                }`}
+              >
+                Public
+              </button>
+              <button
+                onClick={() => setChatTab('private')}
+                className={`px-3 py-1 rounded text-sm font-medium transition-colors ${
+                  chatTab === 'private'
+                    ? 'bg-blue-600 text-white'
+                    : 'bg-slate-600 hover:bg-slate-500 text-slate-300'
+                }`}
+              >
+                Private
+              </button>
+            </div>
 
-          {/* Public Chat Tab */}
-          {chatTab === 'public' && (
-            <>
-              {/* Online Users Header */}
-              <div className="bg-slate-700 px-4 py-3 border-b border-slate-600">
-                <div className="flex items-center gap-2">
-                  <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                  <span className="text-white text-sm font-medium">{onlineUsers.length} members online</span>
-                </div>
-              </div>
-
-              {/* Members List */}
-              {onlineUsers.length > 0 && (
-                <div className="max-h-28 overflow-y-auto border-b border-slate-600 bg-slate-750">
-                  <div className="p-3 space-y-2">
-                    {onlineUsers.map(user => (
-                      <div key={user.id} className="flex items-center gap-2 text-sm justify-between">
-                        <div className="flex items-center gap-2 flex-1 min-w-0">
-                          <div className="w-2 h-2 bg-green-500 rounded-full flex-shrink-0"></div>
-                          <button
-                            onClick={() => handleShowUserProfile(user)}
-                            className="text-slate-300 hover:text-blue-400 truncate transition-colors text-left cursor-pointer font-medium"
-                            title="View user profile"
-                          >
-                            {user.name}
-                          </button>
-                        </div>
-                        {isAuthenticated && user.id !== planningUser?.id && (
-                          <button
-                            onClick={() => loadOrCreateConversation(user.user_id, user)}
-                            className="px-2 py-0.5 bg-blue-600 hover:bg-blue-700 text-white text-xs rounded transition-colors flex-shrink-0"
-                            title="Message this user"
-                          >
-                            💬
-                          </button>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </>
-          )}
-
-          {/* Private Chat Tab */}
-          {chatTab === 'private' && (
-            <>
-              <div className="bg-slate-700 px-4 py-3 border-b border-slate-600">
-                {selectedPrivateUser ? (
+            {/* Public Chat Tab */}
+            {chatTab === 'public' && (
+              <>
+                {/* Online Users Header */}
+                <div className="bg-slate-700 px-4 py-3 border-b border-slate-600">
                   <div className="flex items-center gap-2">
                     <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                    <span className="text-white text-sm font-medium">Chat with {selectedPrivateUser.name}</span>
-                    <button
-                      onClick={() => {
-                        setSelectedPrivateUserId(null)
-                        setSelectedPrivateUser(null)
-                        setSelectedConversationId(null)
-                        setPrivateMessages([])
-                      }}
-                      className="ml-auto text-slate-400 hover:text-white text-xs"
-                    >
-                      ✕
-                    </button>
+                    <span className="text-white text-sm font-medium">{onlineUsers.length} members online</span>
                   </div>
-                ) : (
-                  <div className="text-slate-300 text-sm">Select a user to message</div>
-                )}
-              </div>
-            </>
-          )}
-
-          {/* Messages */}
-          <div className="flex-1 overflow-y-auto p-4 space-y-4">
-            {chatTab === 'public' ? (
-              messages.length === 0 ? (
-                <div className="text-slate-500 text-center py-8 text-sm">
-                  No messages yet. Start the discussion!
                 </div>
-              ) : (
-                messages.map(msg => {
-                  const userName = msg.planning_users?.name || (msg.planning_users && typeof msg.planning_users === 'object' && msg.planning_users[0]?.name) || 'Unknown'
-                  return (
-                    <div key={msg.id} className="text-sm">
-                      <div className="flex items-baseline gap-2 mb-1">
-                        <button onClick={() => msg.planning_users && handleShowUserProfile(msg.planning_users)} className="font-semibold text-blue-400 hover:text-blue-300 cursor-pointer transition-colors">
-                          {userName}
-                        </button>
-                        <span className="text-xs text-slate-500">
-                          {new Date(msg.created_at).toLocaleTimeString([], {
-                            hour: '2-digit',
-                            minute: '2-digit'
-                          })}
-                        </span>
-                      </div>
-                      <p className="text-slate-300 break-words">{msg.message}</p>
+
+                {/* Members List */}
+                {onlineUsers.length > 0 && (
+                  <div className="max-h-28 overflow-y-auto border-b border-slate-600 bg-slate-750">
+                    <div className="p-3 space-y-2">
+                      {onlineUsers.map(user => (
+                        <div key={user.id} className="flex items-center gap-2 text-sm justify-between">
+                          <div className="flex items-center gap-2 flex-1 min-w-0">
+                            <div className="w-2 h-2 bg-green-500 rounded-full flex-shrink-0"></div>
+                            <button
+                              onClick={() => handleShowUserProfile(user)}
+                              className="text-slate-300 hover:text-blue-400 truncate transition-colors text-left cursor-pointer font-medium"
+                              title="View user profile"
+                            >
+                              {user.name}
+                            </button>
+                          </div>
+                          {isAuthenticated && user.id !== planningUser?.id && (
+                            <button
+                              onClick={() => loadOrCreateConversation(user.user_id, user)}
+                              className="px-2 py-0.5 bg-blue-600 hover:bg-blue-700 text-white text-xs rounded transition-colors flex-shrink-0"
+                              title="Message this user"
+                            >
+                              💬
+                            </button>
+                          )}
+                        </div>
+                      ))}
                     </div>
-                  )
-                })
-              )
-            ) : (
-              selectedPrivateUser ? (
-                privateMessages.length === 0 ? (
+                  </div>
+                )}
+              </>
+            )}
+
+            {/* Private Chat Tab */}
+            {chatTab === 'private' && (
+              <>
+                <div className="bg-slate-700 px-4 py-3 border-b border-slate-600">
+                  {selectedPrivateUser ? (
+                    <div className="flex items-center gap-2">
+                      <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                      <span className="text-white text-sm font-medium">Chat with {selectedPrivateUser.name}</span>
+                      <button
+                        onClick={() => {
+                          setSelectedPrivateUserId(null)
+                          setSelectedPrivateUser(null)
+                          setSelectedConversationId(null)
+                          setPrivateMessages([])
+                        }}
+                        className="ml-auto text-slate-400 hover:text-white text-xs"
+                      >
+                        ✕
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="text-slate-300 text-sm">Select a user to message</div>
+                  )}
+                </div>
+              </>
+            )}
+
+            {/* Messages */}
+            <div className="flex-1 overflow-y-auto p-4 space-y-4">
+              {chatTab === 'public' ? (
+                messages.length === 0 ? (
                   <div className="text-slate-500 text-center py-8 text-sm">
-                    No messages yet. Start a conversation!
+                    No messages yet. Start the discussion!
                   </div>
                 ) : (
-                  privateMessages.map(msg => {
-                    const senderName = msg.planning_users?.name || 'Unknown'
-                    const isOwnMessage = msg.sender_id === userId
+                  messages.map(msg => {
+                    const userName = msg.planning_users?.name || (msg.planning_users && typeof msg.planning_users === 'object' && msg.planning_users[0]?.name) || 'Unknown'
                     return (
                       <div key={msg.id} className="text-sm">
                         <div className="flex items-baseline gap-2 mb-1">
-                          <span className={`font-semibold ${isOwnMessage ? 'text-green-400' : 'text-blue-400'}`}>
-                            {senderName}
-                          </span>
+                          <button onClick={() => msg.planning_users && handleShowUserProfile(msg.planning_users)} className="font-semibold text-blue-400 hover:text-blue-300 cursor-pointer transition-colors">
+                            {userName}
+                          </button>
                           <span className="text-xs text-slate-500">
                             {new Date(msg.created_at).toLocaleTimeString([], {
                               hour: '2-digit',
@@ -1946,64 +1918,92 @@ export default function PlanningChat() {
                             })}
                           </span>
                         </div>
-                        <p className={`break-words ${isOwnMessage ? 'text-slate-200' : 'text-slate-300'}`}>{msg.message}</p>
+                        <p className="text-slate-300 break-words">{msg.message}</p>
                       </div>
                     )
                   })
                 )
               ) : (
-                <div className="text-slate-500 text-center py-8 text-sm">
-                  Select a user from the list to start chatting
-                </div>
-              )
-            )}
-            <div ref={messagesEndRef} />
-          </div>
+                selectedPrivateUser ? (
+                  privateMessages.length === 0 ? (
+                    <div className="text-slate-500 text-center py-8 text-sm">
+                      No messages yet. Start a conversation!
+                    </div>
+                  ) : (
+                    privateMessages.map(msg => {
+                      const senderName = msg.planning_users?.name || 'Unknown'
+                      const isOwnMessage = msg.sender_id === userId
+                      return (
+                        <div key={msg.id} className="text-sm">
+                          <div className="flex items-baseline gap-2 mb-1">
+                            <span className={`font-semibold ${isOwnMessage ? 'text-green-400' : 'text-blue-400'}`}>
+                              {senderName}
+                            </span>
+                            <span className="text-xs text-slate-500">
+                              {new Date(msg.created_at).toLocaleTimeString([], {
+                                hour: '2-digit',
+                                minute: '2-digit'
+                              })}
+                            </span>
+                          </div>
+                          <p className={`break-words ${isOwnMessage ? 'text-slate-200' : 'text-slate-300'}`}>{msg.message}</p>
+                        </div>
+                      )
+                    })
+                  )
+                ) : (
+                  <div className="text-slate-500 text-center py-8 text-sm">
+                    Select a user from the list to start chatting
+                  </div>
+                )
+              )}
+              <div ref={messagesEndRef} />
+            </div>
 
-          {/* Message Input */}
-          <div className={`border-t border-slate-600 bg-slate-750 ${isMobile ? 'p-2' : 'p-4'}`}>
-            {chatTab === 'public' ? (
-              <div className={`flex ${isMobile ? 'gap-1' : 'gap-2'}`}>
-                <input
-                  type="text"
-                  value={messageInput}
-                  onChange={(e) => setMessageInput(e.target.value)}
-                  onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
-                  placeholder={isMobile ? 'Message...' : 'Type a message...'}
-                  className={`flex-1 bg-slate-700 border border-slate-600 rounded text-white placeholder-slate-500 focus:outline-none focus:border-blue-500 ${isMobile ? 'px-2 py-1.5 text-xs' : 'px-3 py-2 text-sm'}`}
-                />
-                <button
-                  onClick={sendMessage}
-                  disabled={!messageInput.trim()}
-                  className={`bg-blue-600 hover:bg-blue-700 disabled:bg-slate-600 text-white rounded font-medium transition-colors ${isMobile ? 'px-2 py-1.5 text-xs' : 'px-4 py-2 text-sm'}`}
-                >
-                  {isMobile ? '→' : 'Send'}
-                </button>
-              </div>
-            ) : selectedPrivateUser ? (
-              <div className={`flex ${isMobile ? 'gap-1' : 'gap-2'}`}>
-                <input
-                  type="text"
-                  value={privateMessageInput}
-                  onChange={(e) => setPrivateMessageInput(e.target.value)}
-                  onKeyPress={(e) => e.key === 'Enter' && sendPrivateMessage()}
-                  placeholder={isMobile ? 'Message...' : 'Type a message...'}
-                  className={`flex-1 bg-slate-700 border border-slate-600 rounded text-white placeholder-slate-500 focus:outline-none focus:border-blue-500 ${isMobile ? 'px-2 py-1.5 text-xs' : 'px-3 py-2 text-sm'}`}
-                />
-                <button
-                  onClick={sendPrivateMessage}
-                  disabled={!privateMessageInput.trim()}
-                  className={`bg-blue-600 hover:bg-blue-700 disabled:bg-slate-600 text-white rounded font-medium transition-colors ${isMobile ? 'px-2 py-1.5 text-xs' : 'px-4 py-2 text-sm'}`}
-                >
-                  {isMobile ? '→' : 'Send'}
-                </button>
-              </div>
-            ) : (
-              <div className="text-slate-500 text-xs text-center py-2">
-                Select a user to message
-              </div>
-            )}
-          </div>
+            {/* Message Input */}
+            <div className={`border-t border-slate-600 bg-slate-750 ${isMobile ? 'p-2' : 'p-4'}`}>
+              {chatTab === 'public' ? (
+                <div className={`flex ${isMobile ? 'gap-1' : 'gap-2'}`}>
+                  <input
+                    type="text"
+                    value={messageInput}
+                    onChange={(e) => setMessageInput(e.target.value)}
+                    onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
+                    placeholder={isMobile ? 'Message...' : 'Type a message...'}
+                    className={`flex-1 bg-slate-700 border border-slate-600 rounded text-white placeholder-slate-500 focus:outline-none focus:border-blue-500 ${isMobile ? 'px-2 py-1.5 text-xs' : 'px-3 py-2 text-sm'}`}
+                  />
+                  <button
+                    onClick={sendMessage}
+                    disabled={!messageInput.trim()}
+                    className={`bg-blue-600 hover:bg-blue-700 disabled:bg-slate-600 text-white rounded font-medium transition-colors ${isMobile ? 'px-2 py-1.5 text-xs' : 'px-4 py-2 text-sm'}`}
+                  >
+                    {isMobile ? '→' : 'Send'}
+                  </button>
+                </div>
+              ) : selectedPrivateUser ? (
+                <div className={`flex ${isMobile ? 'gap-1' : 'gap-2'}`}>
+                  <input
+                    type="text"
+                    value={privateMessageInput}
+                    onChange={(e) => setPrivateMessageInput(e.target.value)}
+                    onKeyPress={(e) => e.key === 'Enter' && sendPrivateMessage()}
+                    placeholder={isMobile ? 'Message...' : 'Type a message...'}
+                    className={`flex-1 bg-slate-700 border border-slate-600 rounded text-white placeholder-slate-500 focus:outline-none focus:border-blue-500 ${isMobile ? 'px-2 py-1.5 text-xs' : 'px-3 py-2 text-sm'}`}
+                  />
+                  <button
+                    onClick={sendPrivateMessage}
+                    disabled={!privateMessageInput.trim()}
+                    className={`bg-blue-600 hover:bg-blue-700 disabled:bg-slate-600 text-white rounded font-medium transition-colors ${isMobile ? 'px-2 py-1.5 text-xs' : 'px-4 py-2 text-sm'}`}
+                  >
+                    {isMobile ? '→' : 'Send'}
+                  </button>
+                </div>
+              ) : (
+                <div className="text-slate-500 text-xs text-center py-2">
+                  Select a user to message
+                </div>
+              )}
+            </div>
           </div>
         )}
       </div>
