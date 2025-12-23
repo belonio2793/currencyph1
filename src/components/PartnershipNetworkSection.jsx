@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabaseClient'
 import { useDevice } from '../context/DeviceContext'
+import CommitmentForm from './CommitmentForm'
 
 const BUSINESS_TYPES = [
   'farmer',
