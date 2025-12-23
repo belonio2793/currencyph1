@@ -43,12 +43,12 @@ export default function ExpandableModal({
       <>
         {/* Backdrop - lighter for minimized state */}
         <div
-          className="fixed inset-0 bg-black/10 backdrop-blur-none z-40 transition-opacity"
+          className="fixed inset-0 bg-black/10 backdrop-blur-none z-[9998] transition-opacity"
           onClick={onClose}
         />
 
         {/* Minimized Header Button */}
-        <div className="fixed bottom-0 left-0 right-0 z-50 p-4 bg-white/95 backdrop-blur-sm border-t border-slate-200">
+        <div className="fixed bottom-0 left-0 right-0 z-[9999] p-4 bg-white/95 backdrop-blur-sm border-t border-slate-200">
           <button
             onClick={handleToggleExpand}
             className="w-full flex items-center justify-between p-3 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white rounded-lg transition-all shadow-lg hover:shadow-xl active:scale-98"
