@@ -574,27 +574,59 @@ export default function SendMoney({ userId }) {
                       {selectedRecipient && (
                         <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-4">
                           <div className="flex items-center gap-3 mb-4">
-                            <div className="shrink-0 w-10 h-10 rounded-full bg-emerald-600 text-white flex items-center justify-center text-sm font-semibold">
+                            <div className="shrink-0 w-12 h-12 rounded-full bg-emerald-600 text-white flex items-center justify-center text-sm font-semibold overflow-hidden">
                               {selectedRecipient.profile_picture_url ? (
-                                <img src={selectedRecipient.profile_picture_url} alt="Profile" className="w-full h-full object-cover rounded-full" />
+                                <img src={selectedRecipient.profile_picture_url} alt="Profile" className="w-full h-full object-cover" />
                               ) : (
                                 <span>{(selectedRecipient.full_name || selectedRecipient.email)?.charAt(0).toUpperCase()}</span>
                               )}
                             </div>
-                            <div>
-                              <p className="font-medium text-slate-900">{selectedRecipient.full_name || selectedRecipient.email}</p>
+                            <div className="flex-1">
+                              <p className="font-semibold text-slate-900">{selectedRecipient.full_name || selectedRecipient.email}</p>
                               <p className="text-xs text-slate-500">{selectedRecipient.email}</p>
                             </div>
                           </div>
-                          <div className="space-y-2 text-sm">
-                            <div className="flex justify-between items-center">
-                              <span className="text-slate-600">Receive Currency</span>
-                              <span className="font-medium text-slate-900">{recipientCurrency} ({getCurrencySymbol(recipientCurrency)})</span>
+
+                          <div className="space-y-3 text-sm border-t border-emerald-200 pt-3">
+                            {/* Contact Information */}
+                            <div className="flex justify-between items-start">
+                              <span className="text-slate-600">Email</span>
+                              <span className="text-right font-mono text-xs text-slate-900">{selectedRecipient.email}</span>
                             </div>
+
                             {selectedRecipient.phone_number && (
+                              <div className="flex justify-between items-start">
+                                <span className="text-slate-600">Phone</span>
+                                <span className="font-medium text-slate-900">{selectedRecipient.phone_number}</span>
+                              </div>
+                            )}
+
+                            {/* Account Details */}
+                            <div className="flex justify-between items-start">
+                              <span className="text-slate-600">Receive In</span>
+                              <span className="font-semibold text-emerald-700">{recipientCurrency} ({getCurrencySymbol(recipientCurrency)})</span>
+                            </div>
+
+                            {selectedRecipient.country_code && (
+                              <div className="flex justify-between items-start">
+                                <span className="text-slate-600">Country</span>
+                                <span className="font-medium text-slate-900">{selectedRecipient.country_code}</span>
+                              </div>
+                            )}
+
+                            {/* Verification Status */}
+                            <div className="flex justify-between items-center pt-2 border-t border-emerald-200">
+                              <span className="text-slate-600">Status</span>
+                              <span className={`text-xs font-semibold px-3 py-1 rounded-full ${selectedRecipient.phone_number ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}`}>
+                                {selectedRecipient.phone_number ? '✓ Verified' : 'Pending Verification'}
+                              </span>
+                            </div>
+
+                            {/* Account Age */}
+                            {selectedRecipient.created_at && (
                               <div className="flex justify-between items-center">
-                                <span className="text-slate-600">Status</span>
-                                <span className="text-xs font-medium px-2 py-1 rounded bg-emerald-100 text-emerald-700">Verified</span>
+                                <span className="text-slate-600">Member Since</span>
+                                <span className="text-xs text-slate-500">{new Date(selectedRecipient.created_at).toLocaleDateString()}</span>
                               </div>
                             )}
                           </div>
