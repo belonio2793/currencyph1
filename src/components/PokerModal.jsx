@@ -93,7 +93,6 @@ export default function PokerModal({ open, onClose, userId, userEmail, onShowAut
       isOpen={open}
       onClose={onClose}
       title="Poker Lobby"
-      icon="♠️"
       size={isMobile ? 'fullscreen' : 'xl'}
       footer={footer}
       defaultExpanded={!isMobile}

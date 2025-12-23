@@ -100,7 +100,6 @@ export default function RakeModal({ open, onClose, startingBalance, endingBalanc
       isOpen={open}
       onClose={onClose}
       title="Game Summary & Rake"
-      icon="💰"
       size={isMobile ? 'fullscreen' : 'sm'}
       footer={footer}
       defaultExpanded={!isMobile}

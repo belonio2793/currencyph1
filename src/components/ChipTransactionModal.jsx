@@ -355,7 +355,6 @@ export default function ChipTransactionModal({ open, onClose, userId, onPurchase
       isOpen={open}
       onClose={onClose}
       title="Buy Poker Chips"
-      icon="🎰"
       size={isMobile ? 'fullscreen' : 'xl'}
       footer={footer}
       badgeContent={`${formatChips(userChips)} chips`}
@@ -364,7 +363,7 @@ export default function ChipTransactionModal({ open, onClose, userId, onPurchase
     >
       {error && (
         <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
-          ⚠️ {error}
+          {error}
         </div>
       )}
 
@@ -475,7 +474,7 @@ export default function ChipTransactionModal({ open, onClose, userId, onPurchase
                         {bonusChips > 0 && (
                           <div className="px-2 py-1 bg-amber-100 border border-amber-300 rounded text-center">
                             <div className="text-xs text-amber-900 font-semibold">
-                              ✨ +{bonusChips.toLocaleString()} BONUS
+                              +{bonusChips.toLocaleString()} BONUS
                             </div>
                           </div>
                         )}
@@ -493,7 +492,7 @@ export default function ChipTransactionModal({ open, onClose, userId, onPurchase
                                 Processing
                               </span>
                             ) : (
-                              '🛒 BUY NOW'
+                              'BUY NOW'
                             )}
                           </button>
                         ) : (
@@ -511,7 +510,7 @@ export default function ChipTransactionModal({ open, onClose, userId, onPurchase
                                     Processing
                                   </span>
                                 ) : (
-                                  '💳 OTHER PAYMENT'
+                                  'OTHER PAYMENT'
                                 )}
                               </button>
                             )}
@@ -527,7 +526,7 @@ export default function ChipTransactionModal({ open, onClose, userId, onPurchase
                                     Adding
                                   </span>
                                 ) : (
-                                  '🎁 ADD CHIPS'
+                                  'ADD CHIPS'
                                 )}
                               </button>
                             )}
@@ -544,7 +543,7 @@ export default function ChipTransactionModal({ open, onClose, userId, onPurchase
           {/* Info */}
           <div className="bg-slate-50 border border-slate-200 rounded-lg p-3">
             <p className="text-xs text-slate-600">
-              💡 Chips are used to play poker games. Purchase chips to get started or earn them by winning hands.
+              Chips are used to play poker games. Purchase chips to get started or earn them by winning hands.
             </p>
           </div>
         </div>
