@@ -234,9 +234,15 @@ export default function ChipTransactionModal({ open, onClose, userId, onPurchase
         }
 
         const walletBalance = Number(selectedWallet.balance || 0)
+        const phpPrice = usdPrice * exchangeRate
+        const phpBalance = selectedWallet.currency_code === 'PHP' ? walletBalance : walletBalance * exchangeRate
 
         if (walletBalance < usdPrice) {
-          setError(`Insufficient balance. You need $${usdPrice.toFixed(2)} but have $${walletBalance.toFixed(2)}`)
+          const needsPhp = selectedWallet.currency_code === 'PHP'
+          const errorMsg = needsPhp
+            ? `Insufficient balance. You need ₱${formatNumber(phpPrice)} (${selectedWallet.currency_code}) but have ₱${formatNumber(phpBalance)}`
+            : `Insufficient balance. You need $${formatNumber(usdPrice)} USD but have $${formatNumber(walletBalance)} ${selectedWallet.currency_code}`
+          setError(errorMsg)
           setProcessingProductId(null)
           return
         }
