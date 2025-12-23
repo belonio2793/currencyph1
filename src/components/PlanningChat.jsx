@@ -1780,8 +1780,8 @@ export default function PlanningChat() {
 
         {/* Chat Section */}
         <div className={`rounded-lg border border-slate-700 bg-slate-800 flex flex-col overflow-hidden ${isMobile ? 'w-full max-h-72' : 'w-72'}`}>
-            {/* Auth Required Notice */}
-            {!isAuthenticated && (
+          {/* Auth Required Notice */}
+          {!isAuthenticated && (
               <div className="bg-amber-700/30 border-b border-amber-700 px-4 py-3">
                 <p className="text-amber-100 text-xs font-semibold mb-2">🔐 Community Features Locked</p>
                 <p className="text-amber-50 text-xs mb-3">Sign in to access:</p>
@@ -2003,8 +2003,8 @@ export default function PlanningChat() {
                 </div>
               )}
             </div>
-          </div>
-        )}
+          )}
+        </div>
       </div>
 
       {/* Auth Modal - On-Demand */}
