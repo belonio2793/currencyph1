@@ -484,10 +484,25 @@ export default function PartnershipNetworkSection({ isAuthenticated, userId }) {
       </div>
 
       {/* Marketplace Form - Embedded Section */}
-      <CommitmentMarketplace
-        userId={userId}
-        isAuthenticated={isAuthenticated}
-      />
+      {showCommitmentForm && (
+        <div className="border-t border-slate-700 bg-slate-800/50">
+          <div className={`${isMobile ? 'px-3 py-4' : 'px-6 py-6'}`}>
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-white font-bold text-lg">Add Contribution</h3>
+              <button
+                onClick={() => setShowCommitmentForm(false)}
+                className="text-slate-400 hover:text-white text-2xl font-bold leading-none"
+              >
+                ✕
+              </button>
+            </div>
+            <CommitmentMarketplace
+              userId={userId}
+              isAuthenticated={isAuthenticated}
+            />
+          </div>
+        </div>
+      )}
     </div>
   )
 }
