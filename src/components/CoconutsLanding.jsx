@@ -50,7 +50,7 @@ export default function CoconutsLanding() {
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
                 <button className="px-8 py-4 bg-amber-600 text-white rounded-lg hover:bg-amber-700 font-bold text-lg transition-colors flex items-center justify-center gap-2">
-                  Start Your Contribution <ArrowRight className="w-5 h-5" />
+                  Start Your Contribution →
                 </button>
                 <button className="px-8 py-4 border-2 border-gray-300 text-gray-900 rounded-lg hover:bg-gray-50 font-bold text-lg transition-colors">
                   Explore Platform
