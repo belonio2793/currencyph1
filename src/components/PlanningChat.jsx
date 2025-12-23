@@ -582,24 +582,70 @@ export default function PlanningChat() {
     setContributionSubmitting(true)
 
     try {
-      const { error } = await supabase
-        .from('contributions')
+      // First, get or create commitment profile
+      let profileId
+      const { data: existingProfile, error: profileCheckError } = await supabase
+        .from('commitment_profiles')
+        .select('id')
+        .eq('user_id', userId)
+        .single()
+
+      if (profileCheckError && profileCheckError.code !== 'PGRST116') {
+        throw profileCheckError
+      }
+
+      if (existingProfile) {
+        profileId = existingProfile.id
+        // Update existing profile
+        await supabase
+          .from('commitment_profiles')
+          .update({
+            business_name: contributionForm.businessName,
+            business_type: contributionForm.partnerType,
+            email: contributionForm.email
+          })
+          .eq('id', profileId)
+      } else {
+        // Create new profile
+        const { data: newProfile, error: createProfileError } = await supabase
+          .from('commitment_profiles')
+          .insert([{
+            user_id: userId,
+            business_name: contributionForm.businessName,
+            business_type: contributionForm.partnerType,
+            email: contributionForm.email
+          }])
+          .select()
+          .single()
+
+        if (createProfileError) throw createProfileError
+        profileId = newProfile.id
+      }
+
+      // Now create the commitment entry
+      const { error: commitmentError } = await supabase
+        .from('commitments')
         .insert([{
           user_id: userId,
-          partner_type: contributionForm.partnerType,
-          business_name: contributionForm.businessName,
-          email: contributionForm.email,
-          contribution_types: contributionForm.contributions,
-          monthly_capacity: contributionForm.monthlyCapacity ? parseFloat(contributionForm.monthlyCapacity) : null,
-          capacity_unit: contributionForm.capacityUnit,
-          location: contributionForm.location,
-          price_per_unit: contributionForm.pricePerUnit ? parseFloat(contributionForm.pricePerUnit) : null,
-          currency: contributionForm.currency,
-          notes: contributionForm.notes,
-          status: 'pending'
+          commitment_profile_id: profileId,
+          status: 'active',
+          item_type: contributionForm.contributions[0], // use first contribution type as primary
+          item_description: contributionForm.contributions.join(', '),
+          quantity: contributionForm.monthlyCapacity ? parseFloat(contributionForm.monthlyCapacity) : 1,
+          quantity_unit: contributionForm.capacityUnit,
+          scheduled_interval: 'monthly',
+          interval_count: 1,
+          unit_price: contributionForm.pricePerUnit ? parseFloat(contributionForm.pricePerUnit) : null,
+          currency: (contributionForm.currency || 'php').toUpperCase(),
+          notes: `Partner Type: ${contributionForm.partnerType}\nLocation: ${contributionForm.location}\n${contributionForm.notes}`,
+          metadata: {
+            partner_type: contributionForm.partnerType,
+            location: contributionForm.location,
+            contribution_types: contributionForm.contributions
+          }
         }])
 
-      if (error) throw error
+      if (commitmentError) throw commitmentError
 
       // Success - reset form and show message
       alert('✅ Thank you! Your contribution has been submitted. We\'ll review it and reach out soon.')
