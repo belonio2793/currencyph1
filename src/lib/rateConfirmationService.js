@@ -254,13 +254,13 @@ export function buildRateConfirmationMessage(confirmation) {
 export function subscribeToRateUpdates(fromCurrency, toCurrency = 'PHP', callback) {
   try {
     const subscription = supabase
-      .from('crypto_rates_valid')
+      .from('pairs')
       .on(
         'UPDATE',
         {
           event: 'UPDATE',
           schema: 'public',
-          table: 'crypto_rates_valid',
+          table: 'pairs',
           filter: `from_currency=eq.${fromCurrency},to_currency=eq.${toCurrency}`
         },
         async (payload) => {
