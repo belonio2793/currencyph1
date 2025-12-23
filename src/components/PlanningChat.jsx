@@ -4641,6 +4641,252 @@ export default function PlanningChat() {
           </div>
         </section>
 
+        {/* Platform & Ecosystem Expansion */}
+        <section className="py-24 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-indigo-50 to-purple-50">
+          <div className="max-w-7xl mx-auto">
+            <div className="mb-16">
+              <div className="inline-block mb-4 px-4 py-2 bg-purple-100 text-purple-700 rounded-full text-sm font-semibold">
+                🌐 COCONUTS.COM.PH ECOSYSTEM
+              </div>
+              <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+                From Farm to Global Platform: Coconuts.com.ph as a Digital Marketplace
+              </h2>
+              <p className="text-xl text-gray-700 max-w-4xl">
+                Coconuts.com.ph transcends a single company—it's a comprehensive digital ecosystem connecting farmers, manufacturers, distributors, investors, and consumers globally through transparent supply chain management and decentralized governance.
+              </p>
+            </div>
+
+            <div className="space-y-8 mb-12">
+              {/* Tier 1: Direct B2B Marketplace */}
+              <div className="bg-white rounded-xl p-10 border-2 border-indigo-200 shadow-lg">
+                <div className="flex items-start gap-4 mb-6">
+                  <span className="text-4xl">🏪</span>
+                  <div>
+                    <h3 className="text-2xl font-bold text-gray-900">Tier 1: Direct B2B Marketplace</h3>
+                    <p className="text-gray-600 mt-1">Farm-to-Factory Direct Integration</p>
+                  </div>
+                </div>
+                <div className="grid md:grid-cols-3 gap-6">
+                  <div className="p-4 bg-indigo-50 rounded-lg">
+                    <p className="font-bold text-gray-900 mb-2">For Farmers</p>
+                    <ul className="text-sm text-gray-700 space-y-2">
+                      <li>✓ List harvest capacity & specs</li>
+                      <li>✓ Receive bids from manufacturers</li>
+                      <li>✓ Smart contract agreements</li>
+                      <li>✓ Quality verification & payments</li>
+                    </ul>
+                  </div>
+                  <div className="p-4 bg-purple-50 rounded-lg">
+                    <p className="font-bold text-gray-900 mb-2">For Manufacturers</p>
+                    <ul className="text-sm text-gray-700 space-y-2">
+                      <li>✓ Source raw materials at scale</li>
+                      <li>✓ Vetted farmer networks</li>
+                      <li>✓ Batch scheduling & logistics</li>
+                      <li>✓ Quality guarantees & traceability</li>
+                    </ul>
+                  </div>
+                  <div className="p-4 bg-pink-50 rounded-lg">
+                    <p className="font-bold text-gray-900 mb-2">Revenue Model</p>
+                    <ul className="text-sm text-gray-700 space-y-2">
+                      <li>✓ 2-3% commission per transaction</li>
+                      <li>✓ Premium verification fees</li>
+                      <li>✓ API access tiers</li>
+                      <li>✓ Projected Year 5: $5-8M annually</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+
+              {/* Tier 2: Logistics & Cold Chain */}
+              <div className="bg-white rounded-xl p-10 border-2 border-blue-200 shadow-lg">
+                <div className="flex items-start gap-4 mb-6">
+                  <span className="text-4xl">🚚</span>
+                  <div>
+                    <h3 className="text-2xl font-bold text-gray-900">Tier 2: Integrated Logistics Network</h3>
+                    <p className="text-gray-600 mt-1">Port & Supply Chain Optimization</p>
+                  </div>
+                </div>
+                <div className="grid md:grid-cols-2 gap-8">
+                  <div>
+                    <p className="font-bold text-gray-900 mb-4">Platform Features</p>
+                    <ul className="space-y-3">
+                      {[
+                        'Real-time port availability & pricing',
+                        'Cold chain logistics coordination',
+                        'Customs & documentation automation',
+                        'Shipment tracking (blockchain-verified)',
+                        'Insurance & liability management',
+                        'Multi-carrier rate comparison'
+                      ].map((feature, i) => (
+                        <li key={i} className="flex gap-3 text-gray-700">
+                          <span className="text-blue-600 font-bold">▸</span>
+                          {feature}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                  <div className="bg-blue-50 rounded-lg p-6">
+                    <p className="font-bold text-gray-900 mb-4">Projected Growth</p>
+                    <div className="space-y-4">
+                      <div>
+                        <p className="text-sm text-gray-600">Year 1 Volume</p>
+                        <p className="text-2xl font-bold text-blue-600">2.4M units</p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-gray-600">Year 5 Potential</p>
+                        <p className="text-2xl font-bold text-blue-600">100M+ units</p>
+                        <p className="text-xs text-gray-600 mt-1">(Through 3rd-party sellers)</p>
+                      </div>
+                      <div className="border-t pt-4">
+                        <p className="text-sm text-gray-600">Revenue Target (Year 5)</p>
+                        <p className="text-xl font-bold text-blue-600">$12-18M</p>
+                        <p className="text-xs text-gray-600 mt-1">From commission & services</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Tier 3: Retail & DTC */}
+              <div className="bg-white rounded-xl p-10 border-2 border-green-200 shadow-lg">
+                <div className="flex items-start gap-4 mb-6">
+                  <span className="text-4xl">🛍️</span>
+                  <div>
+                    <h3 className="text-2xl font-bold text-gray-900">Tier 3: B2C & Retail Marketplace</h3>
+                    <p className="text-gray-600 mt-1">DTC & Retail Partner Channel</p>
+                  </div>
+                </div>
+                <div className="grid md:grid-cols-3 gap-6">
+                  <div className="p-4 bg-green-50 rounded-lg border border-green-200">
+                    <p className="font-bold text-gray-900 mb-3">🌍 Global Retail Partners</p>
+                    <p className="text-sm text-gray-700 mb-4">White-label fulfillment through Coconuts platform for partner brands</p>
+                    <p className="text-xs text-green-700 font-semibold">Commission: 8-12% of retail sales</p>
+                  </div>
+                  <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
+                    <p className="font-bold text-gray-900 mb-3">📱 Direct-to-Consumer App</p>
+                    <p className="text-sm text-gray-700 mb-4">Coconuts.com.ph app for consumers to buy directly from manufacturers</p>
+                    <p className="text-xs text-blue-700 font-semibold">Commission: 3-5% per transaction</p>
+                  </div>
+                  <div className="p-4 bg-amber-50 rounded-lg border border-amber-200">
+                    <p className="font-bold text-gray-900 mb-3">🤝 Affiliate Network</p>
+                    <p className="text-sm text-gray-700 mb-4">Influencers and wellness brands promote through affiliate links</p>
+                    <p className="text-xs text-amber-700 font-semibold">Commission: 5-15% per referral</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Tier 4: Technology & Data */}
+              <div className="bg-white rounded-xl p-10 border-2 border-orange-200 shadow-lg">
+                <div className="flex items-start gap-4 mb-6">
+                  <span className="text-4xl">⚙️</span>
+                  <div>
+                    <h3 className="text-2xl font-bold text-gray-900">Tier 4: Technology Services & Data</h3>
+                    <p className="text-gray-600 mt-1">SaaS, APIs, and Market Intelligence</p>
+                  </div>
+                </div>
+                <div className="grid md:grid-cols-2 gap-8">
+                  <div>
+                    <p className="font-bold text-gray-900 mb-4 text-lg">Premium Features (SaaS)</p>
+                    <div className="space-y-3">
+                      {[
+                        { name: 'Enterprise Dashboard', price: '$500-2,000/mo' },
+                        { name: 'API Access (Premium)', price: '$1,000-5,000/mo' },
+                        { name: 'Custom Integration', price: '$5,000-50,000/project' },
+                        { name: 'Market Intelligence Reports', price: '$200-1,000/report' },
+                        { name: 'Blockchain Certification', price: '$1,000-10,000/batch' },
+                        { name: 'White-Label Solutions', price: 'Custom licensing' }
+                      ].map((item, i) => (
+                        <div key={i} className="p-3 bg-orange-50 rounded border border-orange-200">
+                          <div className="flex justify-between items-start">
+                            <p className="font-semibold text-gray-900 text-sm">{item.name}</p>
+                            <p className="text-xs text-orange-700 font-bold">{item.price}</p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="bg-gradient-to-br from-orange-50 to-amber-50 rounded-lg p-6">
+                    <p className="font-bold text-gray-900 mb-4">Projected SaaS Revenue (Year 5)</p>
+                    <div className="space-y-4">
+                      <div>
+                        <p className="text-sm text-gray-600">Active Users (SaaS)</p>
+                        <p className="text-3xl font-bold text-orange-600">5,000+</p>
+                      </div>
+                      <div className="border-t border-amber-300 pt-4">
+                        <p className="text-sm text-gray-600">Annual Recurring Revenue</p>
+                        <p className="text-2xl font-bold text-orange-600">$8-12M</p>
+                      </div>
+                      <div className="bg-white rounded p-4">
+                        <p className="text-xs font-semibold text-gray-700 mb-2">Growth Drivers</p>
+                        <ul className="text-xs space-y-1 text-gray-700">
+                          <li>• Increasing data complexity</li>
+                          <li>• Compliance requirements</li>
+                          <li>• Integration demand</li>
+                          <li>• International expansion</li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Tier 5: Financial Services */}
+              <div className="bg-white rounded-xl p-10 border-2 border-pink-200 shadow-lg">
+                <div className="flex items-start gap-4 mb-6">
+                  <span className="text-4xl">💳</span>
+                  <div>
+                    <h3 className="text-2xl font-bold text-gray-900">Tier 5: Embedded Finance & Risk Management</h3>
+                    <p className="text-gray-600 mt-1">Crop Insurance, Trade Finance, Working Capital Solutions</p>
+                  </div>
+                </div>
+                <div className="grid md:grid-cols-3 gap-6">
+                  <div className="p-6 bg-gradient-to-br from-pink-50 to-red-50 rounded-lg border border-pink-200">
+                    <p className="font-bold text-gray-900 mb-4">🌦️ Crop Insurance</p>
+                    <p className="text-sm text-gray-700 mb-4">Weather-indexed insurance for farmers ($0.5-2M annual premiums)</p>
+                    <p className="font-semibold text-pink-700">Revenue: 15% commission</p>
+                  </div>
+                  <div className="p-6 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg border border-blue-200">
+                    <p className="font-bold text-gray-900 mb-4">📋 Trade Finance</p>
+                    <p className="text-sm text-gray-700 mb-4">Pre-export financing & letters of credit ($5-20M facility)</p>
+                    <p className="font-semibold text-blue-700">Revenue: 2-3% per transaction</p>
+                  </div>
+                  <div className="p-6 bg-gradient-to-br from-green-50 to-teal-50 rounded-lg border border-green-200">
+                    <p className="font-bold text-gray-900 mb-4">💰 Working Capital</p>
+                    <p className="text-sm text-gray-700 mb-4">Supply chain financing for partners ($10-50M facility)</p>
+                    <p className="font-semibold text-green-700">Revenue: 1-2% annual servicing</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-xl p-12">
+              <h3 className="text-3xl font-bold mb-8">🎯 Ecosystem Economics: The Full Picture</h3>
+              <div className="grid md:grid-cols-4 gap-6">
+                <div>
+                  <p className="text-purple-200 font-semibold mb-2">Year 5 Total Platform Revenue</p>
+                  <p className="text-4xl font-bold">$45-52M</p>
+                  <p className="text-sm text-purple-100 mt-2">(Beyond core coconut products)</p>
+                </div>
+                <div>
+                  <p className="text-purple-200 font-semibold mb-2">Volume Multiplier</p>
+                  <p className="text-4xl font-bold">10-50x</p>
+                  <p className="text-sm text-purple-100 mt-2">3rd party sellers using platform</p>
+                </div>
+                <div>
+                  <p className="text-purple-200 font-semibold mb-2">Active Users</p>
+                  <p className="text-4xl font-bold">50K+</p>
+                  <p className="text-sm text-purple-100 mt-2">Farmers, manufacturers, investors</p>
+                </div>
+                <div>
+                  <p className="text-purple-200 font-semibold mb-2">Exit Valuation Potential</p>
+                  <p className="text-4xl font-bold">$500M+</p>
+                  <p className="text-sm text-purple-100 mt-2">As a platform/marketplace company</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
         {/* Final CTA Section */}
         <section className="py-16 px-4 sm:px-6 lg:px-8 bg-gradient-to-r from-amber-600 to-orange-600">
           <div className="max-w-4xl mx-auto text-center">
