@@ -57,6 +57,37 @@ export default function CommitmentMarketplace({ userId, isAuthenticated, onAuthS
       return
     }
 
+    // Validate email if provided
+    if (!isAuthenticated && email && !email.includes('@')) {
+      setError('Please enter a valid email address')
+      return
+    }
+
+    // If not authenticated, show password modal instead of direct submission
+    if (!isAuthenticated) {
+      if (!email.trim()) {
+        setError('Please enter your email to create an account')
+        return
+      }
+
+      setNewUserEmail(email)
+      setTempFormData({
+        name,
+        email,
+        whatICanOffer,
+        whatINeed,
+        notes
+      })
+      setShowPasswordModal(true)
+      setError('')
+      return
+    }
+
+    // If authenticated, proceed with submission
+    await submitMarketplaceListing(userId, name, email, whatICanOffer, whatINeed, notes)
+  }
+
+  const submitMarketplaceListing = async (currentUserId, contactName, contactEmail, offer, need, additionalNotes) => {
     setLoading(true)
     setError('')
     setSuccess('')
@@ -65,12 +96,12 @@ export default function CommitmentMarketplace({ userId, isAuthenticated, onAuthS
       // Create or get commitment profile
       let profileId = null
 
-      if (isAuthenticated && userId) {
+      if (currentUserId) {
         // Try to get existing profile
         const { data: existingProfile } = await supabase
           .from('commitment_profiles')
           .select('id')
-          .eq('user_id', userId)
+          .eq('user_id', currentUserId)
           .single()
 
         if (existingProfile) {
@@ -80,9 +111,9 @@ export default function CommitmentMarketplace({ userId, isAuthenticated, onAuthS
           const { data: newProfile, error: profileError } = await supabase
             .from('commitment_profiles')
             .insert({
-              user_id: userId,
-              contact_person: name,
-              email: email,
+              user_id: currentUserId,
+              contact_person: contactName,
+              email: contactEmail,
               profile_completed: true
             })
             .select()
@@ -97,12 +128,12 @@ export default function CommitmentMarketplace({ userId, isAuthenticated, onAuthS
       const { error: insertError } = await supabase
         .from('marketplace_listings')
         .insert({
-          user_id: isAuthenticated ? userId : null,
-          contact_name: name,
-          contact_email: email,
-          what_can_offer: whatICanOffer,
-          what_need: whatINeed,
-          notes: notes,
+          user_id: currentUserId || null,
+          contact_name: contactName,
+          contact_email: contactEmail,
+          what_can_offer: offer,
+          what_need: need,
+          notes: additionalNotes,
           commitment_profile_id: profileId,
           status: 'active'
         })
@@ -110,7 +141,7 @@ export default function CommitmentMarketplace({ userId, isAuthenticated, onAuthS
       if (insertError) throw insertError
 
       setSuccess('🎉 Thank you! We\'re matching you with others...')
-      
+
       // Reset form
       setTimeout(() => {
         setWhatICanOffer('')
@@ -123,6 +154,80 @@ export default function CommitmentMarketplace({ userId, isAuthenticated, onAuthS
       setError(err.message || 'Something went wrong. Please try again.')
     } finally {
       setLoading(false)
+    }
+  }
+
+  const handlePasswordSubmit = async (e) => {
+    e.preventDefault()
+    setPasswordError('')
+
+    // Validate password
+    if (!password || password.length < 6) {
+      setPasswordError('Password must be at least 6 characters long')
+      return
+    }
+
+    if (password !== confirmPassword) {
+      setPasswordError('Passwords do not match')
+      return
+    }
+
+    setPasswordLoading(true)
+
+    try {
+      // Register user with Supabase Auth
+      const { data, error: signUpError } = await supabase.auth.signUp({
+        email: newUserEmail,
+        password: password,
+        options: {
+          data: {
+            contact_person: tempFormData.name
+          }
+        }
+      })
+
+      if (signUpError) throw signUpError
+
+      if (!data.user) {
+        throw new Error('User registration failed')
+      }
+
+      // Auto sign in the user
+      const { error: signInError } = await supabase.auth.signInWithPassword({
+        email: newUserEmail,
+        password: password
+      })
+
+      if (signInError) throw signInError
+
+      // Close modal
+      setShowPasswordModal(false)
+
+      // Submit marketplace listing with new user ID
+      await submitMarketplaceListing(
+        data.user.id,
+        tempFormData.name,
+        tempFormData.email,
+        tempFormData.whatICanOffer,
+        tempFormData.whatINeed,
+        tempFormData.notes
+      )
+
+      // Reset password form
+      setPassword('')
+      setConfirmPassword('')
+      setNewUserEmail('')
+      setTempFormData(null)
+
+      // Trigger parent callback if provided
+      if (onAuthSuccess) {
+        onAuthSuccess(data.user.id)
+      }
+    } catch (err) {
+      console.error('Error during registration/sign in:', err)
+      setPasswordError(err.message || 'Something went wrong. Please try again.')
+    } finally {
+      setPasswordLoading(false)
     }
   }
 
