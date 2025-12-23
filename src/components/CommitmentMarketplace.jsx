@@ -24,12 +24,37 @@ export default function CommitmentMarketplace({ userId, isAuthenticated, onAuthS
   const [newUserEmail, setNewUserEmail] = useState('')
   const [tempFormData, setTempFormData] = useState(null)
 
+  // Signatories display state
+  const [signatories, setSignatories] = useState([])
+  const [loadingSignatories, setLoadingSignatories] = useState(false)
+  const [editingId, setEditingId] = useState(null)
+
   // Load user data if authenticated
   useEffect(() => {
     if (isAuthenticated && userId) {
       loadUserData()
     }
+    loadSignatories()
   }, [isAuthenticated, userId])
+
+  const loadSignatories = async () => {
+    setLoadingSignatories(true)
+    try {
+      const { data, error } = await supabase
+        .from('marketplace_listings')
+        .select('id, contact_name, contact_email, what_can_offer, what_need, notes, created_at, user_id')
+        .eq('status', 'active')
+        .order('created_at', { ascending: false })
+
+      if (!error && data) {
+        setSignatories(data)
+      }
+    } catch (err) {
+      console.error('Error loading signatories:', err)
+    } finally {
+      setLoadingSignatories(false)
+    }
+  }
 
   const loadUserData = async () => {
     try {
