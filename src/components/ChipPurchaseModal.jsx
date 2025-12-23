@@ -3,14 +3,20 @@ import { supabase } from '../lib/supabaseClient'
 import ExpandableModal from './ExpandableModal'
 import { useDevice } from '../context/DeviceContext'
 import { convertUSDToLocalCurrency, formatPriceWithCurrency, getCurrencySymbol } from '../lib/currencyManager'
+import { formatNumber } from '../lib/currency'
+import { walletService } from '../lib/walletService'
+import { payments } from '../lib/payments'
 
 export default function ChipPurchaseModal({ open, onClose, userId, onPurchaseComplete }) {
   const { isMobile } = useDevice()
   const [packages, setPackages] = useState([])
+  const [wallets, setWallets] = useState([])
+  const [selectedWallet, setSelectedWallet] = useState(null)
   const [loading, setLoading] = useState(false)
   const [processing, setProcessing] = useState(false)
   const [error, setError] = useState(null)
   const [userChips, setUserChips] = useState(0n)
+  const [exchangeRate, setExchangeRate] = useState(null)
   const DEFAULT_CURRENCY = 'PHP'
   const isGuestLocal = userId && userId.includes('guest-local')
 
