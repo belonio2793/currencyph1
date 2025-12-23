@@ -623,14 +623,15 @@ export default function CommitmentForm({ isOpen, onClose, onCommitmentSaved, use
             <button
               type="submit"
               disabled={loading}
-              className="flex-1 px-4 py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-slate-600 text-white font-semibold rounded transition-colors"
+              className="flex-1 px-4 py-3 bg-gradient-to-r from-emerald-600 to-cyan-600 hover:from-emerald-700 hover:to-cyan-700 disabled:from-slate-600 disabled:to-slate-600 text-white font-bold rounded-lg transition-all transform hover:scale-105 shadow-lg shadow-emerald-600/30 flex items-center justify-center gap-2"
             >
+              <span>{loading ? '⏳' : '✨'}</span>
               {loading ? 'Saving...' : 'Add Contribution'}
             </button>
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 px-4 py-3 bg-slate-700 hover:bg-slate-600 text-white font-semibold rounded transition-colors"
+              className="flex-1 px-4 py-3 bg-slate-700 hover:bg-slate-600 text-white font-semibold rounded-lg transition-all border border-slate-600 hover:border-slate-500"
             >
               Cancel
             </button>
