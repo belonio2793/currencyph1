@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { supabase } from '../lib/supabaseClient'
+import { flexibleAuthClient } from '../lib/flexibleAuthClient'
 import ExpandableModal from './ExpandableModal'
 import { useDevice } from '../context/DeviceContext'
 
