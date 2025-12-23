@@ -3119,14 +3119,22 @@ export default function PlanningChat() {
               Whether you're a farmer seeking fair pricing, an investor looking for impact returns, a partner building networks, or a technology provider—Coconuts.com.ph is built for your contribution and success.
             </p>
 
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <button className="px-10 py-4 bg-white text-amber-600 rounded-lg hover:bg-gray-100 font-bold text-lg transition-colors">
-                Get Started Now →
-              </button>
-              <button className="px-10 py-4 border-2 border-white text-white rounded-lg hover:bg-white/10 font-bold text-lg transition-colors">
-                Learn More
-              </button>
-            </div>
+            {!isAuthenticated && (
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <button
+                  onClick={() => setShowAuthModalOnDemand(true)}
+                  className="px-10 py-4 bg-white text-amber-600 rounded-lg hover:bg-gray-100 font-bold text-lg transition-colors"
+                >
+                  Get Started Now →
+                </button>
+                <button
+                  onClick={() => setShowAuthModalOnDemand(true)}
+                  className="px-10 py-4 border-2 border-white text-white rounded-lg hover:bg-white/10 font-bold text-lg transition-colors"
+                >
+                  Learn More
+                </button>
+              </div>
+            )}
 
             <div className="mt-16 pt-8 border-t border-white/30">
               <p className="text-amber-50 text-sm">
