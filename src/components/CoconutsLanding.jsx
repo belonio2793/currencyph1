@@ -17,7 +17,7 @@ export default function CoconutsLanding() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-20">
             <div className="flex items-center gap-3">
-              <Leaf className="w-8 h-8 text-amber-600" />
+              <span className="text-3xl">🥥</span>
               <span className="text-2xl font-bold text-gray-900">Coconuts.com.ph</span>
             </div>
             <div className="hidden md:flex items-center gap-8">
