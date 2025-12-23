@@ -340,7 +340,7 @@ export default function ChipPurchaseModal({ open, onClose, userId, onPurchaseCom
                       <div className="text-center">
                         <p className="text-xs text-slate-500 uppercase tracking-wider mb-1">Price (PHP)</p>
                         <div className="text-xl font-bold text-emerald-600">
-                          {formatNumber(Number(pkg.php_price || (pkg.usd_price * (exchangeRate || 1))))}
+                          {'\u20B1'}{formatNumber(Number(pkg.php_price || (pkg.usd_price * (exchangeRate || 1))))}
                         </div>
                       </div>
                       <div className="text-center">
