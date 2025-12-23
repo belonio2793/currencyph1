@@ -519,6 +519,7 @@ export default function PlanningChat() {
     setUserId(user.id)
     setUserEmail(user.email || '')
     setIsAuthenticated(true)
+    setShowAuthModalOnDemand(false)
     loadPlanningUser(user.id, user)
   }
 
