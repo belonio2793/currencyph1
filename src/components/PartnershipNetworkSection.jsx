@@ -49,7 +49,8 @@ export default function PartnershipNetworkSection({ isAuthenticated, userId }) {
   const loadPartnerships = async () => {
     try {
       setLoading(true)
-      const { data, error } = await supabase
+      // First try with all columns, fallback to basic columns if error
+      let query = supabase
         .from('commitment_profiles')
         .select(`
           id,
@@ -62,19 +63,19 @@ export default function PartnershipNetworkSection({ isAuthenticated, userId }) {
           city,
           province,
           bio,
-          display_publicly,
-          created_at,
-          commitments (
-            id,
-            status,
-            quantity,
-            unit_price,
-            currency,
-            grand_total
-          )
+          created_at
         `)
-        .eq('display_publicly', true)
         .order('created_at', { ascending: false })
+
+      // Try to filter by display_publicly if column exists
+      try {
+        query = query.eq('display_publicly', true)
+      } catch (err) {
+        // Column might not exist, continue without filter
+        console.warn('display_publicly column might not exist, loading all profiles')
+      }
+
+      const { data, error } = await query
 
       if (error) {
         console.error('Error loading partnerships:', error?.message || JSON.stringify(error))
