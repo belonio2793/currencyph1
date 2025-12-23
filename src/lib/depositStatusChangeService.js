@@ -402,7 +402,7 @@ export class DepositStatusChangeService {
         originalAmount: amount,
         exchangeRate: exchangeRate,
         convertedAmount: convertedAmount,
-        rateSource: rateData.source,
+        rateSource: rateData.source_table || 'pairs',
         rateUpdatedAt: rateData.updated_at,
         timestamp: new Date().toISOString()
       }
