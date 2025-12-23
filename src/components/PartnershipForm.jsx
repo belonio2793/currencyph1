@@ -291,7 +291,29 @@ export default function PartnershipForm({
       </div>
 
       {/* Content */}
-      <div className="px-6 py-4 space-y-4 max-h-96 overflow-y-auto">
+      <div className="px-6 py-4 space-y-4 max-h-96 overflow-y-auto relative">
+        {/* Preview Mode Overlay - for signed out users */}
+        {!isAuthenticated && (
+          <div className="absolute inset-0 bg-black/10 backdrop-blur-[0.5px] rounded z-10 flex items-center justify-center">
+            <div className="bg-slate-900 border-2 border-amber-600 rounded-lg p-6 text-center max-w-sm">
+              <p className="text-amber-100 font-semibold text-lg mb-3">👀 Preview Mode</p>
+              <p className="text-slate-300 text-sm mb-4">You're viewing the partnership form. Sign in to contribute and share your capabilities with the community.</p>
+              <button
+                onClick={() => onAuthRequired && onAuthRequired('login')}
+                className="w-full px-4 py-2 bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 text-white font-semibold rounded-lg transition-all transform hover:scale-105 text-sm"
+              >
+                Sign In to Contribute
+              </button>
+              <button
+                onClick={() => onAuthRequired && onAuthRequired('register')}
+                className="w-full mt-2 px-4 py-2 bg-slate-700 hover:bg-slate-600 text-slate-300 hover:text-white font-semibold rounded-lg transition-colors text-sm"
+              >
+                Create Account
+              </button>
+            </div>
+          </div>
+        )}
+
         {/* Info Box */}
         <div className="p-4 bg-blue-900/30 border border-blue-700 rounded-lg">
           <p className="text-blue-100 text-sm">
