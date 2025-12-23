@@ -3580,6 +3580,567 @@ export default function PlanningChat() {
           </div>
         </section>
 
+        {/* Risk Analysis & Mitigation */}
+        <section className="py-24 px-4 sm:px-6 lg:px-8 bg-gray-50">
+          <div className="max-w-7xl mx-auto">
+            <div className="mb-16">
+              <div className="inline-block mb-4 px-4 py-2 bg-red-100 text-red-700 rounded-full text-sm font-semibold">
+                RISK MANAGEMENT
+              </div>
+              <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+                Identified Risks & Mitigation Strategies
+              </h2>
+            </div>
+
+            <div className="grid md:grid-cols-2 gap-8">
+              {[
+                {
+                  risk: 'Climate & Weather Risk',
+                  impact: 'Typhoons, droughts affect coconut yield',
+                  mitigation: [
+                    'Diversified sourcing across 3 regions',
+                    'Crop insurance programs ($200K/year)',
+                    'Drought-resistant hybrid cultivation',
+                    'Strategic reserves (3-month buffer inventory)'
+                  ],
+                  severity: 'Medium'
+                },
+                {
+                  risk: 'Market Competition',
+                  impact: 'Existing coconut brands increase competition',
+                  mitigation: [
+                    'Vertical integration = lower cost advantage',
+                    'Premium positioning (100% pure)',
+                    'First-mover advantage in transparency market',
+                    'Direct retailer relationships (exclude intermediaries)'
+                  ],
+                  severity: 'Low-Medium'
+                },
+                {
+                  risk: 'Currency Volatility',
+                  impact: 'PHP/USD fluctuations affect profitability',
+                  mitigation: [
+                    'Currency.ph hedging integrated',
+                    'Multi-currency revenue streams',
+                    'Price adjustments for major shifts',
+                    'Natural hedge through global operations'
+                  ],
+                  severity: 'Low'
+                },
+                {
+                  risk: 'Supply Chain Disruption',
+                  impact: 'Port closures, shipping delays',
+                  mitigation: [
+                    'Multiple port partnerships (Manila, Cebu, Davao)',
+                    '3-week inventory buffer maintained',
+                    'Backup logistics providers contracted',
+                    'Insurance coverage for supply interruption'
+                  ],
+                  severity: 'Medium'
+                },
+                {
+                  risk: 'Regulatory Changes',
+                  impact: 'Export regulations, food safety standards',
+                  mitigation: [
+                    'Compliance team monitoring developments',
+                    'Certifications beyond minimum standards',
+                    'Monthly regulatory updates to stakeholders',
+                    'Advocacy through industry associations'
+                  ],
+                  severity: 'Low'
+                },
+                {
+                  risk: 'Key Personnel Risk',
+                  impact: 'Loss of critical management staff',
+                  mitigation: [
+                    'Succession planning documented',
+                    'Equity incentives for key staff (2-3 years vesting)',
+                    'Cross-training on critical functions',
+                    'Key person insurance policies'
+                  ],
+                  severity: 'Medium'
+                },
+                {
+                  risk: 'Geopolitical Tensions',
+                  impact: 'Trade wars, tariff increases',
+                  mitigation: [
+                    '50+ market diversification',
+                    'Tariff hedging through partnerships',
+                    'Regional production facilities (future)',
+                    'Value-added products less impacted'
+                  ],
+                  severity: 'Low-Medium'
+                },
+                {
+                  risk: 'Technology System Failure',
+                  impact: 'Currency.ph integration or supply chain systems down',
+                  mitigation: [
+                    'Redundant cloud infrastructure',
+                    '99.9% uptime SLAs with providers',
+                    'Manual backup systems for critical ops',
+                    'Weekly disaster recovery drills'
+                  ],
+                  severity: 'Low'
+                }
+              ].map((item, i) => {
+                const severityColor = item.severity.includes('High') ? 'bg-red-100 text-red-700' : item.severity.includes('Medium') ? 'bg-yellow-100 text-yellow-700' : 'bg-green-100 text-green-700';
+                return (
+                  <div key={i} className="bg-white rounded-lg p-8 border border-gray-200 hover:shadow-lg transition-shadow">
+                    <div className="flex items-start justify-between mb-4">
+                      <h3 className="text-xl font-bold text-gray-900">{item.risk}</h3>
+                      <span className={`px-3 py-1 rounded-full text-xs font-bold ${severityColor}`}>{item.severity}</span>
+                    </div>
+                    <p className="text-gray-700 font-medium mb-4">{item.impact}</p>
+                    <div className="space-y-2">
+                      <p className="text-sm font-semibold text-gray-600">Mitigation Strategies:</p>
+                      {item.mitigation.map((m, j) => (
+                        <div key={j} className="flex items-start gap-3 text-gray-700 text-sm">
+                          <span className="text-amber-600 font-bold mt-0.5">✓</span>
+                          {m}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </section>
+
+        {/* Competitive Landscape */}
+        <section className="py-24 px-4 sm:px-6 lg:px-8 bg-white">
+          <div className="max-w-7xl mx-auto">
+            <div className="mb-16">
+              <div className="inline-block mb-4 px-4 py-2 bg-blue-100 text-blue-700 rounded-full text-sm font-semibold">
+                COMPETITIVE ANALYSIS
+              </div>
+              <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+                How Coconuts.com.ph Stands Apart
+              </h2>
+            </div>
+
+            <div className="overflow-x-auto bg-white rounded-xl border border-gray-200">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b-2 border-gray-300">
+                    <th className="text-left py-4 px-6 font-bold text-gray-900">Feature</th>
+                    <th className="text-center py-4 px-6 font-bold text-gray-900">Coconuts.com.ph</th>
+                    <th className="text-center py-4 px-6 font-bold text-gray-900">Traditional Brand</th>
+                    <th className="text-center py-4 px-6 font-bold text-gray-900">Regional Producer</th>
+                    <th className="text-center py-4 px-6 font-bold text-gray-900">E-Commerce Only</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {[
+                    { feature: 'Vertical Integration', ccph: '✓ Full', trad: '✗ Partial', reg: '✗ None', ec: '✗ Sourced' },
+                    { feature: 'Sourcing Transparency', ccph: '✓ Blockchain', trad: '✗ Limited', reg: '✗ None', ec: '✗ None' },
+                    { feature: 'Direct Farmer Payment', ccph: '✓ 24-48hrs', trad: '✗ 60+ days', reg: '✓ 30 days', ec: '✗ N/A' },
+                    { feature: 'Equity Distribution', ccph: '✓ 100%', trad: '✗ None', reg: '✗ None', ec: '✗ None' },
+                    { feature: 'Product Purity', ccph: '✓ 100% Pure', trad: '✗ Additives', reg: '✓ Natural', ec: '✓ Varies' },
+                    { feature: 'Global Distribution', ccph: '✓ 50+ markets', trad: '✓ 40+ markets', reg: '✗ 5-10', ec: '✓ Digital only' },
+                    { feature: 'Retail Price Position', ccph: '$3.40 premium', trad: '$2.80 (discount)', reg: '$4.20 (high)', ec: '$3.60 (online)' },
+                    { feature: 'Impact Commitment', ccph: '✓ 3% net profit', trad: '✗ 0.2%', reg: '✗ Minimal', ec: '✗ None' },
+                    { feature: 'Technology Integration', ccph: '✓ currency.ph', trad: '✗ Basic', reg: '✗ None', ec: '✓ Marketplace' },
+                    { feature: 'Sustainability Certs', ccph: '✓ 8 certifications', trad: '✓ 3-4 certs', reg: '✓ 1-2 certs', ec: '✗ None' }
+                  ].map((row, i) => (
+                    <tr key={i} className={i % 2 === 0 ? 'bg-gray-50' : 'bg-white'}>
+                      <td className="py-4 px-6 font-semibold text-gray-900 border-r border-gray-200">{row.feature}</td>
+                      <td className="py-4 px-6 text-center text-gray-700 border-r border-gray-200"><span className="font-bold text-amber-600">{row.ccph}</span></td>
+                      <td className="py-4 px-6 text-center text-gray-700 border-r border-gray-200">{row.trad}</td>
+                      <td className="py-4 px-6 text-center text-gray-700 border-r border-gray-200">{row.reg}</td>
+                      <td className="py-4 px-6 text-center text-gray-700">{row.ec}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            <div className="mt-12 p-10 bg-gradient-to-r from-amber-100 to-orange-100 rounded-xl border-2 border-amber-600">
+              <h3 className="text-2xl font-bold text-gray-900 mb-6">🎯 Unique Value Proposition</h3>
+              <div className="grid md:grid-cols-3 gap-8">
+                <div>
+                  <p className="font-bold text-amber-700 mb-3">Only Enterprise with:</p>
+                  <ul className="space-y-2 text-gray-800">
+                    <li>✓ Full farm-to-retail integration</li>
+                    <li>✓ Blockchain supply chain</li>
+                    <li>✓ Equity for all stakeholders</li>
+                    <li>✓ Community profit sharing</li>
+                    <li>✓ Currency.ph transparency</li>
+                  </ul>
+                </div>
+                <div>
+                  <p className="font-bold text-amber-700 mb-3">Market Timing Advantage:</p>
+                  <ul className="space-y-2 text-gray-800">
+                    <li>✓ Surge in health/wellness</li>
+                    <li>✓ Plant-based movement peak</li>
+                    <li>✓ Sustainable brands trending</li>
+                    <li>✓ Fair trade demand rising</li>
+                    <li>✓ Transparency imperative</li>
+                  </ul>
+                </div>
+                <div>
+                  <p className="font-bold text-amber-700 mb-3">Barriers to Competition:</p>
+                  <ul className="space-y-2 text-gray-800">
+                    <li>✓ First-mover in transparency</li>
+                    <li>✓ Farmer network lock-in</li>
+                    <li>✓ Proprietary tech stack</li>
+                    <li>✓ Brand & ecosystem moat</li>
+                    <li>✓ Partnership network</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Team & Expertise */}
+        <section className="py-24 px-4 sm:px-6 lg:px-8 bg-gray-50">
+          <div className="max-w-7xl mx-auto">
+            <div className="mb-16">
+              <div className="inline-block mb-4 px-4 py-2 bg-purple-100 text-purple-700 rounded-full text-sm font-semibold">
+                LEADERSHIP & ADVISORS
+              </div>
+              <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+                Experienced Team with Track Record
+              </h2>
+            </div>
+
+            <div className="grid md:grid-cols-3 gap-8 mb-12">
+              {[
+                {
+                  role: 'CEO & Co-Founder',
+                  name: 'Strategic Leader',
+                  background: [
+                    '15 years in agriculture/food processing',
+                    'Built 2 businesses to $50M+ revenue',
+                    'Former VP at major beverage company',
+                    'Expert in supply chain optimization'
+                  ],
+                  expertise: 'Operations, Strategy, Fundraising'
+                },
+                {
+                  role: 'COO & Operations Lead',
+                  name: 'Manufacturing Expert',
+                  background: [
+                    '20 years manufacturing leadership',
+                    'Managed 500+ person facilities',
+                    'Quality & safety certifications (HACCP, ISO)',
+                    'Cost optimization specialist (30-40% reductions)'
+                  ],
+                  expertise: 'Manufacturing, Quality, Logistics'
+                },
+                {
+                  role: 'CFO & Finance Director',
+                  name: 'Financial Strategist',
+                  background: [
+                    '12 years in fintech & food finance',
+                    'Currency.ph core team founding member',
+                    'Raised $100M+ in structured finance',
+                    'Expert in emerging market currencies'
+                  ],
+                  expertise: 'Finance, Compliance, Treasury'
+                },
+                {
+                  role: 'Chief Sustainability Officer',
+                  name: 'Impact Leader',
+                  background: [
+                    '18 years in development & sustainability',
+                    'Led programs in 15 countries',
+                    'Expert in B-Corp & Fair Trade',
+                    'Community engagement specialist'
+                  ],
+                  expertise: 'Impact, Sustainability, Community'
+                },
+                {
+                  role: 'Chief Technology Officer',
+                  name: 'Tech Innovator',
+                  background: [
+                    '10 years blockchain & supply chain tech',
+                    'Built 3 successful agritech platforms',
+                    'Expert in IoT & real-time analytics',
+                    'Scaled platforms to 50K+ users'
+                  ],
+                  expertise: 'Technology, Blockchain, Analytics'
+                },
+                {
+                  role: 'Director of Market Development',
+                  name: 'Export Specialist',
+                  background: [
+                    '14 years in agricultural exports',
+                    'Established distribution in 30+ countries',
+                    'Expert in retail partnerships',
+                    'Negotiated $500M+ in supply contracts'
+                  ],
+                  expertise: 'Sales, Distribution, Market Entry'
+                }
+              ].map((member, i) => (
+                <div key={i} className="bg-white rounded-xl p-8 border border-gray-200 hover:shadow-lg transition-shadow">
+                  <div className="mb-4">
+                    <div className="w-12 h-12 bg-gradient-to-br from-purple-400 to-blue-400 rounded-full flex items-center justify-center text-white font-bold text-xl">
+                      {member.name.charAt(0)}
+                    </div>
+                  </div>
+                  <h3 className="text-2xl font-bold text-gray-900 mb-1">{member.name}</h3>
+                  <p className="text-amber-600 font-semibold mb-4">{member.role}</p>
+                  <div className="space-y-3 mb-6">
+                    {member.background.map((item, j) => (
+                      <p key={j} className="text-gray-700 text-sm flex items-start gap-3">
+                        <span className="text-gray-400 mt-1">▸</span>
+                        {item}
+                      </p>
+                    ))}
+                  </div>
+                  <div className="pt-6 border-t border-gray-200">
+                    <p className="text-xs font-semibold text-gray-600">CORE EXPERTISE</p>
+                    <p className="text-gray-900 font-medium text-sm mt-2">{member.expertise}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div className="bg-white rounded-xl p-10 border border-gray-200">
+              <h3 className="text-2xl font-bold text-gray-900 mb-8">Advisory Board</h3>
+              <div className="grid md:grid-cols-2 gap-6">
+                {[
+                  { advisor: 'Former Secretary of Agriculture (Philippines)', expertise: 'Policy, partnerships' },
+                  { advisor: 'CEO, Major Multinational Food Company', expertise: 'Global scale, distribution' },
+                  { advisor: 'UN Development Program Director (ASEAN)', expertise: 'Impact, sustainability' },
+                  { advisor: 'Founder, Leading Fintech Platform', expertise: 'Technology, finance' },
+                  { advisor: 'President, Philippine Coconut Association', expertise: 'Industry relations' },
+                  { advisor: 'Climate & Agriculture Professor (MIT)', expertise: 'Climate resilience' }
+                ].map((item, i) => (
+                  <div key={i} className="p-6 bg-gradient-to-r from-purple-50 to-blue-50 rounded-lg border border-gray-200">
+                    <p className="font-bold text-gray-900">{item.advisor}</p>
+                    <p className="text-gray-600 text-sm mt-2">Expertise: {item.expertise}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Product Roadmap */}
+        <section className="py-24 px-4 sm:px-6 lg:px-8 bg-white">
+          <div className="max-w-7xl mx-auto">
+            <div className="mb-16">
+              <div className="inline-block mb-4 px-4 py-2 bg-green-100 text-green-700 rounded-full text-sm font-semibold">
+                FUTURE VISION
+              </div>
+              <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+                Product & Market Expansion Roadmap
+              </h2>
+            </div>
+
+            <div className="space-y-8">
+              {[
+                {
+                  year: 'Year 1-2 (2025-2026)',
+                  phase: 'Foundation & Core Products',
+                  products: [
+                    '💧 Coconut Water (aseptic) - 1.8M units/year',
+                    '🫒 Virgin Coconut Oil - 0.4M units/year',
+                    '✨ Coconut Moisturizer - 0.2M units/year'
+                  ],
+                  markets: 'Asia, North America, Europe (15 countries)',
+                  capex: '$3M additional',
+                  projectedRevenue: '$8-24M'
+                },
+                {
+                  year: 'Year 2-3 (2026-2027)',
+                  phase: 'Product Line Expansion',
+                  products: [
+                    'NEW: 🍫 Coconut Chocolate (organic, fair-trade)',
+                    'NEW: 🥤 Coconut Protein Drinks (fitness market)',
+                    'NEW: 🧴 Coconut Body Care Line (shampoo, lotion)',
+                    'EXPAND: Coconut Sugar & Flour (baking market)'
+                  ],
+                  markets: 'Add Middle East, Australia, additional EU (25 countries)',
+                  capex: '$8M (new product facility)',
+                  projectedRevenue: '$50M'
+                },
+                {
+                  year: 'Year 3-4 (2027-2028)',
+                  phase: 'Regional Production Hubs',
+                  products: [
+                    'EXPAND: Premium Coconut Supplement Line',
+                    'NEW: 🍶 Coconut Wine & Beverages (craft market)',
+                    'NEW: 🧴 Professional Cosmetics (B2B)',
+                    'LAUNCH: Coconut-based Bio-packaging'
+                  ],
+                  markets: 'Open 2nd facility (Vietnam/Indonesia). 35+ countries globally',
+                  capex: '$25M (facility + equipment)',
+                  projectedRevenue: '$90M'
+                },
+                {
+                  year: 'Year 4-5 (2028-2029)',
+                  phase: 'Market Leader & Sustainability Focus',
+                  products: [
+                    'PREMIUM: Luxury Coconut Beauty Line (spa/resort)',
+                    'B2B: Food Service Coconut Solutions',
+                    'NEW: Pharmaceutical-grade Coconut Extracts',
+                    'EXPAND: Regional specialty products'
+                  ],
+                  markets: '50+ countries, 4 regional distribution hubs',
+                  capex: '$30M (optimization + capacity)',
+                  projectedRevenue: '$140M+'
+                },
+                {
+                  year: 'Year 5+ (2029 onwards)',
+                  phase: 'Global Enterprise & Exit Options',
+                  products: [
+                    'GLOBAL: 15+ coconut-based product categories',
+                    'SERVICES: Coconut farming consulting',
+                    'TECH: Sustainability analytics platform',
+                    'EDUCATION: Academy for farming communities'
+                  ],
+                  markets: 'Global presence (100+ countries), regional production centers',
+                  capex: 'Self-funded from profits',
+                  projectedRevenue: '$250M+ (pre-exit)'
+                }
+              ].map((roadmap, i) => (
+                <div key={i} className="bg-gradient-to-r from-green-50 to-white rounded-xl p-10 border-l-4 border-green-600">
+                  <div className="mb-6">
+                    <span className="inline-block px-4 py-2 bg-green-600 text-white rounded-full font-bold text-sm mr-3">{roadmap.year}</span>
+                    <span className="text-2xl font-bold text-gray-900">{roadmap.phase}</span>
+                  </div>
+
+                  <div className="grid md:grid-cols-2 gap-8">
+                    <div>
+                      <p className="font-bold text-gray-900 mb-3">📦 Products:</p>
+                      <ul className="space-y-2">
+                        {roadmap.products.map((product, j) => (
+                          <li key={j} className="text-gray-700 flex items-start gap-3">
+                            <span className="text-green-600 font-bold">•</span>
+                            {product}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+
+                    <div className="space-y-4">
+                      <div>
+                        <p className="font-bold text-gray-900 text-sm mb-1">🌍 Markets</p>
+                        <p className="text-gray-700">{roadmap.markets}</p>
+                      </div>
+                      <div>
+                        <p className="font-bold text-gray-900 text-sm mb-1">💰 CapEx</p>
+                        <p className="text-gray-700">{roadmap.capex}</p>
+                      </div>
+                      <div className="p-4 bg-green-100 border border-green-300 rounded-lg">
+                        <p className="font-bold text-gray-900 text-sm mb-1">📈 Projected Revenue</p>
+                        <p className="text-2xl font-bold text-green-700">{roadmap.projectedRevenue}</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Success Metrics & KPIs */}
+        <section className="py-24 px-4 sm:px-6 lg:px-8 bg-gray-50">
+          <div className="max-w-7xl mx-auto">
+            <div className="mb-16">
+              <div className="inline-block mb-4 px-4 py-2 bg-indigo-100 text-indigo-700 rounded-full text-sm font-semibold">
+                PERFORMANCE TRACKING
+              </div>
+              <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+                Key Success Metrics & Performance Indicators
+              </h2>
+            </div>
+
+            <div className="grid md:grid-cols-2 gap-12 mb-12">
+              <div className="bg-white rounded-xl p-10 border border-gray-200">
+                <h3 className="text-2xl font-bold text-gray-900 mb-6">💼 Business Metrics</h3>
+                <div className="space-y-4">
+                  {[
+                    { metric: 'Revenue Growth (Year-over-Year)', target: '85% CAGR', measurement: 'Quarterly financial reports' },
+                    { metric: 'Production Capacity Utilization', target: '90%+ by Year 3', measurement: 'Manufacturing dashboards' },
+                    { metric: 'Gross Profit Margin', target: '65% (vs. 45% industry avg)', measurement: 'Monthly P&L' },
+                    { metric: 'Customer Acquisition Cost (CAC)', target: '$2 per unit (wholesale)', measurement: 'Marketing analytics' },
+                    { metric: 'Market Penetration Rate', target: '8% of target markets by Year 5', measurement: 'Sales data' },
+                    { metric: 'Export Market Share', target: '$500M+ of $48.8B market', measurement: 'Industry reports' }
+                  ].map((item, i) => (
+                    <div key={i} className="p-4 bg-gradient-to-r from-indigo-50 to-white rounded-lg border border-indigo-200">
+                      <div className="flex items-start justify-between mb-2">
+                        <p className="font-bold text-gray-900">{item.metric}</p>
+                        <p className="text-indigo-600 font-bold">{item.target}</p>
+                      </div>
+                      <p className="text-xs text-gray-600">{item.measurement}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="bg-white rounded-xl p-10 border border-gray-200">
+                <h3 className="text-2xl font-bold text-gray-900 mb-6">🌍 Impact Metrics</h3>
+                <div className="space-y-4">
+                  {[
+                    { metric: 'Direct Jobs Created', target: '200+ by Year 1, 10,000+ by Year 5', measurement: 'HR systems' },
+                    { metric: 'Farmer Family Income Increase', target: '3-4x baseline', measurement: 'Payment records' },
+                    { metric: 'Women in Leadership', target: '40%+', measurement: 'Organizational charts' },
+                    { metric: 'Educational Scholarships', target: '1,000+ per year by Year 3', measurement: 'Education program tracking' },
+                    { metric: 'Carbon Reduction', target: 'Carbon neutral by 2030', measurement: 'Annual carbon audits' },
+                    { metric: 'Forest Area Restored', target: '10,000 hectares by Year 5', measurement: 'Land surveys & monitoring' }
+                  ].map((item, i) => (
+                    <div key={i} className="p-4 bg-gradient-to-r from-green-50 to-white rounded-lg border border-green-200">
+                      <div className="flex items-start justify-between mb-2">
+                        <p className="font-bold text-gray-900">{item.metric}</p>
+                        <p className="text-green-600 font-bold text-sm">{item.target}</p>
+                      </div>
+                      <p className="text-xs text-gray-600">{item.measurement}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl p-12">
+              <h3 className="text-2xl font-bold mb-8">📊 Quarterly Reporting Dashboard</h3>
+              <div className="grid md:grid-cols-4 gap-6">
+                <div>
+                  <p className="text-indigo-100 font-semibold mb-2">Operational Health</p>
+                  <ul className="text-sm space-y-1 text-indigo-50">
+                    <li>✓ Production volume</li>
+                    <li>✓ Capacity utilization</li>
+                    <li>✓ Quality metrics</li>
+                    <li>✓ Safety incidents</li>
+                  </ul>
+                </div>
+                <div>
+                  <p className="text-indigo-100 font-semibold mb-2">Financial Performance</p>
+                  <ul className="text-sm space-y-1 text-indigo-50">
+                    <li>✓ Revenue & EBITDA</li>
+                    <li>✓ Unit economics</li>
+                    <li>✓ Cash position</li>
+                    <li>✓ Growth rates</li>
+                  </ul>
+                </div>
+                <div>
+                  <p className="text-indigo-100 font-semibold mb-2">Community Impact</p>
+                  <ul className="text-sm space-y-1 text-indigo-50">
+                    <li>✓ Farmer income</li>
+                    <li>✓ Jobs created</li>
+                    <li>✓ Scholarships awarded</li>
+                    <li>✓ Community programs</li>
+                  </ul>
+                </div>
+                <div>
+                  <p className="text-indigo-100 font-semibold mb-2">Sustainability</p>
+                  <ul className="text-sm space-y-1 text-indigo-50">
+                    <li>✓ Carbon footprint</li>
+                    <li>✓ Waste reduction</li>
+                    <li>✓ Water usage</li>
+                    <li>✓ Land restored</li>
+                  </ul>
+                </div>
+              </div>
+              <p className="mt-8 text-indigo-100 text-sm">All metrics published publicly on currency.ph quarterly. Third-party audit verification available annually.</p>
+            </div>
+          </div>
+        </section>
+
         {/* FAQ Section */}
         <section className="py-24 px-4 sm:px-6 lg:px-8 bg-white">
           <div className="max-w-4xl mx-auto">
