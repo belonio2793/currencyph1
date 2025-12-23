@@ -132,10 +132,13 @@ export default function CommitmentMarketplace({ userId, isAuthenticated }) {
       {/* Form */}
       <div className={`max-w-4xl mx-auto bg-gradient-to-br from-slate-800 to-slate-900 rounded-xl border border-slate-700 p-6 md:p-8 space-y-6`}>
         {error && (
-          <div className="p-4 bg-red-900/30 border border-red-700/50 rounded-lg text-red-200 text-sm">
-            {error}
-          </div>
-        )}
+        <div className="p-4 bg-red-900/30 border border-red-700/50 rounded-lg text-red-200 text-sm mb-4">
+          <p className="flex items-center gap-2"><span>❌</span> {error}</p>
+          {error.includes('marketplace_listings') && (
+            <p className="text-xs mt-2 text-red-100">Setup required: Check MARKETPLACE_SETUP.md for database setup instructions.</p>
+          )}
+        </div>
+      )}
 
         {success && (
           <div className="p-4 bg-emerald-900/30 border border-emerald-700/50 rounded-lg text-emerald-200 text-sm animate-pulse">
