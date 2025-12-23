@@ -4405,7 +4405,7 @@ export default function PlanningChat() {
                 {
                   region: '📱 E-Commerce Global',
                   focus: 'Direct-to-Consumer Channel',
-                  markets: 'All regions simultaneously',
+                  markets: ['All regions (simultaneously)'],
                   timeline: 'Ongoing (Q1 2025 launch)',
                   strategy: 'Amazon Global, Alibaba, Shopify store. Content marketing on sustainability story. Influencer partnerships (nutrition, sustainability).',
                   target: '$1M Year 1, $12M by Year 3',
