@@ -49,53 +49,56 @@ export default function PartnershipNetworkSection({ isAuthenticated, userId }) {
   const loadPartnerships = async () => {
     try {
       setLoading(true)
-      // First try with all columns, fallback to basic columns if error
-      let query = supabase
+      // Load commitment profiles - basic columns only
+      const { data: profilesData, error: profilesError } = await supabase
         .from('commitment_profiles')
-        .select(`
-          id,
-          user_id,
-          public_name,
-          business_name,
-          business_type,
-          contact_person,
-          email,
-          city,
-          province,
-          bio,
-          created_at
-        `)
+        .select('*')
         .order('created_at', { ascending: false })
 
-      // Try to filter by display_publicly if column exists
-      try {
-        query = query.eq('display_publicly', true)
-      } catch (err) {
-        // Column might not exist, continue without filter
-        console.warn('display_publicly column might not exist, loading all profiles')
-      }
-
-      const { data, error } = await query
-
-      if (error) {
-        console.error('Error loading partnerships:', error?.message || JSON.stringify(error))
+      if (profilesError) {
+        console.error('Error loading partnerships:', profilesError?.message || JSON.stringify(profilesError))
         setPartnerships([])
         return
       }
 
-      if (data) {
-        setPartnerships(data)
-        setPartnerCount(data.length)
-
-        // Calculate total commitment value
-        const total = data.reduce((sum, profile) => {
-          const profileTotal = profile.commitments?.reduce((pSum, commitment) => {
-            return pSum + (commitment.grand_total || 0)
-          }, 0) || 0
-          return sum + profileTotal
-        }, 0)
-        setTotalCommitmentValue(total)
+      if (!profilesData || profilesData.length === 0) {
+        setPartnerships([])
+        setPartnerCount(0)
+        setTotalCommitmentValue(0)
+        return
       }
+
+      // Filter to only public profiles (default to showing all if column doesn't exist)
+      const publicProfiles = profilesData.filter(p =>
+        p.display_publicly !== false // Show if not explicitly false
+      )
+
+      // Load commitments for each profile
+      const profilesWithCommitments = await Promise.all(
+        publicProfiles.map(async (profile) => {
+          const { data: commitments = [] } = await supabase
+            .from('commitments')
+            .select('id, status, quantity, unit_price, currency, grand_total')
+            .eq('commitment_profile_id', profile.id)
+
+          return {
+            ...profile,
+            commitments: commitments || []
+          }
+        })
+      )
+
+      setPartnerships(profilesWithCommitments)
+      setPartnerCount(profilesWithCommitments.length)
+
+      // Calculate total commitment value
+      const total = profilesWithCommitments.reduce((sum, profile) => {
+        const profileTotal = profile.commitments?.reduce((pSum, commitment) => {
+          return pSum + (commitment.grand_total || 0)
+        }, 0) || 0
+        return sum + profileTotal
+      }, 0)
+      setTotalCommitmentValue(total)
     } catch (error) {
       console.error('Unexpected error loading partnerships:', error?.message || String(error))
     } finally {
