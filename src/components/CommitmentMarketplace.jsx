@@ -393,6 +393,113 @@ export default function CommitmentMarketplace({ userId, isAuthenticated, onAuthS
           </div>
         </div>
       </div>
+
+      {/* Password Modal */}
+      {showPasswordModal && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className={`bg-gradient-to-br from-slate-800 to-slate-900 rounded-xl border border-slate-700 shadow-2xl ${isMobile ? 'w-full' : 'w-full max-w-md'}`}>
+            {/* Modal Header */}
+            <div className="border-b border-slate-700 px-6 py-4 flex items-center justify-between">
+              <h3 className="text-xl font-bold text-white flex items-center gap-2">
+                <span>🔐</span> Create Your Account
+              </h3>
+              <button
+                onClick={() => {
+                  setShowPasswordModal(false)
+                  setPassword('')
+                  setConfirmPassword('')
+                  setPasswordError('')
+                }}
+                className="text-slate-400 hover:text-white text-2xl font-bold leading-none"
+              >
+                ✕
+              </button>
+            </div>
+
+            {/* Modal Body */}
+            <div className="px-6 py-6 space-y-4">
+              <p className="text-slate-300 text-sm">
+                Complete your profile by setting a secure password. We'll automatically sign you in.
+              </p>
+
+              {passwordError && (
+                <div className="p-3 bg-red-900/30 border border-red-700/50 rounded-lg text-red-200 text-sm">
+                  <p className="flex items-center gap-2"><span>❌</span> {passwordError}</p>
+                </div>
+              )}
+
+              <form onSubmit={handlePasswordSubmit} className="space-y-4">
+                {/* Email Display */}
+                <div>
+                  <label className="block text-slate-300 text-sm mb-2">Email</label>
+                  <input
+                    type="email"
+                    value={newUserEmail}
+                    disabled
+                    className="w-full bg-slate-700/50 border border-slate-600 rounded-lg px-4 py-2.5 text-slate-400 cursor-not-allowed"
+                  />
+                </div>
+
+                {/* Password */}
+                <div>
+                  <label className="block text-slate-300 text-sm mb-2">Password</label>
+                  <input
+                    type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="At least 6 characters"
+                    className="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-2.5 text-white placeholder-slate-500 focus:outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-400/30 transition-all"
+                    disabled={passwordLoading}
+                  />
+                </div>
+
+                {/* Confirm Password */}
+                <div>
+                  <label className="block text-slate-300 text-sm mb-2">Confirm Password</label>
+                  <input
+                    type="password"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    placeholder="Repeat your password"
+                    className="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-2.5 text-white placeholder-slate-500 focus:outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-400/30 transition-all"
+                    disabled={passwordLoading}
+                  />
+                </div>
+
+                {/* Submit Button */}
+                <div className="pt-2 flex gap-3">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowPasswordModal(false)
+                      setPassword('')
+                      setConfirmPassword('')
+                      setPasswordError('')
+                    }}
+                    className="flex-1 px-4 py-2.5 bg-slate-700 hover:bg-slate-600 text-white font-semibold rounded-lg transition-all"
+                    disabled={passwordLoading}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={passwordLoading || !password || !confirmPassword}
+                    className="flex-1 px-4 py-2.5 bg-gradient-to-r from-emerald-600 to-cyan-600 hover:from-emerald-700 hover:to-cyan-700 disabled:from-slate-600 disabled:to-slate-600 text-white font-semibold rounded-lg transition-all flex items-center justify-center gap-2"
+                  >
+                    <span>{passwordLoading ? '⏳' : '✨'}</span>
+                    {passwordLoading ? 'Creating Account...' : 'Create Account'}
+                  </button>
+                </div>
+
+                {/* Security Info */}
+                <p className="text-slate-400 text-xs text-center pt-2">
+                  🔒 Your password is encrypted and stored securely
+                </p>
+              </form>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
