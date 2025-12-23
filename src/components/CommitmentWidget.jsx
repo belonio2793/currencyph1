@@ -24,22 +24,47 @@ export default function CommitmentWidget() {
   })
 
   useEffect(() => {
-    // Check if user is authenticated
+    // Check if user is authenticated (only if online)
     const checkSession = async () => {
-      const { data: { session } } = await supabase.auth.getSession()
-      setSession(session)
-      setIsLoading(false)
+      if (!isOnline) {
+        return
+      }
+      try {
+        const { data: { session } } = await supabase.auth.getSession()
+        setSession(session)
+      } catch (err) {
+        console.log('Auth check failed (offline or no connection):', err.message)
+      }
     }
 
     checkSession()
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
-        setSession(session)
-      }
-    )
+    // Only setup auth listener if online
+    let subscription
+    if (isOnline) {
+      const { data } = supabase.auth.onAuthStateChange(
+        (event, session) => {
+          setSession(session)
+        }
+      )
+      subscription = data?.subscription
+    }
 
     return () => subscription?.unsubscribe()
+  }, [isOnline])
+
+  // Monitor online/offline status
+  useEffect(() => {
+    const handleOnline = () => setIsOnline(true)
+    const handleOffline = () => setIsOnline(false)
+
+    window.addEventListener('online', handleOnline)
+    window.addEventListener('offline', handleOffline)
+
+    return () => {
+      window.removeEventListener('online', handleOnline)
+      window.removeEventListener('offline', handleOffline)
+    }
   }, [])
 
   const handleChange = (e) => {
