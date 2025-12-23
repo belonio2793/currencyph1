@@ -582,10 +582,10 @@ export default function App() {
             </Suspense>
           )}
 
-          {/* Coconuts.com.ph Landing Page */}
+          {/* Planning page is a standalone fullscreen interface */}
           {activeTab === 'planning' && (
             <Suspense fallback={<PageLoader />}>
-              <CoconutsLanding />
+              <PlanningChat />
             </Suspense>
           )}
 
