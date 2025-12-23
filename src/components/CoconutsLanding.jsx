@@ -855,7 +855,7 @@ export default function CoconutsLanding() {
             <div className="space-y-8">
               <div className="bg-white rounded-xl p-10 border border-gray-200">
                 <h3 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-3">
-                  <Leaf className="w-8 h-8 text-green-600" />
+                  <span className="text-3xl">🌱</span>
                   Environmental Commitments
                 </h3>
                 <div className="space-y-4">
