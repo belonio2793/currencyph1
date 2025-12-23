@@ -108,23 +108,23 @@ export default function CoconutsLanding() {
           <div className="grid md:grid-cols-3 gap-8 mt-12">
             {[
               {
-                icon: <Leaf className="w-12 h-12" />,
+                icon: '🌾',
                 title: 'Farming & Acquisition',
                 description: 'Direct partnerships with Philippine coconut farmers and landowners. Fair-price contracts with transparent pricing mechanisms and currency hedging through exconvert integration.'
               },
               {
-                icon: <Zap className="w-12 h-12" />,
+                icon: '⚡',
                 title: 'Manufacturing & Processing',
                 description: 'State-of-the-art facilities for 100% pure product extraction and processing. Zero additives, zero preservatives—just pure coconut goodness at scale.'
               },
               {
-                icon: <Globe className="w-12 h-12" />,
+                icon: '🌍',
                 title: 'Global Distribution',
                 description: 'Strategic logistics partnerships, port management, and direct-to-retailer distribution channels across 50+ countries with real-time tracking.'
               }
             ].map((item, i) => (
               <div key={i} className="bg-white rounded-xl p-8 shadow-sm border border-gray-200 hover:shadow-lg transition-shadow">
-                <div className="text-amber-600 mb-4">{item.icon}</div>
+                <div className="text-4xl mb-4">{item.icon}</div>
                 <h3 className="text-2xl font-bold text-gray-900 mb-4">{item.title}</h3>
                 <p className="text-gray-600 leading-relaxed">{item.description}</p>
               </div>
