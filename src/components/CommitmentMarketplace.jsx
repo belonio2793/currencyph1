@@ -203,12 +203,7 @@ export default function CommitmentMarketplace({ userId, isAuthenticated, onAuthS
       // Register user with Supabase Auth
       const { data, error: signUpError } = await supabase.auth.signUp({
         email: newUserEmail,
-        password: password,
-        options: {
-          data: {
-            contact_person: tempFormData.name
-          }
-        }
+        password: password
       })
 
       if (signUpError) throw signUpError
