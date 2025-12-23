@@ -1779,6 +1779,25 @@ export default function PlanningChat() {
 
         {/* Chat Section */}
         <div className={`rounded-lg border border-slate-700 bg-slate-800 flex flex-col overflow-hidden ${isMobile ? 'w-full max-h-72' : 'w-96'}`}>
+          {/* Auth Required Notice */}
+          {!isAuthenticated && (
+            <div className="bg-amber-700/30 border-b border-amber-700 px-4 py-3">
+              <p className="text-amber-100 text-xs font-semibold mb-2">🔐 Community Features Locked</p>
+              <p className="text-amber-50 text-xs mb-3">Sign in to access:</p>
+              <ul className="text-amber-50 text-xs space-y-1 ml-2">
+                <li>✓ Public & private messaging</li>
+                <li>✓ View online community members</li>
+                <li>✓ Real-time collaboration</li>
+              </ul>
+              <button
+                onClick={() => setShowAuthModalOnDemand(true)}
+                className="w-full mt-3 px-3 py-2 bg-amber-600 hover:bg-amber-700 text-white font-semibold text-xs rounded transition-colors"
+              >
+                Unlock Community Features
+              </button>
+            </div>
+          )}
+
           {/* Chat Tabs */}
           <div className="bg-slate-700 px-4 py-2 border-b border-slate-600 flex gap-2">
             <button
