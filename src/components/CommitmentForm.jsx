@@ -244,14 +244,20 @@ export default function CommitmentForm({ isOpen, onClose, onCommitmentSaved, use
   if (!isOpen) return null
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 overflow-y-auto">
-      <div className={`bg-slate-800 rounded-lg border border-slate-700 ${isMobile ? 'w-full max-h-[90vh]' : 'w-full max-w-2xl max-h-[90vh]'} overflow-y-auto`}>
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50 overflow-y-auto">
+      <div className={`bg-gradient-to-br from-slate-800 via-slate-800 to-slate-900 rounded-xl border border-slate-700 shadow-2xl ${isMobile ? 'w-full max-h-[90vh]' : 'w-full max-w-2xl max-h-[90vh]'} overflow-y-auto`}>
         {/* Header */}
-        <div className="bg-slate-700 border-b border-slate-600 px-6 py-4 sticky top-0 flex items-center justify-between">
-          <h2 className="text-xl font-bold text-white">Add Contribution to Partnership</h2>
+        <div className="bg-gradient-to-r from-blue-700 to-cyan-600 border-b border-blue-500 px-6 py-5 sticky top-0 flex items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <span className="text-2xl">🌱</span>
+            <div>
+              <h2 className="text-xl font-bold text-white">Grow With Us</h2>
+              <p className="text-blue-100 text-xs">Add your contribution to the partnership</p>
+            </div>
+          </div>
           <button
             onClick={onClose}
-            className="text-slate-400 hover:text-white text-2xl"
+            className="text-blue-100 hover:text-white text-2xl flex-shrink-0 transition-colors"
           >
             ✕
           </button>
