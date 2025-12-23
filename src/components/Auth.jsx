@@ -184,158 +184,23 @@ export default function Auth({ onAuthSuccess, initialTab = 'login', isModal = fa
         throw new Error('Please fill in all fields')
       }
 
-      const email = normalizeIdentifier(identifier)
-      // Map guest/guest -> backend safe password to bypass Supabase min-length checks
-      const effectivePassword = (identifier === 'guest' && password === 'guest') ? 'guest123' : password
+      // Use flexible auth that supports email, phone, username, nickname, etc.
+      const result = await flexibleAuthClient.signInWithIdentifier(identifier, password)
 
-      // Try signing in with timeout
-      let signInResult
-      try {
-        const controller = new AbortController()
-        const timeoutId = setTimeout(() => controller.abort(), 10000) // 10 second timeout
-
-        try {
-          signInResult = await supabase.auth.signInWithPassword({ email, password: effectivePassword })
-        } finally {
-          clearTimeout(timeoutId)
-        }
-      } catch (err) {
-        if (err.name === 'AbortError') {
-          signInResult = { error: new Error('Login request timed out. Check your internet connection.') }
-        } else if (err?.message?.includes('Failed to fetch')) {
-          signInResult = { error: new Error('Cannot connect to authentication service. Check your internet connection or try again later.') }
-        } else if (err?.message?.includes('body stream already read')) {
-          signInResult = { error: new Error('Invalid login credentials. Please check your email/phone and password.') }
-        } else {
-          signInResult = { error: err }
-        }
+      if (result.error) {
+        throw new Error(result.error)
       }
 
-      let data = signInResult.data
-      let signInError = signInResult.error
-
-      if (signInError) {
-        // If the error indicates email not confirmed, keep error but allow resend
-        let msg = String(signInError.message || signInError.error_description || signInError.error || '')
-
-        // Map Supabase error messages to user-friendly messages
-        if (msg.toLowerCase().includes('invalid login credentials') || msg.toLowerCase().includes('credentials')) {
-          msg = 'Invalid login credentials. Please check your email/phone and password.'
-        } else if (msg.toLowerCase().includes('user not found') || msg.toLowerCase().includes('user_not_found')) {
-          msg = 'Email address does not exist.'
-        } else if (msg.toLowerCase().includes('wrong password') || msg.toLowerCase().includes('wrong_password')) {
-          msg = 'Wrong password.'
-        } else if (msg.includes('body stream already read')) {
-          msg = 'Invalid login credentials. Please check your email/phone and password.'
-        } else if (!msg) {
-          msg = 'Invalid login credentials. Please check your email/phone and password.'
-        }
-        if (/confirm/i.test(msg)) {
-          setError(msg)
-          // do not throw; allow user to resend confirmation
-          return
-        }
-
-        if (identifier === 'guest') {
-          try {
-            // Try to create the guest user via serverless Edge Function (preferred)
-            const PROJECT_URL = import.meta.env.VITE_PROJECT_URL || import.meta.env.PROJECT_URL || window?.PROJECT_URL
-            try {
-              if (PROJECT_URL) {
-                const controller = new AbortController()
-                const timeout = setTimeout(() => controller.abort(), 5000)
-                try {
-                  const fnRes = await fetch(`${PROJECT_URL}/functions/v1/create-guest`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email, password: effectivePassword, full_name: 'Guest' }),
-                    signal: controller.signal
-                  })
-                  clearTimeout(timeout)
-                  if (!fnRes.ok) {
-                    const txt = await fnRes.text().catch(()=>'')
-                    console.warn('create-guest function failed', fnRes.status, txt)
-                    throw new Error('create-guest failed')
-                  }
-                  // After creation, sign in
-                  const retry = await supabase.auth.signInWithPassword({ email, password: effectivePassword })
-                  if (retry.error) throw retry.error
-                  data = retry.data
-                } finally {
-                  clearTimeout(timeout)
-                }
-              } else {
-                throw new Error('Project URL not configured')
-              }
-            } catch (err) {
-              console.warn('create-guest function error', err)
-              // fallback to admin direct (if service role key is present on client)
-              const ADMIN_KEY = import.meta.env.VITE_SUPABASE_SERVICE_ROLE_KEY || import.meta.env.SUPABASE_SERVICE_ROLE_KEY || window?.SUPABASE_SERVICE_ROLE_KEY
-              if (ADMIN_KEY && PROJECT_URL) {
-                const controller = new AbortController()
-                const timeout = setTimeout(() => controller.abort(), 5000)
-                try {
-                  const res = await fetch(`${PROJECT_URL}/auth/v1/admin/users`, {
-                    method: 'POST',
-                    headers: {
-                      'Content-Type': 'application/json',
-                      apikey: ADMIN_KEY,
-                      Authorization: `Bearer ${ADMIN_KEY}`,
-                    },
-                    body: JSON.stringify({ email, password: effectivePassword, email_confirm: true, user_metadata: { full_name: 'Guest' } }),
-                    signal: controller.signal
-                  })
-                  clearTimeout(timeout)
-                  if (res.ok) {
-                    const retry = await supabase.auth.signInWithPassword({ email, password: effectivePassword })
-                    if (retry.error) throw retry.error
-                    data = retry.data
-                  } else {
-                    const txt = await (res.text().catch(()=>''))
-                    console.warn('Admin create user failed', res.status, txt)
-                    throw new Error('Admin create user failed')
-                  }
-                } finally {
-                  clearTimeout(timeout)
-                }
-              } else {
-                throw err
-              }
-            }
-          } catch (err) {
-            console.warn('Guest backend create failed', err)
-            // Final fallback: create local guest session with persistence
-            const localUser = { id: 'guest-local-' + Date.now(), email: 'guest@currency.ph', user_metadata: { full_name: 'Guest' } }
-            // Persist to localStorage so session survives refresh
-            try {
-              localStorage.setItem('currency_ph_guest_session', JSON.stringify({
-                user: localUser,
-                timestamp: Date.now()
-              }))
-            } catch (e) {
-              console.warn('Could not persist guest session to localStorage', e)
-            }
-            setSuccess('Guest session created (offline mode)')
-            setTimeout(() => onAuthSuccess(localUser), 500)
-            return
-          }
-        } else {
-          throw new Error(msg)
-        }
+      if (!result.session || !result.user) {
+        throw new Error('Login failed - no session returned')
       }
 
       setSuccess('Login successful! Redirecting...')
       setTimeout(() => {
-        onAuthSuccess(data.user)
+        onAuthSuccess(result.user)
       }, 1000)
     } catch (err) {
       let errorMsg = err.message || 'Login failed'
-      // Ensure any remaining technical errors are converted to user-friendly messages
-      if (errorMsg.includes('body stream already read')) {
-        errorMsg = 'Invalid login credentials. Please check your email/phone and password.'
-      } else if (errorMsg.includes('Failed to fetch')) {
-        errorMsg = 'Cannot connect to authentication service. Please check your internet connection and try again.'
-      }
       setError(errorMsg)
     } finally {
       setLoading(false)
