@@ -591,11 +591,7 @@ export default function App() {
           )}
 
           {/* Planning page is a standalone fullscreen interface */}
-          {activeTab === 'planning' && (
-            <Suspense fallback={<PageLoader />}>
-              <PlanningChat />
-            </Suspense>
-          )}
+          {activeTab === 'planning' && <PlanningChat />}
 
           {/* Commitment Manager - Partnership network interface */}
           {activeTab === 'commitments' && (
