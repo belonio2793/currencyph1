@@ -534,14 +534,25 @@ export default function ChipTransactionModal({ open, onClose, userId, onPurchase
                           <div className="text-xs text-slate-600 mt-1">CHIPS</div>
                         </div>
 
-                        {/* Price */}
-                        {usdPrice > 0 && (
-                          <div className="text-center">
-                            <div className="text-lg font-semibold text-emerald-600">
-                              ${usdPrice.toFixed(2)}
-                            </div>
-                          </div>
-                        )}
+                        {/* Price Display - PHP Primary with USD */}
+                        <div className="space-y-2">
+                          {usdPrice > 0 && (
+                            <>
+                              <div className="text-center">
+                                <p className="text-xs text-slate-500 uppercase tracking-wider mb-1">Price (PHP)</p>
+                                <div className="text-xl font-bold text-emerald-600">
+                                  {'\u20B1'}{formatNumber(Number(usdPrice * exchangeRate))}
+                                </div>
+                              </div>
+                              <div className="text-center">
+                                <p className="text-xs text-slate-500 uppercase tracking-wider mb-1">USD Price</p>
+                                <div className="text-sm text-slate-600">
+                                  ${formatNumber(usdPrice)}
+                                </div>
+                              </div>
+                            </>
+                          )}
+                        </div>
 
                         {/* Bonus Badge */}
                         {bonusChips > 0 && (
