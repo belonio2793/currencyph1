@@ -1779,6 +1779,7 @@ export default function PlanningChat() {
         </div>
 
         {/* Chat Section */}
+        {!isAuthenticated && (
         <div className={`rounded-lg border border-slate-700 bg-slate-800 flex flex-col overflow-hidden ${isMobile ? 'w-full max-h-72' : 'w-72'}`}>
           {/* Auth Required Notice */}
           {!isAuthenticated && (
@@ -2004,6 +2005,7 @@ export default function PlanningChat() {
             )}
           </div>
         </div>
+        )}
       </div>
 
       {/* Auth Modal - On-Demand */}
