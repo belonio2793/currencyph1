@@ -879,6 +879,9 @@ export default function App() {
                         <button onClick={() => { window.history.pushState(null, '', '/coconuts'); setActiveTab('planning'); }} className="text-slate-600 hover:text-slate-900 transition-colors font-medium">
                           Coconuts
                         </button>
+                        <button onClick={() => { window.history.pushState(null, '', '/commitments'); setActiveTab('commitments'); }} className="text-slate-600 hover:text-slate-900 transition-colors font-medium">
+                          Partnership Network
+                        </button>
                         <a href="#" className="text-slate-600 hover:text-slate-900 transition-colors font-medium">Privacy Policy</a>
                         <a href="#" className="text-slate-600 hover:text-slate-900 transition-colors font-medium">Terms of Service</a>
                         <a href="#" className="text-slate-600 hover:text-slate-900 transition-colors font-medium">Contact</a>
