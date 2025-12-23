@@ -53,7 +53,7 @@ export default function CommitmentMarketplace({ userId, isAuthenticated, onAuthS
     try {
       const { data, error } = await supabase
         .from('marketplace_listings')
-        .select('id, contact_name, contact_email, what_can_offer, what_need, notes, created_at, user_id')
+        .select('id, contact_name, contact_email, contact_phone, social_media, what_can_offer, what_need, notes, created_at, user_id')
         .eq('status', 'active')
         .order('created_at', { ascending: false })
 
