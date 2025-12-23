@@ -200,32 +200,97 @@ export default function CommitmentMarketplace({ userId, isAuthenticated, onAuthS
     setPasswordLoading(true)
 
     try {
+      // First, try to sign in case the user already exists
+      try {
+        const { data: existingSession, error: signInCheckError } = await supabase.auth.signInWithPassword({
+          email: newUserEmail,
+          password: password
+        })
+
+        if (!signInCheckError && existingSession?.user) {
+          // User already exists and login successful, skip signup
+          const userId = existingSession.user.id
+
+          // Close modal and proceed
+          setShowPasswordModal(false)
+
+          // Submit marketplace listing
+          await submitMarketplaceListing(
+            userId,
+            tempFormData.name,
+            tempFormData.email,
+            tempFormData.whatICanOffer,
+            tempFormData.whatINeed,
+            tempFormData.notes
+          )
+
+          // Reset form
+          setPassword('')
+          setConfirmPassword('')
+          setNewUserEmail('')
+          setTempFormData(null)
+
+          if (onAuthSuccess) {
+            onAuthSuccess(userId)
+          }
+          setPasswordLoading(false)
+          return
+        }
+      } catch (signInErr) {
+        // User doesn't exist, proceed with signup
+      }
+
       // Register user with Supabase Auth
       const { data, error: signUpError } = await supabase.auth.signUp({
         email: newUserEmail,
-        password: password
+        password: password,
+        options: {
+          emailRedirectTo: window.location.origin
+        }
       })
 
-      if (signUpError) throw signUpError
+      if (signUpError) {
+        // Better error messaging
+        if (signUpError.message?.includes('already registered')) {
+          setPasswordError('This email is already registered. Please sign in instead.')
+        } else if (signUpError.message?.includes('Database error')) {
+          setPasswordError('Account creation requires email verification. Please check your email shortly, or try again in a moment.')
+        } else {
+          setPasswordError(signUpError.message || 'Registration failed. Please try again.')
+        }
+        setPasswordLoading(false)
+        return
+      }
 
       if (!data.user) {
         throw new Error('User registration failed')
       }
 
-      // Auto sign in the user
-      const { error: signInError } = await supabase.auth.signInWithPassword({
-        email: newUserEmail,
-        password: password
-      })
+      const userId = data.user.id
 
-      if (signInError) throw signInError
+      // Try to auto sign in the newly created user
+      try {
+        const { error: signInError } = await supabase.auth.signInWithPassword({
+          email: newUserEmail,
+          password: password
+        })
+
+        if (signInError) {
+          // Sign in failed but user was created - show helpful message
+          setPasswordError('Account created! Please check your email to verify your account, then sign in.')
+          setPasswordLoading(false)
+          return
+        }
+      } catch (signInErr) {
+        // Fallback: still proceed if user was created
+      }
 
       // Close modal
       setShowPasswordModal(false)
 
       // Submit marketplace listing with new user ID
       await submitMarketplaceListing(
-        data.user.id,
+        userId,
         tempFormData.name,
         tempFormData.email,
         tempFormData.whatICanOffer,
@@ -241,11 +306,20 @@ export default function CommitmentMarketplace({ userId, isAuthenticated, onAuthS
 
       // Trigger parent callback if provided
       if (onAuthSuccess) {
-        onAuthSuccess(data.user.id)
+        onAuthSuccess(userId)
       }
     } catch (err) {
       console.error('Error during registration/sign in:', err)
-      setPasswordError(err.message || 'Something went wrong. Please try again.')
+      const errorMsg = err.message || 'Something went wrong. Please try again.'
+
+      // Provide user-friendly error messages
+      if (errorMsg.includes('Database error')) {
+        setPasswordError('Account setup is temporarily unavailable. Please try again in a moment.')
+      } else if (errorMsg.includes('already registered')) {
+        setPasswordError('This email is already registered. Please sign in instead.')
+      } else {
+        setPasswordError(errorMsg)
+      }
     } finally {
       setPasswordLoading(false)
     }
