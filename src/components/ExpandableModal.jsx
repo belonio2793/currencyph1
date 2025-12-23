@@ -108,14 +108,14 @@ export default function ExpandableModal({
     <>
       {/* Backdrop */}
       <div
-        className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 transition-opacity"
+        className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[9998] transition-opacity"
         onClick={onClose}
         aria-label="Close modal"
       />
 
       {/* Expanded Modal */}
       <div
-        className={`fixed z-50 bg-white rounded-lg overflow-hidden flex flex-col transition-all ${
+        className={`fixed z-[9999] bg-white rounded-lg overflow-hidden flex flex-col transition-all ${
           isMobile
             ? 'inset-0 rounded-t-2xl rounded-b-none'
             : `top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 ${sizeClasses}`
