@@ -1048,14 +1048,14 @@ export default function PlanningChat() {
   return (
     <div className={`bg-slate-900 flex flex-col ${isAuthenticated ? 'min-h-[600vh]' : 'min-h-screen'}`}>
       {/* Header */}
-      <div className={`bg-slate-800 border-b border-slate-700 ${isMobile ? 'px-4 py-2 mt-4' : 'px-12 py-8 mt-12'}`}>
+      <div className={`bg-slate-800 border-b border-slate-700 ${isMobile ? 'px-4 py-2 mt-4' : 'px-6 py-3 mt-6'}`}>
         <div className={`flex ${isMobile ? 'flex-col gap-3' : 'items-center justify-between mb-3'}`}>
           <div>
             <div className="flex items-center gap-3 mb-2">
-              <h1 className={`font-bold text-white ${isMobile ? 'text-lg' : 'text-6xl'}`}>🥥 Coconuts.com.ph</h1>
-              <span className="inline-block px-4 py-2 bg-amber-700 text-amber-100 text-lg font-semibold rounded">Partnership Network</span>
+              <h1 className={`font-bold text-white ${isMobile ? 'text-lg' : 'text-2xl'}`}>🥥 Coconuts.com.ph</h1>
+              <span className="inline-block px-2 py-1 bg-amber-700 text-amber-100 text-xs font-semibold rounded">Partnership Network</span>
             </div>
-            <p className={`text-slate-400 ${isMobile ? 'text-xs' : 'text-2xl'}`}>Transparent supply chain coordination & collaborative commerce with currency.ph integration</p>
+            <p className={`text-slate-400 ${isMobile ? 'text-xs' : 'text-sm'}`}>Transparent supply chain coordination & collaborative commerce with currency.ph integration</p>
           </div>
           {isAuthenticated && (
             <div className={`flex ${isMobile ? 'items-center justify-between w-full' : 'items-center gap-4'}`}>
@@ -1077,7 +1077,7 @@ export default function PlanningChat() {
         </div>
 
         {/* Public Locations & Ports Dropdown with Collapse on Mobile */}
-        <div className={`${isMobile ? 'flex flex-col gap-2' : 'flex items-center gap-6 flex-wrap'} bg-slate-700 px-8 py-6 rounded-lg`}>
+        <div className={`${isMobile ? 'flex flex-col gap-2' : 'flex items-center gap-3 flex-wrap'} bg-slate-700 px-4 py-3 rounded-lg`}>
           {isMobile && (
             <button
               onClick={() => setShowFilterSelects(!showFilterSelects)}
@@ -1092,12 +1092,12 @@ export default function PlanningChat() {
             <>
               {locations.length > 0 && (
                 <div className={`flex ${isMobile ? 'flex-col gap-1 w-full' : 'items-center gap-2'}`}>
-                  <label htmlFor="public-locations-select" className={`text-slate-300 font-medium opacity-50 ${isMobile ? 'text-xs' : 'text-2xl'}`}>Locations:</label>
+                  <label htmlFor="public-locations-select" className={`text-slate-300 font-medium opacity-50 ${isMobile ? 'text-xs' : 'text-sm'}`}>Locations:</label>
                   <select
                     id="public-locations-select"
                     value={selectedLocationId}
                     onChange={handleLocationSelect}
-                    className={`rounded bg-slate-700 text-white border border-slate-600 hover:border-slate-500 transition-colors cursor-pointer focus:outline-none focus:border-blue-400 ${isMobile ? 'w-full px-2 py-1.5 text-xs' : 'px-6 py-3 text-xl'}`}
+                    className={`rounded bg-slate-700 text-white border border-slate-600 hover:border-slate-500 transition-colors cursor-pointer focus:outline-none focus:border-blue-400 ${isMobile ? 'w-full px-2 py-1.5 text-xs' : 'px-3 py-1 text-sm'}`}
                   >
                     <option value="">View location...</option>
                     {locations.map(loc => (
@@ -1111,12 +1111,12 @@ export default function PlanningChat() {
 
               {shippingPorts.length > 0 && (
                 <div className={`flex ${isMobile ? 'flex-col gap-1 w-full' : 'items-center gap-2'}`}>
-                  <label htmlFor="shipping-ports-select" className={`text-slate-300 font-medium opacity-50 ${isMobile ? 'text-xs' : 'text-2xl'}`}>Ports:</label>
+                  <label htmlFor="shipping-ports-select" className={`text-slate-300 font-medium opacity-50 ${isMobile ? 'text-xs' : 'text-sm'}`}>Ports:</label>
                   <select
                     id="shipping-ports-select"
                     value={selectedPortId}
                     onChange={handlePortSelect}
-                    className={`rounded bg-slate-700 text-white border border-slate-600 hover:border-slate-500 transition-colors cursor-pointer focus:outline-none focus:border-blue-400 ${isMobile ? 'w-full px-2 py-1.5 text-xs' : 'px-6 py-3 text-xl'}`}
+                    className={`rounded bg-slate-700 text-white border border-slate-600 hover:border-slate-500 transition-colors cursor-pointer focus:outline-none focus:border-blue-400 ${isMobile ? 'w-full px-2 py-1.5 text-xs' : 'px-3 py-1 text-sm'}`}
                   >
                     <option value="">View port...</option>
                     {shippingPorts.map(port => (
@@ -1129,12 +1129,12 @@ export default function PlanningChat() {
               )}
 
               <div className={`flex ${isMobile ? 'flex-col gap-1 w-full' : 'items-center gap-2'}`}>
-                <label htmlFor="cities-select" className={`text-slate-300 font-medium opacity-50 ${isMobile ? 'text-xs' : 'text-2xl'}`}>Cities:</label>
+                <label htmlFor="cities-select" className={`text-slate-300 font-medium opacity-50 ${isMobile ? 'text-xs' : 'text-sm'}`}>Cities:</label>
                 <select
                   id="cities-select"
                   value={selectedCity}
                   onChange={handleCitySelect}
-                  className={`rounded bg-slate-700 text-white border border-slate-600 hover:border-slate-500 transition-colors cursor-pointer focus:outline-none focus:border-blue-400 ${isMobile ? 'w-full px-2 py-1.5 text-xs' : 'px-6 py-3 text-xl'}`}
+                  className={`rounded bg-slate-700 text-white border border-slate-600 hover:border-slate-500 transition-colors cursor-pointer focus:outline-none focus:border-blue-400 ${isMobile ? 'w-full px-2 py-1.5 text-xs' : 'px-3 py-1 text-sm'}`}
                 >
                   <option value="">Select a city...</option>
                   {PHILIPPINE_CITIES.map((city, idx) => (
@@ -1149,7 +1149,7 @@ export default function PlanningChat() {
         </div>
       </div>
 
-      <div className={`flex-1 flex ${isMobile ? 'flex-col gap-3' : 'gap-8'} ${isMobile ? 'p-3' : 'p-12'} overflow-hidden pb-20`}>
+      <div className={`flex-1 flex ${isMobile ? 'flex-col gap-3' : 'gap-4'} ${isMobile ? 'p-3' : 'p-6'} overflow-hidden pb-12`}>
         {/* Preview Mode Notice */}
         {!isAuthenticated && (
           <div className="bg-blue-900/50 border border-blue-600 rounded-lg p-4 flex items-center justify-between">
