@@ -36,7 +36,7 @@ export default function ChipPurchaseModal({ open, onClose, userId, onPurchaseCom
         .from('poker_chip_packages')
         .select('*')
         .order('display_order', { ascending: true })
-
+      
       if (error) throw error
       setPackages(data || [])
     } catch (err) {
@@ -74,7 +74,7 @@ export default function ChipPurchaseModal({ open, onClose, userId, onPurchaseCom
   async function loadWallets() {
     try {
       if (isGuestLocal) return
-
+      
       const allWallets = await walletService.getUserWalletsWithDetails(userId)
       if (allWallets && allWallets.length > 0) {
         setWallets(allWallets)
@@ -207,6 +207,13 @@ export default function ChipPurchaseModal({ open, onClose, userId, onPurchaseCom
     return null
   }
 
+  const formatAccountNumber = (num) => {
+    if (!num) return 'Not assigned'
+    const str = num.toString()
+    if (str.length <= 8) return str
+    return `${str.substring(0, 4)}...${str.substring(str.length - 4)}`
+  }
+
   const footer = (
     <button
       onClick={onClose}
@@ -216,13 +223,6 @@ export default function ChipPurchaseModal({ open, onClose, userId, onPurchaseCom
       Close
     </button>
   )
-
-  const formatAccountNumber = (num) => {
-    if (!num) return 'Not assigned'
-    const str = num.toString()
-    if (str.length <= 8) return str
-    return `${str.substring(0, 4)}...${str.substring(str.length - 4)}`
-  }
 
   return (
     <ExpandableModal
@@ -253,71 +253,127 @@ export default function ChipPurchaseModal({ open, onClose, userId, onPurchaseCom
           <p className="text-slate-600">No chip packages available at the moment</p>
         </div>
       ) : (
-        <div className={`grid ${isMobile ? 'grid-cols-1' : 'grid-cols-2 lg:grid-cols-3'} gap-4`}>
-          {packages.map((pkg) => {
-            if (!pkg || !pkg.id) return null
-
-            const chipAmount = Number(pkg.chip_amount) || 0
-            const bonusChips = Number(pkg.bonus_chips) || 0
-            const totalChips = chipAmount + bonusChips
-            const label = getPackageLabel(pkg)
-            const labelColor = getPackageLabelColor(pkg)
-            const isFlashSale = pkg.is_flash_sale === true
-
-            return (
-              <div
-                key={pkg.id}
-                className={`relative rounded-lg overflow-hidden border-2 transition transform hover:scale-105 ${
-                  isFlashSale 
-                    ? 'border-red-500 bg-red-50' 
-                    : 'border-slate-200 bg-slate-50 hover:border-blue-400'
-                }`}
+        <div className="space-y-6">
+          {/* Wallet Selection */}
+          {!isGuestLocal && wallets.length > 0 && (
+            <div className="bg-gradient-to-br from-slate-50 to-slate-100 p-6 rounded-lg border border-slate-200">
+              <label className="block text-sm font-semibold text-slate-700 mb-3 uppercase tracking-wide">
+                Select Payment Wallet
+              </label>
+              <select
+                value={selectedWallet?.id || ''}
+                onChange={(e) => {
+                  const selected = wallets.find(w => w.id === e.target.value)
+                  setSelectedWallet(selected)
+                }}
+                className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
               >
-                {/* Label Badge */}
-                {label && labelColor && (
-                  <div className={`${labelColor} text-white text-center py-1 text-xs font-bold tracking-wider`}>
-                    {label}
+                <option value="">Choose a wallet...</option>
+                {wallets.map(wallet => (
+                  <option key={wallet.id} value={wallet.id}>
+                    {wallet.currency_code} - Balance: {formatNumber(Number(wallet.balance || 0))} (ID: {wallet.id.substring(0, 8)}...)
+                  </option>
+                ))}
+              </select>
+              
+              {selectedWallet && (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                  <div className="bg-white p-4 rounded-lg border border-slate-200">
+                    <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Wallet ID</p>
+                    <p className="font-mono text-sm text-slate-900 break-all">{selectedWallet.id}</p>
                   </div>
-                )}
-
-                {/* Card Content */}
-                <div className="p-4 space-y-3">
-                  {/* Chip Amount */}
-                  <div className="text-center">
-                    <div className="text-2xl font-bold text-slate-900">
-                      {totalChips.toLocaleString()}
-                    </div>
-                    <div className="text-xs text-slate-600 mt-1">CHIPS</div>
+                  <div className="bg-white p-4 rounded-lg border border-slate-200">
+                    <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Account Number</p>
+                    <p className="font-mono text-sm text-slate-900">{formatAccountNumber(selectedWallet.account_number)}</p>
                   </div>
+                </div>
+              )}
+            </div>
+          )}
 
-                  {/* Bonus Badge */}
-                  {bonusChips > 0 && (
-                    <div className="px-2 py-1 bg-amber-100 border border-amber-300 rounded text-center">
-                      <div className="text-xs text-amber-900 font-semibold">
-                        ✨ +{bonusChips.toLocaleString()} BONUS
-                      </div>
+          {/* Chip Packages Grid */}
+          <div className={`grid ${isMobile ? 'grid-cols-1' : 'grid-cols-2 lg:grid-cols-3'} gap-4`}>
+            {packages.map((pkg) => {
+              if (!pkg || !pkg.id) return null
+
+              const chipAmount = Number(pkg.chip_amount) || 0
+              const bonusChips = Number(pkg.bonus_chips) || 0
+              const totalChips = chipAmount + bonusChips
+              const label = getPackageLabel(pkg)
+              const labelColor = getPackageLabelColor(pkg)
+              const isFlashSale = pkg.is_flash_sale === true
+
+              return (
+                <div
+                  key={pkg.id}
+                  className={`relative rounded-lg overflow-hidden border-2 transition transform hover:scale-105 ${
+                    isFlashSale 
+                      ? 'border-red-500 bg-red-50' 
+                      : 'border-slate-200 bg-slate-50 hover:border-blue-400'
+                  }`}
+                >
+                  {/* Label Badge */}
+                  {label && labelColor && (
+                    <div className={`${labelColor} text-white text-center py-1 text-xs font-bold tracking-wider`}>
+                      {label}
                     </div>
                   )}
 
-                  {/* Buy Button */}
-                  <button
-                    onClick={() => handlePurchase(pkg.id)}
-                    disabled={processing}
-                    className="w-full py-2 font-semibold rounded-lg transition active:scale-95 bg-emerald-600 hover:bg-emerald-700 text-white disabled:opacity-50 disabled:cursor-not-allowed text-sm"
-                  >
-                    {processing ? (
-                      <span className="flex items-center justify-center gap-1">
-                        <span className="inline-block w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
-                        Processing
-                      </span>
-                    ) : (
-                      '🛒 BUY NOW'
+                  {/* Card Content */}
+                  <div className="p-4 space-y-3">
+                    {/* Chip Amount */}
+                    <div className="text-center">
+                      <div className="text-2xl font-bold text-slate-900">
+                        {totalChips.toLocaleString()}
+                      </div>
+                      <div className="text-xs text-slate-600 mt-1">CHIPS</div>
+                    </div>
+
+                    {/* Price Display - PHP Primary with USD */}
+                    <div className="space-y-2">
+                      <div className="text-center">
+                        <p className="text-xs text-slate-500 uppercase tracking-wider mb-1">Price (PHP)</p>
+                        <div className="text-xl font-bold text-emerald-600">
+                          {formatNumber(Number(pkg.php_price || (pkg.usd_price * (exchangeRate || 1))))}
+                        </div>
+                      </div>
+                      <div className="text-center">
+                        <p className="text-xs text-slate-500 uppercase tracking-wider mb-1">USD Price</p>
+                        <div className="text-sm text-slate-600">
+                          ${formatNumber(Number(pkg.usd_price || 0))}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Bonus Badge */}
+                    {bonusChips > 0 && (
+                      <div className="px-2 py-1 bg-amber-100 border border-amber-300 rounded text-center">
+                        <div className="text-xs text-amber-900 font-semibold">
+                          +{bonusChips.toLocaleString()} BONUS
+                        </div>
+                      </div>
                     )}
-                  </button>
+
+                    {/* Buy Button */}
+                    <button
+                      onClick={() => handlePurchase(pkg.id)}
+                      disabled={processing}
+                      className="w-full py-2 font-semibold rounded-lg transition active:scale-95 bg-emerald-600 hover:bg-emerald-700 text-white disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+                    >
+                      {processing ? (
+                        <span className="flex items-center justify-center gap-1">
+                          <span className="inline-block w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+                          Processing
+                        </span>
+                      ) : (
+                        'BUY NOW'
+                      )}
+                    </button>
+                  </div>
                 </div>
-              </div>
-            )
-          })}
+              )
+            })}
+          </div>
         </div>
       )}
     </ExpandableModal>
