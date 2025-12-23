@@ -160,20 +160,26 @@ export default function Rates() {
         }
       })
 
-      // Find rates against PHP (base currency) from pairs table
-      pairsData?.forEach(pair => {
+      // Find rates against PHP (base currency) from merged pairs table
+      mergedPairs.forEach(pair => {
         if (pair.updated_at) {
           timestamps.push(new Date(pair.updated_at))
         }
 
         if (pair.rate && isFinite(Number(pair.rate)) && Number(pair.rate) > 0) {
           if (pair.from_currency === 'PHP' && pair.to_currency && ratesByCode[pair.to_currency]) {
-            if (!ratesByCode[pair.to_currency].rate) {
+            // Update rate if we have a newer timestamp or if rate doesn't exist
+            const existingTime = new Date(ratesByCode[pair.to_currency].updatedAt || 0)
+            const pairTime = new Date(pair.updated_at || 0)
+            if (!ratesByCode[pair.to_currency].rate || pairTime > existingTime) {
               ratesByCode[pair.to_currency].rate = Number(pair.rate)
               ratesByCode[pair.to_currency].updatedAt = pair.updated_at || new Date().toISOString()
             }
           } else if (pair.to_currency === 'PHP' && pair.from_currency && ratesByCode[pair.from_currency]) {
-            if (!ratesByCode[pair.from_currency].rate) {
+            // Update rate if we have a newer timestamp or if rate doesn't exist
+            const existingTime = new Date(ratesByCode[pair.from_currency].updatedAt || 0)
+            const pairTime = new Date(pair.updated_at || 0)
+            if (!ratesByCode[pair.from_currency].rate || pairTime > existingTime) {
               const invertedRate = 1 / Number(pair.rate)
               if (isFinite(invertedRate) && invertedRate > 0) {
                 ratesByCode[pair.from_currency].rate = invertedRate
