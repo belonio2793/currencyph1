@@ -121,6 +121,7 @@ export default function CommitmentMarketplace({ userId, isAuthenticated, onAuthS
       setNewUserEmail(signupEmail)
       setTempFormData({
         name,
+        username,
         email,
         phone,
         whatICanOffer,
