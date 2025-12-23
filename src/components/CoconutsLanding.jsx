@@ -812,7 +812,7 @@ export default function CoconutsLanding() {
             <div className="space-y-8">
               <div className="bg-white rounded-xl p-10 border border-gray-200">
                 <h3 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-3">
-                  <Shield className="w-8 h-8 text-blue-600" />
+                  <span className="text-3xl">⚖️</span>
                   Governance Structure
                 </h3>
                 <div className="space-y-4">
