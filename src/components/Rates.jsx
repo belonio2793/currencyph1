@@ -179,17 +179,26 @@ export default function Rates() {
       setRates(validRates)
       setLastUpdated(mostRecentTimestamp)
       console.log(`✅ Final rates list: ${validRates.length} items (${ratesWithValues.length} with rates)`)
+      setError(null)
     } catch (err) {
       const errorMsg = err?.message || String(err) || 'Unknown error'
       console.error('❌ Error loading rates:', errorMsg)
+      console.error('Full error object:', err)
+
+      let userFriendlyError = 'Failed to load exchange rates'
 
       if (err.message?.includes('Failed to fetch')) {
-        setError(`Network error - could not connect to database.`)
+        userFriendlyError = 'Network error - could not connect to database.'
       } else if (err.message?.includes('CORS')) {
-        setError(`CORS error - check Supabase configuration`)
-      } else {
-        setError(`Failed to load exchange rates: ${errorMsg}`)
+        userFriendlyError = 'CORS error - check Supabase configuration'
+      } else if (err.code === 'PGRST205' || err.message?.includes('Could not find')) {
+        userFriendlyError = 'Exchange rates table not found in database.'
+      } else if (errorMsg) {
+        userFriendlyError = `Failed to load exchange rates: ${errorMsg}`
       }
+
+      setError(userFriendlyError)
+      setRates([])
     } finally {
       setLoading(false)
     }
