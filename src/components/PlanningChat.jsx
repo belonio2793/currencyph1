@@ -1968,10 +1968,19 @@ export default function PlanningChat() {
         </div>
       </div>
 
-      {/* Auth Overlay */}
-      {showAuthModal && (
+      {/* Auth Modal - On-Demand */}
+      {showAuthModalOnDemand && (
         <div className="fixed inset-0 z-[9999] bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
-          <Auth onAuthSuccess={handleAuthSuccess} isModal={true} />
+          <div className="relative w-full max-w-md">
+            <button
+              onClick={() => setShowAuthModalOnDemand(false)}
+              className="absolute -top-10 -right-10 text-slate-300 hover:text-white text-2xl font-bold transition-colors z-10"
+              aria-label="Close modal"
+            >
+              ✕
+            </button>
+            <Auth onAuthSuccess={handleAuthSuccess} isModal={true} />
+          </div>
         </div>
       )}
 
