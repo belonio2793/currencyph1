@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabaseClient'
 import { useDevice } from '../context/DeviceContext'
 
-export default function CommitmentMarketplace({ userId, isAuthenticated }) {
+export default function CommitmentMarketplace({ userId, isAuthenticated, onAuthSuccess }) {
   const { isMobile } = useDevice()
   const [loading, setLoading] = useState(false)
   const [success, setSuccess] = useState('')
@@ -14,6 +14,15 @@ export default function CommitmentMarketplace({ userId, isAuthenticated }) {
   const [whatICanOffer, setWhatICanOffer] = useState('')
   const [whatINeed, setWhatINeed] = useState('')
   const [notes, setNotes] = useState('')
+
+  // Password modal state
+  const [showPasswordModal, setShowPasswordModal] = useState(false)
+  const [password, setPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
+  const [passwordError, setPasswordError] = useState('')
+  const [passwordLoading, setPasswordLoading] = useState(false)
+  const [newUserEmail, setNewUserEmail] = useState('')
+  const [tempFormData, setTempFormData] = useState(null)
 
   // Load user data if authenticated
   useEffect(() => {
