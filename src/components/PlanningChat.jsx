@@ -1149,6 +1149,24 @@ export default function PlanningChat() {
       </div>
 
       <div className={`flex-1 flex ${isMobile ? 'flex-col gap-3' : 'gap-6'} ${isMobile ? 'p-3' : 'p-6'} overflow-hidden`}>
+        {/* Preview Mode Notice */}
+        {!isAuthenticated && (
+          <div className="bg-blue-900/50 border border-blue-600 rounded-lg p-4 flex items-center justify-between">
+            <div>
+              <p className="text-blue-100 font-semibold flex items-center gap-2 mb-1">
+                <span>🔍 Preview Mode</span>
+              </p>
+              <p className="text-blue-100 text-sm">You can view the map, ports, and products. <strong>Sign in to add locations, send messages, and manage your supply chain.</strong></p>
+            </div>
+            <button
+              onClick={() => setShowAuthModalOnDemand(true)}
+              className="ml-4 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors whitespace-nowrap flex-shrink-0"
+            >
+              Sign In Now
+            </button>
+          </div>
+        )}
+
         {/* Map Section */}
         <div className={`rounded-lg overflow-hidden border border-slate-700 bg-slate-800 flex flex-col ${isMobile ? 'flex-1 min-h-[calc(100vh-400px)]' : 'flex-1'}`} style={showLocationForm ? { pointerEvents: 'none' } : {}}>
           {/* Map Controls */}
