@@ -483,26 +483,9 @@ export default function PartnershipNetworkSection({ isAuthenticated, userId }) {
         )}
       </div>
 
-      {/* CTA Footer */}
-      {isAuthenticated && !userProfile && (
-        <div className="bg-gradient-to-r from-blue-700/30 to-purple-700/30 border-t border-blue-600/50 px-6 py-4 text-center">
-          <p className="text-slate-300 text-sm mb-2">Ready to grow with us?</p>
-          <button
-            onClick={() => setShowCommitmentForm(true)}
-            className="px-6 py-2 bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-600 hover:to-cyan-600 text-white font-bold rounded-lg transition-all transform hover:scale-105 shadow-lg shadow-emerald-600/40"
-          >
-            Create Your Profile & Contribute
-          </button>
-        </div>
-      )}
-
-      {/* Commitment Form Modal */}
-      <CommitmentForm
-        isOpen={showCommitmentForm}
-        onClose={() => setShowCommitmentForm(false)}
-        onCommitmentSaved={handleCommitmentSaved}
+      {/* Marketplace Form - Embedded Section */}
+      <CommitmentMarketplace
         userId={userId}
-        profileId={userProfile?.id}
         isAuthenticated={isAuthenticated}
       />
     </div>
