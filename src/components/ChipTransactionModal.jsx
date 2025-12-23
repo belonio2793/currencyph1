@@ -432,79 +432,62 @@ export default function ChipTransactionModal({ open, onClose, userId, onPurchase
               <label className="block text-sm font-semibold text-slate-700 mb-4 uppercase tracking-wide">
                 Select Payment Wallet
               </label>
-              <div className="space-y-3">
+              <select
+                value={selectedWalletId || ''}
+                onChange={(e) => setSelectedWalletId(e.target.value)}
+                className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-slate-900 font-medium"
+              >
+                <option value="">Choose a wallet...</option>
                 {fiatWallets.length > 0 && (
-                  <div>
-                    <p className="text-xs font-semibold text-slate-700 mb-2 uppercase tracking-wider">Fiat Wallets</p>
-                    <div className="space-y-2">
-                      {fiatWallets.map(wallet => (
-                        <button
-                          key={wallet.id}
-                          onClick={() => setSelectedWalletId(wallet.id)}
-                          className={`w-full p-4 rounded-lg text-left transition-all border-2 ${
-                            selectedWalletId === wallet.id
-                              ? 'border-blue-500 bg-blue-50'
-                              : 'border-slate-200 bg-white hover:border-blue-300 hover:bg-slate-50'
-                          }`}
-                        >
-                          <div className="flex items-center justify-between mb-2">
-                            <span className="font-semibold text-slate-900">{wallet.currency_code}</span>
-                            <span className="text-sm text-slate-600">Balance: {formatNumber(Number(wallet.balance || 0))}</span>
-                          </div>
-                          {selectedWalletId === wallet.id && (
-                            <div className="mt-3 pt-3 border-t border-blue-200 space-y-2 text-xs">
-                              <div className="flex justify-between">
-                                <span className="text-slate-600">Wallet ID:</span>
-                                <span className="font-mono text-slate-900">{wallet.id.substring(0, 8)}...{wallet.id.substring(wallet.id.length - 4)}</span>
-                              </div>
-                              <div className="flex justify-between">
-                                <span className="text-slate-600">Account:</span>
-                                <span className="font-mono text-slate-900">{formatAccountNumber(wallet.account_number)}</span>
-                              </div>
-                            </div>
-                          )}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
+                  <optgroup label="Fiat Wallets">
+                    {fiatWallets.map(wallet => (
+                      <option key={wallet.id} value={wallet.id}>
+                        {wallet.currency_code} - Balance: {formatNumber(Number(wallet.balance || 0))}
+                      </option>
+                    ))}
+                  </optgroup>
                 )}
-
                 {cryptoWallets.length > 0 && (
-                  <div>
-                    <p className="text-xs font-semibold text-slate-700 mb-2 uppercase tracking-wider">Cryptocurrency</p>
-                    <div className="space-y-2">
-                      {cryptoWallets.map(wallet => (
-                        <button
-                          key={wallet.id}
-                          onClick={() => setSelectedWalletId(wallet.id)}
-                          className={`w-full p-4 rounded-lg text-left transition-all border-2 ${
-                            selectedWalletId === wallet.id
-                              ? 'border-orange-500 bg-orange-50'
-                              : 'border-slate-200 bg-white hover:border-orange-300 hover:bg-slate-50'
-                          }`}
-                        >
-                          <div className="flex items-center justify-between mb-2">
-                            <span className="font-semibold text-slate-900">{wallet.currency_code}</span>
-                            <span className="text-sm text-slate-600">Balance: {formatNumber(Number(wallet.balance || 0))}</span>
-                          </div>
-                          {selectedWalletId === wallet.id && (
-                            <div className="mt-3 pt-3 border-t border-orange-200 space-y-2 text-xs">
-                              <div className="flex justify-between">
-                                <span className="text-slate-600">Wallet ID:</span>
-                                <span className="font-mono text-slate-900">{wallet.id.substring(0, 8)}...{wallet.id.substring(wallet.id.length - 4)}</span>
-                              </div>
-                              <div className="flex justify-between">
-                                <span className="text-slate-600">Account:</span>
-                                <span className="font-mono text-slate-900">{formatAccountNumber(wallet.account_number)}</span>
-                              </div>
-                            </div>
-                          )}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
+                  <optgroup label="Cryptocurrency">
+                    {cryptoWallets.map(wallet => (
+                      <option key={wallet.id} value={wallet.id}>
+                        {wallet.currency_code} - Balance: {formatNumber(Number(wallet.balance || 0))}
+                      </option>
+                    ))}
+                  </optgroup>
                 )}
-              </div>
+              </select>
+
+              {selectedWalletId && (
+                <div className="mt-4 space-y-3">
+                  {(() => {
+                    const selectedWallet = userWallets.find(w => w.id === selectedWalletId)
+                    if (!selectedWallet) return null
+
+                    const isCrypto = ['BTC', 'ETH', 'SOLANA', 'BNB', 'USDC', 'USDT', 'DOGECOIN', 'XRP', 'ADA', 'MATIC'].includes(selectedWallet.currency_code)
+                    const bgColor = isCrypto ? 'bg-orange-50 border-orange-200' : 'bg-slate-50 border-slate-200'
+
+                    return (
+                      <>
+                        <div className={`${bgColor} rounded-lg p-4 border`}>
+                          <p className="text-xs text-slate-600 font-semibold mb-2 uppercase tracking-wider">Current Balance</p>
+                          <p className="text-xl font-light text-slate-900 font-mono">
+                            {formatNumber(Number(selectedWallet.balance || 0))} {selectedWallet.currency_code}
+                          </p>
+                        </div>
+                        <div className={`${bgColor} rounded-lg p-4 border`}>
+                          <p className="text-xs text-slate-600 font-medium mb-2 uppercase tracking-wider">Wallet ID</p>
+                          <p className="font-mono text-xs text-slate-900 break-all">{selectedWallet.id}</p>
+                        </div>
+                        <div className={`${bgColor} rounded-lg p-4 border`}>
+                          <p className="text-xs text-slate-600 font-medium mb-2 uppercase tracking-wider">Account Number</p>
+                          <p className="font-mono text-xs text-slate-900">{formatAccountNumber(selectedWallet.account_number)}</p>
+                        </div>
+                      </>
+                    )
+                  })()}
+                </div>
+              )}
             </div>
           )}
 
