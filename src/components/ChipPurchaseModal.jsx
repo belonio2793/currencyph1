@@ -256,8 +256,8 @@ export default function ChipPurchaseModal({ open, onClose, userId, onPurchaseCom
         <div className="space-y-6">
           {/* Wallet Selection */}
           {!isGuestLocal && wallets.length > 0 && (
-            <div className="bg-gradient-to-br from-slate-50 to-slate-100 p-6 rounded-lg border border-slate-200">
-              <label className="block text-sm font-semibold text-slate-700 mb-3 uppercase tracking-wide">
+            <div className="bg-white border border-slate-200 rounded-lg p-6 hover:shadow-lg transition-all">
+              <label className="block text-sm font-semibold text-slate-700 mb-4 uppercase tracking-wide">
                 Select Payment Wallet
               </label>
               <select
@@ -266,25 +266,31 @@ export default function ChipPurchaseModal({ open, onClose, userId, onPurchaseCom
                   const selected = wallets.find(w => w.id === e.target.value)
                   setSelectedWallet(selected)
                 }}
-                className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
+                className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-slate-900 font-medium"
               >
                 <option value="">Choose a wallet...</option>
                 {wallets.map(wallet => (
                   <option key={wallet.id} value={wallet.id}>
-                    {wallet.currency_code} - Balance: {formatNumber(Number(wallet.balance || 0))} (ID: {wallet.id.substring(0, 8)}...)
+                    {wallet.currency_code} - Balance: {formatNumber(Number(wallet.balance || 0))}
                   </option>
                 ))}
               </select>
-              
+
               {selectedWallet && (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-                  <div className="bg-white p-4 rounded-lg border border-slate-200">
-                    <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Wallet ID</p>
-                    <p className="font-mono text-sm text-slate-900 break-all">{selectedWallet.id}</p>
+                <div className="mt-4 space-y-3">
+                  <div className="bg-slate-50 rounded-lg p-4">
+                    <p className="text-xs text-slate-600 font-semibold mb-2 uppercase tracking-wider">Current Balance</p>
+                    <p className="text-xl font-light text-slate-900 font-mono">
+                      {formatNumber(Number(selectedWallet.balance || 0))} {selectedWallet.currency_code}
+                    </p>
                   </div>
-                  <div className="bg-white p-4 rounded-lg border border-slate-200">
-                    <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Account Number</p>
-                    <p className="font-mono text-sm text-slate-900">{formatAccountNumber(selectedWallet.account_number)}</p>
+                  <div className="bg-blue-50 rounded-lg p-4 border border-blue-200">
+                    <p className="text-xs text-blue-700 font-medium mb-2 uppercase tracking-wider">Wallet ID</p>
+                    <p className="font-mono text-xs text-slate-900 break-all">{selectedWallet.id}</p>
+                  </div>
+                  <div className="bg-blue-50 rounded-lg p-4 border border-blue-200">
+                    <p className="text-xs text-blue-700 font-medium mb-2 uppercase tracking-wider">Account Number</p>
+                    <p className="font-mono text-xs text-slate-900">{formatAccountNumber(selectedWallet.account_number)}</p>
                   </div>
                 </div>
               )}
