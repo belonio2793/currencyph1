@@ -134,6 +134,22 @@ export default function PartnershipHero({ userId, userEmail, isAuthenticated, on
       {/* Main Content */}
       <div className="flex-1 py-12 px-4 sm:px-6 lg:px-8 overflow-auto">
         <div className="max-w-6xl mx-auto space-y-12">
+          {/* Public Preview Banner */}
+          <div className="bg-gradient-to-r from-blue-900/50 to-indigo-900/50 border border-blue-600/50 rounded-lg p-6">
+            <div className="flex items-start gap-4">
+              <div className="text-3xl flex-shrink-0">👁️</div>
+              <div className="flex-1">
+                <h3 className="text-lg font-semibold text-blue-100 mb-2">Public Partnership Network</h3>
+                <p className="text-blue-100 text-sm mb-3">
+                  This partnership directory is completely public and open to everyone. You can browse all active partnerships, see what people are contributing, and view the real-time progress of our project.
+                </p>
+                <p className="text-blue-100 text-sm">
+                  <strong>Ready to join?</strong> Sign in above to add your partnership and start contributing to the coconut supply chain network. All contributions help us coordinate and make this project a reality!
+                </p>
+              </div>
+            </div>
+          </div>
+
         {/* Partnership Form Section */}
         <div className="max-w-2xl mx-auto">
           <PartnershipForm
