@@ -666,10 +666,23 @@ export const currencyAPI = {
   async getBeneficiaries(userId) {
     if (!userId) return []
     try {
-      // Fetch all beneficiary columns including new recipient_id reference
+      // Try to fetch with recipient_id first (after migration is applied)
+      try {
+        const { data, error } = await supabase
+          .from('beneficiaries')
+          .select('id,user_id,recipient_id,recipient_email,recipient_phone,recipient_name,bank_account,bank_name,country_code,relationship,is_favorite,created_at')
+          .eq('user_id', userId)
+          .order('created_at', { ascending: false })
+
+        if (!error && data) return data
+      } catch (err) {
+        console.debug('getBeneficiaries with recipient_id failed, trying fallback:', err.message)
+      }
+
+      // Fallback: Fetch without recipient_id if column doesn't exist
       const { data, error } = await supabase
         .from('beneficiaries')
-        .select('id,user_id,recipient_id,recipient_email,recipient_phone,recipient_name,bank_account,bank_name,country_code,relationship,is_favorite,created_at')
+        .select('id,user_id,recipient_email,recipient_phone,recipient_name,bank_account,bank_name,country_code,relationship,is_favorite,created_at')
         .eq('user_id', userId)
         .order('created_at', { ascending: false })
 
