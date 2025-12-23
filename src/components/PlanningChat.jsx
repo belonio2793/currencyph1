@@ -1048,17 +1048,33 @@ export default function PlanningChat() {
 
   return (
     <div className={`bg-slate-900 flex flex-col min-h-screen`}>
-      {/* Sticky Navigation */}
+      {/* Sticky Navigation with All Headlines */}
       <div className="sticky top-0 z-50 bg-slate-800 border-b border-slate-700 px-4 py-2">
-        <div className="flex items-center gap-2 overflow-x-auto">
-          <a href="#planning-map" className="px-3 py-1 text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-700 rounded transition-colors whitespace-nowrap">
+        <div className="flex items-center gap-1 overflow-x-auto scrollbar-hide">
+          <a href="#planning-map" className="px-2.5 py-1 text-xs font-medium text-slate-300 hover:text-white hover:bg-slate-700 rounded transition-colors whitespace-nowrap">
             🗺️ Map
           </a>
-          <a href="#planning-chat" className="px-3 py-1 text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-700 rounded transition-colors whitespace-nowrap">
+          <a href="#planning-chat" className="px-2.5 py-1 text-xs font-medium text-slate-300 hover:text-white hover:bg-slate-700 rounded transition-colors whitespace-nowrap">
             💬 Chat
           </a>
-          <a href="#coconuts-info" className="px-3 py-1 text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-700 rounded transition-colors whitespace-nowrap">
-            🌾 About
+          <div className="border-r border-slate-600 h-5 mx-0.5"></div>
+          <a href="#coconuts-vision" className="px-2.5 py-1 text-xs font-medium text-slate-300 hover:text-white hover:bg-slate-700 rounded transition-colors whitespace-nowrap">
+            🌾 Vision
+          </a>
+          <a href="#coconuts-products" className="px-2.5 py-1 text-xs font-medium text-slate-300 hover:text-white hover:bg-slate-700 rounded transition-colors whitespace-nowrap">
+            📦 Products
+          </a>
+          <a href="#coconuts-market" className="px-2.5 py-1 text-xs font-medium text-slate-300 hover:text-white hover:bg-slate-700 rounded transition-colors whitespace-nowrap">
+            📊 Market
+          </a>
+          <a href="#coconuts-ecosystem" className="px-2.5 py-1 text-xs font-medium text-slate-300 hover:text-white hover:bg-slate-700 rounded transition-colors whitespace-nowrap">
+            🤝 Ecosystem
+          </a>
+          <a href="#coconuts-impact" className="px-2.5 py-1 text-xs font-medium text-slate-300 hover:text-white hover:bg-slate-700 rounded transition-colors whitespace-nowrap">
+            ✨ Impact
+          </a>
+          <a href="#coconuts-cta" className="px-2.5 py-1 text-xs font-medium text-slate-300 hover:text-white hover:bg-slate-700 rounded transition-colors whitespace-nowrap">
+            🚀 Join
           </a>
         </div>
       </div>
