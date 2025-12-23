@@ -11,9 +11,21 @@ export default function CommitmentMarketplace({ userId, isAuthenticated, onAuthS
   // Simple form data
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
+  const [phone, setPhone] = useState('')
   const [whatICanOffer, setWhatICanOffer] = useState('')
   const [whatINeed, setWhatINeed] = useState('')
   const [notes, setNotes] = useState('')
+
+  // Social media profiles
+  const [socialMedia, setSocialMedia] = useState({
+    twitter: '',
+    linkedin: '',
+    instagram: '',
+    facebook: '',
+    telegram: '',
+    whatsapp: '',
+    viber: ''
+  })
 
   // Password modal state
   const [showPasswordModal, setShowPasswordModal] = useState(false)
