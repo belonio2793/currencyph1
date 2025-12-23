@@ -4141,6 +4141,245 @@ export default function PlanningChat() {
           </div>
         </section>
 
+        {/* Regional Market Strategy */}
+        <section className="py-24 px-4 sm:px-6 lg:px-8 bg-gray-50">
+          <div className="max-w-7xl mx-auto">
+            <div className="mb-16">
+              <div className="inline-block mb-4 px-4 py-2 bg-cyan-100 text-cyan-700 rounded-full text-sm font-semibold">
+                MARKET EXPANSION
+              </div>
+              <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+                Regional Market Entry Strategy (Year 1-3)
+              </h2>
+            </div>
+
+            <div className="grid md:grid-cols-3 gap-8">
+              {[
+                {
+                  region: '🌏 Southeast Asia',
+                  focus: 'Domestic & Regional Hub',
+                  markets: ['Philippines', 'Vietnam', 'Thailand', 'Indonesia', 'Malaysia'],
+                  timeline: 'Q1-Q3 2025',
+                  strategy: 'Direct distribution partnerships with major retailers (Lotus, BigC, SM). Domestic positioning as national brand.',
+                  target: '$12M Year 1, $35M by Year 3',
+                  challenges: 'Local competition, logistics complexity'
+                },
+                {
+                  region: '🌎 North America',
+                  focus: 'Health & Wellness Premium Market',
+                  markets: ['USA', 'Canada'],
+                  timeline: 'Q2-Q4 2025',
+                  strategy: 'Distribution through Whole Foods, Natural Grocers, Amazon Fresh. Social media marketing targeting health influencers.',
+                  target: '$8M Year 1, $28M by Year 3',
+                  challenges: 'FDA regulatory complexity, shipping costs, brand awareness'
+                },
+                {
+                  region: '🌍 Europe',
+                  focus: 'Sustainability & Fair Trade',
+                  markets: ['Germany', 'UK', 'France', 'Netherlands', 'Scandinavia'],
+                  timeline: 'Q3-Q4 2025',
+                  strategy: 'Position on sustainability & transparency. Partner with organic retailers, e-commerce platforms (Ocado, Naturalia). Certifications (Fair Trade, Organic EU).',
+                  target: '$4M Year 1, $20M by Year 3',
+                  challenges: 'EU regulations, premium pricing acceptance, sustainability claims verification'
+                },
+                {
+                  region: '🌐 Middle East & Africa',
+                  focus: 'Premium Positioning',
+                  markets: ['UAE', 'Saudi Arabia', 'Egypt', 'South Africa'],
+                  timeline: 'Q4 2025 - Q2 2026',
+                  strategy: 'Luxury retail partnerships. Emphasis on health benefits & exotic positioning. Halal certification.',
+                  target: '$2M Year 1, $15M by Year 3',
+                  challenges: 'Import logistics, distribution infrastructure, regulatory compliance'
+                },
+                {
+                  region: '🎯 Australia & Oceania',
+                  focus: 'Health & Beach Lifestyle',
+                  markets: ['Australia', 'New Zealand'],
+                  timeline: 'Q1-Q2 2026',
+                  strategy: 'Partner with health food retailers & sports nutrition channels. Emphasize natural hydration & performance benefits.',
+                  target: '$1.5M Year 1, $10M by Year 3',
+                  challenges: 'Shipping costs, local competition, market education'
+                },
+                {
+                  region: '📱 E-Commerce Global',
+                  focus: 'Direct-to-Consumer Channel',
+                  markets: 'All regions simultaneously',
+                  timeline: 'Ongoing (Q1 2025 launch)',
+                  strategy: 'Amazon Global, Alibaba, Shopify store. Content marketing on sustainability story. Influencer partnerships (nutrition, sustainability).',
+                  target: '$1M Year 1, $12M by Year 3',
+                  challenges: 'Logistics costs, product damage during shipping, competitive pricing'
+                }
+              ].map((item, i) => (
+                <div key={i} className="bg-white rounded-xl p-8 border border-gray-200 hover:shadow-lg transition-shadow">
+                  <h3 className="text-2xl font-bold text-gray-900 mb-2">{item.region}</h3>
+                  <p className="text-amber-600 font-bold mb-4">{item.focus}</p>
+
+                  <div className="space-y-4 text-sm">
+                    <div>
+                      <p className="font-semibold text-gray-900">Markets:</p>
+                      <p className="text-gray-700">{item.markets.join(', ')}</p>
+                    </div>
+                    <div>
+                      <p className="font-semibold text-gray-900">Timeline:</p>
+                      <p className="text-gray-700">{item.timeline}</p>
+                    </div>
+                    <div>
+                      <p className="font-semibold text-gray-900">Strategy:</p>
+                      <p className="text-gray-700">{item.strategy}</p>
+                    </div>
+                    <div className="p-3 bg-blue-50 rounded border border-blue-200">
+                      <p className="font-semibold text-gray-900">Target Revenue:</p>
+                      <p className="text-blue-700 font-bold">{item.target}</p>
+                    </div>
+                    <div>
+                      <p className="font-semibold text-gray-900 text-xs">Key Challenges:</p>
+                      <p className="text-gray-700 text-xs">{item.challenges}</p>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Investment Terms & Legal Structure */}
+        <section className="py-24 px-4 sm:px-6 lg:px-8 bg-white">
+          <div className="max-w-7xl mx-auto">
+            <div className="mb-16">
+              <div className="inline-block mb-4 px-4 py-2 bg-gray-700 text-white rounded-full text-sm font-semibold">
+                INVESTMENT STRUCTURE
+              </div>
+              <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+                Investment Terms & Legal Framework
+              </h2>
+            </div>
+
+            <div className="grid md:grid-cols-2 gap-12 mb-12">
+              <div className="bg-gradient-to-br from-slate-50 to-white rounded-xl p-10 border border-gray-200">
+                <h3 className="text-2xl font-bold text-gray-900 mb-6">💼 Investment Options</h3>
+                <div className="space-y-4">
+                  {[
+                    {
+                      type: 'Impact Investor Equity',
+                      minimum: '$50,000',
+                      terms: '15-25% equity return expected; Annual dividends from Year 2',
+                      structure: 'Preferred shares with board observation rights',
+                      liquidation: '7-10 year hold, exit at Year 5-7'
+                    },
+                    {
+                      type: 'Strategic Partner Investment',
+                      minimum: '$200,000+',
+                      terms: 'Custom structure; Operations synergy expected',
+                      structure: 'Common or preferred shares + partnership agreement',
+                      liquidation: 'Flexible terms, often buyback post-profitability'
+                    },
+                    {
+                      type: 'Farmer/Supplier Equity',
+                      minimum: 'Land/equipment contribution',
+                      terms: '2-5% net profit sharing + purchase guarantees',
+                      structure: 'Cooperative equity model + contract',
+                      liquidation: 'Indefinite until chose to exit'
+                    },
+                    {
+                      type: 'Debt Facility (Optional)',
+                      minimum: '$500,000+',
+                      terms: '8% fixed rate, 5-year amortization',
+                      structure: 'Senior secured debt against assets + cash flow',
+                      liquidation: 'Fixed repayment schedule'
+                    }
+                  ].map((option, i) => (
+                    <div key={i} className="p-4 bg-gray-50 border border-gray-300 rounded-lg">
+                      <p className="font-bold text-gray-900 mb-3">{option.type}</p>
+                      <div className="space-y-2 text-sm text-gray-700">
+                        <p><span className="font-semibold">Min. Investment:</span> {option.minimum}</p>
+                        <p><span className="font-semibold">Expected Returns:</span> {option.terms}</p>
+                        <p><span className="font-semibold">Structure:</span> {option.structure}</p>
+                        <p><span className="font-semibold">Exit Path:</span> {option.liquidation}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="bg-gradient-to-br from-amber-50 to-white rounded-xl p-10 border border-gray-200">
+                <h3 className="text-2xl font-bold text-gray-900 mb-6">⚖️ Legal & Governance</h3>
+                <div className="space-y-4">
+                  {[
+                    { item: 'Corporate Structure', detail: 'Philippine C-Corporation (registered with SEC) with international subsidiary options' },
+                    { item: 'Governing Documents', detail: 'Articles of Incorporation, Bylaws, Shareholder Agreement, Board Charter' },
+                    { item: 'Compliance', detail: 'Philippines BIR approved, RCBC banking partner, regular external audits' },
+                    { item: 'Insurance', detail: 'Directors & Officers liability, Product liability, Key person insurance' },
+                    { item: 'Dispute Resolution', detail: 'Internal arbitration, Singapore LCIA if international' },
+                    { item: 'Currency.ph Integration', detail: 'All equity & payment flows through currency.ph platform for transparency' }
+                  ].map((item, i) => (
+                    <div key={i} className="p-4 bg-amber-50 border border-amber-200 rounded-lg">
+                      <p className="font-bold text-gray-900">{item.item}</p>
+                      <p className="text-gray-700 text-sm mt-2">{item.detail}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl p-12">
+              <h3 className="text-2xl font-bold mb-8">📋 Investor Protections & Rights</h3>
+              <div className="grid md:grid-cols-2 gap-8">
+                <div>
+                  <p className="font-bold mb-4">Minority Investor Rights</p>
+                  <ul className="space-y-3 text-sm">
+                    <li className="flex items-start gap-3">
+                      <span className="text-blue-100 mt-1">✓</span>
+                      <span>Proportional voting on major decisions (strategic changes, dividends, exits)</span>
+                    </li>
+                    <li className="flex items-start gap-3">
+                      <span className="text-blue-100 mt-1">✓</span>
+                      <span>Information rights: Monthly operations, quarterly audited financials, annual impact reports</span>
+                    </li>
+                    <li className="flex items-start gap-3">
+                      <span className="text-blue-100 mt-1">✓</span>
+                      <span>Board observation rights (positions ≥2%)</span>
+                    </li>
+                    <li className="flex items-start gap-3">
+                      <span className="text-blue-100 mt-1">✓</span>
+                      <span>Anti-dilution protection (weighted average)</span>
+                    </li>
+                    <li className="flex items-start gap-3">
+                      <span className="text-blue-100 mt-1">✓</span>
+                      <span>Liquidation preference (1x non-participating preferred)</span>
+                    </li>
+                  </ul>
+                </div>
+
+                <div>
+                  <p className="font-bold mb-4">Transparency & Accountability</p>
+                  <ul className="space-y-3 text-sm">
+                    <li className="flex items-start gap-3">
+                      <span className="text-blue-100 mt-1">✓</span>
+                      <span>Real-time dashboard on currency.ph: equity ownership, revenue, profit allocation</span>
+                    </li>
+                    <li className="flex items-start gap-3">
+                      <span className="text-blue-100 mt-1">✓</span>
+                      <span>Blockchain-verified supply chain data: farm-to-retail visibility</span>
+                    </li>
+                    <li className="flex items-start gap-3">
+                      <span className="text-blue-100 mt-1">✓</span>
+                      <span>Annual third-party impact audit (SDG metrics)</span>
+                    </li>
+                    <li className="flex items-start gap-3">
+                      <span className="text-blue-100 mt-1">✓</span>
+                      <span>All board votes & decisions published within 48 hours</span>
+                    </li>
+                    <li className="flex items-start gap-3">
+                      <span className="text-blue-100 mt-1">✓</span>
+                      <span>Whistleblower protection & ethics hotline</span>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
         {/* FAQ Section */}
         <section className="py-24 px-4 sm:px-6 lg:px-8 bg-white">
           <div className="max-w-4xl mx-auto">
