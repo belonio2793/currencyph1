@@ -258,24 +258,24 @@ export default function CommitmentMarketplace({ userId, isAuthenticated }) {
         </form>
       </div>
 
-      {/* Why This Works */}
+      {/* How This Works */}
       <div className={`mt-12 max-w-4xl mx-auto`}>
-        <h3 className="text-xl font-bold text-white mb-4 text-center">How This Works</h3>
+        <h3 className="text-2xl font-bold text-white mb-6 text-center">✨ How This Works</h3>
         <div className={`grid gap-4 ${isMobile ? 'grid-cols-1' : 'grid-cols-3'}`}>
-          <div className="bg-slate-800/50 rounded-lg p-4 border border-slate-700 text-center">
-            <p className="text-3xl mb-2">1️⃣</p>
-            <h4 className="text-white font-semibold mb-2">You Share</h4>
+          <div className="bg-gradient-to-br from-emerald-900/30 to-emerald-900/10 rounded-lg p-5 border border-emerald-700/30 text-center hover:border-emerald-600/50 transition-colors">
+            <p className="text-4xl mb-3">1️⃣</p>
+            <h4 className="text-white font-bold mb-2">You Share</h4>
             <p className="text-slate-400 text-sm">Tell us what you can offer and what you need</p>
           </div>
-          <div className="bg-slate-800/50 rounded-lg p-4 border border-slate-700 text-center">
-            <p className="text-3xl mb-2">2️⃣</p>
-            <h4 className="text-white font-semibold mb-2">We Match</h4>
-            <p className="text-slate-400 text-sm">Our algorithm connects you with perfect partners</p>
+          <div className="bg-gradient-to-br from-blue-900/30 to-blue-900/10 rounded-lg p-5 border border-blue-700/30 text-center hover:border-blue-600/50 transition-colors">
+            <p className="text-4xl mb-3">2️⃣</p>
+            <h4 className="text-white font-bold mb-2">We Match</h4>
+            <p className="text-slate-400 text-sm">Our system connects you with the right partners</p>
           </div>
-          <div className="bg-slate-800/50 rounded-lg p-4 border border-slate-700 text-center">
-            <p className="text-3xl mb-2">3️⃣</p>
-            <h4 className="text-white font-semibold mb-2">You Grow</h4>
-            <p className="text-slate-400 text-sm">Build lasting relationships and scale together</p>
+          <div className="bg-gradient-to-br from-cyan-900/30 to-cyan-900/10 rounded-lg p-5 border border-cyan-700/30 text-center hover:border-cyan-600/50 transition-colors">
+            <p className="text-4xl mb-3">3️⃣</p>
+            <h4 className="text-white font-bold mb-2">You Connect</h4>
+            <p className="text-slate-400 text-sm">Build relationships and grow your network</p>
           </div>
         </div>
       </div>
