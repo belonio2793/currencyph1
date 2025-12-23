@@ -1145,6 +1145,14 @@ export default function PlanningChat() {
                   ))}
                 </select>
               </div>
+
+              <div className={`flex ${isMobile ? 'flex-col gap-1 w-full' : 'items-center gap-2'}`}>
+                <label className={`text-slate-300 font-medium text-opacity-75 ${isMobile ? 'text-xs' : 'text-sm'}`}>Available Positions</label>
+                <span className={`px-3 py-1 bg-slate-600 text-slate-200 rounded font-medium flex items-center gap-1 ${isMobile ? 'w-full justify-center text-xs py-1.5' : 'text-sm'}`}>
+                  <span>💼</span>
+                  <span>Explore Opportunities</span>
+                </span>
+              </div>
             </>
           )}
         </div>
