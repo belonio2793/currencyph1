@@ -596,6 +596,13 @@ export default function App() {
             </Suspense>
           )}
 
+          {/* Commitment Manager - Partnership network interface */}
+          {activeTab === 'commitments' && (
+            <Suspense fallback={<PageLoader />}>
+              <CommitmentManager />
+            </Suspense>
+          )}
+
           {activeTab === 'checkout' && (
             <Suspense fallback={<PageLoader />}>
               <PaymentCheckoutPage userId={userId} globalCurrency={globalCurrency} />
