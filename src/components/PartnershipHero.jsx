@@ -199,15 +199,25 @@ export default function PartnershipHero({ userId, userEmail, isAuthenticated, on
                     </div>
                   )}
 
-                  {/* Join Button */}
+                  {/* Connect Button */}
                   <button
-                    className="w-full mt-4 px-3 py-2 bg-amber-600 hover:bg-amber-700 text-white text-xs font-semibold rounded transition-colors"
+                    className={`w-full mt-4 px-3 py-2 text-white text-xs font-semibold rounded transition-colors ${
+                      isAuthenticated
+                        ? 'bg-amber-600 hover:bg-amber-700'
+                        : 'bg-slate-600 hover:bg-slate-700 opacity-60'
+                    }`}
                     onClick={() => {
+                      if (!isAuthenticated) {
+                        if (onAuthRequired) {
+                          onAuthRequired('login')
+                        }
+                        return
+                      }
                       // This could open a connection/messaging dialog in the future
                       alert(`Connect with ${partner.public_name} - messaging feature coming soon!`)
                     }}
                   >
-                    💬 Connect
+                    {isAuthenticated ? '💬 Connect' : '🔒 Sign In to Connect'}
                   </button>
                 </div>
               ))}
