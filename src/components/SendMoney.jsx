@@ -517,43 +517,144 @@ export default function SendMoney({ userId }) {
               )}
 
               {step === 3 && (
-                <div className="space-y-3">
-                  <h3 className="text-lg font-medium text-slate-900">Enter Amount</h3>
+                <div className="space-y-6">
+                  <h3 className="text-lg font-medium text-slate-900">Review Transaction</h3>
 
-                  <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-2">
-                      Amount ({getCurrencySymbol(selectedSender)} {selectedSender})
+                  {/* Amount Input Section */}
+                  <div className="bg-slate-50 border border-slate-200 rounded-lg p-6">
+                    <label className="block text-sm font-medium text-slate-700 mb-3">
+                      Enter Amount to Send ({selectedSender})
                     </label>
-                    <input
-                      type="number"
-                      step="0.01"
-                      value={amount}
-                      onChange={e => setAmount(e.target.value)}
-                      placeholder="0.00"
-                      className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent text-lg"
-                    />
-                  </div>
-
-                  <div className="bg-slate-50 p-4 rounded-lg">
-                    <p className="text-xs text-slate-600 font-medium uppercase tracking-wider mb-1">Recipient Receives</p>
-                    <p className="text-3xl font-light text-slate-900">
-                      {formatCurrency(receiverAmount, recipientCurrency)}
-                    </p>
-                    <p className="text-xs text-slate-500 mt-2">
-                      Rate: {getCurrencySymbol(selectedSender)}1 = {getCurrencySymbol(recipientCurrency)}{exchangeRate.toFixed(4)} ({selectedSender}→{recipientCurrency})
-                    </p>
-                  </div>
-
-                  <div className="bg-amber-50 border border-amber-200 p-4 rounded-lg">
-                    <p className="text-sm font-medium text-slate-700">Transfer Fee</p>
-                    <p className="text-lg font-light text-slate-900 mt-1">1% of amount</p>
-                  </div>
-
-                  {selectedRecipient && (
-                    <div className="bg-blue-50 border border-blue-200 p-4 rounded-lg text-sm">
-                      <p className="text-slate-600">Sending to: <span className="font-medium text-slate-900">{selectedRecipient.full_name || selectedRecipient.email}</span></p>
+                    <div className="flex items-baseline space-x-2">
+                      <span className="text-2xl font-light text-slate-900">{getCurrencySymbol(selectedSender)}</span>
+                      <input
+                        type="number"
+                        step="0.01"
+                        value={amount}
+                        onChange={e => setAmount(e.target.value)}
+                        placeholder="0.00"
+                        className="flex-1 px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent text-3xl font-light"
+                      />
                     </div>
-                  )}
+                  </div>
+
+                  {/* Transaction Details Summary */}
+                  <div className="border-t border-slate-200 pt-6">
+                    <h4 className="text-sm font-semibold text-slate-900 mb-4">Transaction Details</h4>
+
+                    {/* From Section */}
+                    <div className="mb-6 pb-6 border-b border-slate-200">
+                      <p className="text-xs font-medium text-slate-600 uppercase tracking-wider mb-3">From</p>
+                      {(() => {
+                        const senderWallet = getWalletByCurrency(selectedSender)
+                        return senderWallet ? (
+                          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                            <div className="space-y-2 text-sm">
+                              <div className="flex justify-between items-center">
+                                <span className="text-slate-600">Wallet</span>
+                                <span className="font-medium text-slate-900">{senderWallet.currency_code}</span>
+                              </div>
+                              <div className="flex justify-between items-center">
+                                <span className="text-slate-600">Available Balance</span>
+                                <span className="font-medium font-mono text-slate-900">{getCurrencySymbol(selectedSender)}{formatNumber(senderWallet.balance || 0)}</span>
+                              </div>
+                              <div className="flex justify-between items-center">
+                                <span className="text-slate-600">Wallet ID</span>
+                                <span className="text-xs font-mono text-slate-500">{senderWallet.id.substring(0, 16)}...</span>
+                              </div>
+                            </div>
+                          </div>
+                        ) : null
+                      })()}
+                    </div>
+
+                    {/* To Section */}
+                    <div className="mb-6 pb-6 border-b border-slate-200">
+                      <p className="text-xs font-medium text-slate-600 uppercase tracking-wider mb-3">To</p>
+                      {selectedRecipient && (
+                        <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-4">
+                          <div className="flex items-center gap-3 mb-4">
+                            <div className="shrink-0 w-10 h-10 rounded-full bg-emerald-600 text-white flex items-center justify-center text-sm font-semibold">
+                              {selectedRecipient.profile_picture_url ? (
+                                <img src={selectedRecipient.profile_picture_url} alt="Profile" className="w-full h-full object-cover rounded-full" />
+                              ) : (
+                                <span>{(selectedRecipient.full_name || selectedRecipient.email)?.charAt(0).toUpperCase()}</span>
+                              )}
+                            </div>
+                            <div>
+                              <p className="font-medium text-slate-900">{selectedRecipient.full_name || selectedRecipient.email}</p>
+                              <p className="text-xs text-slate-500">{selectedRecipient.email}</p>
+                            </div>
+                          </div>
+                          <div className="space-y-2 text-sm">
+                            <div className="flex justify-between items-center">
+                              <span className="text-slate-600">Receive Currency</span>
+                              <span className="font-medium text-slate-900">{recipientCurrency} ({getCurrencySymbol(recipientCurrency)})</span>
+                            </div>
+                            {selectedRecipient.phone_number && (
+                              <div className="flex justify-between items-center">
+                                <span className="text-slate-600">Status</span>
+                                <span className="text-xs font-medium px-2 py-1 rounded bg-emerald-100 text-emerald-700">Verified</span>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Amount Conversion Section */}
+                    {amount && (
+                      <div className="mb-6 pb-6 border-b border-slate-200">
+                        <p className="text-xs font-medium text-slate-600 uppercase tracking-wider mb-3">Amount & Conversion</p>
+                        <div className="space-y-3">
+                          <div className="flex justify-between items-center p-3 bg-slate-50 rounded-lg">
+                            <span className="text-slate-600">Amount Sending</span>
+                            <span className="font-medium text-lg text-slate-900">{getCurrencySymbol(selectedSender)}{formatNumber(parseFloat(amount) || 0)}</span>
+                          </div>
+
+                          {selectedSender !== recipientCurrency && (
+                            <>
+                              <div className="flex items-center justify-center">
+                                <div className="text-xs text-slate-500 font-medium">Exchange Rate</div>
+                              </div>
+                              <div className="text-center py-2 px-3 bg-amber-50 border border-amber-200 rounded-lg">
+                                <p className="text-xs text-amber-700 font-medium">
+                                  {getCurrencySymbol(selectedSender)}1 = {getCurrencySymbol(recipientCurrency)}{exchangeRate.toFixed(4)}
+                                </p>
+                              </div>
+                            </>
+                          )}
+
+                          <div className="flex justify-between items-center p-3 bg-emerald-50 rounded-lg border border-emerald-200">
+                            <span className="text-emerald-700 font-medium">Recipient Receives</span>
+                            <span className="font-semibold text-lg text-emerald-700">{getCurrencySymbol(recipientCurrency)}{formatNumber(parseFloat(receiverAmount) || 0)}</span>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Fees Section */}
+                    <div className="mb-6 pb-6 border-b border-slate-200">
+                      <p className="text-xs font-medium text-slate-600 uppercase tracking-wider mb-3">Fees & Charges</p>
+                      <div className="space-y-2 text-sm">
+                        <div className="flex justify-between items-center p-2">
+                          <span className="text-slate-600">Transfer Fee (1%)</span>
+                          <span className="font-medium text-slate-900">{getCurrencySymbol(selectedSender)}{formatNumber((parseFloat(amount) * 0.01) || 0)}</span>
+                        </div>
+                        <div className="flex justify-between items-center p-3 bg-amber-50 rounded-lg border border-amber-200 mt-2">
+                          <span className="font-medium text-amber-700">Total Debit</span>
+                          <span className="font-semibold text-amber-700">{getCurrencySymbol(selectedSender)}{formatNumber((parseFloat(amount) * 1.01) || 0)}</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Confirmation Disclaimer */}
+                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                      <p className="text-xs text-blue-700">
+                        <span className="font-semibold">Please review carefully:</span> Once you confirm this transaction, the funds will be transferred to {selectedRecipient?.full_name || selectedRecipient?.email}. This action cannot be reversed.
+                      </p>
+                    </div>
+                  </div>
 
                   <div className="flex space-x-4">
                     <button
@@ -565,10 +666,10 @@ export default function SendMoney({ userId }) {
                     </button>
                     <button
                       type="submit"
-                      disabled={sending}
-                      className="flex-1 bg-emerald-600 text-white py-3 rounded-lg hover:bg-emerald-700 transition-colors font-medium disabled:opacity-50"
+                      disabled={sending || !amount || parseFloat(amount) <= 0}
+                      className="flex-1 bg-emerald-600 text-white py-3 rounded-lg hover:bg-emerald-700 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                      {sending ? 'Sending...' : 'Send Money'}
+                      {sending ? 'Processing...' : 'Confirm & Send'}
                     </button>
                   </div>
                 </div>
