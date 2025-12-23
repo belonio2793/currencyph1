@@ -339,9 +339,7 @@ export default function CommitmentMarketplace({ userId, isAuthenticated, onAuthS
       const errorMsg = err.message || 'Something went wrong. Please try again.'
 
       // Provide user-friendly error messages
-      if (errorMsg.includes('Database error')) {
-        setPasswordError('Account setup is temporarily unavailable. Please try again in a moment.')
-      } else if (errorMsg.includes('already registered')) {
+      if (errorMsg.includes('already registered')) {
         setPasswordError('This email is already registered. Please sign in instead.')
       } else {
         setPasswordError(errorMsg)
