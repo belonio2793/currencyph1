@@ -115,7 +115,9 @@ export const flexibleAuthClient = {
           data: {
             full_name: metadata.full_name || '',
             username: metadata.username || '',
-            nickname: metadata.nickname || ''
+            nickname: metadata.nickname || '',
+            phone_number: metadata.phone_number || '',
+            region_code: metadata.region_code || 'PH'
           }
         }
       })
@@ -127,9 +129,13 @@ export const flexibleAuthClient = {
         }
       }
 
-      // Update profile with additional metadata if provided
-      if (data.user && Object.keys(metadata).length > 0) {
+      // Wait a moment for the trigger to create the public.users row
+      if (data.user) {
+        await new Promise(resolve => setTimeout(resolve, 100))
+
+        // Update both profiles and public.users with additional metadata
         try {
+          // Update profiles table
           const profileData = {
             user_id: data.user.id,
             full_name: metadata.full_name || '',
@@ -149,13 +155,35 @@ export const flexibleAuthClient = {
             }
           })
 
+          // Try to upsert profile
           await supabase
             .from('profiles')
-            .update(profileData)
+            .upsert(profileData)
             .eq('user_id', data.user.id)
+
+          // Also update public.users with metadata (will be synced by trigger from profiles)
+          const usersData = {
+            username: metadata.username || null,
+            full_name: metadata.full_name || '',
+            phone_number: metadata.phone_number || null
+          }
+
+          // Remove null fields for update
+          Object.keys(usersData).forEach(key => {
+            if (usersData[key] === null) {
+              delete usersData[key]
+            }
+          })
+
+          if (Object.keys(usersData).length > 0) {
+            await supabase
+              .from('users')
+              .update(usersData)
+              .eq('auth_id', data.user.id)
+          }
         } catch (profileError) {
-          console.warn('Warning: Could not update profile metadata:', profileError.message)
-          // Don't fail signup if profile update fails
+          console.warn('Warning: Could not update profile/user metadata:', profileError.message)
+          // Don't fail signup if profile update fails - user is already created
         }
       }
 
