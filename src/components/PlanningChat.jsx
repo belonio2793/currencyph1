@@ -2795,6 +2795,160 @@ export default function PlanningChat() {
           </div>
         </section>
 
+        {/* Currency.ph Integration & Transparent Finance */}
+        <section className="py-24 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-green-50 to-blue-50">
+          <div className="max-w-7xl mx-auto">
+            <div className="mb-16">
+              <div className="inline-block mb-4 px-4 py-2 bg-green-100 text-green-700 rounded-full text-sm font-semibold">
+                💳 CURRENCY.PH PARTNERSHIP
+              </div>
+              <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+                Transparent Finance for Transparent Commerce
+              </h2>
+              <p className="text-xl text-gray-700 max-w-3xl">
+                Coconuts.com.ph leverages currency.ph's blockchain-powered infrastructure to enable real-time, transparent transactions across all stakeholders.
+              </p>
+            </div>
+
+            <div className="grid md:grid-cols-2 gap-12 mb-12">
+              <div className="bg-white rounded-xl p-10 border border-green-200 shadow-lg">
+                <h3 className="text-2xl font-bold text-gray-900 mb-8 flex items-center gap-3">
+                  <span className="text-3xl">🔗</span>
+                  Multi-Currency Wallet Integration
+                </h3>
+                <div className="space-y-6">
+                  <div className="border-b border-gray-200 pb-6">
+                    <p className="text-gray-700 font-semibold mb-3">Supported Currencies</p>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="p-3 bg-green-50 rounded"><span className="text-2xl">🇵🇭</span> PHP</div>
+                      <div className="p-3 bg-blue-50 rounded"><span className="text-2xl">🇺🇸</span> USD</div>
+                      <div className="p-3 bg-yellow-50 rounded"><span className="text-2xl">₿</span> BTC</div>
+                      <div className="p-3 bg-purple-50 rounded"><span className="text-2xl">⟠</span> ETH</div>
+                      <div className="p-3 bg-gray-50 rounded"><span className="text-2xl">€</span> EUR</div>
+                      <div className="p-3 bg-pink-50 rounded"><span className="text-2xl">💴</span> JPY</div>
+                    </div>
+                  </div>
+                  <div>
+                    <p className="text-gray-700 font-semibold mb-2">Instant Settlement</p>
+                    <p className="text-gray-600 text-sm">24-48 hour farmer payments. Secure multi-signature wallets for funds security.</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-white rounded-xl p-10 border border-blue-200 shadow-lg">
+                <h3 className="text-2xl font-bold text-gray-900 mb-8 flex items-center gap-3">
+                  <span className="text-3xl">📊</span>
+                  Real-Time Transparency Dashboard
+                </h3>
+                <div className="space-y-4">
+                  {[
+                    { feature: 'Live Supply Chain', desc: 'Track every coconut from farm to retail via blockchain' },
+                    { feature: 'Production Metrics', desc: 'Real-time volume, quality, and inventory updates' },
+                    { feature: 'Revenue Allocation', desc: 'Auto-calculated profit sharing visible to all stakeholders' },
+                    { feature: 'Payment History', desc: 'Complete transaction records for audit and compliance' },
+                    { feature: 'Impact Metrics', desc: 'Community jobs, farmer income, sustainability impact tracked' }
+                  ].map((item, i) => (
+                    <div key={i} className="flex gap-3">
+                      <span className="text-green-600 font-bold mt-1">✓</span>
+                      <div>
+                        <p className="font-semibold text-gray-900">{item.feature}</p>
+                        <p className="text-gray-600 text-sm">{item.desc}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            <div className="grid md:grid-cols-3 gap-8 mb-12">
+              <div className="bg-gradient-to-br from-blue-500 to-blue-600 text-white rounded-xl p-8">
+                <h3 className="text-xl font-bold mb-4">🌐 Global Payments</h3>
+                <ul className="space-y-3 text-sm">
+                  <li className="flex gap-2"><span>✓</span><span>Instant cross-border transfers</span></li>
+                  <li className="flex gap-2"><span>✓</span><span>Competitive FX rates</span></li>
+                  <li className="flex gap-2"><span>✓</span><span>No middleman delays</span></li>
+                  <li className="flex gap-2"><span>✓</span><span>API integration for B2B</span></li>
+                </ul>
+              </div>
+
+              <div className="bg-gradient-to-br from-green-500 to-green-600 text-white rounded-xl p-8">
+                <h3 className="text-xl font-bold mb-4">🔐 Security & Compliance</h3>
+                <ul className="space-y-3 text-sm">
+                  <li className="flex gap-2"><span>✓</span><span>Bank-grade encryption</span></li>
+                  <li className="flex gap-2"><span>✓</span><span>Philippines BIR approved</span></li>
+                  <li className="flex gap-2"><span>✓</span><span>Multi-sig wallet protection</span></li>
+                  <li className="flex gap-2"><span>✓</span><span>Quarterly audit verification</span></li>
+                </ul>
+              </div>
+
+              <div className="bg-gradient-to-br from-purple-500 to-purple-600 text-white rounded-xl p-8">
+                <h3 className="text-xl font-bold mb-4">📈 For All Stakeholders</h3>
+                <ul className="space-y-3 text-sm">
+                  <li className="flex gap-2"><span>✓</span><span>Farmers: Instant payments</span></li>
+                  <li className="flex gap-2"><span>✓</span><span>Investors: Real-time ROI</span></li>
+                  <li className="flex gap-2"><span>✓</span><span>Partners: API access</span></li>
+                  <li className="flex gap-2"><span>✓</span><span>Consumers: Trust & traceability</span></li>
+                </ul>
+              </div>
+            </div>
+
+            <div className="bg-white rounded-xl p-10 border border-gray-200">
+              <h3 className="text-2xl font-bold text-gray-900 mb-8">🤝 Governance & Transparent Processes</h3>
+              <div className="grid md:grid-cols-2 gap-8">
+                <div>
+                  <p className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                    <span className="text-2xl">🗳️</span>
+                    Democratic Decision Making
+                  </p>
+                  <ul className="space-y-3 text-gray-700">
+                    <li className="flex gap-3">
+                      <span className="text-green-600 font-bold">1</span>
+                      <div>
+                        <p className="font-semibold">Quarterly Stakeholder Council</p>
+                        <p className="text-sm text-gray-600">All equity holders vote proportional to stake</p>
+                      </div>
+                    </li>
+                    <li className="flex gap-3">
+                      <span className="text-green-600 font-bold">2</span>
+                      <div>
+                        <p className="font-semibold">Public Vote Recording</p>
+                        <p className="text-sm text-gray-600">All votes recorded on blockchain, published within 48hrs</p>
+                      </div>
+                    </li>
+                    <li className="flex gap-3">
+                      <span className="text-green-600 font-bold">3</span>
+                      <div>
+                        <p className="font-semibold">Farmer Veto Rights</p>
+                        <p className="text-sm text-gray-600">Farmer collective can veto pricing or supply changes</p>
+                      </div>
+                    </li>
+                  </ul>
+                </div>
+                <div>
+                  <p className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                    <span className="text-2xl">📋</span>
+                    Reporting Standards
+                  </p>
+                  <div className="space-y-3">
+                    <div className="p-4 bg-green-50 rounded-lg border border-green-200">
+                      <p className="font-semibold text-gray-900 text-sm">Monthly Operations Report</p>
+                      <p className="text-xs text-gray-600 mt-1">Production, costs, inventory, shipments (on currency.ph)</p>
+                    </div>
+                    <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
+                      <p className="font-semibold text-gray-900 text-sm">Quarterly Financial Statement</p>
+                      <p className="text-xs text-gray-600 mt-1">Revenue, EBITDA, profit distribution, audited</p>
+                    </div>
+                    <div className="p-4 bg-purple-50 rounded-lg border border-purple-200">
+                      <p className="font-semibold text-gray-900 text-sm">Annual Impact Audit</p>
+                      <p className="text-xs text-gray-600 mt-1">3rd-party verification of social & environmental metrics</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
         {/* Partnership Ecosystem */}
         <section className="py-24 px-4 sm:px-6 lg:px-8 bg-white">
           <div className="max-w-7xl mx-auto">
