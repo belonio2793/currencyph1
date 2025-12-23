@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabaseClient'
 import PartnershipForm from './PartnershipForm'
 
-export default function PartnershipHero({ userId, userEmail, isAuthenticated }) {
+export default function PartnershipHero({ userId, userEmail, isAuthenticated, onAuthRequired = null }) {
   const [partnerships, setPartnerships] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
