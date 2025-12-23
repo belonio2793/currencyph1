@@ -39,9 +39,18 @@ export default function PartnershipNetworkSection({ isAuthenticated, userId }) {
   const [totalCommitmentValue, setTotalCommitmentValue] = useState(0)
   const [partnerCount, setPartnerCount] = useState(0)
 
+  // User's own commitments
+  const [userProfile, setUserProfile] = useState(null)
+  const [userCommitments, setUserCommitments] = useState([])
+  const [userTotalValue, setUserTotalValue] = useState(0)
+  const [showCommitmentForm, setShowCommitmentForm] = useState(false)
+
   useEffect(() => {
     loadPartnerships()
-  }, [])
+    if (isAuthenticated && userId) {
+      loadUserProfile()
+    }
+  }, [isAuthenticated, userId])
 
   useEffect(() => {
     filterPartnerships()
