@@ -640,6 +640,25 @@ export default function SendMoney({ userId }) {
                               <span className="font-semibold text-emerald-700">{recipientCurrency} ({getCurrencySymbol(recipientCurrency)})</span>
                             </div>
 
+                            {/* Recipient Wallet Details */}
+                            {(() => {
+                              const recipientWallet = recipientWallets.find(w => w.currency_code === recipientCurrency)
+                              return recipientWallet ? (
+                                <>
+                                  <div className="pt-2 border-t border-emerald-200">
+                                    <p className="text-xs text-emerald-700 font-medium mb-1">Wallet ID</p>
+                                    <p className="text-xs font-mono text-slate-900 break-all">{recipientWallet.id}</p>
+                                  </div>
+                                  {recipientWallet.account_number && (
+                                    <div>
+                                      <p className="text-xs text-slate-600 font-medium mb-1">Account Number</p>
+                                      <p className="text-xs font-mono text-slate-900">{recipientWallet.account_number}</p>
+                                    </div>
+                                  )}
+                                </>
+                              ) : null
+                            })()}
+
                             {selectedRecipient.country_code && (
                               <div className="flex justify-between items-start">
                                 <span className="text-slate-600">Country</span>
