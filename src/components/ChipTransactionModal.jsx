@@ -345,6 +345,23 @@ export default function ChipTransactionModal({ open, onClose, userId, onPurchase
     return chips.toLocaleString()
   }
 
+  const formatAccountNumber = (num) => {
+    if (!num) return 'Not assigned'
+    const str = num.toString()
+    if (str.length <= 8) return str
+    return `${str.substring(0, 4)}...${str.substring(str.length - 4)}`
+  }
+
+  const fiatWallets = userWallets.filter(w => {
+    const isCrypto = ['BTC', 'ETH', 'SOLANA', 'BNB', 'USDC', 'USDT', 'DOGECOIN', 'XRP', 'ADA', 'MATIC'].includes(w.currency_code)
+    return !isCrypto
+  })
+
+  const cryptoWallets = userWallets.filter(w => {
+    const isCrypto = ['BTC', 'ETH', 'SOLANA', 'BNB', 'USDC', 'USDT', 'DOGECOIN', 'XRP', 'ADA', 'MATIC'].includes(w.currency_code)
+    return isCrypto
+  })
+
   const getPackageLabel = (pkg) => {
     if (!pkg) return null
     if (pkg.is_first_purchase_special === true) return 'FIRST PURCHASE SPECIAL'
