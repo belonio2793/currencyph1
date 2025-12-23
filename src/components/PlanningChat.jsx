@@ -1047,7 +1047,7 @@ export default function PlanningChat() {
   return (
     <div className="min-h-screen bg-slate-900 flex flex-col">
       {/* Header */}
-      <div className={`bg-slate-800 border-b border-slate-700 ${isMobile ? 'px-4 py-2' : 'px-6 py-3'}}`}>
+      <div className={`bg-slate-800 border-b border-slate-700 ${isMobile ? 'px-4 py-2 mt-4' : 'px-6 py-3 mt-6'}}`}>
         <div className={`flex ${isMobile ? 'flex-col gap-3' : 'items-center justify-between mb-3'}`}>
           <div>
             <div className="flex items-center gap-3 mb-2">
