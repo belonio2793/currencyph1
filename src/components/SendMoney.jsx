@@ -466,24 +466,30 @@ export default function SendMoney({ userId }) {
                     </div>
                   )}
 
-                  {/* Recipient Currency */}
+                  {/* Recipient Wallets */}
                   <div className="space-y-6">
-                    <h4 className="text-lg font-medium text-slate-900">How Should Recipient Receive Funds?</h4>
-                    {wallets.length === 0 ? (
-                      <div className="bg-slate-50 border border-slate-300 rounded-lg p-3 text-sm text-slate-600">
-                        No wallets available
+                    <h4 className="text-lg font-medium text-slate-900">Recipient's Wallets</h4>
+                    {loadingRecipientWallets ? (
+                      <div className="bg-slate-50 border border-slate-300 rounded-lg p-4 text-center text-slate-600">
+                        Loading recipient wallets...
+                      </div>
+                    ) : recipientWallets.length === 0 ? (
+                      <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
+                        <p className="text-sm text-amber-800">
+                          This recipient doesn't have any wallets yet.
+                        </p>
                       </div>
                     ) : (
                       <div className="space-y-4">
                         <div>
-                          <label className="block text-sm font-medium text-slate-700 mb-3">Select Receive Currency</label>
+                          <label className="block text-sm font-medium text-slate-700 mb-3">Select Recipient's Wallet</label>
                           <select
                             value={recipientCurrency}
                             onChange={(e) => setRecipientCurrency(e.target.value)}
                             className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent bg-white"
                           >
-                            <option value="">Choose currency...</option>
-                            {wallets.map(wallet => (
+                            <option value="">Choose wallet...</option>
+                            {recipientWallets.map(wallet => (
                               <option key={wallet.id} value={wallet.currency_code}>
                                 {wallet.currency_code} ({getCurrencySymbol(wallet.currency_code)})
                               </option>
@@ -491,19 +497,29 @@ export default function SendMoney({ userId }) {
                           </select>
                         </div>
 
-                        {/* Selected Currency Details */}
+                        {/* Selected Wallet Details */}
                         {recipientCurrency && (() => {
-                          const wallet = getWalletByCurrency(recipientCurrency)
+                          const wallet = recipientWallets.find(w => w.currency_code === recipientCurrency)
                           return wallet ? (
                             <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-4">
-                              <h5 className="text-sm font-semibold text-slate-900 mb-3">Recipient Will Receive</h5>
-                              <div className="space-y-2 text-sm">
-                                <div className="flex justify-between">
+                              <h5 className="text-sm font-semibold text-slate-900 mb-3">Recipient Wallet Details</h5>
+                              <div className="space-y-3 text-sm">
+                                <div className="flex justify-between items-center">
                                   <span className="text-slate-600">Currency</span>
-                                  <span className="font-medium text-slate-900">{wallet.currency_code} ({getCurrencySymbol(wallet.currency_code)})</span>
+                                  <span className="font-semibold text-emerald-700">{wallet.currency_code} ({getCurrencySymbol(wallet.currency_code)})</span>
                                 </div>
-                                <div className="text-xs text-emerald-700 mt-2">
-                                  ✓ Recipient will receive funds in {wallet.currency_code}
+                                <div className="pt-2 border-t border-emerald-200">
+                                  <p className="text-xs text-emerald-700 font-medium mb-2">Wallet ID</p>
+                                  <p className="text-xs font-mono text-slate-900 break-all bg-white p-2 rounded border border-emerald-200">{wallet.id}</p>
+                                </div>
+                                {wallet.account_number && (
+                                  <div>
+                                    <p className="text-xs text-slate-600 font-medium mb-1">Account Number</p>
+                                    <p className="text-sm font-mono text-slate-900">{wallet.account_number}</p>
+                                  </div>
+                                )}
+                                <div className="text-xs text-emerald-700 pt-2">
+                                  ✓ Funds will be sent to this wallet
                                 </div>
                               </div>
                             </div>
