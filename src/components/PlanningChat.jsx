@@ -4419,7 +4419,7 @@ export default function PlanningChat() {
                   <div className="space-y-4 text-sm">
                     <div>
                       <p className="font-semibold text-gray-900">Markets:</p>
-                      <p className="text-gray-700">{item.markets.join(', ')}</p>
+                      <p className="text-gray-700">{Array.isArray(item.markets) ? item.markets.join(', ') : item.markets}</p>
                     </div>
                     <div>
                       <p className="font-semibold text-gray-900">Timeline:</p>
