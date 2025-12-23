@@ -1779,8 +1779,7 @@ export default function PlanningChat() {
         </div>
 
         {/* Chat Section */}
-        {!isAuthenticated && (
-          <div className={`rounded-lg border border-slate-700 bg-slate-800 flex flex-col overflow-hidden ${isMobile ? 'w-full max-h-72' : 'w-72'}`}>
+        <div className={`rounded-lg border border-slate-700 bg-slate-800 flex flex-col overflow-hidden ${isMobile ? 'w-full max-h-72' : 'w-72'}`}>
             {/* Auth Required Notice */}
             {!isAuthenticated && (
               <div className="bg-amber-700/30 border-b border-amber-700 px-4 py-3">
