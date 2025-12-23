@@ -226,7 +226,7 @@ export default function CoconutsLanding() {
           <div className="grid md:grid-cols-2 gap-12 mb-12">
             <div className="bg-white rounded-xl p-10 border border-gray-200">
               <h3 className="text-2xl font-bold text-gray-900 mb-8 flex items-center gap-3">
-                <BarChart3 className="w-8 h-8 text-amber-600" />
+                <span className="text-3xl">📊</span>
                 Market Size & Growth
               </h3>
               <div className="space-y-6">
