@@ -517,6 +517,7 @@ export default function PartnershipNetworkSection({ isAuthenticated, userId }) {
             <CommitmentMarketplace
               userId={userId}
               isAuthenticated={isAuthenticated}
+              onAuthSuccess={handleAuthSuccess}
             />
           </div>
         </div>
