@@ -331,6 +331,7 @@ export default function CommitmentMarketplace({ userId, isAuthenticated, onAuthS
       // Reset password form
       setPassword('')
       setConfirmPassword('')
+      setUsername('')
       setNewUserEmail('')
       setTempFormData(null)
 
