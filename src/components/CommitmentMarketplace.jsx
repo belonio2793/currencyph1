@@ -765,6 +765,7 @@ export default function CommitmentMarketplace({ userId, isAuthenticated, onAuthS
                   setShowPasswordModal(false)
                   setPassword('')
                   setConfirmPassword('')
+                  setUsername('')
                   setPasswordError('')
                 }}
                 className="text-slate-400 hover:text-white text-2xl font-bold leading-none"
