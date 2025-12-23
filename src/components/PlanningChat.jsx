@@ -169,6 +169,19 @@ export default function PlanningChat() {
   const [pendingMarkerType, setPendingMarkerType] = useState(null)
   const [selectedExistingLocationId, setSelectedExistingLocationId] = useState('')
   const [showAuthModalOnDemand, setShowAuthModalOnDemand] = useState(false)
+  const [contributionForm, setContributionForm] = useState({
+    partnerType: '',
+    businessName: '',
+    email: '',
+    contributions: [],
+    monthlyCapacity: '',
+    capacityUnit: 'tons',
+    location: '',
+    pricePerUnit: '',
+    currency: 'php',
+    notes: ''
+  })
+  const [contributionSubmitting, setContributionSubmitting] = useState(false)
 
   const messagesEndRef = useRef(null)
   const mapRef = useRef(null)
