@@ -8,6 +8,7 @@ import L from 'leaflet'
 import { MapContainer, TileLayer, Marker, Popup, useMapEvents, useMap, Circle, Tooltip } from 'react-leaflet'
 import 'leaflet/dist/leaflet.css'
 import Auth from './Auth'
+import CommitmentWidget from './CommitmentWidget'
 
 // Fix default marker icons (needed for proper Leaflet functionality)
 delete L.Icon.Default.prototype._getIconUrl
