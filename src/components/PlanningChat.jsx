@@ -1149,7 +1149,7 @@ export default function PlanningChat() {
         </div>
       </div>
 
-      <div className={`flex-1 flex ${isMobile ? 'flex-col gap-3' : 'gap-8'} ${isMobile ? 'p-3' : 'p-12'} overflow-hidden pb-96`}>
+      <div className={`flex-1 flex ${isMobile ? 'flex-col gap-3' : 'gap-8'} ${isMobile ? 'p-3' : 'p-12'} overflow-hidden pb-20`}>
         {/* Preview Mode Notice */}
         {!isAuthenticated && (
           <div className="bg-blue-900/50 border border-blue-600 rounded-lg p-4 flex items-center justify-between">
