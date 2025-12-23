@@ -607,7 +607,17 @@ export default function App() {
           {/* Partnership Hero - Full page partnership network */}
           {activeTab === 'partnership' && (
             <Suspense fallback={<PageLoader />}>
-              <PartnershipHero userId={userId} userEmail={userEmail} isAuthenticated={!!userId} />
+              <PartnershipHero
+                userId={userId}
+                userEmail={userEmail}
+                isAuthenticated={!!userId}
+                onAuthRequired={(tab) => {
+                  setAuthInitialTab(tab || 'login')
+                  setShowAuth(true)
+                  if (tab === 'register') window.history.replaceState(null, '', '/register')
+                  else window.history.replaceState(null, '', '/login')
+                }}
+              />
             </Suspense>
           )}
 
