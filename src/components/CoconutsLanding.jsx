@@ -549,7 +549,7 @@ export default function CoconutsLanding() {
             {/* Impact Partners */}
             <div className="bg-white rounded-xl p-12 border border-gray-200">
               <h3 className="text-2xl font-bold text-gray-900 mb-8 flex items-center gap-3">
-                <Users className="w-8 h-8 text-amber-600" />
+                <span className="text-3xl">👥</span>
                 Impact & Community Partners
               </h3>
               <div className="grid md:grid-cols-2 gap-8">
