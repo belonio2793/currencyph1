@@ -97,26 +97,34 @@ export default function CommitmentMarketplace({ userId, isAuthenticated, onAuthS
       return
     }
 
-    // Validate email if provided
-    if (!isAuthenticated && email && !email.includes('@')) {
-      setError('Please enter a valid email address')
-      return
-    }
-
-    // If not authenticated, show password modal instead of direct submission
+    // Validate email or phone is provided for non-authenticated users
     if (!isAuthenticated) {
-      if (!email.trim()) {
-        setError('Please enter your email to create an account')
+      const hasEmail = email && email.includes('@')
+      const hasPhone = phone && phone.trim().length >= 7
+
+      if (!hasEmail && !hasPhone) {
+        setError('Please enter either an email address or phone number to create an account')
         return
       }
 
-      setNewUserEmail(email)
+      // If using email, proceed with signup
+      if (hasEmail && !email.includes('@')) {
+        setError('Please enter a valid email address')
+        return
+      }
+
+      // For phone-only accounts, use a generated email
+      const signupEmail = hasEmail ? email : `phone.${Date.now()}@coconuts.local`
+
+      setNewUserEmail(signupEmail)
       setTempFormData({
         name,
         email,
+        phone,
         whatICanOffer,
         whatINeed,
-        notes
+        notes,
+        socialMedia
       })
       setShowPasswordModal(true)
       setError('')
@@ -124,7 +132,7 @@ export default function CommitmentMarketplace({ userId, isAuthenticated, onAuthS
     }
 
     // If authenticated, proceed with submission
-    await submitMarketplaceListing(userId, name, email, whatICanOffer, whatINeed, notes)
+    await submitMarketplaceListing(userId, name, email, phone, whatICanOffer, whatINeed, notes, socialMedia)
   }
 
   const submitMarketplaceListing = async (currentUserId, contactName, contactEmail, offer, need, additionalNotes) => {
