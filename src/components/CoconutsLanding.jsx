@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import CommitmentWidget from './CommitmentWidget'
 
 export default function CoconutsLanding() {
   const [scrollPosition, setScrollPosition] = useState(0)
