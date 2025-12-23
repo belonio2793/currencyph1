@@ -259,47 +259,44 @@ export default function SendMoney({ userId }) {
                     </div>
                   ) : (
                     <div className="space-y-6">
-                      {/* Fiat Currencies Section */}
-                      {(() => {
-                        const { fiatWallets } = getWalletsByType()
-                        return fiatWallets.length > 0 ? (
-                          <div>
-                            <label className="block text-sm font-medium text-slate-700 mb-3">Fiat Currency</label>
-                            <select
-                              value={selectedSender}
-                              onChange={(e) => setSelectedSender(e.target.value)}
-                              className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent bg-white"
-                            >
-                              {fiatWallets.map(wallet => (
-                                <option key={wallet.id} value={wallet.currency_code}>
-                                  {wallet.currency_code} ({getCurrencySymbol(wallet.currency_code)}) - Balance: {formatNumber(wallet.balance || 0)}
-                                </option>
-                              ))}
-                            </select>
-                          </div>
-                        ) : null
-                      })()}
+                      <div>
+                        <label className="block text-sm font-medium text-slate-700 mb-3">Select Your Wallet</label>
+                        <select
+                          value={selectedSender}
+                          onChange={(e) => setSelectedSender(e.target.value)}
+                          className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent bg-white"
+                        >
+                          <option value="">Choose a wallet...</option>
 
-                      {/* Cryptocurrency Section */}
-                      {(() => {
-                        const { cryptoWallets } = getWalletsByType()
-                        return cryptoWallets.length > 0 ? (
-                          <div>
-                            <label className="block text-sm font-medium text-slate-700 mb-3">Cryptocurrency</label>
-                            <select
-                              value={selectedSender}
-                              onChange={(e) => setSelectedSender(e.target.value)}
-                              className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent bg-white"
-                            >
-                              {cryptoWallets.map(wallet => (
-                                <option key={wallet.id} value={wallet.currency_code}>
-                                  {wallet.currency_code} - Balance: {formatNumber(wallet.balance || 0)}
-                                </option>
-                              ))}
-                            </select>
-                          </div>
-                        ) : null
-                      })()}
+                          {/* Fiat Currencies Group */}
+                          {(() => {
+                            const { fiatWallets } = getWalletsByType()
+                            return fiatWallets.length > 0 ? (
+                              <optgroup label="FIAT CURRENCY">
+                                {fiatWallets.map(wallet => (
+                                  <option key={wallet.id} value={wallet.currency_code}>
+                                    {wallet.currency_code} ({getCurrencySymbol(wallet.currency_code)}) - Balance: {formatNumber(wallet.balance || 0)}
+                                  </option>
+                                ))}
+                              </optgroup>
+                            ) : null
+                          })()}
+
+                          {/* Cryptocurrency Group */}
+                          {(() => {
+                            const { cryptoWallets } = getWalletsByType()
+                            return cryptoWallets.length > 0 ? (
+                              <optgroup label="CRYPTOCURRENCY">
+                                {cryptoWallets.map(wallet => (
+                                  <option key={wallet.id} value={wallet.currency_code}>
+                                    {wallet.currency_code} - Balance: {formatNumber(wallet.balance || 0)}
+                                  </option>
+                                ))}
+                              </optgroup>
+                            ) : null
+                          })()}
+                        </select>
+                      </div>
 
                       {/* Selected Account Details */}
                       {selectedSender && (() => {
