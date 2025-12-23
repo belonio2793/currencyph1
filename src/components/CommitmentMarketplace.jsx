@@ -135,7 +135,7 @@ export default function CommitmentMarketplace({ userId, isAuthenticated, onAuthS
     await submitMarketplaceListing(userId, name, email, phone, whatICanOffer, whatINeed, notes, socialMedia)
   }
 
-  const submitMarketplaceListing = async (currentUserId, contactName, contactEmail, offer, need, additionalNotes) => {
+  const submitMarketplaceListing = async (currentUserId, contactName, contactEmail, contactPhone, offer, need, additionalNotes, socMediaProfiles) => {
     setLoading(true)
     setError('')
     setSuccess('')
@@ -154,6 +154,18 @@ export default function CommitmentMarketplace({ userId, isAuthenticated, onAuthS
 
         if (existingProfile) {
           profileId = existingProfile.id
+          // Update existing profile with new contact info
+          const { error: updateError } = await supabase
+            .from('commitment_profiles')
+            .update({
+              contact_person: contactName,
+              email: contactEmail,
+              phone_number: contactPhone,
+              social_media: socMediaProfiles
+            })
+            .eq('id', profileId)
+
+          if (updateError) throw updateError
         } else {
           // Create new profile
           const { data: newProfile, error: profileError } = await supabase
@@ -162,6 +174,8 @@ export default function CommitmentMarketplace({ userId, isAuthenticated, onAuthS
               user_id: currentUserId,
               contact_person: contactName,
               email: contactEmail,
+              phone_number: contactPhone,
+              social_media: socMediaProfiles,
               profile_completed: true
             })
             .select()
@@ -179,9 +193,11 @@ export default function CommitmentMarketplace({ userId, isAuthenticated, onAuthS
           user_id: currentUserId || null,
           contact_name: contactName,
           contact_email: contactEmail,
+          contact_phone: contactPhone,
           what_can_offer: offer,
           what_need: need,
           notes: additionalNotes,
+          social_media: socMediaProfiles,
           commitment_profile_id: profileId,
           status: 'active'
         })
