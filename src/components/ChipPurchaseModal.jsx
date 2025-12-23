@@ -24,6 +24,8 @@ export default function ChipPurchaseModal({ open, onClose, userId, onPurchaseCom
     if (open && userId) {
       loadPackages()
       loadUserData()
+      loadWallets()
+      loadExchangeRate()
     }
   }, [open, userId])
 
@@ -34,7 +36,7 @@ export default function ChipPurchaseModal({ open, onClose, userId, onPurchaseCom
         .from('poker_chip_packages')
         .select('*')
         .order('display_order', { ascending: true })
-      
+
       if (error) throw error
       setPackages(data || [])
     } catch (err) {
@@ -66,6 +68,32 @@ export default function ChipPurchaseModal({ open, onClose, userId, onPurchaseCom
     } catch (err) {
       console.error('Error loading user chips:', err)
       setUserChips(0n)
+    }
+  }
+
+  async function loadWallets() {
+    try {
+      if (isGuestLocal) return
+
+      const allWallets = await walletService.getUserWalletsWithDetails(userId)
+      if (allWallets && allWallets.length > 0) {
+        setWallets(allWallets)
+        // Select first PHP wallet or first wallet if no PHP
+        const phpWallet = allWallets.find(w => w.currency_code === 'PHP')
+        setSelectedWallet(phpWallet || allWallets[0])
+      }
+    } catch (err) {
+      console.error('Error loading wallets:', err)
+    }
+  }
+
+  async function loadExchangeRate() {
+    try {
+      const rate = await payments.getExchangeRate('USD', DEFAULT_CURRENCY)
+      setExchangeRate(rate || 1)
+    } catch (err) {
+      console.error('Error loading exchange rate:', err)
+      setExchangeRate(1)
     }
   }
 
