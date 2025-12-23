@@ -617,6 +617,10 @@ export default function App() {
                   if (tab === 'register') window.history.replaceState(null, '', '/register')
                   else window.history.replaceState(null, '', '/login')
                 }}
+                onNavigate={(tab) => {
+                  setActiveTab(tab || 'home')
+                  setShowAuth(false)
+                }}
               />
             </Suspense>
           )}
