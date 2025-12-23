@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabaseClient'
+import { flexibleAuthClient } from '../lib/flexibleAuthClient'
 
 export default function Auth({ onAuthSuccess, initialTab = 'login', isModal = false }) {
   const [activeTab, setActiveTab] = useState(initialTab)
