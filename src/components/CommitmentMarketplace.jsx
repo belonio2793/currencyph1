@@ -220,13 +220,16 @@ export default function CommitmentMarketplace({ userId, isAuthenticated }) {
           </div>
 
           {/* Additional Notes */}
-          <div className="space-y-3">
+          <div className="space-y-3 bg-gradient-to-br from-purple-900/20 to-transparent rounded-lg p-4 border border-purple-700/30">
             <div className="flex items-center gap-2">
               <span className="text-2xl">💬</span>
               <label className="block text-white font-semibold">
                 Anything else we should know?
               </label>
             </div>
+            <p className="text-slate-400 text-sm">
+              💡 Location, timing, preferences, constraints, dreams... anything helps!
+            </p>
             <textarea
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
