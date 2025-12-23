@@ -1887,13 +1887,15 @@ export default function PlanningChat() {
             </div>
 
             {/* Contribution Form */}
-            <form className="space-y-4">
+            <form className="space-y-4" onSubmit={handleContributionSubmit}>
               {/* Partner Type Selection */}
               <div>
                 <label className="block text-sm font-semibold text-slate-200 mb-2">I am a... *</label>
                 <select
+                  name="partnerType"
+                  value={contributionForm.partnerType}
+                  onChange={handleContributionChange}
                   className="w-full px-4 py-2 rounded-lg bg-slate-700 text-white border border-slate-600 focus:outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-500/50 text-sm"
-                  defaultValue="individual"
                 >
                   <option value="">-- Select Your Type --</option>
                   <optgroup label="Agricultural">
