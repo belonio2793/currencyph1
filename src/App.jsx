@@ -42,7 +42,7 @@ const NetworkBalances = lazy(() => import('./components/NetworkBalances'))
 const BorrowMoney = lazy(() => import('./components/BorrowMoney'))
 const P2PLoanMarketplace = lazy(() => import('./components/P2PLoanMarketplace'))
 const About = lazy(() => import('./components/About'))
-const PlanningChat = lazy(() => import('./components/PlanningChat'))
+import PlanningChat from './components/PlanningChat'
 const CoconutsLanding = lazy(() => import('./components/CoconutsLanding'))
 const PlanningSetup = lazy(() => import('./components/PlanningSetup'))
 const CommitmentManager = lazy(() => import('./components/CommitmentManager'))
