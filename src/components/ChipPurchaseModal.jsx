@@ -217,12 +217,18 @@ export default function ChipPurchaseModal({ open, onClose, userId, onPurchaseCom
     </button>
   )
 
+  const formatAccountNumber = (num) => {
+    if (!num) return 'Not assigned'
+    const str = num.toString()
+    if (str.length <= 8) return str
+    return `${str.substring(0, 4)}...${str.substring(str.length - 4)}`
+  }
+
   return (
     <ExpandableModal
       isOpen={open}
       onClose={onClose}
       title="Buy Poker Chips"
-      icon="🎰"
       size={isMobile ? 'fullscreen' : 'xl'}
       footer={footer}
       badgeContent={`${formatChips(userChips)} chips`}
@@ -231,7 +237,7 @@ export default function ChipPurchaseModal({ open, onClose, userId, onPurchaseCom
     >
       {error && (
         <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
-          ⚠️ {error}
+          {error}
         </div>
       )}
 
