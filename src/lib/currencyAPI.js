@@ -101,31 +101,39 @@ export const currencyAPI = {
         console.warn('Edge function invocation failed:', e && e.message)
       }
 
-      // 2b) Fallback to database cached rates
+      // 2b) Fallback to public.pairs table
       try {
-        const { data: cachedData, error: cacheError } = await supabase
-          .from('cached_rates')
-          .select('exchange_rates, fetched_at')
-          .order('fetched_at', { ascending: false })
-          .limit(1)
-          .single()
+        const { data: pairsData, error: pairsError } = await supabase
+          .from('pairs')
+          .select('from_currency, to_currency, rate, updated_at')
 
-        if (!cacheError && cachedData?.exchange_rates) {
-          console.log('Using cached exchange rates from database')
-          const lastUpdated = new Date(cachedData.fetched_at)
+        if (!pairsError && pairsData && pairsData.length > 0) {
+          console.log('Using exchange rates from public.pairs table')
+          const lastUpdated = new Date(pairsData[0].updated_at || Date.now())
           const rates = {}
+
+          // Build rates from USD conversions in pairs
           CURRENCIES.forEach(currency => {
             if (currency.code === 'USD') {
               rates[currency.code] = { ...currency, rate: 1, lastUpdated }
               return
             }
-            const rateVal = cachedData.exchange_rates[currency.code]
-            rates[currency.code] = { ...currency, rate: typeof rateVal === 'number' ? rateVal : 0, lastUpdated }
+
+            // Find rate from USD to this currency
+            const pair = pairsData.find(p =>
+              p.from_currency === 'USD' && p.to_currency === currency.code
+            )
+
+            if (pair && typeof pair.rate === 'number' && pair.rate > 0) {
+              rates[currency.code] = { ...currency, rate: pair.rate, lastUpdated }
+            } else {
+              rates[currency.code] = { ...currency, rate: 0, lastUpdated }
+            }
           })
           return rates
         }
       } catch (e) {
-        console.warn('Database fallback for exchange rates failed:', e && e.message)
+        console.warn('Public.pairs fallback for exchange rates failed:', e && e.message)
       }
 
       // 3) Fallback to public exchangerate.host
