@@ -426,12 +426,6 @@ export default function Rates() {
                       </p>
                     </div>
                   )}
-                  {result && result.error && (
-                    <div className="bg-red-50 rounded-lg p-6 border border-red-200">
-                      <p className="text-sm font-semibold text-red-700 mb-2">{result.error}</p>
-                      <p className="text-sm text-red-600">{result.message}</p>
-                    </div>
-                  )}
                 </div>
               </div>
 
