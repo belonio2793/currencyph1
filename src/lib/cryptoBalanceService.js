@@ -25,23 +25,31 @@ export async function getCryptoWallets(userId) {
 }
 
 /**
- * Fetch current crypto prices from cached_rates table
+ * Fetch current crypto prices from public.pairs table
  */
 export async function getCryptoPrices() {
   try {
+    // Get all crypto-to-PHP rates from pairs
     const { data, error } = await supabase
-      .from('cached_rates')
-      .select('crypto_prices')
-      .order('fetched_at', { ascending: false })
-      .limit(1)
-      .single()
+      .from('pairs')
+      .select('from_currency, to_currency, rate')
+      .eq('to_currency', 'PHP')
 
-    if (error) {
+    if (error || !data) {
       console.warn('Error fetching crypto prices:', error)
       return {}
     }
 
-    return data?.crypto_prices || {}
+    // Build crypto prices object: { BTC: { php: 2850000 }, ... }
+    const prices = {}
+    data.forEach(pair => {
+      if (!prices[pair.from_currency.toLowerCase()]) {
+        prices[pair.from_currency.toLowerCase()] = {}
+      }
+      prices[pair.from_currency.toLowerCase()].php = parseFloat(pair.rate)
+    })
+
+    return prices
   } catch (error) {
     console.error('Error in getCryptoPrices:', error)
     return {}
