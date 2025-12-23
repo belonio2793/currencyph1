@@ -71,13 +71,17 @@ export default function CommitmentMarketplace({ userId, isAuthenticated, onAuthS
     try {
       const { data: profileData } = await supabase
         .from('commitment_profiles')
-        .select('contact_person, email')
+        .select('contact_person, email, phone_number, social_media')
         .eq('user_id', userId)
         .single()
 
       if (profileData) {
         setName(profileData.contact_person || '')
         setEmail(profileData.email || '')
+        setPhone(profileData.phone_number || '')
+        if (profileData.social_media) {
+          setSocialMedia({ ...socialMedia, ...profileData.social_media })
+        }
       }
     } catch (err) {
       console.error('Error loading user data:', err)
