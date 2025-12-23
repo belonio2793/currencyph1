@@ -1,62 +1,27 @@
 import { supabase } from './supabaseClient'
 
 /**
- * Get latest cached rates from the cached_rates table
- */
-async function getCachedRates() {
-  try {
-    const { data, error } = await supabase
-      .from('cached_rates')
-      .select('exchange_rates, crypto_prices, fetched_at')
-      .order('fetched_at', { ascending: false })
-      .limit(1)
-      .single()
-
-    if (error) {
-      console.warn('Failed to fetch cached_rates:', error.message)
-      return null
-    }
-
-    return data
-  } catch (error) {
-    console.warn('Error fetching cached rates:', error.message)
-    return null
-  }
-}
-
-/**
- * Fetch cryptocurrency exchange rate from cached rates
+ * Fetch cryptocurrency exchange rate from public.pairs table
  * Returns the rate of fromCurrency -> toCurrency
  */
 export async function getCryptoRateFromDb(fromCurrency, toCurrency = 'USD') {
   try {
-    const cached = await getCachedRates()
-    if (!cached?.crypto_prices) {
-      console.warn('No cached crypto prices available')
+    const fromCode = fromCurrency.toUpperCase()
+    const toCode = toCurrency.toUpperCase()
+
+    const { data, error } = await supabase
+      .from('pairs')
+      .select('rate, updated_at')
+      .eq('from_currency', fromCode)
+      .eq('to_currency', toCode)
+      .single()
+
+    if (error || !data || !(typeof data.rate === 'number' && isFinite(data.rate) && data.rate > 0)) {
+      console.warn(`No exchange rate found for ${fromCurrency}/${toCurrency}`)
       return null
     }
 
-    const cryptoPrices = cached.crypto_prices
-    const fromKey = fromCurrency.toLowerCase()
-    const toKey = toCurrency.toLowerCase()
-
-    // Handle various crypto price formats from CoinGecko
-    if (fromKey === 'btc' || fromKey === 'bitcoin') {
-      // Bitcoin base case
-      if (toKey === 'usd') {
-        return cryptoPrices['bitcoin']?.usd
-      } else if (toKey === 'php') {
-        return cryptoPrices['bitcoin']?.php
-      }
-    }
-
-    // For other cryptos, return the direct price in the target currency
-    const price = cryptoPrices[fromKey]?.[toKey]
-    if (price) return price
-
-    // Try alternative formats or fallback
-    console.warn(`Could not find ${fromCurrency}/${toCurrency} in cached prices`)
-    return null
+    return parseFloat(data.rate)
   } catch (error) {
     console.warn(`Error fetching crypto rate for ${fromCurrency}/${toCurrency}:`, error.message)
     return null
