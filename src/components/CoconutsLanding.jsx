@@ -928,7 +928,7 @@ export default function CoconutsLanding() {
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <button className="px-10 py-4 bg-white text-amber-600 rounded-lg hover:bg-gray-100 font-bold text-lg transition-colors flex items-center justify-center gap-2">
-              Get Started Now <ArrowRight className="w-5 h-5" />
+              Get Started Now →
             </button>
             <button className="px-10 py-4 border-2 border-white text-white rounded-lg hover:bg-white/10 font-bold text-lg transition-colors">
               Download Full Prospectus
