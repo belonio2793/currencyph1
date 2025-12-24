@@ -19,9 +19,35 @@ export default function Wallet({ userId, globalCurrency = 'PHP' }) {
   const [authStatus, setAuthStatus] = useState(null)
   const [showDiagnostics, setShowDiagnostics] = useState(true) // Show by default when no wallets
   const [availableTypes, setAvailableTypes] = useState([])
+  const [refreshing, setRefreshing] = useState(false) // Track if we're refreshing after wallet creation
 
   useEffect(() => {
     loadData()
+
+    // Subscribe to wallet changes in real-time
+    if (userId && userId !== 'null' && userId !== 'undefined' && !userId.includes('guest-local')) {
+      const subscription = supabase
+        .channel(`wallets-${userId}`)
+        .on(
+          'postgres_changes',
+          {
+            event: '*',
+            schema: 'public',
+            table: 'wallets',
+            filter: `user_id=eq.${userId}`
+          },
+          (payload) => {
+            console.debug('Wallet change detected:', payload.eventType, payload.new)
+            // Refresh wallets when any change is detected
+            loadData()
+          }
+        )
+        .subscribe()
+
+      return () => {
+        subscription.unsubscribe()
+      }
+    }
   }, [userId])
 
   const loadData = async () => {
