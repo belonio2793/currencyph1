@@ -21,15 +21,19 @@ export default function PokerAuthModal({ open, onClose, onSuccess }) {
 
     try {
       if (isSignUp) {
+        // For signup, identifier should be email format
+        const signupEmail = identifier.includes('@') ? identifier : `${identifier.toLowerCase()}+${Date.now()}@currency.ph`
+
         // Use flexible auth for signup (no email verification required)
-        const result = await flexibleAuthClient.signUp(email, password, {
-          full_name: email.split('@')[0]
+        const result = await flexibleAuthClient.signUp(signupEmail, password, {
+          full_name: identifier.split('@')[0],
+          username: !identifier.includes('@') ? identifier : null
         })
 
         if (result.error) throw new Error(result.error)
 
         setMessage('Account created successfully!')
-        setEmail('')
+        setIdentifier('')
         setPassword('')
 
         setTimeout(() => {
@@ -38,11 +42,11 @@ export default function PokerAuthModal({ open, onClose, onSuccess }) {
         }, 2000)
       } else {
         // Use flexible auth for signin (supports email, username, phone, etc.)
-        const result = await flexibleAuthClient.signInWithIdentifier(email, password)
+        const result = await flexibleAuthClient.signInWithIdentifier(identifier, password)
 
         if (result.error) throw new Error(result.error)
 
-        setEmail('')
+        setIdentifier('')
         setPassword('')
         onSuccess?.()
         onClose()
