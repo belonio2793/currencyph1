@@ -375,24 +375,15 @@ export default function Auth({ onAuthSuccess, initialTab = 'login', isModal = fa
             {/* Login Form */}
             {activeTab === 'login' && (
               <form onSubmit={handleLogin} className="space-y-4">
-                <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 mb-4">
-                  <p className="text-xs font-medium text-amber-900 mb-2">
-                    🔑 Flexible Authentication
-                  </p>
-                  <p className="text-xs text-amber-800 leading-relaxed">
-                    You can log in using any of these from your account: username, email, phone number, or full name. Use whichever you remember!
-                  </p>
-                </div>
-
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-2">
-                    Username, Email, Phone, or Name
+                    Username
                   </label>
                   <input
                     type="text"
                     value={identifier}
                     onChange={(e) => setIdentifier(e.target.value)}
-                    placeholder="Enter any profile detail to log in"
+                    placeholder="your username"
                     className="w-full px-4 py-3 border-2 border-slate-300 rounded-lg focus:outline-none focus:border-blue-600 text-sm"
                     disabled={loading}
                   />
