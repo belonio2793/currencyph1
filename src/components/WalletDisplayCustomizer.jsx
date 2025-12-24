@@ -384,6 +384,18 @@ export default function WalletDisplayCustomizer({ userId, onClose, onUpdate }) {
           {saving ? 'Saving...' : 'Save Dashboard Preferences'}
         </button>
       </div>
+
+      {/* Wallet Initialization Modal */}
+      <WalletInitializationModal
+        isOpen={showInitializationModal}
+        currencyCode={initializingCurrency?.code}
+        currencyName={initializingCurrency?.name}
+        currencySymbol={initializingCurrency?.symbol}
+        userId={userId}
+        onClose={handleInitializationModalClose}
+        onSuccess={handleInitializationSuccess}
+        onCancel={handleInitializationCancel}
+      />
     </div>
   )
 }
