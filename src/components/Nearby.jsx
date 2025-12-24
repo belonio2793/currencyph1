@@ -229,30 +229,6 @@ export default function Nearby({ userId, setActiveTab, setCurrentListingSlug }) 
     }
   }
 
-  async function loadFeaturedListings() {
-    try {
-      const { data, error: fetchError } = await supabase
-        .from('nearby_listings')
-        .select('*')
-        .order('photo_count', { ascending: false, nullsLast: true })
-        .order('rating', { ascending: false, nullsLast: true })
-        .limit(6)
-
-      if (fetchError) throw fetchError
-
-      // Filter out listings without ratings client-side
-      const filteredData = (data || []).filter(item => item.rating !== null && item.rating !== undefined)
-      setFeaturedListings(filteredData)
-    } catch (err) {
-      const errorMessage = err?.message || err?.details || String(err) || 'Unknown error'
-      console.error('Error loading featured listings:', {
-        message: errorMessage,
-        status: err?.status,
-        code: err?.code,
-        details: err?.details
-      })
-    }
-  }
 
 
   async function loadListings() {
