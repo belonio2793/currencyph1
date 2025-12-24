@@ -223,7 +223,13 @@ export default function Nearby({ userId, setActiveTab, setCurrentListingSlug }) 
       setCitiesByLetter(groupCitiesByLetter(allCities))
       setListingStats((prev) => (prev ? { ...prev, cities: allCities.length } : prev))
     } catch (err) {
-      console.error('Error loading cities:', err)
+      const errorMessage = err?.message || err?.details || String(err) || 'Unknown error'
+      console.error('Error loading cities:', {
+        message: errorMessage,
+        status: err?.status,
+        code: err?.code,
+        details: err?.details
+      })
     }
   }
 
