@@ -147,20 +147,18 @@ async function getCachedRateFromDatabase(cryptoCode, toCurrency = 'PHP') {
 
 /**
  * Store rate in database for future use
+ * NOTE: This requires service role - currently disabled to avoid RLS issues
+ * Rates are stored in-memory cache instead (60 second TTL)
  */
 async function storeRateInDatabase(cryptoCode, toCurrency, rate, source) {
+  // DISABLED: Database writes for rates disabled due to RLS policies
+  // Rates are cached in-memory instead (60 second TTL)
+  // If you need persistent caching, use edge functions with service role
   try {
-    await supabase
-      .from('crypto_rates')
-      .upsert({
-        from_currency: cryptoCode,
-        to_currency: toCurrency,
-        rate: rate.toString(),
-        source: source,
-        expires_at: new Date(Date.now() + 3600000).toISOString() // 1 hour
-      }, { onConflict: 'from_currency,to_currency' })
+    // Log for monitoring but don't actually write
+    console.debug(`[Rates Cache] ${cryptoCode}/${toCurrency}: ${rate} (source: ${source})`)
   } catch (err) {
-    console.warn(`Failed to store rate in database:`, err.message)
+    console.warn(`Rate storage skipped:`, err.message)
   }
 }
 
