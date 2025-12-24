@@ -247,10 +247,29 @@ export const currencyAPI = {
       return existing
     }
 
+    // Fetch currency details to get the correct type
+    let walletType = 'fiat' // Default fallback
+    try {
+      const { data: currencyData, error: currencyError } = await supabase
+        .from('currencies')
+        .select('type')
+        .eq('code', currencyCode)
+        .single()
+
+      if (!currencyError && currencyData && currencyData.type) {
+        walletType = currencyData.type
+        console.debug(`Setting wallet type to '${walletType}' for currency ${currencyCode}`)
+      } else {
+        console.warn(`Currency ${currencyCode} not found in currencies table, defaulting to 'fiat'`)
+      }
+    } catch (err) {
+      console.warn(`Could not fetch currency type for ${currencyCode}, defaulting to 'fiat':`, err)
+    }
+
     // Generate a unique account number for the wallet
     const accountNumber = await generateUniqueAccountNumber(12, 12)
 
-    // Create new wallet
+    // Create new wallet with explicit type
     const { data, error } = await supabase
       .from('wallets')
       .insert([
@@ -261,7 +280,8 @@ export const currencyAPI = {
           total_deposited: 0,
           total_withdrawn: 0,
           is_active: true,
-          account_number: accountNumber
+          account_number: accountNumber,
+          type: walletType
         }
       ])
       .select()
@@ -282,6 +302,8 @@ export const currencyAPI = {
       console.error('Wallet creation failed:', errorInfo)
       throw new Error(`Wallet creation failed: ${error.message || error.code || 'Unknown error'}`)
     }
+
+    console.debug(`Wallet created successfully for ${currencyCode} with type '${walletType}'`)
     return data
   },
 
