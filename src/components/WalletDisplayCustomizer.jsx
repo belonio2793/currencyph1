@@ -65,7 +65,7 @@ export default function WalletDisplayCustomizer({ userId, onClose, onUpdate }) {
       const newWallet = await currencyAPI.createWallet(userId, currencyCode)
 
       if (newWallet) {
-        // Immediately update local wallet list
+        // Immediately update local wallet list (optimistic update)
         setUserWallets(prev => {
           if (prev.includes(currencyCode)) return prev
           return [...prev, currencyCode]
@@ -79,14 +79,16 @@ export default function WalletDisplayCustomizer({ userId, onClose, onUpdate }) {
 
         setMessage(`✓ ${currencyCode} wallet created successfully!`)
 
-        // Refresh wallet list after a short delay to ensure DB is updated
+        // Notify parent immediately - real-time subscriptions will handle the refresh
+        if (onUpdate) {
+          onUpdate(selectedCurrencies)
+        }
+
+        // Also refresh local data after a short delay to ensure DB is updated
+        // (This is just a backup, the parent's real-time listener will handle it)
         setTimeout(() => {
           loadData()
-          // Notify parent to refresh if callback exists
-          if (onUpdate) {
-            onUpdate(selectedCurrencies)
-          }
-        }, 500)
+        }, 200)
       } else {
         throw new Error('Wallet creation returned null')
       }
