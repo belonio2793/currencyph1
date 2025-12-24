@@ -29,8 +29,9 @@ export default function Wallet({ userId, globalCurrency = 'PHP' }) {
     const unsubscribeWalletCreated = walletEventBus.on('walletCreated', (walletData) => {
       // Only refresh if this wallet belongs to the current user
       if (walletData.user_id === userId) {
-        console.debug('Wallet creation event received:', walletData)
+        console.debug('Wallet creation event received, refreshing immediately:', walletData)
         setRefreshing(true)
+        // Force immediate refresh without waiting for debounce
         loadData()
       }
     })
