@@ -263,10 +263,26 @@ The migration hasn't been applied yet, or there was an error applying it. Check 
 3. **Enhanced UI** to show currency type icons/badges
 4. **Currency catalog** that auto-syncs with external data sources
 
+## Critical Issue: VARCHAR(3) Currency Columns
+
+**IMPORTANT:** Multiple tables in the system have `VARCHAR(3)` columns for currency codes, which only support 3-character codes like 'PHP' and 'USD'.
+
+**Affected Cryptocurrencies (4+ characters):**
+- AVAX, USDT, USDC, DOGE, LINK, HBAR, PEPE, SHIB, AAVE, XAUT, ENA, HYPE, LITECOIN, WBTC, etc.
+
+**Affected Tables:**
+- payments, payment_intents, invoices, deposits, payment_links
+- escrow_payments, ride_requests, commitments
+- shop_products, orders, product_orders, alibaba_products
+- industrial_products, shop_customer_addresses
+
+**Solution:** Apply migration `0111_expand_currency_code_varchar_limits.sql` to change all `VARCHAR(3)` columns to `VARCHAR(16)`.
+
 ## References
 
 - Migration: `supabase/migrations/059_add_wallet_type_column.sql` (original trigger)
-- Migration: `supabase/migrations/0110_fix_wallet_types_crypto.sql` (fix)
+- Migration: `supabase/migrations/0110_fix_wallet_types_crypto.sql` (fix wallet types)
+- Migration: `supabase/migrations/0111_expand_currency_code_varchar_limits.sql` (fix VARCHAR limits)
 - Schema: `supabase/sql/wallet_schema.sql` (currencies table definition)
 - Code: `src/lib/walletService.js` (createWallet function)
 - Code: `src/lib/payments.js` (alternative createWallet)
