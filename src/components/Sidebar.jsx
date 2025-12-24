@@ -176,26 +176,47 @@ function SidebarComponent({ activeTab, onTabChange, userEmail, onShowAuth, onSig
     }))
   }
 
-  const handleNavClick = (tabId) => {
-    // Map business sub-menu items to 'my-business' tab
-    const businessSubItems = [
-      'bir-integration',
-      'digital-receipts',
-      'shareholders',
-      'jobs-hiring',
-      'employees-payroll',
-      'sales-tax'
-    ]
+  const businessSubItems = [
+    'bir-integration',
+    'digital-receipts',
+    'payments',
+    'shareholders',
+    'jobs-hiring',
+    'employees-payroll',
+    'sales-tax'
+  ]
 
-    if (businessSubItems.includes(tabId)) {
-      // Redirect to my-business page with notification
-      onTabChange('my-business')
-      // Store the intended section in sessionStorage to show on load
-      try {
-        sessionStorage.setItem('pendingBusinessSection', tabId)
-      } catch (e) {
-        console.debug('Could not store pending section:', e)
+  const loadUserBusinesses = async () => {
+    try {
+      setBusinessLoading(true)
+      if (!userId || userId.includes('guest')) {
+        setUserBusinesses([])
+        return
       }
+
+      const { data, error } = await supabase
+        .from('businesses')
+        .select('id, business_name, metadata')
+        .eq('user_id', userId)
+        .order('created_at', { ascending: false })
+
+      if (error) throw error
+      setUserBusinesses(data || [])
+    } catch (err) {
+      console.error('Error loading businesses:', err)
+      setUserBusinesses([])
+    } finally {
+      setBusinessLoading(false)
+    }
+  }
+
+  const handleNavClick = (tabId) => {
+    if (businessSubItems.includes(tabId)) {
+      // Show business modal for business sub-items
+      setSelectedBusinessSection(tabId)
+      loadUserBusinesses().then(() => {
+        setShowBusinessModal(true)
+      })
     } else {
       onTabChange(tabId)
     }
