@@ -33,11 +33,13 @@ function RouteDisplay({ userLocation, listingLocation }) {
 }
 
 export default function ListingDetail({ slug, onBack }) {
+  const { location: userLocation } = useGeolocation()
   const [listing, setListing] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [relatedListings, setRelatedListings] = useState([])
   const [selectedPhotoIndex, setSelectedPhotoIndex] = useState(0)
+  const [showRouteMap, setShowRouteMap] = useState(false)
 
   useEffect(() => {
     loadListing()
