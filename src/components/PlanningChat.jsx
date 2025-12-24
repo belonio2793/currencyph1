@@ -4398,7 +4398,7 @@ export default function PlanningChat() {
         </section>
 
         {/* Regional Market Strategy */}
-        <section className="py-24 px-4 sm:px-6 lg:px-8 bg-gray-50">
+        <section id="coconuts-market" className="py-24 px-4 sm:px-6 lg:px-8 bg-gray-50">
           <div className="max-w-7xl mx-auto">
             <div className="mb-16">
               <div className="inline-block mb-4 px-4 py-2 bg-cyan-100 text-cyan-700 rounded-full text-sm font-semibold">
