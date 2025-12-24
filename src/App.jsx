@@ -114,6 +114,39 @@ export default function App() {
   const [totalCryptoBalancePHP, setTotalCryptoBalancePHP] = useState(0)
   const totalNet = Number(totalBalanceConverted || 0) - Number(totalDebtConverted || 0)
 
+  // Define protected pages that require authentication
+  const protectedPages = new Set([
+    'wallet', 'send', 'send-payment', 'receive', 'deposits', 'dashboard',
+    'profile', 'transactions', 'investments', 'bills', 'payments',
+    'nearby', 'jobs', 'my-business', 'business-marketplace', 'product-detail',
+    'inventory', 'poker', 'chess', 'rides', 'addresses', 'business', 'listing',
+    'network', 'network-balances', 'p2p-loans', 'inbox', 'online-users',
+    'shop', 'shop-product', 'shop-cart', 'shop-checkout', 'shop-order-confirmation',
+    'commitment', 'commitments', 'planning', 'ride-match', 'ride-details'
+  ])
+
+  // Safe tab change that respects auth requirements
+  const handleTabChange = (tab) => {
+    // Public pages that don't require auth
+    if (!protectedPages.has(tab)) {
+      setActiveTab(tab)
+      return
+    }
+
+    // Protected page - check if user is authenticated
+    if (!userId) {
+      // Store where to redirect after auth
+      setRedirectAfterAuth(tab)
+      // Show auth modal
+      setAuthInitialTab('login')
+      setShowAuth(true)
+      return
+    }
+
+    // User is authenticated, allow navigation
+    setActiveTab(tab)
+  }
+
   useEffect(() => {
     // Ensure default page title/meta is set
     if (typeof document !== 'undefined') {
