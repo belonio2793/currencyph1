@@ -20,6 +20,100 @@ L.Icon.Default.mergeOptions({
 
 const ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('')
 
+// Haversine distance formula
+function calculateDistance(lat1, lon1, lat2, lon2) {
+  const R = 6371 // Earth's radius in kilometers
+  const toRad = (deg) => deg * Math.PI / 180
+  const dLat = toRad(lat2 - lat1)
+  const dLon = toRad(lon2 - lon1)
+  const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
+    Math.sin(dLon / 2) * Math.sin(dLon / 2)
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
+  const distance = R * c
+  return isFinite(distance) ? distance : Number.POSITIVE_INFINITY
+}
+
+// Map component for displaying user and nearby listings
+function NearbyMap({ userLocation, listings, onListingClick }) {
+  const map = useMap()
+
+  useEffect(() => {
+    if (userLocation) {
+      map.setView([userLocation.latitude, userLocation.longitude], 13)
+      setTimeout(() => {
+        try { map.invalidateSize() } catch (e) {}
+      }, 100)
+    }
+  }, [userLocation, map])
+
+  if (!userLocation) {
+    return (
+      <div className="absolute inset-0 flex items-center justify-center bg-white/80">
+        <div className="text-center">
+          <p className="text-slate-600 font-medium mb-2">Getting your location...</p>
+          <p className="text-sm text-slate-500">Please enable location access</p>
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <>
+      {/* User location marker */}
+      <Marker position={[userLocation.latitude, userLocation.longitude]} icon={createUserIcon()}>
+        <Popup>
+          <div className="font-semibold text-slate-900">Your Location</div>
+        </Popup>
+      </Marker>
+
+      {/* Listing markers */}
+      {listings.map((listing) => {
+        const lat = Number(listing.latitude ?? listing.lat ?? 0)
+        const lon = Number(listing.longitude ?? listing.lng ?? 0)
+        if (!lat || !lon) return null
+
+        const distance = calculateDistance(userLocation.latitude, userLocation.longitude, lat, lon)
+        return (
+          <Marker key={listing.id} position={[lat, lon]} icon={createListingIcon()}>
+            <Popup>
+              <div
+                className="cursor-pointer"
+                onClick={() => onListingClick && onListingClick(listing.slug)}
+              >
+                <div className="font-semibold text-slate-900 text-sm">{listing.name}</div>
+                <div className="text-xs text-slate-600 mt-1">{distance.toFixed(1)} km away</div>
+                {listing.rating && <div className="text-xs text-yellow-600 mt-1">★ {listing.rating}</div>}
+                <div className="text-xs text-blue-600 mt-2 font-medium hover:underline">View Details</div>
+              </div>
+            </Popup>
+          </Marker>
+        )
+      })}
+    </>
+  )
+}
+
+function createUserIcon() {
+  return L.icon({
+    iconUrl: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48Y2lyY2xlIGN4PSIxNiIgY3k9IjE2IiByPSIxMiIgZmlsbD0iIzMzNjZmZiIgc3Ryb2tlPSIjZmZmIiBzdHJva2Utd2lkdGg9IjIiLz48Y2lyY2xlIGN4PSIxNiIgY3k9IjE2IiByPSI0IiBmaWxsPSIjZmZmIi8+PC9zdmc+',
+    iconSize: [32, 32],
+    iconAnchor: [16, 16],
+    popupAnchor: [0, -16],
+  })
+}
+
+function createListingIcon() {
+  return L.icon({
+    iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png',
+    iconSize: [25, 41],
+    iconAnchor: [12, 41],
+    popupAnchor: [1, -34],
+    shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
+    shadowSize: [41, 41],
+  })
+}
+
 const PHILIPPINE_CITIES = [
   'Abuyog', 'Alaminos', 'Alcala', 'Angeles', 'Antipolo', 'Aroroy', 'Bacolod', 'Bacoor', 'Bago', 'Bais',
   'Balanga', 'Baliuag', 'Bangued', 'Bansalan', 'Bantayan', 'Bataan', 'Batac', 'Batangas City', 'Bayambang', 'Bayawan',
