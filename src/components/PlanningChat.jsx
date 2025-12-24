@@ -2736,7 +2736,7 @@ export default function PlanningChat() {
       {/* Coconuts.com.ph Promotional Sections */}
       <div className="mt-24 border-t-8 border-amber-600">
         {/* Market Opportunity */}
-        <section className="py-24 px-4 sm:px-6 lg:px-8 bg-gray-50">
+        <section id="coconuts-vision" className="py-24 px-4 sm:px-6 lg:px-8 bg-gray-50">
           <div className="max-w-7xl mx-auto">
             <div className="mb-16">
               <div className="inline-block mb-4 px-4 py-2 bg-amber-100 text-amber-700 rounded-full text-sm font-semibold">
