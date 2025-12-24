@@ -586,105 +586,33 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
         }
       }
 
-      // ===== CALCULATE CONVERTED AMOUNT =====
-      const isCryptoDeposit = activeType === 'cryptocurrency'
-      let convertedAmount = null
-      let conversionRate = null
-
-      // Same currency - no conversion needed
-      if (selectedCurrency === targetWalletData.currency_code) {
-        convertedAmount = parseFloat(amount)
-        conversionRate = 1
-      } else {
-        // Different currencies - need exchange rates
-        const fromRate = exchangeRates[selectedCurrency]
-        const toRate = exchangeRates[targetWalletData.currency_code]
-
-        if (!fromRate || !toRate) {
-          setError(`Could not fetch exchange rates for ${selectedCurrency} and ${targetWalletData.currency_code}. Please try again.`)
-          setSubmitting(false)
-          return
-        }
-
-        if (!isFinite(fromRate) || !isFinite(toRate) || fromRate <= 0 || toRate <= 0) {
-          setError(`Invalid exchange rates received. Please try again.`)
-          setSubmitting(false)
-          return
-        }
-
-        // Perform calculation
-        if (isCryptoDeposit) {
-          // Crypto to crypto: (amount / fromRate) * toRate
-          convertedAmount = (parseFloat(amount) / fromRate) * toRate
-          conversionRate = toRate / fromRate
-        } else {
-          // Fiat to fiat: (amount / fromRate) * toRate
-          convertedAmount = (parseFloat(amount) / fromRate) * toRate
-          conversionRate = toRate / fromRate
-        }
-
-        // Validate calculation result
-        if (!isFinite(convertedAmount) || convertedAmount <= 0) {
-          setError('Conversion calculation failed. Please try again.')
-          setSubmitting(false)
-          return
-        }
-
-        // Round to appropriate decimal places
-        const decimals = ['USD', 'EUR', 'GBP', 'JPY', 'PHP'].includes(targetWalletData.currency_code) ? 2 : 8
-        convertedAmount = Math.round(convertedAmount * Math.pow(10, decimals)) / Math.pow(10, decimals)
-        conversionRate = Math.round(conversionRate * 1000000) / 1000000
-      }
-
-      // ===== BUILD AND VALIDATE DEPOSIT RECORD =====
-      const depositRecordBuilder = buildDepositRecord({
+      // ===== USE MULTI-CURRENCY DEPOSIT SERVICE =====
+      // This handles all conversion and validation automatically
+      const result = await multiCurrencyDepositService.createMultiCurrencyDeposit({
         userId,
         walletId: selectedWallet,
         amount,
-        selectedCurrency,
+        depositCurrency: selectedCurrency,
         walletCurrency: targetWalletData.currency_code,
-        convertedAmount,
-        conversionRate,
         depositMethod: activeType === 'cryptocurrency' ? selectedCurrency.toLowerCase() : selectedMethod,
-        activeType,
-        gcashReferenceNumber: selectedMethod === 'gcash' ? gcashReferenceNumber : null,
-        networkInfo: activeMethodData ? { network: activeMethodData.network, provider: activeMethodData.provider } : null
+        paymentReference: selectedMethod === 'gcash' ? gcashReferenceNumber : null,
+        paymentAddress: activeMethodData?.address || null,
+        metadata: {
+          activeType,
+          methodName: selectedMethod || selectedCurrency,
+          networkInfo: activeMethodData ? { network: activeMethodData.network, provider: activeMethodData.provider } : null
+        }
       })
 
-      if (!depositRecordBuilder.isValid) {
-        setError(`Invalid deposit data: ${depositRecordBuilder.errors.join('; ')}`)
+      if (!result.success) {
+        setError(result.error || 'Failed to create deposit')
         setSubmitting(false)
         return
       }
 
-      const depositRecord = depositRecordBuilder.record
-
-      // ===== NOW SAFE TO INSERT INTO DATABASE =====
-      const { data: deposit, error: err } = await supabase
-        .from('deposits')
-        .insert([depositRecord])
-        .select()
-        .single()
-
-      if (err) {
-        console.error('Deposit insert error:', err)
-
-        // User-friendly error messages
-        if (err.code === 'PGRST116') {
-          setError('Database connection error. Please try again.')
-        } else if (err.message.includes('foreign key')) {
-          setError('Invalid wallet selected. Please create a new wallet.')
-        } else if (err.message.includes('unique')) {
-          setError('Duplicate deposit detected. Please try again.')
-        } else {
-          setError('Failed to create deposit. Please try again.')
-        }
-        return
-      }
-
       // Success
-      setDeposits([deposit, ...deposits])
-      setSuccess('Deposit initiated successfully')
+      setDeposits([result.deposit, ...deposits])
+      setSuccess(`Deposit initiated successfully! Converting ${selectedCurrency} to ${targetWalletData.currency_code} at rate ${result.conversion.rate.toFixed(6)}`)
       setError('')
       setStep('confirm')
     } catch (err) {
