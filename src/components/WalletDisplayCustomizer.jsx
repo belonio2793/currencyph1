@@ -380,8 +380,7 @@ export default function WalletDisplayCustomizer({ userId, onClose, onUpdate, onW
       {/* All Available Currencies Section */}
       <div>
         <div className="mb-4">
-          <h3 className="text-lg font-semibold text-slate-900 flex items-center gap-2">
-            <span className="text-2xl">🌍</span>
+          <h3 className="text-lg font-semibold text-slate-900">
             All Currencies
           </h3>
           <p className="text-sm text-slate-600 mt-1">Browse and add more currencies</p>
