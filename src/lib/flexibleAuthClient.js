@@ -117,8 +117,7 @@ export const flexibleAuthClient = {
         }
       }
 
-      // Simple signup without metadata - more reliable with Supabase
-      // We'll store metadata separately if needed
+      // Sign up user
       const { data, error } = await supabase.auth.signUp({
         email: trimmedEmail,
         password
@@ -132,7 +131,38 @@ export const flexibleAuthClient = {
         }
       }
 
-      // Signup successful - metadata can be stored later if needed
+      if (!data.user) {
+        return {
+          user: null,
+          error: 'User creation failed'
+        }
+      }
+
+      // Save metadata to profile
+      try {
+        const profileData = {
+          user_id: data.user.id,
+          email: trimmedEmail,
+          full_name: metadata.full_name || metadata.username || trimmedEmail.split('@')[0],
+          username: metadata.username || null,
+          phone_number: metadata.phone_number || null,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        }
+
+        const { error: profileError } = await supabase
+          .from('profiles')
+          .upsert(profileData, { onConflict: 'user_id' })
+
+        if (profileError) {
+          console.error('Profile save error:', profileError)
+          // Don't fail signup just because profile save failed
+        }
+      } catch (profileErr) {
+        console.error('Error saving profile metadata:', profileErr)
+        // Continue - user is already created, profile save is secondary
+      }
+
       return {
         user: data.user,
         error: null
