@@ -206,8 +206,6 @@ export default function Nearby({ userId, setActiveTab, setCurrentListingSlug }) 
       const { data, error } = await supabase
         .from('nearby_listings')
         .select('city, country')
-        .neq('city', null)
-        .order('city', { ascending: true })
         .limit(10000)
 
       if (error) throw error
