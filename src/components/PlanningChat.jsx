@@ -5078,6 +5078,21 @@ export default function PlanningChat() {
             </p>
           </div>
         </section>
+
+        {/* Partnership Network Section - Bottom of Page */}
+        <section id="partnership-network-bottom" className="py-24 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-slate-900 to-slate-800 border-t border-slate-700">
+          <div className="max-w-7xl mx-auto">
+            <div className="text-center mb-12">
+              <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">
+                🤝 Partnership Network
+              </h2>
+              <p className="text-xl text-slate-300 max-w-2xl mx-auto">
+                Join our growing network of farmers, suppliers, investors, and partners
+              </p>
+            </div>
+            <PartnershipNetworkSection isAuthenticated={isAuthenticated} userId={userId} />
+          </div>
+        </section>
       </div>
     </div>
   )
