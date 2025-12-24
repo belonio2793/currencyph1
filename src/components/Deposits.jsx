@@ -634,8 +634,10 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
   const currencyWallets = wallets.filter(
     w => w.currency_type === 'fiat' && w.currency_code === selectedCurrency
   )
-  // For crypto deposits, only show PHP wallet to receive converted funds
-  const cryptocurrencyWallets = wallets.filter(w => w.currency_code === 'PHP')
+  // For crypto deposits: only show wallets matching the selected cryptocurrency
+  const cryptocurrencyWallets = wallets.filter(
+    w => w.currency_type === 'crypto' && w.currency_code === selectedCurrency
+  )
 
   // Get currency codes that user has wallets for
   const userCurrencyCodes = new Set(wallets.map(w => w.currency_code))
