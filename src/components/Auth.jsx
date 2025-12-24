@@ -457,6 +457,15 @@ export default function Auth({ onAuthSuccess, initialTab = 'login', isModal = fa
                   />
                 </div>
 
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-4">
+                  <p className="text-xs font-medium text-blue-900 mb-2">
+                    Please fill in one way to authenticate your account:
+                  </p>
+                  <p className="text-xs text-blue-800">
+                    Only 1 field required, or you can fill both (all optional)
+                  </p>
+                </div>
+
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-2">
                     Email <span className="text-slate-500 font-normal">(optional)</span>
@@ -466,6 +475,20 @@ export default function Auth({ onAuthSuccess, initialTab = 'login', isModal = fa
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="your@email.com"
+                    className="w-full px-4 py-3 border-2 border-slate-300 rounded-lg focus:outline-none focus:border-blue-600 text-sm"
+                    disabled={loading}
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-2">
+                    Phone Number <span className="text-slate-500 font-normal">(optional)</span>
+                  </label>
+                  <input
+                    type="tel"
+                    value={phoneNumber}
+                    onChange={(e) => setPhoneNumber(e.target.value)}
+                    placeholder="+63 9XX XXXX XXX"
                     className="w-full px-4 py-3 border-2 border-slate-300 rounded-lg focus:outline-none focus:border-blue-600 text-sm"
                     disabled={loading}
                   />
