@@ -313,6 +313,8 @@ export default function Auth({ onAuthSuccess, initialTab = 'login', isModal = fa
                 setActiveTab('login')
                 setError('')
                 setSuccess('')
+                setPhoneNumber('')
+                setEmail('')
                 window.history.replaceState(null, '', '/login')
               }}
               className={`flex-1 px-6 py-4 font-medium text-center transition-colors ${
@@ -328,6 +330,7 @@ export default function Auth({ onAuthSuccess, initialTab = 'login', isModal = fa
                 setActiveTab('register')
                 setError('')
                 setSuccess('')
+                setPhoneNumber('')
                 window.history.replaceState(null, '', '/register')
               }}
               className={`flex-1 px-6 py-4 font-medium text-center transition-colors ${
