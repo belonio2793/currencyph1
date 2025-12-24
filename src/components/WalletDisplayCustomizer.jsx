@@ -245,6 +245,11 @@ export default function WalletDisplayCustomizer({ userId, onClose, onUpdate, onW
     )
   }
 
+  const topCurrencies = ['PHP', 'USD', 'CAD', 'EUR', 'AUD']
+  const topCurrencyData = topCurrencies
+    .map(code => [...allFiatCurrencies, ...allCryptoCurrencies].find(c => c.code === code))
+    .filter(Boolean)
+
   return (
     <div className="bg-white rounded-lg border border-slate-200 p-8">
       {/* Header */}
@@ -266,150 +271,229 @@ export default function WalletDisplayCustomizer({ userId, onClose, onUpdate, onW
         </div>
       )}
 
-      {/* Tabs */}
-      <div className="mb-8 border-b border-slate-200">
-        <div className="flex gap-6">
-          <button
-            onClick={() => setActiveTab('currency')}
-            className={`pb-3 px-2 font-medium text-base border-b-2 transition-colors ${
-              activeTab === 'currency'
-                ? 'border-blue-600 text-blue-600'
-                : 'border-transparent text-slate-600 hover:text-slate-900'
-            }`}
-          >
-            Fiat Currencies ({allFiatCurrencies.length})
-          </button>
-          <button
-            onClick={() => setActiveTab('cryptocurrency')}
-            className={`pb-3 px-2 font-medium text-base border-b-2 transition-colors ${
-              activeTab === 'cryptocurrency'
-                ? 'border-orange-600 text-orange-600'
-                : 'border-transparent text-slate-600 hover:text-slate-900'
-            }`}
-          >
-            Cryptocurrencies ({allCryptoCurrencies.length})
-          </button>
+      {/* Top Currencies Section */}
+      <div className="mb-10">
+        <div className="mb-4">
+          <h3 className="text-lg font-semibold text-slate-900 flex items-center gap-2">
+            <span className="text-2xl">⭐</span>
+            Top Currencies
+          </h3>
+          <p className="text-sm text-slate-600 mt-1">Popular currencies at a glance</p>
         </div>
-      </div>
-
-      {/* Search */}
-      <div className="mb-8">
-        <label className="block text-sm font-medium text-slate-700 mb-3">
-          Search {activeTab === 'currency' ? 'Fiat Currencies' : 'Cryptocurrencies'}
-        </label>
-        <input
-          type="text"
-          placeholder={`Search by code or name... (${activeTab === 'currency' ? 'USD, EUR, GBP' : 'BTC, ETH, SOL'}, etc.)`}
-          value={searchInput}
-          onChange={(e) => setSearchInput(e.target.value)}
-          className="w-full px-4 py-3 border border-slate-300 rounded-lg text-base focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent"
-        />
-      </div>
-
-      {/* Currency List */}
-      <div className="mb-8 space-y-3">
-        {filteredCurrencies.length === 0 ? (
-          <p className="text-slate-500 text-center py-6">No currencies found</p>
-        ) : (
-          filteredCurrencies.map(currency => {
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+          {topCurrencyData.map(currency => {
             const walletExists = hasWallet(currency.code)
-            const isDisplayed_ = isDisplayed(currency.code)
-
             return (
               <div
                 key={currency.code}
-                className={`px-5 py-4 rounded-lg border transition-all ${
-                  walletExists
-                    ? 'bg-slate-50 border-slate-200'
-                    : 'bg-slate-100 border-slate-300'
-                }`}
+                className="p-4 border-2 border-slate-200 rounded-xl hover:border-blue-400 transition-all bg-gradient-to-br from-slate-50 to-white"
               >
-                <div className="flex items-center justify-between gap-4">
-                  {/* Currency Info */}
-                  <div className="flex items-center gap-4 flex-1">
-                    <div className="flex-1">
-                      <p className="font-semibold text-slate-900">{currency.code}</p>
-                      <p className="text-sm text-slate-600">{currency.name}</p>
-                    </div>
-                    <p className="text-lg font-medium text-slate-700">{currency.symbol}</p>
-                  </div>
-
-                  {/* Status and Actions */}
-                  <div className="flex items-center gap-3">
-                    {/* Wallet Status */}
-                    {walletExists ? (
-                      <span className="px-3 py-1 bg-emerald-100 text-emerald-700 text-xs font-semibold rounded-full">
-                        ✓ Wallet Created
-                      </span>
-                    ) : (
-                      <span className="px-3 py-1 bg-amber-100 text-amber-700 text-xs font-semibold rounded-full">
-                        No Wallet
-                      </span>
-                    )}
-
-                    {/* Actions */}
-                    {!walletExists ? (
-                      <button
-                        onClick={() => handleCreateWallet(currency.code)}
-                        disabled={creatingWallet === currency.code}
-                        className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
-                          creatingWallet === currency.code
-                            ? 'bg-slate-300 text-slate-600 cursor-not-allowed'
-                            : 'bg-blue-600 text-white hover:bg-blue-700'
-                        }`}
-                      >
-                        {creatingWallet === currency.code ? 'Creating...' : 'Create Wallet'}
-                      </button>
-                    ) : (
-                      <span className="px-3 py-1 bg-blue-100 text-blue-700 text-xs font-semibold rounded-full">
-                        On Dashboard
-                      </span>
-                    )}
-                  </div>
+                <div className="text-center">
+                  <p className="text-2xl font-semibold text-slate-900 mb-1">{currency.symbol}</p>
+                  <p className="text-sm font-semibold text-slate-700 mb-3">{currency.code}</p>
+                  <p className="text-xs text-slate-600 mb-4 line-clamp-1">{currency.name}</p>
+                  {walletExists ? (
+                    <span className="inline-block px-2 py-1 bg-emerald-100 text-emerald-700 text-xs font-semibold rounded-full">
+                      ✓ Created
+                    </span>
+                  ) : (
+                    <button
+                      onClick={() => handleCreateWallet(currency.code)}
+                      disabled={creatingWallet === currency.code}
+                      className={`w-full px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors ${
+                        creatingWallet === currency.code
+                          ? 'bg-slate-200 text-slate-600 cursor-not-allowed'
+                          : 'bg-blue-600 text-white hover:bg-blue-700'
+                      }`}
+                    >
+                      {creatingWallet === currency.code ? 'Creating...' : 'Add'}
+                    </button>
+                  )}
                 </div>
               </div>
             )
-          })
-        )}
+          })}
+        </div>
       </div>
 
-      {/* Summary Section */}
-      <div className="mb-8 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-        <div className="grid grid-cols-2 gap-4 text-sm">
-          <div>
-            <p className="text-blue-900 font-medium">Wallets Created</p>
-            <p className="text-2xl font-light text-blue-900">{userWallets.length}</p>
+      {/* My Wallets Section */}
+      {userWallets.length > 0 && (
+        <div className="mb-10 pb-10 border-b border-slate-200">
+          <div className="mb-4">
+            <h3 className="text-lg font-semibold text-slate-900 flex items-center gap-2">
+              <span className="text-2xl">💳</span>
+              My Wallets ({userWallets.length})
+            </h3>
+            <p className="text-sm text-slate-600 mt-1">Your existing wallets</p>
           </div>
-          <div>
-            <p className="text-blue-900 font-medium">On Dashboard</p>
-            <p className="text-2xl font-light text-blue-900">{userWallets.length}</p>
+
+          {/* Wallet Tabs */}
+          <div className="mb-6 border-b border-slate-200">
+            <div className="flex gap-6">
+              <button
+                onClick={() => setActiveTab('currency')}
+                className={`pb-3 px-2 font-medium text-base border-b-2 transition-colors ${
+                  activeTab === 'currency'
+                    ? 'border-blue-600 text-blue-600'
+                    : 'border-transparent text-slate-600 hover:text-slate-900'
+                }`}
+              >
+                Fiat ({fiatWallets.length = userWallets.filter(code => allFiatCurrencies.some(c => c.code === code)).length})
+              </button>
+              <button
+                onClick={() => setActiveTab('cryptocurrency')}
+                className={`pb-3 px-2 font-medium text-base border-b-2 transition-colors ${
+                  activeTab === 'cryptocurrency'
+                    ? 'border-orange-600 text-orange-600'
+                    : 'border-transparent text-slate-600 hover:text-slate-900'
+                }`}
+              >
+                Crypto ({cryptoWallets.length = userWallets.filter(code => allCryptoCurrencies.some(c => c.code === code)).length})
+              </button>
+            </div>
+          </div>
+
+          {/* My Wallets List */}
+          <div className="space-y-3">
+            {(activeTab === 'currency'
+              ? userWallets.filter(code => allFiatCurrencies.some(c => c.code === code))
+              : userWallets.filter(code => allCryptoCurrencies.some(c => c.code === code))
+            ).map(code => {
+              const currency = [...allFiatCurrencies, ...allCryptoCurrencies].find(c => c.code === code)
+              return currency ? (
+                <div key={code} className="px-4 py-3 bg-slate-50 border border-slate-200 rounded-lg flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <span className="text-lg font-semibold text-slate-900">{currency.symbol}</span>
+                    <div>
+                      <p className="font-semibold text-slate-900">{currency.code}</p>
+                      <p className="text-xs text-slate-600">{currency.name}</p>
+                    </div>
+                  </div>
+                  <span className="px-3 py-1 bg-emerald-100 text-emerald-700 text-xs font-semibold rounded-full">
+                    ✓ Active
+                  </span>
+                </div>
+              ) : null
+            })}
           </div>
         </div>
-        <p className="text-xs text-blue-700 mt-3">All your wallets are automatically displayed on your dashboard.</p>
+      )}
+
+      {/* All Available Currencies Section */}
+      <div>
+        <div className="mb-4">
+          <h3 className="text-lg font-semibold text-slate-900 flex items-center gap-2">
+            <span className="text-2xl">🌍</span>
+            All Currencies
+          </h3>
+          <p className="text-sm text-slate-600 mt-1">Browse and add more currencies</p>
+        </div>
+
+        {/* Tabs */}
+        <div className="mb-6 border-b border-slate-200">
+          <div className="flex gap-6">
+            <button
+              onClick={() => setActiveTab('currency')}
+              className={`pb-3 px-2 font-medium text-base border-b-2 transition-colors ${
+                activeTab === 'currency'
+                  ? 'border-blue-600 text-blue-600'
+                  : 'border-transparent text-slate-600 hover:text-slate-900'
+              }`}
+            >
+              Fiat Currencies ({allFiatCurrencies.length})
+            </button>
+            <button
+              onClick={() => setActiveTab('cryptocurrency')}
+              className={`pb-3 px-2 font-medium text-base border-b-2 transition-colors ${
+                activeTab === 'cryptocurrency'
+                  ? 'border-orange-600 text-orange-600'
+                  : 'border-transparent text-slate-600 hover:text-slate-900'
+              }`}
+            >
+              Cryptocurrencies ({allCryptoCurrencies.length})
+            </button>
+          </div>
+        </div>
+
+        {/* Search */}
+        <div className="mb-6">
+          <label className="block text-sm font-medium text-slate-700 mb-3">
+            Search {activeTab === 'currency' ? 'Fiat Currencies' : 'Cryptocurrencies'}
+          </label>
+          <input
+            type="text"
+            placeholder={`Search by code or name... (${activeTab === 'currency' ? 'USD, EUR, GBP' : 'BTC, ETH, SOL'}, etc.)`}
+            value={searchInput}
+            onChange={(e) => setSearchInput(e.target.value)}
+            className="w-full px-4 py-3 border border-slate-300 rounded-lg text-base focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent"
+          />
+        </div>
+
+        {/* Currency List */}
+        <div className="space-y-3 max-h-96 overflow-y-auto">
+          {filteredCurrencies.length === 0 ? (
+            <p className="text-slate-500 text-center py-6">No currencies found</p>
+          ) : (
+            filteredCurrencies.map(currency => {
+              const walletExists = hasWallet(currency.code)
+
+              return (
+                <div
+                  key={currency.code}
+                  className={`px-4 py-3 rounded-lg border transition-all ${
+                    walletExists
+                      ? 'bg-emerald-50/30 border-emerald-200'
+                      : 'bg-slate-50 border-slate-200 hover:border-blue-300'
+                  }`}
+                >
+                  <div className="flex items-center justify-between gap-4">
+                    {/* Currency Info */}
+                    <div className="flex items-center gap-3 flex-1">
+                      <span className="text-lg font-semibold text-slate-900">{currency.symbol}</span>
+                      <div>
+                        <p className="font-semibold text-slate-900">{currency.code}</p>
+                        <p className="text-xs text-slate-600">{currency.name}</p>
+                      </div>
+                    </div>
+
+                    {/* Actions */}
+                    <div className="flex items-center gap-2">
+                      {walletExists ? (
+                        <span className="px-3 py-1 bg-emerald-100 text-emerald-700 text-xs font-semibold rounded-full">
+                          ✓ Created
+                        </span>
+                      ) : (
+                        <button
+                          onClick={() => handleCreateWallet(currency.code)}
+                          disabled={creatingWallet === currency.code}
+                          className={`px-4 py-1.5 text-xs font-semibold rounded-lg transition-colors ${
+                            creatingWallet === currency.code
+                              ? 'bg-slate-300 text-slate-600 cursor-not-allowed'
+                              : 'bg-blue-600 text-white hover:bg-blue-700'
+                          }`}
+                        >
+                          {creatingWallet === currency.code ? 'Creating...' : 'Add Wallet'}
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )
+            })
+          )}
+        </div>
       </div>
 
       {/* Action Buttons */}
-      <div className="flex gap-4 justify-end">
+      <div className="flex gap-4 justify-end mt-8 pt-6 border-t border-slate-200">
         {onClose && (
           <button
             onClick={onClose}
             className="px-6 py-3 text-slate-700 border border-slate-300 hover:bg-slate-50 rounded-lg transition-colors text-base font-medium"
           >
-            Cancel
+            Done
           </button>
         )}
-
-        <button
-          onClick={handleSavePreferences}
-          disabled={saving}
-          className={`px-6 py-3 text-white rounded-lg transition-colors text-base font-medium ${
-            saving
-              ? 'bg-slate-300 cursor-not-allowed'
-              : 'bg-blue-600 hover:bg-blue-700'
-          }`}
-        >
-          {saving ? 'Saving...' : 'Save Dashboard Preferences'}
-        </button>
       </div>
 
       {/* Wallet Initialization Modal */}
