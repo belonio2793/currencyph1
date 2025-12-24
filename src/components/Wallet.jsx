@@ -300,11 +300,12 @@ export default function Wallet({ userId, globalCurrency = 'PHP' }) {
               </div>
             ) : viewMode === 'grid' ? (
               // Grid View
-              <div className="space-y-12">
+              <div className="space-y-16">
                 {/* Fiat Currencies Section */}
                 {(activeType === 'all' || activeType === 'currency') && fiatWallets.length > 0 && (
-                  <div>
-                    <div className="mb-6 flex items-center gap-3">
+                  <div className="bg-gradient-to-br from-blue-50/40 to-slate-50 border border-blue-100 rounded-xl p-8">
+                    <div className="mb-8 pb-6 border-b-2 border-blue-200 flex items-center gap-3">
+                      <div className="w-2 h-8 bg-blue-600 rounded-full"></div>
                       <h2 className="text-2xl font-semibold text-slate-900">Fiat Currencies</h2>
                       <span className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm font-medium">
                         {fiatWallets.length}
