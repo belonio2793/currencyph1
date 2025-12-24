@@ -68,6 +68,18 @@ export default function WalletDisplayCustomizer({ userId, onClose, onUpdate, onW
       const allCurrencies = [...allFiatCurrencies, ...allCryptoCurrencies]
       const currencyData = allCurrencies.find(c => c.code === currencyCode)
 
+      // OPTIMISTIC UPDATE: Immediately add wallet to UI
+      // This makes the interface feel instant even while the backend is processing
+      setUserWallets(prev => {
+        if (prev.includes(currencyCode)) return prev
+        return [...prev, currencyCode]
+      })
+
+      setSelectedCurrencies(prev => {
+        if (prev.includes(currencyCode)) return prev
+        return [...prev, currencyCode]
+      })
+
       // Set the initializing currency for the modal
       setInitializingCurrency({
         code: currencyCode,
@@ -78,29 +90,23 @@ export default function WalletDisplayCustomizer({ userId, onClose, onUpdate, onW
       // Show the initialization modal
       setShowInitializationModal(true)
 
-      // Create wallet in the background
+      // Create wallet in the background (non-blocking)
       const newWallet = await currencyAPI.createWallet(userId, currencyCode)
 
-      if (newWallet) {
-        console.log(`✓ Wallet created for ${currencyCode}:`, newWallet)
-        // The modal will handle polling and showing success
-        // Just update our local state
-        setUserWallets(prev => {
-          if (prev.includes(currencyCode)) return prev
-          return [...prev, currencyCode]
-        })
-
-        setSelectedCurrencies(prev => {
-          if (prev.includes(currencyCode)) return prev
-          return [...prev, currencyCode]
-        })
-      } else {
+      if (!newWallet) {
         throw new Error('Wallet creation returned null')
       }
+
+      console.log(`✓ Wallet created for ${currencyCode}:`, newWallet)
     } catch (err) {
       console.error('Error creating wallet:', err)
-      // The modal will show this error via its error state
-      // based on timeout or polling failure
+
+      // ROLLBACK: If creation failed, remove the optimistic update
+      setUserWallets(prev => prev.filter(code => code !== currencyCode))
+      setSelectedCurrencies(prev => prev.filter(code => code !== currencyCode))
+      setMessage(`✗ Failed to create ${currencyCode} wallet. Please try again.`)
+      setShowInitializationModal(false)
+      setInitializingCurrency(null)
     } finally {
       setCreatingWallet(null)
     }
