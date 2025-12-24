@@ -1,5 +1,6 @@
 import { supabase } from './supabaseClient'
 import { currencyAPI as currencyConverter } from './currencyAPI'
+import { walletEventBus } from './walletEventBus'
 
 // Helper: generate numeric account number of given length
 const generateAccountNumber = (length = 12) => {
