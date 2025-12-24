@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabaseClient'
+import { walletEventBus } from '../lib/walletEventBus'
 
 export default function WalletInitializationModal({
   isOpen,
