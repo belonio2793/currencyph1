@@ -91,9 +91,6 @@ function Footer({ onNavigate, userEmail }) {
         <div className="py-12 border-b border-gray-200">
           <div className="mb-8">
             <h2 className="text-lg font-semibold text-gray-900 mb-2">currency.ph</h2>
-            <p className="text-sm text-gray-600 max-w-md">
-              An open source application that displays all transactions across the network.
-            </p>
           </div>
 
           {/* Footer Grid */}
