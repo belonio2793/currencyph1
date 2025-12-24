@@ -55,17 +55,6 @@ export default function WalletDisplayCustomizer({ userId, onClose, onUpdate }) {
     }
   }
 
-  const handleToggleDisplay = (currencyCode) => {
-    if (currencyCode === 'PHP') return
-
-    let updated
-    if (selectedCurrencies.includes(currencyCode)) {
-      updated = selectedCurrencies.filter(c => c !== currencyCode)
-    } else {
-      updated = [...selectedCurrencies, currencyCode]
-    }
-    setSelectedCurrencies(updated)
-  }
 
   const handleCreateWallet = async (currencyCode) => {
     try {
