@@ -447,7 +447,6 @@ export default function Nearby({ userId, setActiveTab, setCurrentListingSlug }) 
         .or(
           `name.ilike.%${searchQuery}%,address.ilike.%${searchQuery}%,category.ilike.%${searchQuery}%,description.ilike.%${searchQuery}%,city.ilike.%${searchQuery}%,country.ilike.%${searchQuery}%`
         )
-        .order('photo_count', { ascending: false, nullsLast: true })
         .order('rating', { ascending: false })
         .limit(50)
 
