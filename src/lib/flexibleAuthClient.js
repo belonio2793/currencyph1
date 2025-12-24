@@ -117,44 +117,11 @@ export const flexibleAuthClient = {
         }
       }
 
-      // Sign up through Supabase auth (will auto-confirm email via trigger)
-      // Pass metadata to auth for trigger processing
-      const metadataData = {}
-
-      if (metadata.full_name) {
-        metadataData.full_name = String(metadata.full_name).substring(0, 255)
-      }
-      if (metadata.username) {
-        metadataData.username = String(metadata.username).substring(0, 255)
-      }
-      if (metadata.phone_number) {
-        metadataData.phone_number = String(metadata.phone_number).substring(0, 255)
-      }
-      if (metadata.nickname) {
-        metadataData.nickname = String(metadata.nickname).substring(0, 255)
-      }
-      if (metadata.address) {
-        metadataData.address = String(metadata.address).substring(0, 255)
-      }
-      if (metadata.country) {
-        metadataData.country = String(metadata.country).substring(0, 100)
-      }
-      if (metadata.city) {
-        metadataData.city = String(metadata.city).substring(0, 100)
-      }
-      if (metadata.region) {
-        metadataData.region = String(metadata.region).substring(0, 100)
-      }
-      if (metadata.region_code) {
-        metadataData.region_code = String(metadata.region_code).substring(0, 5)
-      }
-
+      // Simple signup without metadata - more reliable with Supabase
+      // We'll store metadata separately if needed
       const { data, error } = await supabase.auth.signUp({
         email: trimmedEmail,
-        password,
-        options: {
-          data: metadataData
-        }
+        password
       })
 
       if (error) {
@@ -165,9 +132,7 @@ export const flexibleAuthClient = {
         }
       }
 
-      // Profile is automatically created by trigger in database
-      // All metadata has been passed to the database trigger via options.data
-
+      // Signup successful - metadata can be stored later if needed
       return {
         user: data.user,
         error: null
