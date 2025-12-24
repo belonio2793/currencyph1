@@ -155,11 +155,11 @@ export const flexibleAuthClient = {
           .upsert(profileData, { onConflict: 'user_id' })
 
         if (profileError) {
-          console.error('Profile save error:', profileError)
+          console.error('Profile save error:', profileError.message || JSON.stringify(profileError))
           // Don't fail signup just because profile save failed
         }
       } catch (profileErr) {
-        console.error('Error saving profile metadata:', profileErr)
+        console.error('Error saving profile metadata:', profileErr.message || JSON.stringify(profileErr))
         // Continue - user is already created, profile save is secondary
       }
 
