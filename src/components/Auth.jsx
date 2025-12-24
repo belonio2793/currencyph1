@@ -479,36 +479,6 @@ export default function Auth({ onAuthSuccess, initialTab = 'login', isModal = fa
             {/* Register Form */}
             {activeTab === 'register' && (
               <form onSubmit={handleRegister} className="space-y-4">
-                {/* First Name and Last Name in one row */}
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-2">
-                      First Name
-                    </label>
-                    <input
-                      type="text"
-                      value={firstName}
-                      onChange={(e) => setFirstName(e.target.value)}
-                      placeholder="John"
-                      className="w-full px-3 py-2 border-2 border-slate-300 rounded-lg focus:outline-none focus:border-blue-600 text-sm"
-                      disabled={loading}
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-2">
-                      Last Name
-                    </label>
-                    <input
-                      type="text"
-                      value={lastName}
-                      onChange={(e) => setLastName(e.target.value)}
-                      placeholder="Doe"
-                      className="w-full px-3 py-2 border-2 border-slate-300 rounded-lg focus:outline-none focus:border-blue-600 text-sm"
-                      disabled={loading}
-                    />
-                  </div>
-                </div>
-
                 {/* Smart Primary Identifier Field */}
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-1">
