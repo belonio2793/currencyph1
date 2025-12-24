@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabaseClient'
 import { getWalletDisplayPreferences, setWalletDisplayPreferences } from '../lib/walletPreferences'
 import { currencyAPI } from '../lib/payments'
+import WalletInitializationModal from './WalletInitializationModal'
 
 export default function WalletDisplayCustomizer({ userId, onClose, onUpdate }) {
   const [allFiatCurrencies, setAllFiatCurrencies] = useState([])
@@ -14,6 +15,8 @@ export default function WalletDisplayCustomizer({ userId, onClose, onUpdate }) {
   const [saving, setSaving] = useState(false)
   const [message, setMessage] = useState('')
   const [creatingWallet, setCreatingWallet] = useState(null) // Track which wallet is being created
+  const [initializingCurrency, setInitializingCurrency] = useState(null) // Currency being initialized
+  const [showInitializationModal, setShowInitializationModal] = useState(false) // Show initialization modal
 
   useEffect(() => {
     loadData()
