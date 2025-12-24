@@ -26,6 +26,35 @@ const PROJECT_URL = getEnv('VITE_PROJECT_URL') || getEnv('PROJECT_URL') || windo
  */
 export const flexibleAuthClient = {
   /**
+   * Check if identifier (email/username) already exists
+   * @param {string} identifier - Email or username to check
+   * @returns {Promise<{exists: boolean, error: string|null}>}
+   */
+  async checkIdentifierExists(identifier) {
+    try {
+      if (!identifier) {
+        return { exists: false, error: null }
+      }
+
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('id')
+        .or(`email.eq.${identifier},username.eq.${identifier.toLowerCase()}`)
+        .limit(1)
+
+      if (error && error.code !== 'PGRST116') {
+        console.error('Check identifier error:', error.message)
+        return { exists: false, error: error.message }
+      }
+
+      return { exists: data && data.length > 0, error: null }
+    } catch (err) {
+      console.error('Error checking identifier:', err.message)
+      return { exists: false, error: err.message }
+    }
+  },
+
+  /**
    * Login with flexible identifier (email, phone, username, nickname, etc.)
    * @param {string} identifier - Any field value (email, phone, username, nickname, full name)
    * @param {string} password - User's password
