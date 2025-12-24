@@ -647,10 +647,9 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
   // Get currency codes that user has wallets for
   const userCurrencyCodes = new Set(wallets.map(w => w.currency_code))
 
-  // Filter currencies by type
-  // For fiat: only show those with existing wallets
-  // For crypto: show only those with addresses configured in wallets_house
-  const currencyCurrencies = currencies.filter(c => c.type === 'fiat' && userCurrencyCodes.has(c.code))
+  // Filter currencies by type (show ALL currencies, not just wallet matches)
+  // Users can now deposit ANY currency into ANY wallet
+  const currencyCurrencies = currencies.filter(c => c.type === 'fiat')
   const cryptoCurrencies = currencies.filter(c => c.type === 'crypto' && cryptoAddresses[c.code])
   const displayedCurrencies = activeType === 'currency' ? currencyCurrencies : cryptoCurrencies
 
