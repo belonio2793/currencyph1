@@ -126,16 +126,14 @@ export const flexibleAuthClient = {
         }
       }
 
-      // Wait a moment for the trigger to create the public.profiles row
+      // Create profile record immediately after auth signup
       if (data.user) {
-        await new Promise(resolve => setTimeout(resolve, 100))
-
-        // Update profiles table with metadata
         try {
-          // Build profile data - only include non-empty values
+          // Build profile data with all metadata
           const profileData = {
             user_id: data.user.id,
             full_name: metadata.full_name && metadata.full_name.trim() ? metadata.full_name.trim() : '',
+            created_at: new Date().toISOString(),
             updated_at: new Date().toISOString()
           }
 
@@ -162,17 +160,19 @@ export const flexibleAuthClient = {
             profileData.region = metadata.region.trim()
           }
 
-          // Upsert profile - this will insert or update
+          // Insert profile - use insert instead of upsert to avoid conflicts
           const { error: profileError } = await supabase
             .from('profiles')
-            .upsert(profileData, { onConflict: 'user_id' })
+            .insert([profileData])
 
-          if (profileError && profileError.code !== 'PGRST116') {
-            console.warn('Warning: Could not update profile:', profileError.message)
+          if (profileError) {
+            // If profile insert fails, log it but don't fail the signup
+            console.warn('Warning: Could not create profile:', profileError.message)
+            console.warn('Profile insert error code:', profileError.code)
           }
         } catch (profileError) {
-          console.warn('Warning: Could not update profile metadata:', profileError.message)
-          // Don't fail signup if profile update fails - user is already created
+          console.warn('Warning: Profile creation error:', profileError.message)
+          // Don't fail signup if profile creation fails - user is already created in auth
         }
       }
 
