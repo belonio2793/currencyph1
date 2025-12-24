@@ -888,7 +888,20 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
               {/* Conversion Display */}
               {amount && selectedWallet && (
                 <div className={`border rounded-lg p-6 ${!calculateConvertedAmount() && !exchangeRates[selectedCurrency] ? 'bg-amber-50 border-amber-200' : 'bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200'}`}>
-                  {activeType === 'cryptocurrency' ? (
+                  {selectedCurrency === selectedWalletData?.currency_code ? (
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-sm text-slate-600">Deposit Amount</p>
+                        <p className="text-xs text-emerald-600 font-medium mt-1">✓ No conversion needed - same currency</p>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-sm text-slate-600">You will receive</p>
+                        <p className="text-2xl font-bold text-emerald-600">
+                          {parseFloat(amount).toLocaleString(undefined, { maximumFractionDigits: 8 })} {selectedWalletData?.currency_code}
+                        </p>
+                      </div>
+                    </div>
+                  ) : activeType === 'cryptocurrency' ? (
                     <>
                       <h3 className="text-lg font-semibold text-slate-900 mb-4">
                         Converting {selectedCurrency} <span className="text-indigo-600">{selectedCurrency}</span> to {selectedWalletData?.currency_name} <span className="text-indigo-600">{selectedWalletData?.currency_code}</span>
@@ -909,14 +922,14 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
                         <div className="text-right">
                           <p className="text-xs text-slate-600 mb-1">You receive in {selectedWalletData?.currency_code}</p>
                           <p className={`text-3xl font-bold ${calculateConvertedAmount() ? 'text-indigo-600' : 'text-amber-600'}`}>
-                            {calculateConvertedAmount() ? calculateConvertedAmount().toLocaleString(undefined, { maximumFractionDigits: 2 }) : (
-                              exchangeRates[selectedCurrency] ? (parseFloat(amount) * exchangeRates[selectedCurrency]).toLocaleString(undefined, { maximumFractionDigits: 2 }) : '⏳'
+                            {calculateConvertedAmount() ? calculateConvertedAmount().toLocaleString(undefined, { maximumFractionDigits: 8 }) : (
+                              exchangeRates[selectedCurrency] ? (parseFloat(amount) * exchangeRates[selectedCurrency]).toLocaleString(undefined, { maximumFractionDigits: 8 }) : '⏳'
                             )}
                           </p>
                         </div>
                       </div>
                     </>
-                  ) : selectedCurrency !== selectedWalletData?.currency_code ? (
+                  ) : (
                     <div className="flex items-center justify-between">
                       <div>
                         <p className="text-sm text-slate-600">Conversion Rate</p>
@@ -931,13 +944,13 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
                       <div className="text-right">
                         <p className="text-sm text-slate-600">You will receive</p>
                         <p className={`text-2xl font-bold ${calculateConvertedAmount() ? 'text-blue-600' : 'text-amber-600'}`}>
-                          {calculateConvertedAmount() ? calculateConvertedAmount().toLocaleString(undefined, { maximumFractionDigits: 2 }) : (
-                            exchangeRates[selectedCurrency] && exchangeRates[selectedWalletData?.currency_code] ? (parseFloat(amount) * (exchangeRates[selectedCurrency] / exchangeRates[selectedWalletData?.currency_code])).toLocaleString(undefined, { maximumFractionDigits: 2 }) : '⏳'
+                          {calculateConvertedAmount() ? calculateConvertedAmount().toLocaleString(undefined, { maximumFractionDigits: 8 }) : (
+                            exchangeRates[selectedCurrency] && exchangeRates[selectedWalletData?.currency_code] ? (parseFloat(amount) * (exchangeRates[selectedCurrency] / exchangeRates[selectedWalletData?.currency_code])).toLocaleString(undefined, { maximumFractionDigits: 8 }) : '⏳'
                           )} {selectedWalletData?.currency_code}
                         </p>
                       </div>
                     </div>
-                  ) : null}
+                  )}
                 </div>
               )}
 
