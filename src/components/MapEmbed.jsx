@@ -29,7 +29,7 @@ export default function MapEmbed({ latitude, longitude }) {
         </div>
       ) : (
         <div className="w-full h-64 border rounded overflow-hidden">
-          <MapContainer center={center} zoom={15} scrollWheelZoom={false} className="w-full h-full">
+          <MapContainer center={center} zoom={15} scrollWheelZoom={false} className="w-full h-full" attributionControl={false}>
             <TileLayer
               url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
               attribution=""
