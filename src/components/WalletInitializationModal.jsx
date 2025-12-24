@@ -92,7 +92,6 @@ export default function WalletInitializationModal({
     }, pollCount < 6 ? 500 : 2000) // Fast polling for first 3 seconds, then slower
 
     return () => {
-      clearTimeout(initialDelay)
       clearInterval(pollInterval)
     }
   }, [isOpen, currencyCode, userId, status, checkCount])
