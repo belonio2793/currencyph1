@@ -419,6 +419,8 @@ export default function Auth({ onAuthSuccess, initialTab = 'login', isModal = fa
                       setActiveTab('register')
                       setError('')
                       setSuccess('')
+                      setPhoneNumber('')
+                      setEmail('')
                       window.history.replaceState(null, '', '/register')
                     }}
                     className="text-blue-600 hover:text-blue-700 font-medium"
