@@ -626,6 +626,13 @@ export default function Wallet({ userId, globalCurrency = 'PHP' }) {
                     // Real-time subscription will automatically refresh when wallet is created
                     // No need to do anything here
                   }}
+                  onWalletCreated={(walletData) => {
+                    // Wallet was detected in database - immediately refresh data
+                    console.log('Wallet detected in database, refreshing:', walletData)
+                    setRefreshing(true)
+                    // Force immediate refresh instead of waiting for real-time subscription
+                    loadData()
+                  }}
                 />
               </div>
             </div>
