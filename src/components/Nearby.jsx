@@ -319,7 +319,6 @@ export default function Nearby({ userId, setActiveTab, setCurrentListingSlug }) 
 
       const qRestaurants = base
         .ilike('category', '%restaurant%')
-        .order('photo_count', { ascending: false, nullsLast: true })
         .order('rating', { ascending: false })
         .range(fromFor(nextPages.restaurants), toFor(nextPages.restaurants))
 
@@ -328,7 +327,6 @@ export default function Nearby({ userId, setActiveTab, setCurrentListingSlug }) 
         .select('*')
         .eq('city', city)
         .or('category.ilike.%hotel%,category.ilike.%resort%')
-        .order('photo_count', { ascending: false, nullsLast: true })
         .order('rating', { ascending: false })
         .range(fromFor(nextPages.hotels), toFor(nextPages.hotels))
 
@@ -339,7 +337,6 @@ export default function Nearby({ userId, setActiveTab, setCurrentListingSlug }) 
         .not('category', 'ilike', '%restaurant%')
         .not('category', 'ilike', '%hotel%')
         .not('category', 'ilike', '%resort%')
-        .order('photo_count', { ascending: false, nullsLast: true })
         .order('rating', { ascending: false })
         .range(fromFor(nextPages.attractions), toFor(nextPages.attractions))
 
