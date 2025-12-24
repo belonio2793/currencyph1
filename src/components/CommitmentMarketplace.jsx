@@ -296,8 +296,8 @@ export default function CommitmentMarketplace({ userId, isAuthenticated, onAuthS
 
       const userId = signupResult.user.id
 
-      // Auto sign in the newly created user using flexible auth
-      const signInResult = await flexibleAuthClient.signInWithIdentifier(newUserEmail, password)
+      // Auto sign in the newly created user using flexible auth with username
+      const signInResult = await flexibleAuthClient.signInWithIdentifier(tempFormData.username, password)
       if (signInResult.error) {
         // User was created but sign-in failed - this is unusual
         setPasswordError('Account created successfully! You can now sign in with your credentials.')
