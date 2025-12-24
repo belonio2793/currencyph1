@@ -68,21 +68,25 @@ PEPE, UNI, AAVE, XAUT, ENA, WLD, PYUSD, HYPE, LITECOIN
 
 ---
 
-### Migration 0111: Fix VARCHAR Limits
-**File:** `supabase/migrations/0111_expand_currency_code_varchar_limits.sql`
+### Migration 0111: Fix VARCHAR Limits (CORRECTED VERSION)
+**File:** `supabase/migrations/0111_expand_currency_varchar_SAFE.sql`
 
 **What it does:**
-1. Changes all `VARCHAR(3)` currency columns to `VARCHAR(16)`
-2. Affects 15+ tables across payments, deposits, orders systems
-3. Maintains backward compatibility
+1. **Safely** checks for column existence before altering
+2. Changes `VARCHAR(3)` currency columns to `VARCHAR(16)`
+3. **Explicitly skips deposits table** (already uses currency_code VARCHAR(16))
+4. Maintains backward compatibility
+5. Idempotent - safe to run multiple times
 
-**Tables Fixed:**
+**Tables That Get Fixed (if they have "currency" VARCHAR(3) column):**
 ```
-payments, payment_intents, invoices, deposits, payment_links,
+payments, payment_intents, invoices, payment_links,
 escrow_payments, ride_requests, commitments, orders,
 product_orders, shop_products, industrial_products,
 shop_customer_addresses, alibaba_products, payment_gateways
 ```
+
+**NOTE:** The deposits table uses `currency_code VARCHAR(16)` and is NOT altered by this migration.
 
 ---
 
