@@ -24,9 +24,17 @@ ALTER TABLE public.wallets_crypto
 ADD CONSTRAINT wallets_crypto_user_id_fkey 
 FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE;
 
-ALTER TABLE public.wallets_fiat
-ADD CONSTRAINT wallets_fiat_user_currency_key UNIQUE (user_id, currency) 
-DEFERRABLE INITIALLY DEFERRED;
+-- Add unique constraint only if it doesn't exist
+DO $$
+BEGIN
+  -- Try to add the constraint, ignore if it already exists
+  ALTER TABLE public.wallets_fiat
+  ADD CONSTRAINT wallets_fiat_user_currency_key UNIQUE (user_id, currency) 
+  DEFERRABLE INITIALLY DEFERRED;
+EXCEPTION WHEN duplicate_object THEN
+  -- Constraint already exists, that's fine
+  NULL;
+END$$;
 
 DROP POLICY IF EXISTS "Users can view own fiat wallets" ON public.wallets_fiat;
 CREATE POLICY "Users can view own fiat wallets" ON public.wallets_fiat
@@ -50,9 +58,6 @@ CREATE POLICY "Users can insert own crypto wallets" ON public.wallets_crypto
 
 GRANT SELECT, INSERT, UPDATE ON public.wallets_fiat TO anon, authenticated, service_role;
 GRANT SELECT, INSERT, UPDATE ON public.wallets_crypto TO anon, authenticated, service_role;
-
-COMMENT ON CONSTRAINT wallets_fiat_user_id_fkey ON public.wallets_fiat IS 'Foreign key to auth.users, allowing wallets to be created during signup trigger';
-COMMENT ON CONSTRAINT wallets_crypto_user_id_fkey ON public.wallets_crypto IS 'Foreign key to auth.users, allowing wallets to be created during signup trigger';
 
 -- ============================================================================
 -- MIGRATION 073: Robust Master Trigger with Error Handling
@@ -135,6 +140,7 @@ DROP FUNCTION IF EXISTS public.initialize_user_wallets_internal(user_row auth.us
 CREATE OR REPLACE FUNCTION public.initialize_user_wallets_internal(user_row auth.users)
 RETURNS void AS $$
 BEGIN
+  -- Create only the primary PHP wallet
   INSERT INTO public.wallets_fiat (
     user_id,
     provider,
@@ -155,6 +161,7 @@ BEGIN
     now()
   ) ON CONFLICT (user_id, currency) DO NOTHING;
   
+  -- Create USD wallet for international users
   INSERT INTO public.wallets_fiat (
     user_id,
     provider,
@@ -185,7 +192,15 @@ COMMENT ON FUNCTION public.initialize_user_wallets_internal IS 'Initialize prima
 -- MIGRATION 075: Fix RLS Policies for Signup Trigger
 -- ============================================================================
 
-ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
+-- PROFILES TABLE
+DO $$
+BEGIN
+  BEGIN
+    ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
+  EXCEPTION WHEN OTHERS THEN
+    NULL;
+  END;
+END$$;
 
 DROP POLICY IF EXISTS "Users can view their own profile" ON public.profiles;
 DROP POLICY IF EXISTS "Users can update their own profile" ON public.profiles;
@@ -205,7 +220,15 @@ CREATE POLICY "Users can insert their own profile" ON public.profiles
 CREATE POLICY "Service role can manage profiles" ON public.profiles
   FOR ALL USING (auth.role() = 'service_role');
 
-ALTER TABLE public.users ENABLE ROW LEVEL SECURITY;
+-- USERS TABLE
+DO $$
+BEGIN
+  BEGIN
+    ALTER TABLE public.users ENABLE ROW LEVEL SECURITY;
+  EXCEPTION WHEN OTHERS THEN
+    NULL;
+  END;
+END$$;
 
 DROP POLICY IF EXISTS "Users can view their own user data" ON public.users;
 DROP POLICY IF EXISTS "Users can update their own user data" ON public.users;
@@ -225,7 +248,15 @@ CREATE POLICY "Service role can insert users on signup" ON public.users
 CREATE POLICY "Service role can manage all users" ON public.users
   FOR ALL USING (auth.role() = 'service_role');
 
-ALTER TABLE public.wallets_fiat ENABLE ROW LEVEL SECURITY;
+-- WALLETS_FIAT TABLE
+DO $$
+BEGIN
+  BEGIN
+    ALTER TABLE public.wallets_fiat ENABLE ROW LEVEL SECURITY;
+  EXCEPTION WHEN OTHERS THEN
+    NULL;
+  END;
+END$$;
 
 DROP POLICY IF EXISTS "Users can view own fiat wallets" ON public.wallets_fiat;
 DROP POLICY IF EXISTS "Users can insert own fiat wallets" ON public.wallets_fiat;
@@ -241,7 +272,15 @@ CREATE POLICY "Users can update own fiat wallets" ON public.wallets_fiat
   FOR UPDATE USING (auth.uid() = user_id OR auth.role() = 'service_role')
   WITH CHECK (auth.uid() = user_id OR auth.role() = 'service_role');
 
-ALTER TABLE public.wallets_crypto ENABLE ROW LEVEL SECURITY;
+-- WALLETS_CRYPTO TABLE
+DO $$
+BEGIN
+  BEGIN
+    ALTER TABLE public.wallets_crypto ENABLE ROW LEVEL SECURITY;
+  EXCEPTION WHEN OTHERS THEN
+    NULL;
+  END;
+END$$;
 
 DROP POLICY IF EXISTS "Users can view own crypto wallets" ON public.wallets_crypto;
 DROP POLICY IF EXISTS "Users can insert own crypto wallets" ON public.wallets_crypto;
@@ -257,7 +296,15 @@ CREATE POLICY "Users can update own crypto wallets" ON public.wallets_crypto
   FOR UPDATE USING (auth.uid() = user_id OR auth.role() = 'service_role')
   WITH CHECK (auth.uid() = user_id OR auth.role() = 'service_role');
 
-ALTER TABLE public.ride_profiles ENABLE ROW LEVEL SECURITY;
+-- RIDE_PROFILES TABLE
+DO $$
+BEGIN
+  BEGIN
+    ALTER TABLE public.ride_profiles ENABLE ROW LEVEL SECURITY;
+  EXCEPTION WHEN OTHERS THEN
+    NULL;
+  END;
+END$$;
 
 DROP POLICY IF EXISTS "Users can view own ride profile" ON public.ride_profiles;
 DROP POLICY IF EXISTS "Users can insert own ride profile" ON public.ride_profiles;
@@ -271,6 +318,7 @@ CREATE POLICY "Service role can create ride profile on signup" ON public.ride_pr
 CREATE POLICY "Users can update own ride profile" ON public.ride_profiles
   FOR UPDATE USING (auth.uid() = user_id OR auth.role() = 'service_role');
 
+-- GRANT PERMISSIONS
 GRANT USAGE ON SCHEMA public TO service_role;
 GRANT ALL ON ALL TABLES IN SCHEMA public TO service_role;
 GRANT ALL ON ALL SEQUENCES IN SCHEMA public TO service_role;
@@ -283,10 +331,16 @@ GRANT SELECT ON public.wallets_fiat TO authenticated;
 GRANT SELECT ON public.wallets_crypto TO authenticated;
 GRANT SELECT ON public.ride_profiles TO authenticated;
 
-GRANT EXECUTE ON FUNCTION public.master_on_auth_user_created TO anon, authenticated, service_role;
-GRANT EXECUTE ON FUNCTION public.create_profile_on_signup_internal TO anon, authenticated, service_role;
-GRANT EXECUTE ON FUNCTION public.create_user_on_signup_internal TO anon, authenticated, service_role;
-GRANT EXECUTE ON FUNCTION public.initialize_user_wallets_internal TO anon, authenticated, service_role;
+-- Grant execute permissions
+DO $$
+BEGIN
+  GRANT EXECUTE ON FUNCTION public.master_on_auth_user_created TO anon, authenticated, service_role;
+  GRANT EXECUTE ON FUNCTION public.create_profile_on_signup_internal TO anon, authenticated, service_role;
+  GRANT EXECUTE ON FUNCTION public.create_user_on_signup_internal TO anon, authenticated, service_role;
+  GRANT EXECUTE ON FUNCTION public.initialize_user_wallets_internal TO anon, authenticated, service_role;
+EXCEPTION WHEN OTHERS THEN
+  NULL;
+END$$;
 
 DO $$
 BEGIN
@@ -297,12 +351,9 @@ BEGIN
   ) THEN
     GRANT EXECUTE ON FUNCTION public.create_ride_profile_on_signup_internal TO anon, authenticated, service_role;
   END IF;
+EXCEPTION WHEN OTHERS THEN
+  NULL;
 END$$;
-
-COMMENT ON TABLE public.profiles IS 'User profile data, allows service_role to insert on signup';
-COMMENT ON TABLE public.users IS 'Central user table, allows service_role to insert on signup';
-COMMENT ON TABLE public.wallets_fiat IS 'Fiat wallets, allows service_role to insert on signup';
-COMMENT ON TABLE public.wallets_crypto IS 'Crypto wallets, allows service_role to insert on signup';
 
 -- ============================================================================
 -- COMPLETION
