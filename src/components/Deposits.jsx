@@ -680,8 +680,7 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
     availableMethods = dynamicMethods
   }
 
-  // When switching currencies in crypto mode, reset the selected method and step
-  // This ensures only methods for the selected currency are shown
+  // When switching currencies, ensure wallet matches or handle accordingly
   useEffect(() => {
     if (activeType === 'cryptocurrency') {
       // Check if selected method is still valid for the new currency
@@ -693,8 +692,26 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
           setStep('amount')
         }
       }
+    } else if (activeType === 'currency') {
+      // For fiat deposits, ensure selected wallet matches the currency
+      const matchingWallets = wallets.filter(
+        w => w.currency_type === 'fiat' && w.currency_code === selectedCurrency
+      )
+
+      // Check if current selectedWallet is still valid
+      const currentWalletValid = matchingWallets.some(w => w.id === selectedWallet)
+
+      if (!currentWalletValid) {
+        if (matchingWallets.length > 0) {
+          // Auto-select the matching wallet if only one exists
+          setSelectedWallet(matchingWallets[0].id)
+        } else {
+          // No matching wallet - deselect
+          setSelectedWallet(null)
+        }
+      }
     }
-  }, [selectedCurrency, activeType])
+  }, [selectedCurrency, activeType, wallets])
 
   const copyToClipboard = async (text) => {
     try {
