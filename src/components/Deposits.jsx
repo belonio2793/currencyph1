@@ -327,7 +327,11 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
 
   const loadInitialData = async () => {
     try {
-      setLoading(true)
+      // Don't set loading during auto-refresh (when wallets are initializing)
+      const isAutoRefresh = initializingWallets.size > 0
+      if (!isAutoRefresh) {
+        setLoading(true)
+      }
       setError('')
 
       if (!userId || userId.includes('guest')) {
@@ -391,6 +395,18 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
 
       setWallets(enrichedWallets)
 
+      // Update initializing wallets: remove any that now exist
+      const newWalletIds = new Set(enrichedWallets.map(w => w.currency_code))
+      setInitializingWallets(prev => {
+        const updated = new Set(prev)
+        for (const currencyCode of prev) {
+          if (newWalletIds.has(currencyCode)) {
+            updated.delete(currencyCode)
+          }
+        }
+        return updated
+      })
+
       // Don't auto-select a wallet - let currency selection trigger wallet selection
       // The useEffect with selectedCurrency will handle selecting the appropriate wallet
       setSelectedWallet(null)
@@ -412,7 +428,9 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
       if (depositsResult.error) throw depositsResult.error
       setDeposits(depositsResult.data || [])
 
-      setLoading(false)
+      if (!isAutoRefresh) {
+        setLoading(false)
+      }
     } catch (err) {
       console.error('Error loading data:', err?.message || err)
       setError(err?.message || 'Failed to load wallet data')
