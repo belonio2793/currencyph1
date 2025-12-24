@@ -25,9 +25,29 @@ export default function Wallet({ userId, globalCurrency = 'PHP' }) {
   useEffect(() => {
     loadData()
 
-    // Subscribe to wallet changes in real-time
+    // Subscribe to wallet event bus for immediate updates
+    const unsubscribeWalletCreated = walletEventBus.on('walletCreated', (walletData) => {
+      // Only refresh if this wallet belongs to the current user
+      if (walletData.user_id === userId) {
+        console.debug('Wallet creation event received:', walletData)
+        setRefreshing(true)
+        loadData()
+      }
+    })
+
+    const unsubscribeRefresh = walletEventBus.on('walletsRefresh', (data) => {
+      // Refresh if this is for the current user
+      if (data.userId === userId) {
+        console.debug('Wallet refresh event received for user:', userId)
+        setRefreshing(true)
+        loadData()
+      }
+    })
+
+    // Subscribe to wallet changes in real-time via Supabase
+    let subscription = null
     if (userId && userId !== 'null' && userId !== 'undefined' && !userId.includes('guest-local')) {
-      const subscription = supabase
+      subscription = supabase
         .channel(`wallets-${userId}`)
         .on(
           'postgres_changes',
@@ -38,14 +58,19 @@ export default function Wallet({ userId, globalCurrency = 'PHP' }) {
             filter: `user_id=eq.${userId}`
           },
           (payload) => {
-            console.debug('Wallet change detected:', payload.eventType, payload.new)
+            console.debug('Wallet change detected via Supabase:', payload.eventType, payload.new)
             // Refresh wallets when any change is detected
+            setRefreshing(true)
             loadData()
           }
         )
         .subscribe()
+    }
 
-      return () => {
+    return () => {
+      unsubscribeWalletCreated()
+      unsubscribeRefresh()
+      if (subscription) {
         subscription.unsubscribe()
       }
     }
