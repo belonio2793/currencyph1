@@ -53,6 +53,7 @@ export default function ListingDetail({ slug, onBack }) {
       })
 
       setListing(data)
+      setSelectedPhotoIndex(0)
 
       // Load related listings in same category
       if (data.category) {
