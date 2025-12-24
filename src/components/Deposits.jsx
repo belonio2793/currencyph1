@@ -5,6 +5,7 @@ import { currencyAPI } from '../lib/currencyAPI'
 import { getCryptoPrice, getMultipleCryptoPrices } from '../lib/cryptoRatesService'
 import { coinsPhApi } from '../lib/coinsPhApi'
 import { formatNumber } from '../lib/currency'
+import { walletService } from '../lib/walletService'
 import {
   validateDepositInput,
   validateWalletCurrency,
