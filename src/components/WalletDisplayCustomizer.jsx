@@ -293,17 +293,18 @@ export default function WalletDisplayCustomizer({ userId, onClose, onUpdate }) {
       </div>
 
       {/* Summary Section */}
-      <div className="mb-8 p-4 bg-slate-50 border border-slate-200 rounded-lg">
+      <div className="mb-8 p-4 bg-blue-50 border border-blue-200 rounded-lg">
         <div className="grid grid-cols-2 gap-4 text-sm">
           <div>
-            <p className="text-slate-600 font-medium">Wallets Created</p>
-            <p className="text-2xl font-light text-slate-900">{userWallets.length}</p>
+            <p className="text-blue-900 font-medium">Wallets Created</p>
+            <p className="text-2xl font-light text-blue-900">{userWallets.length}</p>
           </div>
           <div>
-            <p className="text-slate-600 font-medium">Displayed on Dashboard</p>
-            <p className="text-2xl font-light text-slate-900">{selectedCurrencies.length}</p>
+            <p className="text-blue-900 font-medium">On Dashboard</p>
+            <p className="text-2xl font-light text-blue-900">{userWallets.length}</p>
           </div>
         </div>
+        <p className="text-xs text-blue-700 mt-3">All your wallets are automatically displayed on your dashboard.</p>
       </div>
 
       {/* Action Buttons */}
