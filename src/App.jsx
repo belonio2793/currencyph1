@@ -603,6 +603,9 @@ export default function App() {
     setUserId(null)
     setUserEmail(null)
     setShowAuth(false)
+    setRedirectAfterAuth(null)
+    // Redirect to home page after sign out
+    setActiveTab('home')
     setActiveTab('home')
   }
 
