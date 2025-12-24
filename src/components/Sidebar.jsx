@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useMemo } from 'react'
 import { useDevice } from '../context/DeviceContext'
+import { supabase } from '../lib/supabaseClient'
 
-function SidebarComponent({ activeTab, onTabChange, userEmail, onShowAuth, onSignOut }) {
+function SidebarComponent({ activeTab, onTabChange, userEmail, onShowAuth, onSignOut, userId }) {
   const { isMobile } = useDevice()
   const [isCollapsed, setIsCollapsed] = useState(() => {
     if (typeof window !== 'undefined') {
@@ -23,6 +24,10 @@ function SidebarComponent({ activeTab, onTabChange, userEmail, onShowAuth, onSig
     maps: false,
     system: false
   })
+  const [showBusinessModal, setShowBusinessModal] = useState(false)
+  const [userBusinesses, setUserBusinesses] = useState([])
+  const [businessLoading, setBusinessLoading] = useState(false)
+  const [selectedBusinessSection, setSelectedBusinessSection] = useState(null)
 
   useEffect(() => {
     localStorage.setItem('sidebar_collapsed', JSON.stringify(isCollapsed))
