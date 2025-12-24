@@ -712,14 +712,14 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
     setError('')
   }
 
-  // Filter wallets by type AND matching currency
-  // For fiat deposits: only show wallets matching the selected currency
+  // Filter wallets by type (NOT by matching currency - enable cross-currency deposits)
+  // Users can now deposit any currency into any wallet with automatic conversion
   const currencyWallets = wallets.filter(
-    w => w.currency_type === 'fiat' && w.currency_code === selectedCurrency
+    w => w.currency_type === 'fiat'
   )
-  // For crypto deposits: only show wallets matching the selected cryptocurrency
+  // For crypto deposits: show all crypto wallets
   const cryptocurrencyWallets = wallets.filter(
-    w => w.currency_type === 'crypto' && w.currency_code === selectedCurrency
+    w => w.currency_type === 'crypto'
   )
 
   // Get currency codes that user has wallets for
