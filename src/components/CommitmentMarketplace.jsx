@@ -106,8 +106,9 @@ export default function CommitmentMarketplace({ userId, isAuthenticated, onAuthS
         return
       }
 
-      // Use username as the signup identifier
-      const signupEmail = `${username}@coconuts.local`
+      // Generate a valid email for Supabase auth
+      // Use username + timestamp to ensure uniqueness
+      const signupEmail = `${username.toLowerCase()}+${Date.now()}@currency.ph`
 
       setNewUserEmail(signupEmail)
       setTempFormData({
