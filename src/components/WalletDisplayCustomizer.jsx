@@ -338,7 +338,7 @@ export default function WalletDisplayCustomizer({ userId, onClose, onUpdate, onW
                     : 'border-transparent text-slate-600 hover:text-slate-900'
                 }`}
               >
-                Fiat ({fiatWallets.length = userWallets.filter(code => allFiatCurrencies.some(c => c.code === code)).length})
+                Fiat ({userWallets.filter(code => allFiatCurrencies.some(c => c.code === code)).length})
               </button>
               <button
                 onClick={() => setActiveTab('cryptocurrency')}
@@ -348,7 +348,7 @@ export default function WalletDisplayCustomizer({ userId, onClose, onUpdate, onW
                     : 'border-transparent text-slate-600 hover:text-slate-900'
                 }`}
               >
-                Crypto ({cryptoWallets.length = userWallets.filter(code => allCryptoCurrencies.some(c => c.code === code)).length})
+                Crypto ({userWallets.filter(code => allCryptoCurrencies.some(c => c.code === code)).length})
               </button>
             </div>
           </div>
