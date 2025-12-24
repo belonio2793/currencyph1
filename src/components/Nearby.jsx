@@ -230,7 +230,13 @@ export default function Nearby({ userId, setActiveTab, setCurrentListingSlug }) 
 
       setFeaturedListings(data || [])
     } catch (err) {
-      console.error('Error loading featured listings:', err)
+      const errorMessage = err?.message || err?.details || String(err) || 'Unknown error'
+      console.error('Error loading featured listings:', {
+        message: errorMessage,
+        status: err?.status,
+        code: err?.code,
+        details: err?.details
+      })
     }
   }
 
