@@ -592,7 +592,7 @@ export default function CommitmentMarketplace({ userId, isAuthenticated, onAuthS
             </button>
 
             <p className="text-slate-400 text-xs text-center">
-              ✓ All fields are optional. Share what feels right.
+              ✓ Share what feels right.
             </p>
           </form>
         </div>
