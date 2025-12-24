@@ -575,8 +575,11 @@ export default function App() {
     }
 
     setShowAuth(false)
+    // Redirect to the page they were trying to access, or home if none
+    const targetTab = redirectAfterAuth || 'home'
+    setRedirectAfterAuth(null)
+    setActiveTab(targetTab)
     window.history.replaceState(null, '', '/')
-    setActiveTab('home')
     // load balance for new user session
     loadTotalBalance(user.id)
   }
