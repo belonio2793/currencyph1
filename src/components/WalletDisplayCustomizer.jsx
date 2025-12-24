@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabaseClient'
 import { getWalletDisplayPreferences, setWalletDisplayPreferences } from '../lib/walletPreferences'
 import { currencyAPI } from '../lib/payments'
+import { walletEventBus } from '../lib/walletEventBus'
 import WalletInitializationModal from './WalletInitializationModal'
 
 export default function WalletDisplayCustomizer({ userId, onClose, onUpdate, onWalletCreated }) {
