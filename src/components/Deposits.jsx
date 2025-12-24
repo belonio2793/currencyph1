@@ -182,18 +182,13 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
   useEffect(() => {
     fetchExchangeRates()
 
-    // When switching to crypto mode
+    // When switching to crypto mode, select first available crypto currency
     if (activeType === 'cryptocurrency') {
       // Select the first available crypto currency
       const availableCrypto = cryptoCurrencies.find(c => c.code in cryptoAddresses)
       if (availableCrypto) {
         setSelectedCurrency(availableCrypto.code)
-      }
-
-      // Auto-select PHP wallet for crypto deposits
-      const phpWallet = wallets.find(w => w.currency_code === 'PHP')
-      if (phpWallet) {
-        setSelectedWallet(phpWallet.id)
+        // Don't auto-select wallet - let the currency selection trigger wallet selection via the other useEffect
       }
     }
   }, [activeType, cryptoAddresses, wallets])
