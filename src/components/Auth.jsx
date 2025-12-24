@@ -196,7 +196,7 @@ export default function Auth({ onAuthSuccess, initialTab = 'login', isModal = fa
 
     try {
       if (!identifier || !password || !confirmPassword || !fullName) {
-        throw new Error('Please fill in all fields')
+        throw new Error('Please fill in all required fields')
       }
 
       if (password !== confirmPassword) {
@@ -207,10 +207,17 @@ export default function Auth({ onAuthSuccess, initialTab = 'login', isModal = fa
         throw new Error('Password must be at least 6 characters')
       }
 
+      // Generate a valid email for Supabase auth
+      // If user provided an email, use it; otherwise generate one with username + timestamp
+      const authEmail = email && email.trim()
+        ? email
+        : `${identifier.toLowerCase()}+${Date.now()}@currency.ph`
+
       // Use flexible auth registration - email verification will be auto-confirmed via DB trigger
-      const result = await flexibleAuthClient.signUp(identifier, password, {
+      const result = await flexibleAuthClient.signUp(authEmail, password, {
         full_name: fullName,
-        email: identifier
+        username: identifier,
+        email: email || null
       })
 
       if (result.error) {
@@ -219,6 +226,7 @@ export default function Auth({ onAuthSuccess, initialTab = 'login', isModal = fa
 
       setSuccess('Registration successful! You can now log in.')
       setIdentifier('')
+      setEmail('')
       setPassword('')
       setConfirmPassword('')
       setFullName('')
