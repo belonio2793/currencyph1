@@ -975,6 +975,50 @@ export default function Nearby({ userId, setActiveTab, setCurrentListingSlug }) 
 
       {viewMode === 'listings' && (
       <>
+      {/* Map Section - Prominent display of user location and nearby listings */}
+      {userLocation && !selectedCity && !expandedLetter && searchResults.length === 0 && (
+        <div className="w-full bg-slate-100 border-b border-slate-300">
+          <div className="relative h-96 sm:h-[500px] lg:h-[600px] w-full">
+            <MapContainer
+              attributionControl={false}
+              center={[userLocation.latitude, userLocation.longitude]}
+              zoom={13}
+              keyboard={false}
+              style={{ height: '100%', width: '100%' }}
+            >
+              <TileLayer
+                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                attribution=""
+              />
+              <NearbyMap
+                userLocation={userLocation}
+                listings={displayListings}
+                onListingClick={handleNavigateToListing}
+              />
+            </MapContainer>
+
+            {/* Location Status Badge */}
+            <div className="absolute top-4 left-4 bg-white rounded-lg shadow-lg p-3 max-w-xs">
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 bg-blue-600 rounded-full animate-pulse" />
+                <div>
+                  <p className="text-sm font-semibold text-slate-900">Your Location</p>
+                  <p className="text-xs text-slate-600">{userLocation.latitude.toFixed(3)}, {userLocation.longitude.toFixed(3)}</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Info Badge */}
+            <div className="absolute bottom-4 right-4 bg-white rounded-lg shadow-lg p-3 max-w-sm">
+              <div className="text-xs text-slate-700">
+                <p className="font-semibold mb-1">📍 {listings.length} listings found nearby</p>
+                <p className="text-slate-600">Sorted by closest distance to you</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Header Section */}
       <div className="px-4 sm:px-6 lg:px-8 py-6 sm:py-8 lg:py-10 border-b border-slate-200">
         <div className="max-w-7xl mx-auto">
