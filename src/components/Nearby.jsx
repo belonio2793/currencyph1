@@ -278,14 +278,13 @@ export default function Nearby({ userId, setActiveTab, setCurrentListingSlug }) 
         return
       }
 
-      // Fallback: no user location — use existing ordering
+      // Fallback: no user location — use rating ordering
       const from = (page - 1) * itemsPerPage
       const to = from + itemsPerPage - 1
 
       const { data, error: fetchError } = await supabase
         .from('nearby_listings')
         .select('*')
-        .order('photo_count', { ascending: false, nullsLast: true })
         .order('rating', { ascending: false })
         .range(from, to)
 
