@@ -161,7 +161,13 @@ CREATE TRIGGER on_auth_user_created
   EXECUTE FUNCTION public.master_on_auth_user_created();
 
 -- ============================================================================
--- 5. KEEP OLD FUNCTIONS FOR BACKWARD COMPATIBILITY
+-- 5. GRANT NECESSARY PERMISSIONS
+-- ============================================================================
+GRANT EXECUTE ON FUNCTION public.create_profile_on_signup_internal TO anon, authenticated, service_role;
+GRANT EXECUTE ON FUNCTION public.master_on_auth_user_created TO anon, authenticated, service_role;
+
+-- ============================================================================
+-- 6. KEEP OLD FUNCTIONS FOR BACKWARD COMPATIBILITY
 -- ============================================================================
 -- These functions are now called internally by wrappers
 -- No changes needed - they continue to work as before
