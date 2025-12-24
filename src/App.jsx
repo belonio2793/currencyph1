@@ -710,7 +710,7 @@ export default function App() {
                 <div data-component="navbar">
                   <Navbar
                     activeTab={activeTab}
-                  onTabChange={setActiveTab}
+                  onTabChange={handleTabChange}
                   globalCurrency={globalCurrency}
                   setGlobalCurrency={setGlobalCurrency}
                   globalCryptocurrency={globalCryptocurrency}
