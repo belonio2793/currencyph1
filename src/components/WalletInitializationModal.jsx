@@ -9,7 +9,8 @@ export default function WalletInitializationModal({
   userId,
   onClose,
   onSuccess,
-  onCancel
+  onCancel,
+  onWalletDetected  // New callback: triggered when wallet is detected in database
 }) {
   const [status, setStatus] = useState('initializing') // 'initializing', 'checking', 'success', 'error', 'cancelled'
   const [error, setError] = useState('')
