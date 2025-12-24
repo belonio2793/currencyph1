@@ -73,20 +73,31 @@ export default function WalletDisplayCustomizer({ userId, onClose, onUpdate }) {
       setMessage('')
 
       // Create wallet
-      await currencyAPI.createWallet(userId, currencyCode)
+      const newWallet = await currencyAPI.createWallet(userId, currencyCode)
 
-      // Update local wallet list
-      setUserWallets([...userWallets, currencyCode])
+      if (newWallet) {
+        // Immediately update local wallet list
+        setUserWallets(prev => {
+          if (prev.includes(currencyCode)) return prev
+          return [...prev, currencyCode]
+        })
 
-      // Auto-add to display preferences if not already there
-      if (!selectedCurrencies.includes(currencyCode)) {
-        setSelectedCurrencies([...selectedCurrencies, currencyCode])
+        // Auto-add to display preferences if not already there
+        setSelectedCurrencies(prev => {
+          if (prev.includes(currencyCode)) return prev
+          return [...prev, currencyCode]
+        })
+
+        setMessage(`✓ ${currencyCode} wallet created successfully!`)
+
+        // Refresh wallet list after a short delay to ensure DB is updated
+        setTimeout(loadData, 500)
+      } else {
+        throw new Error('Wallet creation returned null')
       }
-
-      setMessage(`✓ ${currencyCode} wallet created successfully!`)
     } catch (err) {
       console.error('Error creating wallet:', err)
-      setMessage(`✗ Failed to create ${currencyCode} wallet`)
+      setMessage(`✗ Failed to create ${currencyCode} wallet: ${err.message}`)
     } finally {
       setCreatingWallet(null)
     }
