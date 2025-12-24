@@ -42,12 +42,12 @@ export default function WalletDisplayCustomizer({ userId, onClose, onUpdate }) {
         .eq('user_id', userId)
 
       if (wallets) {
-        setUserWallets(wallets.map(w => w.currency_code))
-      }
+        const walletCodes = wallets.map(w => w.currency_code)
+        setUserWallets(walletCodes)
 
-      // Load user's display preferences
-      const prefs = await getWalletDisplayPreferences(userId)
-      setSelectedCurrencies(prefs)
+        // All existing wallets should be shown on dashboard by default
+        setSelectedCurrencies(walletCodes)
+      }
     } catch (err) {
       console.error('Error loading data:', err)
     } finally {
