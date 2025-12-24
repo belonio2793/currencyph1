@@ -58,6 +58,13 @@ export default function WalletInitializationModal({
           setWalletData(data)
           setStatus('success')
 
+          // Broadcast wallet creation event across the entire app
+          walletEventBus.broadcastWalletCreated({
+            ...data,
+            detected_at: new Date().toISOString(),
+            check_number: checkCount + 1
+          })
+
           // Immediately notify parent component so it can refresh
           if (onWalletDetected) {
             onWalletDetected(data)
