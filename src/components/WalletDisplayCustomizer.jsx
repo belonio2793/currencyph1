@@ -162,15 +162,40 @@ export default function WalletDisplayCustomizer({ userId, onClose, onUpdate }) {
       const missingCurrencies = selectedCurrencies.filter(code => !userWallets.includes(code))
 
       if (missingCurrencies.length > 0) {
+        setMessage(`Creating ${missingCurrencies.length} wallet(s)...`)
+
         for (const currencyCode of missingCurrencies) {
           try {
-            await currencyAPI.createWallet(userId, currencyCode)
-            // Optimistically update the local list
-            setUserWallets(prev => [...prev, currencyCode])
+            // Find currency details
+            const allCurrencies = [...allFiatCurrencies, ...allCryptoCurrencies]
+            const currencyData = allCurrencies.find(c => c.code === currencyCode)
+
+            // Show initialization modal
+            setInitializingCurrency({
+              code: currencyCode,
+              name: currencyData?.name || currencyCode,
+              symbol: currencyData?.symbol
+            })
+            setShowInitializationModal(true)
+
+            // Create wallet
+            const newWallet = await currencyAPI.createWallet(userId, currencyCode)
+
+            if (newWallet) {
+              // Optimistically update the local list
+              setUserWallets(prev => {
+                if (prev.includes(currencyCode)) return prev
+                return [...prev, currencyCode]
+              })
+            }
           } catch (err) {
             console.warn(`Warning: Could not create wallet for ${currencyCode}:`, err)
           }
         }
+
+        // Hide modal after batch creation
+        setShowInitializationModal(false)
+        setInitializingCurrency(null)
       }
 
       setMessage('✓ Preferences saved! Wallets created.')
@@ -185,10 +210,12 @@ export default function WalletDisplayCustomizer({ userId, onClose, onUpdate }) {
         if (onClose) {
           onClose()
         }
-      }, 800)
+      }, 1500)
     } catch (err) {
       console.error('Error saving preferences:', err)
       setMessage('✗ Failed to save preferences')
+      setShowInitializationModal(false)
+      setInitializingCurrency(null)
     } finally {
       setSaving(false)
     }
