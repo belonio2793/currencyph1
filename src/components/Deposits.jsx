@@ -928,52 +928,54 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
               )}
 
               {/* Select Deposit Method / Network */}
-              <div>
-                <div className="flex items-center justify-between mb-3">
-                  <label className="block text-sm font-medium text-slate-700">
-                    {activeType === 'cryptocurrency' ? 'Blockchain Network' : 'Payment Method'}
-                  </label>
-                  {activeType === 'cryptocurrency' && !exchangeRates[selectedCurrency] && (
-                    <button
-                      onClick={fetchExchangeRates}
-                      className="text-xs text-blue-600 hover:text-blue-700 font-medium"
-                    >
-                      Retry Rate
-                    </button>
-                  )}
-                </div>
-                {availableMethods.length > 0 ? (
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    {availableMethods.map(method => (
+              {selectedWallet && (
+                <div>
+                  <div className="flex items-center justify-between mb-3">
+                    <label className="block text-sm font-medium text-slate-700">
+                      {activeType === 'cryptocurrency' ? 'Blockchain Network' : 'Payment Method'}
+                    </label>
+                    {activeType === 'cryptocurrency' && !exchangeRates[selectedCurrency] && (
                       <button
-                        key={method.id}
-                        onClick={() => {
-                          setSelectedAddressMethod(method)
-                          setShowCryptoAddressModal(true)
-                        }}
-                        className="p-4 border-2 border-slate-200 rounded-lg text-left transition-all hover:border-blue-400 hover:bg-blue-50"
+                        onClick={fetchExchangeRates}
+                        className="text-xs text-blue-600 hover:text-blue-700 font-medium"
                       >
-                        <div className="font-semibold text-slate-900">{method.name}</div>
-                        <div className="text-sm text-slate-600">{method.description}</div>
-                        {method.network && (
-                          <div className="text-xs text-blue-600 font-medium mt-2">{method.network}</div>
-                        )}
+                        Retry Rate
                       </button>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="p-4 bg-amber-50 border border-amber-200 rounded-lg text-amber-700 text-sm">
-                    {activeType === 'cryptocurrency' ? (
-                      <>
-                        <p className="font-medium mb-2">⚠️ No deposit methods available for {selectedCurrency}</p>
-                        <p>This cryptocurrency may not be configured yet. Please select a different currency or contact support.</p>
-                      </>
-                    ) : (
-                      <p>No payment methods available for {selectedCurrency}. Please create a wallet first.</p>
                     )}
                   </div>
-                )}
-              </div>
+                  {availableMethods.length > 0 ? (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                      {availableMethods.map(method => (
+                        <button
+                          key={method.id}
+                          onClick={() => {
+                            setSelectedAddressMethod(method)
+                            setShowCryptoAddressModal(true)
+                          }}
+                          className="p-4 border-2 border-slate-200 rounded-lg text-left transition-all hover:border-blue-400 hover:bg-blue-50"
+                        >
+                          <div className="font-semibold text-slate-900">{method.name}</div>
+                          <div className="text-sm text-slate-600">{method.description}</div>
+                          {method.network && (
+                            <div className="text-xs text-blue-600 font-medium mt-2">{method.network}</div>
+                          )}
+                        </button>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="p-4 bg-amber-50 border border-amber-200 rounded-lg text-amber-700 text-sm">
+                      {activeType === 'cryptocurrency' ? (
+                        <>
+                          <p className="font-medium mb-2">⚠️ No deposit methods available for {selectedCurrency}</p>
+                          <p>This cryptocurrency may not be configured yet. Please select a different currency or contact support.</p>
+                        </>
+                      ) : (
+                        <p>No payment methods available for {selectedCurrency}. Please create a wallet first.</p>
+                      )}
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           </div>
         )}
