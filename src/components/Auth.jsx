@@ -231,7 +231,7 @@ export default function Auth({ onAuthSuccess, initialTab = 'login', isModal = fa
     setLoading(true)
 
     try {
-      if (!identifier || !password || !confirmPassword || !fullName) {
+      if (!identifier || !password || !confirmPassword || !firstName || !lastName) {
         throw new Error('Please fill in all required fields')
       }
 
@@ -243,26 +243,46 @@ export default function Auth({ onAuthSuccess, initialTab = 'login', isModal = fa
         throw new Error('Password must be at least 6 characters')
       }
 
-      // Prepare optional email and phone
-      const hasEmail = email && email.trim()
-      const hasPhone = phoneNumber && phoneNumber.trim()
+      // Build full name from first and last name
+      const fullName = `${firstName.trim()} ${lastName.trim()}`.trim()
 
-      // Generate a valid email for Supabase auth
-      // If user provided an email, use it; otherwise generate one with username + timestamp
-      const authEmail = hasEmail
-        ? email.trim()
-        : `${identifier.toLowerCase()}+${Date.now()}@currency.ph`
-
-      // Use flexible auth registration - email verification will be auto-confirmed via DB trigger
-      const result = await flexibleAuthClient.signUp(authEmail, password, {
+      // Process main identifier field
+      const identifierType = detectFieldType(identifier)
+      let authEmail = identifier
+      let userData = {
         full_name: fullName,
-        username: identifier,
-        email: hasEmail ? email.trim() : null,
-        phone_number: hasPhone ? phoneNumber.trim() : null
+        username: identifierType === 'username' ? identifier.toLowerCase() : null,
+        email: identifierType === 'email' ? identifier.toLowerCase() : null,
+        phone_number: identifierType === 'phone' ? identifier : null
+      }
+
+      // If identifier is username, generate an auth email
+      if (identifierType === 'username') {
+        authEmail = `${identifier.toLowerCase()}+${Date.now()}@currency.ph`
+      }
+
+      // Process additional fields
+      additionalFields.forEach(field => {
+        if (!field.value.trim()) return
+
+        if (field.type === 'email' && !userData.email) {
+          userData.email = field.value.toLowerCase()
+        } else if (field.type === 'phone' && !userData.phone_number) {
+          userData.phone_number = field.value
+        } else if (field.type === 'username' && !userData.username) {
+          userData.username = field.value.toLowerCase()
+        }
       })
 
+      // Ensure we have a valid email for auth
+      if (!userData.email) {
+        userData.email = authEmail
+      }
+
+      // Use flexible auth registration
+      const result = await flexibleAuthClient.signUp(userData.email, password, userData)
+
       if (result.error) {
-        // Provide more helpful error messages
         let errorMsg = result.error
         if (errorMsg.includes('unique') || errorMsg.includes('duplicate')) {
           if (errorMsg.includes('email')) {
@@ -280,11 +300,11 @@ export default function Auth({ onAuthSuccess, initialTab = 'login', isModal = fa
 
       setSuccess('Registration successful! You can now log in.')
       setIdentifier('')
-      setEmail('')
-      setPhoneNumber('')
+      setFirstName('')
+      setLastName('')
       setPassword('')
       setConfirmPassword('')
-      setFullName('')
+      setAdditionalFields([])
       setTimeout(() => {
         setActiveTab('login')
       }, 2000)
