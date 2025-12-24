@@ -100,6 +100,19 @@ export default function ListingDetail({ slug, onBack }) {
     )
   }
 
+  // Derive image array from various possible fields
+  const imageArray = Array.isArray(listing.photo_urls)
+    ? listing.photo_urls
+    : Array.isArray(listing.image_urls)
+    ? listing.image_urls
+    : listing.image_url
+    ? [listing.image_url]
+    : listing.photo_url
+    ? [listing.photo_url]
+    : []
+
+  // Get the currently displayed image
+  const displayImage = imageArray.length > 0 ? imageArray[selectedPhotoIndex] : null
 
   // Format hours of operation
   const formatHours = (hours) => {
