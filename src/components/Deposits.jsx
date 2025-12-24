@@ -877,13 +877,13 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
                   {activeType === 'cryptocurrency' ? (
                     <>
                       <h3 className="text-lg font-semibold text-slate-900 mb-4">
-                        Convert {selectedCurrency} <span className="text-indigo-600">{selectedCurrency}</span> to Philippine Peso <span className="text-indigo-600">PHP</span>
+                        Converting {selectedCurrency} <span className="text-indigo-600">{selectedCurrency}</span> to {selectedWalletData?.currency_name} <span className="text-indigo-600">{selectedWalletData?.currency_code}</span>
                       </h3>
                       <p className="text-sm text-slate-600 mb-4">
                         {!exchangeRates[selectedCurrency] ? (
                           <span>⏳ Fetching rate for {selectedCurrency}...</span>
                         ) : (
-                          `${amount} ${selectedCurrency} = ${(parseFloat(amount) * exchangeRates[selectedCurrency]).toLocaleString(undefined, { maximumFractionDigits: 2 })} PHP as of ${new Date().toLocaleString(undefined, { month: 'short', day: 'numeric' })}`
+                          `${amount} ${selectedCurrency} = ${(parseFloat(amount) * exchangeRates[selectedCurrency]).toLocaleString(undefined, { maximumFractionDigits: 2 })} ${selectedWalletData?.currency_code} as of ${new Date().toLocaleString(undefined, { month: 'short', day: 'numeric' })}`
                         )}
                       </p>
                       <div className="flex gap-4 items-center justify-between">
@@ -893,7 +893,7 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
                         </div>
                         <div className="text-slate-400 text-xl">↔</div>
                         <div className="text-right">
-                          <p className="text-xs text-slate-600 mb-1">You receive in PHP</p>
+                          <p className="text-xs text-slate-600 mb-1">You receive in {selectedWalletData?.currency_code}</p>
                           <p className={`text-3xl font-bold ${calculateConvertedAmount() ? 'text-indigo-600' : 'text-amber-600'}`}>
                             {calculateConvertedAmount() ? calculateConvertedAmount().toLocaleString(undefined, { maximumFractionDigits: 2 }) : (
                               exchangeRates[selectedCurrency] ? (parseFloat(amount) * exchangeRates[selectedCurrency]).toLocaleString(undefined, { maximumFractionDigits: 2 }) : '⏳'
@@ -902,7 +902,7 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
                         </div>
                       </div>
                     </>
-                  ) : (
+                  ) : selectedCurrency !== selectedWalletData?.currency_code ? (
                     <div className="flex items-center justify-between">
                       <div>
                         <p className="text-sm text-slate-600">Conversion Rate</p>
@@ -923,7 +923,7 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
                         </p>
                       </div>
                     </div>
-                  )}
+                  ) : null}
                 </div>
               )}
 
