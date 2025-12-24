@@ -81,14 +81,15 @@ export default function WalletInitializationModal({
       }
     }
 
-    // Start polling after a short delay, then every 2 seconds
-    const initialDelay = setTimeout(() => {
-      pollWallet()
-    }, 500)
+    // Start polling immediately with aggressive frequency
+    // First few checks are more frequent (every 500ms), then back off to every 2 seconds
+    pollWallet() // Check immediately
 
+    let pollCount = 0
     const pollInterval = setInterval(() => {
+      pollCount++
       pollWallet()
-    }, 2000)
+    }, pollCount < 6 ? 500 : 2000) // Fast polling for first 3 seconds, then slower
 
     return () => {
       clearTimeout(initialDelay)
