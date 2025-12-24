@@ -176,6 +176,32 @@ export const walletService = {
   // Create a wallet for a user and currency
   async createWallet(userId, currencyCode) {
     try {
+      // Fetch currency details to get the correct type
+      let currencyType = 'fiat' // Default fallback
+      let currencyName = currencyCode
+      let symbol = null
+      let decimals = 2
+
+      try {
+        const { data: currencyData, error: currencyError } = await supabase
+          .from('currencies')
+          .select('name, type, symbol, decimals')
+          .eq('code', currencyCode)
+          .single()
+
+        if (!currencyError && currencyData) {
+          currencyType = currencyData.type || 'fiat'
+          currencyName = currencyData.name || currencyCode
+          symbol = currencyData.symbol
+          decimals = currencyData.decimals || 2
+          console.debug(`Currency ${currencyCode} found: type=${currencyType}`)
+        } else {
+          console.warn(`Currency ${currencyCode} not found in currencies table, defaulting to 'fiat'`)
+        }
+      } catch (err) {
+        console.warn(`Could not fetch currency details for ${currencyCode}:`, err)
+      }
+
       const { data, error } = await supabase
         .from('wallets')
         .insert([
@@ -185,10 +211,11 @@ export const walletService = {
             balance: 0,
             total_deposited: 0,
             total_withdrawn: 0,
-            is_active: true
+            is_active: true,
+            type: currencyType
           }
         ])
-        .select('id, user_id, currency_code, balance, total_deposited, total_withdrawn, is_active, created_at, updated_at, account_number, currencies(name, type, symbol, decimals)')
+        .select('id, user_id, currency_code, balance, total_deposited, total_withdrawn, is_active, created_at, updated_at, account_number, type')
         .single()
 
       if (error) {
@@ -201,10 +228,10 @@ export const walletService = {
         wallet_id: data.id,
         user_id: data.user_id,
         currency_code: data.currency_code,
-        currency_name: data.currencies?.name || data.currency_code,
-        currency_type: data.currencies?.type || 'fiat',
-        symbol: data.currencies?.symbol,
-        decimals: data.currencies?.decimals,
+        currency_name: currencyName,
+        currency_type: data.type || currencyType,
+        symbol: symbol,
+        decimals: decimals,
         balance: data.balance,
         total_deposited: data.total_deposited,
         total_withdrawn: data.total_withdrawn,
