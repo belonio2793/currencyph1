@@ -1,4 +1,5 @@
 import { supabase } from './supabaseClient'
+import { walletEventBus } from './walletEventBus'
 
 export const walletService = {
   // Fetch all active currencies from the database
