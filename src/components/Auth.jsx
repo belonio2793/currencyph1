@@ -316,8 +316,6 @@ export default function Auth({ onAuthSuccess, initialTab = 'login', isModal = fa
 
       setSuccess('Registration successful! You can now log in.')
       setIdentifier('')
-      setFirstName('')
-      setLastName('')
       setPassword('')
       setConfirmPassword('')
       setAdditionalFields([])
