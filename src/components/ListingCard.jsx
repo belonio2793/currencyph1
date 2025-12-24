@@ -241,6 +241,13 @@ export default function ListingCard({
           {listing.address && (
             <p className="text-xs text-slate-600 line-clamp-2">{listing.address}</p>
           )}
+          {/* Distance */}
+          {listing._distance_km !== undefined && (
+            <p className="text-xs text-green-600 font-semibold mt-2 flex items-center gap-1">
+              <span>📍</span>
+              {listing._distance_km.toFixed(1)} km away
+            </p>
+          )}
         </div>
 
         {/* Rating Section */}
