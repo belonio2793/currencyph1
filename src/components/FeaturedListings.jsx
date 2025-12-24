@@ -17,15 +17,19 @@ export default function FeaturedListings({ onNavigateToListing }) {
       const { data, error } = await supabase
         .from('nearby_listings')
         .select('*')
-        .neq('rating', null)
-        .gt('review_count', 10)
         .order('rating', { ascending: false, nullsLast: true })
         .order('review_count', { ascending: false, nullsLast: true })
-        .limit(6)
+        .limit(20)
 
       if (error) throw error
 
-      setFeaturedListings(data || [])
+      // Filter client-side to ensure data quality
+      const filteredData = (data || []).filter(item =>
+        item.rating !== null &&
+        item.rating !== undefined &&
+        (item.review_count ?? 0) > 10
+      ).slice(0, 6)
+      setFeaturedListings(filteredData)
     } catch (err) {
       const errorMessage = err?.message || err?.details || String(err) || 'Unknown error'
       console.error('Error loading featured listings:', {
