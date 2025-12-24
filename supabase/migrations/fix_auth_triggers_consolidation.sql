@@ -151,6 +151,8 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
 DROP TRIGGER IF EXISTS on_auth_user_created_profile ON auth.users;
 DROP TRIGGER IF EXISTS trigger_initialize_user_wallets ON auth.users;
+DROP TRIGGER IF EXISTS on_auth_user_created_public_user ON auth.users;
+DROP TRIGGER IF EXISTS on_auth_user_created_auto_confirm ON auth.users;
 
 -- ============================================================================
 -- 4. CREATE SINGLE MASTER TRIGGER
