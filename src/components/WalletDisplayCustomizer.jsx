@@ -126,11 +126,18 @@ export default function WalletDisplayCustomizer({ userId, onClose, onUpdate, onW
       return [...prev, currencyCode]
     })
 
+    // Broadcast wallet creation to all listening components
+    // This triggers immediate refresh in parent Wallet component
+    walletEventBus.broadcastWalletCreated({
+      ...walletData,
+      user_id: userId,
+      immediate_update: true
+    })
+
     // Notify parent with updated currencies
     if (onUpdate) {
       setSelectedCurrencies(prev => {
         const updated = prev.includes(currencyCode) ? prev : [...prev, currencyCode]
-        // Small delay to ensure state is updated before callback
         setTimeout(() => onUpdate(updated), 0)
         return updated
       })
