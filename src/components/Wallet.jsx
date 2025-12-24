@@ -96,12 +96,11 @@ export default function Wallet({ userId, globalCurrency = 'PHP' }) {
         return
       }
 
-      // Determine available wallet types based on user's wallets
+      // Determine available wallet types - always show fiat and crypto as options
+      // This allows users to see empty sections and add currencies even if they don't have them yet
       const types = new Set(allWallets.map(w => w.currency_type))
       console.debug('Available types detected:', Array.from(types))
-      const availableTypesList = ['all']
-      if (types.has('fiat')) availableTypesList.push('currency')
-      if (types.has('crypto')) availableTypesList.push('cryptocurrency')
+      const availableTypesList = ['all', 'currency', 'cryptocurrency'] // Always show both Fiat and Crypto tabs
       if (types.has('wire')) availableTypesList.push('wire')
       setAvailableTypes(availableTypesList)
 
