@@ -695,6 +695,24 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
           setStep('amount')
         }
       }
+
+      // For crypto deposits, ensure selected wallet matches the selected cryptocurrency
+      const matchingWallets = wallets.filter(
+        w => w.currency_type === 'crypto' && w.currency_code === selectedCurrency
+      )
+
+      // Check if current selectedWallet is still valid
+      const currentWalletValid = matchingWallets.some(w => w.id === selectedWallet)
+
+      if (!currentWalletValid) {
+        if (matchingWallets.length > 0) {
+          // Auto-select the matching wallet if only one exists
+          setSelectedWallet(matchingWallets[0].id)
+        } else {
+          // No matching wallet - deselect
+          setSelectedWallet(null)
+        }
+      }
     } else if (activeType === 'currency') {
       // For fiat deposits, ensure selected wallet matches the currency
       const matchingWallets = wallets.filter(
