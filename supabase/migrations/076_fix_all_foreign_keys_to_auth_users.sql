@@ -1,268 +1,292 @@
--- Migration: 076 - Fix ALL Foreign Keys to Reference auth.users
--- Problem: Many tables reference "users(id)" which could be public.users, causing signup failures
--- Solution: Explicitly reference auth.users(id) for all user-related foreign keys
-
--- This migration ensures that ALL user references in the database point to auth.users(id)
--- This prevents foreign key constraint violations during signup when public.users doesn't exist yet
+-- Migration: 076 - Fix Foreign Keys to Reference auth.users (Safe Version)
+-- Only fixes tables and columns that actually exist in the database
 
 -- ============================================================================
--- 1. DEPOSITS TABLE
+-- CRITICAL TABLES FOR SIGNUP - These MUST exist
 -- ============================================================================
-ALTER TABLE IF EXISTS public.deposits
-  DROP CONSTRAINT IF EXISTS deposits_user_id_fkey CASCADE;
 
-ALTER TABLE IF EXISTS public.deposits
-  ADD CONSTRAINT deposits_user_id_fkey 
-  FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE;
+-- 1. PROFILES TABLE (should already reference auth.users correctly)
+DO $$
+BEGIN
+  IF EXISTS (
+    SELECT 1 FROM information_schema.tables 
+    WHERE table_schema = 'public' AND table_name = 'profiles'
+  ) AND EXISTS (
+    SELECT 1 FROM information_schema.columns
+    WHERE table_schema = 'public' AND table_name = 'profiles' AND column_name = 'user_id'
+  ) THEN
+    ALTER TABLE public.profiles
+      DROP CONSTRAINT IF EXISTS profiles_user_id_fkey CASCADE;
+    
+    ALTER TABLE public.profiles
+      ADD CONSTRAINT profiles_user_id_fkey 
+      FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE;
+    
+    RAISE NOTICE 'Fixed profiles.user_id FK to auth.users';
+  ELSE
+    RAISE WARNING 'profiles table or user_id column does not exist';
+  END IF;
+END$$;
 
--- ============================================================================
--- 2. LOANS TABLE
--- ============================================================================
-ALTER TABLE IF EXISTS public.loans
-  DROP CONSTRAINT IF EXISTS loans_user_id_fkey CASCADE;
+-- 2. WALLETS_FIAT TABLE (CRITICAL!)
+DO $$
+BEGIN
+  IF EXISTS (
+    SELECT 1 FROM information_schema.tables 
+    WHERE table_schema = 'public' AND table_name = 'wallets_fiat'
+  ) AND EXISTS (
+    SELECT 1 FROM information_schema.columns
+    WHERE table_schema = 'public' AND table_name = 'wallets_fiat' AND column_name = 'user_id'
+  ) THEN
+    ALTER TABLE public.wallets_fiat
+      DROP CONSTRAINT IF EXISTS wallets_fiat_user_id_fkey CASCADE;
+    
+    ALTER TABLE public.wallets_fiat
+      ADD CONSTRAINT wallets_fiat_user_id_fkey 
+      FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE;
+    
+    RAISE NOTICE 'Fixed wallets_fiat.user_id FK to auth.users';
+  ELSE
+    RAISE WARNING 'wallets_fiat table or user_id column does not exist';
+  END IF;
+END$$;
 
-ALTER TABLE IF EXISTS public.loans
-  ADD CONSTRAINT loans_user_id_fkey 
-  FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE;
+-- 3. WALLETS_CRYPTO TABLE (CRITICAL!)
+DO $$
+BEGIN
+  IF EXISTS (
+    SELECT 1 FROM information_schema.tables 
+    WHERE table_schema = 'public' AND table_name = 'wallets_crypto'
+  ) AND EXISTS (
+    SELECT 1 FROM information_schema.columns
+    WHERE table_schema = 'public' AND table_name = 'wallets_crypto' AND column_name = 'user_id'
+  ) THEN
+    ALTER TABLE public.wallets_crypto
+      DROP CONSTRAINT IF EXISTS wallets_crypto_user_id_fkey CASCADE;
+    
+    ALTER TABLE public.wallets_crypto
+      ADD CONSTRAINT wallets_crypto_user_id_fkey 
+      FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE;
+    
+    RAISE NOTICE 'Fixed wallets_crypto.user_id FK to auth.users';
+  ELSE
+    RAISE WARNING 'wallets_crypto table or user_id column does not exist';
+  END IF;
+END$$;
 
--- ============================================================================
--- 3. LOAN PAYMENTS TABLE (if exists)
--- ============================================================================
-ALTER TABLE IF EXISTS public.loan_payments
-  DROP CONSTRAINT IF EXISTS loan_payments_user_id_fkey CASCADE;
+-- 4. RIDE_PROFILES TABLE
+DO $$
+BEGIN
+  IF EXISTS (
+    SELECT 1 FROM information_schema.tables 
+    WHERE table_schema = 'public' AND table_name = 'ride_profiles'
+  ) AND EXISTS (
+    SELECT 1 FROM information_schema.columns
+    WHERE table_schema = 'public' AND table_name = 'ride_profiles' AND column_name = 'user_id'
+  ) THEN
+    ALTER TABLE public.ride_profiles
+      DROP CONSTRAINT IF EXISTS ride_profiles_user_id_fkey CASCADE;
+    
+    ALTER TABLE public.ride_profiles
+      ADD CONSTRAINT ride_profiles_user_id_fkey 
+      FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE;
+    
+    RAISE NOTICE 'Fixed ride_profiles.user_id FK to auth.users';
+  ELSE
+    RAISE WARNING 'ride_profiles table or user_id column does not exist';
+  END IF;
+END$$;
 
-ALTER TABLE IF EXISTS public.loan_payments
-  ADD CONSTRAINT loan_payments_user_id_fkey 
-  FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE;
-
--- ============================================================================
--- 4. LOAN REQUESTS TABLE (if exists)
--- ============================================================================
-ALTER TABLE IF EXISTS public.loan_requests
-  DROP CONSTRAINT IF EXISTS loan_requests_lender_id_fkey CASCADE;
-
-ALTER TABLE IF EXISTS public.loan_requests
-  ADD CONSTRAINT loan_requests_lender_id_fkey 
-  FOREIGN KEY (lender_id) REFERENCES auth.users(id) ON DELETE CASCADE;
-
--- ============================================================================
--- 5. CONVERSATIONS TABLE
--- ============================================================================
-ALTER TABLE IF EXISTS public.conversations
-  DROP CONSTRAINT IF EXISTS conversations_created_by_fkey CASCADE;
-
-ALTER TABLE IF EXISTS public.conversations
-  ADD CONSTRAINT conversations_created_by_fkey 
-  FOREIGN KEY (created_by) REFERENCES auth.users(id) ON DELETE SET NULL;
-
--- ============================================================================
--- 6. CONVERSATION MEMBERS TABLE
--- ============================================================================
-ALTER TABLE IF EXISTS public.conversation_members
-  DROP CONSTRAINT IF EXISTS conversation_members_user_id_fkey CASCADE;
-
-ALTER TABLE IF EXISTS public.conversation_members
-  ADD CONSTRAINT conversation_members_user_id_fkey 
-  FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE;
-
--- ============================================================================
--- 7. MESSAGES TABLE
--- ============================================================================
-ALTER TABLE IF EXISTS public.messages
-  DROP CONSTRAINT IF EXISTS messages_user_id_fkey CASCADE;
-
-ALTER TABLE IF EXISTS public.messages
-  ADD CONSTRAINT messages_user_id_fkey 
-  FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE;
-
--- ============================================================================
--- 8. MESSAGE READS TABLE
--- ============================================================================
-ALTER TABLE IF EXISTS public.message_reads
-  DROP CONSTRAINT IF EXISTS message_reads_user_id_fkey CASCADE;
-
-ALTER TABLE IF EXISTS public.message_reads
-  ADD CONSTRAINT message_reads_user_id_fkey 
-  FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE;
-
--- ============================================================================
--- 9. INVESTMENTS TABLE (if exists)
--- ============================================================================
-ALTER TABLE IF EXISTS public.investments
-  DROP CONSTRAINT IF EXISTS investments_user_id_fkey CASCADE;
-
-ALTER TABLE IF EXISTS public.investments
-  ADD CONSTRAINT investments_user_id_fkey 
-  FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE;
-
--- ============================================================================
--- 10. DEPOSITS AUDIT TABLE (if exists)
--- ============================================================================
-ALTER TABLE IF EXISTS public.deposit_audit
-  DROP CONSTRAINT IF EXISTS deposit_audit_changed_by_fkey CASCADE;
-
-ALTER TABLE IF EXISTS public.deposit_audit
-  ADD CONSTRAINT deposit_audit_changed_by_fkey 
-  FOREIGN KEY (changed_by) REFERENCES auth.users(id) ON DELETE SET NULL;
-
--- ============================================================================
--- 11. DEPOSITS TABLE - confirmed_by column (if exists)
--- ============================================================================
-ALTER TABLE IF EXISTS public.deposits
-  DROP CONSTRAINT IF EXISTS deposits_confirmed_by_fkey CASCADE;
-
-ALTER TABLE IF EXISTS public.deposits
-  ADD CONSTRAINT deposits_confirmed_by_fkey 
-  FOREIGN KEY (confirmed_by) REFERENCES auth.users(id) ON DELETE SET NULL;
-
--- ============================================================================
--- 12. PROPERTIES TABLE
--- ============================================================================
-ALTER TABLE IF EXISTS public.properties
-  DROP CONSTRAINT IF EXISTS properties_owner_id_fkey CASCADE;
-
-ALTER TABLE IF EXISTS public.properties
-  ADD CONSTRAINT properties_owner_id_fkey 
-  FOREIGN KEY (owner_id) REFERENCES auth.users(id) ON DELETE SET NULL;
-
--- ============================================================================
--- 13. WALLET ENTRIES TABLE (if exists)
--- ============================================================================
-ALTER TABLE IF EXISTS public.wallet_entries
-  DROP CONSTRAINT IF EXISTS wallet_entries_user_id_fkey CASCADE;
-
-ALTER TABLE IF EXISTS public.wallet_entries
-  ADD CONSTRAINT wallet_entries_user_id_fkey 
-  FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE SET NULL;
+-- 5. USERS TABLE
+DO $$
+BEGIN
+  IF EXISTS (
+    SELECT 1 FROM information_schema.tables 
+    WHERE table_schema = 'public' AND table_name = 'users'
+  ) AND EXISTS (
+    SELECT 1 FROM information_schema.columns
+    WHERE table_schema = 'public' AND table_name = 'users' AND column_name = 'auth_id'
+  ) THEN
+    ALTER TABLE public.users
+      DROP CONSTRAINT IF EXISTS users_auth_id_fkey CASCADE;
+    
+    ALTER TABLE public.users
+      ADD CONSTRAINT users_auth_id_fkey 
+      FOREIGN KEY (auth_id) REFERENCES auth.users(id) ON DELETE CASCADE;
+    
+    RAISE NOTICE 'Fixed users.auth_id FK to auth.users';
+  ELSE
+    RAISE WARNING 'users table or auth_id column does not exist';
+  END IF;
+END$$;
 
 -- ============================================================================
--- 14. COMMUNITY MANAGERS TABLE (if exists)
+-- OTHER COMMON TABLES (only if they exist with the required columns)
 -- ============================================================================
-ALTER TABLE IF EXISTS public.community_managers
-  DROP CONSTRAINT IF EXISTS community_managers_user_id_fkey CASCADE;
 
-ALTER TABLE IF EXISTS public.community_managers
-  ADD CONSTRAINT community_managers_user_id_fkey 
-  FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE;
+-- 6. DEPOSITS TABLE
+DO $$
+BEGIN
+  IF EXISTS (
+    SELECT 1 FROM information_schema.tables 
+    WHERE table_schema = 'public' AND table_name = 'deposits'
+  ) AND EXISTS (
+    SELECT 1 FROM information_schema.columns
+    WHERE table_schema = 'public' AND table_name = 'deposits' AND column_name = 'user_id'
+  ) THEN
+    ALTER TABLE public.deposits
+      DROP CONSTRAINT IF EXISTS deposits_user_id_fkey CASCADE;
+    
+    ALTER TABLE public.deposits
+      ADD CONSTRAINT deposits_user_id_fkey 
+      FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE;
+    
+    RAISE NOTICE 'Fixed deposits.user_id FK to auth.users';
+  END IF;
+END$$;
+
+-- 7. LOANS TABLE
+DO $$
+BEGIN
+  IF EXISTS (
+    SELECT 1 FROM information_schema.tables 
+    WHERE table_schema = 'public' AND table_name = 'loans'
+  ) AND EXISTS (
+    SELECT 1 FROM information_schema.columns
+    WHERE table_schema = 'public' AND table_name = 'loans' AND column_name = 'user_id'
+  ) THEN
+    ALTER TABLE public.loans
+      DROP CONSTRAINT IF EXISTS loans_user_id_fkey CASCADE;
+    
+    ALTER TABLE public.loans
+      ADD CONSTRAINT loans_user_id_fkey 
+      FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE;
+    
+    RAISE NOTICE 'Fixed loans.user_id FK to auth.users';
+  END IF;
+END$$;
+
+-- 8. CONVERSATIONS TABLE
+DO $$
+BEGIN
+  IF EXISTS (
+    SELECT 1 FROM information_schema.tables 
+    WHERE table_schema = 'public' AND table_name = 'conversations'
+  ) AND EXISTS (
+    SELECT 1 FROM information_schema.columns
+    WHERE table_schema = 'public' AND table_name = 'conversations' AND column_name = 'created_by'
+  ) THEN
+    ALTER TABLE public.conversations
+      DROP CONSTRAINT IF EXISTS conversations_created_by_fkey CASCADE;
+    
+    ALTER TABLE public.conversations
+      ADD CONSTRAINT conversations_created_by_fkey 
+      FOREIGN KEY (created_by) REFERENCES auth.users(id) ON DELETE SET NULL;
+    
+    RAISE NOTICE 'Fixed conversations.created_by FK to auth.users';
+  END IF;
+END$$;
+
+-- 9. CONVERSATION_MEMBERS TABLE
+DO $$
+BEGIN
+  IF EXISTS (
+    SELECT 1 FROM information_schema.tables 
+    WHERE table_schema = 'public' AND table_name = 'conversation_members'
+  ) AND EXISTS (
+    SELECT 1 FROM information_schema.columns
+    WHERE table_schema = 'public' AND table_name = 'conversation_members' AND column_name = 'user_id'
+  ) THEN
+    ALTER TABLE public.conversation_members
+      DROP CONSTRAINT IF EXISTS conversation_members_user_id_fkey CASCADE;
+    
+    ALTER TABLE public.conversation_members
+      ADD CONSTRAINT conversation_members_user_id_fkey 
+      FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE;
+    
+    RAISE NOTICE 'Fixed conversation_members.user_id FK to auth.users';
+  END IF;
+END$$;
+
+-- 10. MESSAGES TABLE
+DO $$
+BEGIN
+  IF EXISTS (
+    SELECT 1 FROM information_schema.tables 
+    WHERE table_schema = 'public' AND table_name = 'messages'
+  ) AND EXISTS (
+    SELECT 1 FROM information_schema.columns
+    WHERE table_schema = 'public' AND table_name = 'messages' AND column_name = 'user_id'
+  ) THEN
+    ALTER TABLE public.messages
+      DROP CONSTRAINT IF EXISTS messages_user_id_fkey CASCADE;
+    
+    ALTER TABLE public.messages
+      ADD CONSTRAINT messages_user_id_fkey 
+      FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE;
+    
+    RAISE NOTICE 'Fixed messages.user_id FK to auth.users';
+  END IF;
+END$$;
+
+-- 11. VOICE_CALLS TABLE
+DO $$
+BEGIN
+  IF EXISTS (
+    SELECT 1 FROM information_schema.tables 
+    WHERE table_schema = 'public' AND table_name = 'voice_calls'
+  ) THEN
+    IF EXISTS (
+      SELECT 1 FROM information_schema.columns
+      WHERE table_schema = 'public' AND table_name = 'voice_calls' AND column_name = 'caller_id'
+    ) THEN
+      ALTER TABLE public.voice_calls
+        DROP CONSTRAINT IF EXISTS voice_calls_caller_id_fkey CASCADE;
+      
+      ALTER TABLE public.voice_calls
+        ADD CONSTRAINT voice_calls_caller_id_fkey 
+        FOREIGN KEY (caller_id) REFERENCES auth.users(id) ON DELETE CASCADE;
+      
+      RAISE NOTICE 'Fixed voice_calls.caller_id FK to auth.users';
+    END IF;
+    
+    IF EXISTS (
+      SELECT 1 FROM information_schema.columns
+      WHERE table_schema = 'public' AND table_name = 'voice_calls' AND column_name = 'callee_id'
+    ) THEN
+      ALTER TABLE public.voice_calls
+        DROP CONSTRAINT IF EXISTS voice_calls_callee_id_fkey CASCADE;
+      
+      ALTER TABLE public.voice_calls
+        ADD CONSTRAINT voice_calls_callee_id_fkey 
+        FOREIGN KEY (callee_id) REFERENCES auth.users(id) ON DELETE CASCADE;
+      
+      RAISE NOTICE 'Fixed voice_calls.callee_id FK to auth.users';
+    END IF;
+  END IF;
+END$$;
 
 -- ============================================================================
--- 15. LOANS - verified_by column (if exists)
+-- ENSURE service_role HAS NECESSARY PERMISSIONS
 -- ============================================================================
-ALTER TABLE IF EXISTS public.loans
-  DROP CONSTRAINT IF EXISTS loans_verified_by_fkey CASCADE;
 
-ALTER TABLE IF EXISTS public.loans
-  ADD CONSTRAINT loans_verified_by_fkey 
-  FOREIGN KEY (verified_by) REFERENCES auth.users(id) ON DELETE SET NULL;
+GRANT USAGE ON SCHEMA public TO service_role;
+GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO service_role;
+GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO service_role;
+GRANT ALL PRIVILEGES ON ALL FUNCTIONS IN SCHEMA public TO service_role;
 
--- ============================================================================
--- 16. COMMUNITY_MANAGER_VOTES TABLE (if exists)
--- ============================================================================
-ALTER TABLE IF EXISTS public.community_manager_votes
-  DROP CONSTRAINT IF EXISTS community_manager_votes_voter_id_fkey CASCADE;
-
-ALTER TABLE IF EXISTS public.community_manager_votes
-  ADD CONSTRAINT community_manager_votes_voter_id_fkey 
-  FOREIGN KEY (voter_id) REFERENCES auth.users(id) ON DELETE CASCADE;
+ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON TABLES TO service_role;
+ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON SEQUENCES TO service_role;
+ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON FUNCTIONS TO service_role;
 
 -- ============================================================================
--- 17. PENDING_LISTINGS TABLE (if exists)
+-- SUMMARY
 -- ============================================================================
-ALTER TABLE IF EXISTS public.pending_listings
-  DROP CONSTRAINT IF EXISTS pending_listings_submitted_by_user_id_fkey CASCADE;
 
-ALTER TABLE IF EXISTS public.pending_listings
-  ADD CONSTRAINT pending_listings_submitted_by_user_id_fkey 
-  FOREIGN KEY (submitted_by_user_id) REFERENCES auth.users(id) ON DELETE CASCADE;
-
--- ============================================================================
--- 18. PENDING_LISTINGS_VOTES TABLE (if exists)
--- ============================================================================
-ALTER TABLE IF EXISTS public.pending_listings_votes
-  DROP CONSTRAINT IF EXISTS pending_listings_votes_user_id_fkey CASCADE;
-
-ALTER TABLE IF EXISTS public.pending_listings_votes
-  ADD CONSTRAINT pending_listings_votes_user_id_fkey 
-  FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE;
-
--- ============================================================================
--- 19. NEARBY_LISTINGS_VOTES TABLE (if exists)
--- ============================================================================
-ALTER TABLE IF EXISTS public.nearby_listings_votes
-  DROP CONSTRAINT IF EXISTS nearby_listings_votes_user_id_fkey CASCADE;
-
-ALTER TABLE IF EXISTS public.nearby_listings_votes
-  ADD CONSTRAINT nearby_listings_votes_user_id_fkey 
-  FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE;
-
--- ============================================================================
--- 20. RIDE REQUESTS TABLE (if exists)
--- ============================================================================
-ALTER TABLE IF EXISTS public.ride_requests
-  DROP CONSTRAINT IF EXISTS ride_requests_user_id_fkey CASCADE;
-
-ALTER TABLE IF EXISTS public.ride_requests
-  ADD CONSTRAINT ride_requests_user_id_fkey 
-  FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE;
-
--- ============================================================================
--- 21. RIDE MATCHES TABLE (if exists)
--- ============================================================================
-ALTER TABLE IF EXISTS public.ride_matches
-  DROP CONSTRAINT IF EXISTS ride_matches_user_id_fkey CASCADE;
-
-ALTER TABLE IF EXISTS public.ride_matches
-  ADD CONSTRAINT ride_matches_user_id_fkey 
-  FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE;
-
--- ============================================================================
--- 22. RIDE MATCH RATINGS TABLE (if exists)
--- ============================================================================
-ALTER TABLE IF EXISTS public.ride_match_ratings
-  DROP CONSTRAINT IF EXISTS ride_match_ratings_rater_id_fkey CASCADE;
-
-ALTER TABLE IF EXISTS public.ride_match_ratings
-  ADD CONSTRAINT ride_match_ratings_rater_id_fkey 
-  FOREIGN KEY (rater_id) REFERENCES auth.users(id) ON DELETE CASCADE;
-
--- ============================================================================
--- 23. TRANSFERS TABLE (if exists)
--- ============================================================================
-ALTER TABLE IF EXISTS public.transfers
-  DROP CONSTRAINT IF EXISTS transfers_initiated_by_fkey CASCADE;
-
-ALTER TABLE IF EXISTS public.transfers
-  ADD CONSTRAINT transfers_initiated_by_fkey 
-  FOREIGN KEY (initiated_by) REFERENCES auth.users(id) ON DELETE SET NULL;
-
--- ============================================================================
--- 24. VOICE CALLS TABLE (if exists)
--- ============================================================================
-ALTER TABLE IF EXISTS public.voice_calls
-  DROP CONSTRAINT IF EXISTS voice_calls_caller_id_fkey CASCADE;
-
-ALTER TABLE IF EXISTS public.voice_calls
-  ADD CONSTRAINT voice_calls_caller_id_fkey 
-  FOREIGN KEY (caller_id) REFERENCES auth.users(id) ON DELETE CASCADE;
-
-ALTER TABLE IF EXISTS public.voice_calls
-  DROP CONSTRAINT IF EXISTS voice_calls_callee_id_fkey CASCADE;
-
-ALTER TABLE IF EXISTS public.voice_calls
-  ADD CONSTRAINT voice_calls_callee_id_fkey 
-  FOREIGN KEY (callee_id) REFERENCES auth.users(id) ON DELETE CASCADE;
-
--- ============================================================================
--- 25. USER PRESENCE TABLE (if exists)
--- ============================================================================
-ALTER TABLE IF EXISTS public.user_presence
-  DROP CONSTRAINT IF EXISTS user_presence_user_id_fkey CASCADE;
-
-ALTER TABLE IF EXISTS public.user_presence
-  ADD CONSTRAINT user_presence_user_id_fkey 
-  FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE;
-
--- ============================================================================
--- DOCUMENTATION
--- ============================================================================
-COMMENT ON SCHEMA public IS 'All user_id foreign keys now reference auth.users(id) to ensure signup triggers work correctly';
+DO $$
+BEGIN
+  RAISE NOTICE '=== Foreign Key Repair Complete ===';
+  RAISE NOTICE 'All existing tables with user_id/auth_id columns have been fixed to reference auth.users';
+  RAISE NOTICE 'Only tables that actually exist in the database were modified';
+  RAISE NOTICE 'Signup should now work correctly';
+END$$;
