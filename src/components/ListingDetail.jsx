@@ -372,7 +372,19 @@ export default function ListingDetail({ slug, onBack }) {
         {/* Address */}
         {listing.address && (
           <div className="mb-6 p-4 bg-slate-50 rounded-lg border border-slate-200">
-            <div className="font-semibold text-slate-900 mb-1">Address</div>
+            <div className="flex items-center justify-between mb-3">
+              <div className="font-semibold text-slate-900">Address</div>
+              <button
+                onClick={handleOpenDirections}
+                className="px-3 py-1.5 bg-blue-600 text-white rounded text-sm font-medium hover:bg-blue-700 transition-colors flex items-center gap-2"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+                Get Directions
+              </button>
+            </div>
             <p className="text-slate-700">{listing.address}</p>
             {(listing.latitude || listing.lat) && (
               <p className="text-sm text-slate-500 mt-2">
@@ -380,23 +392,93 @@ export default function ListingDetail({ slug, onBack }) {
               </p>
             )}
 
-            {/* Map for listing coordinates */}
+            {/* Distance from user (if location available) */}
+            {userLocation && (listing.latitude || listing.lat) && (listing.longitude || listing.lng) && (
+              <p className="text-sm text-green-600 font-semibold mt-2">
+                📍 {calculateDistance(userLocation.latitude, userLocation.longitude, listing.latitude || listing.lat, listing.longitude || listing.lng).toFixed(1)} km from your location
+              </p>
+            )}
+
+            {/* Map for listing coordinates with optional route view */}
             {(listing.latitude || listing.lat) && (listing.longitude || listing.lng) && (
-              <div className="mt-4 rounded overflow-hidden border border-slate-200">
-                <div style={{ height: 300 }}>
-                  <MapContainer center={[Number(listing.latitude ?? listing.lat), Number(listing.longitude ?? listing.lng)]} zoom={15} keyboard={false} style={{ height: '100%', width: '100%' }}>
-                    <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" attribution='&copy; OpenStreetMap contributors' />
-                    <Marker position={[Number(listing.latitude ?? listing.lat), Number(listing.longitude ?? listing.lng)]}>
-                      <Popup>
-                        <div className="text-sm">
-                          <div className="font-semibold">{listing.name}</div>
-                          <div className="text-xs text-slate-600 mt-1">{listing.address}</div>
-                        </div>
-                      </Popup>
-                    </Marker>
-                  </MapContainer>
+              <>
+                <div className="mt-4">
+                  <button
+                    onClick={() => setShowRouteMap(!showRouteMap)}
+                    className="mb-3 px-3 py-1.5 bg-slate-200 hover:bg-slate-300 text-slate-900 rounded text-sm font-medium transition-colors"
+                  >
+                    {showRouteMap ? '← Back to Listing Location' : 'View Route from Your Location'}
+                  </button>
                 </div>
-              </div>
+
+                <div className="rounded overflow-hidden border border-slate-200">
+                  <div style={{ height: 300 }}>
+                    {showRouteMap && userLocation ? (
+                      <MapContainer
+                        center={[userLocation.latitude, userLocation.longitude]}
+                        zoom={13}
+                        keyboard={false}
+                        style={{ height: '100%', width: '100%' }}
+                        attributionControl={false}
+                      >
+                        <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" attribution="" />
+
+                        {/* User location marker */}
+                        <Marker position={[userLocation.latitude, userLocation.longitude]} icon={createUserIcon()}>
+                          <Popup>
+                            <div className="text-sm font-semibold">Your Location</div>
+                          </Popup>
+                        </Marker>
+
+                        {/* Listing location marker */}
+                        <Marker position={[Number(listing.latitude ?? listing.lat), Number(listing.longitude ?? listing.lng)]}>
+                          <Popup>
+                            <div className="text-sm">
+                              <div className="font-semibold">{listing.name}</div>
+                              <div className="text-xs text-slate-600 mt-1">{listing.address}</div>
+                            </div>
+                          </Popup>
+                        </Marker>
+
+                        {/* Route line */}
+                        <Polyline
+                          positions={[
+                            [userLocation.latitude, userLocation.longitude],
+                            [Number(listing.latitude ?? listing.lat), Number(listing.longitude ?? listing.lng)]
+                          ]}
+                          color="blue"
+                          weight={3}
+                          opacity={0.7}
+                          dashArray="5, 5"
+                        />
+
+                        <RouteDisplay
+                          userLocation={userLocation}
+                          listingLocation={{ latitude: listing.latitude || listing.lat, longitude: listing.longitude || listing.lng }}
+                        />
+                      </MapContainer>
+                    ) : (
+                      <MapContainer
+                        center={[Number(listing.latitude ?? listing.lat), Number(listing.longitude ?? listing.lng)]}
+                        zoom={15}
+                        keyboard={false}
+                        style={{ height: '100%', width: '100%' }}
+                        attributionControl={false}
+                      >
+                        <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" attribution="" />
+                        <Marker position={[Number(listing.latitude ?? listing.lat), Number(listing.longitude ?? listing.lng)]}>
+                          <Popup>
+                            <div className="text-sm">
+                              <div className="font-semibold">{listing.name}</div>
+                              <div className="text-xs text-slate-600 mt-1">{listing.address}</div>
+                            </div>
+                          </Popup>
+                        </Marker>
+                      </MapContainer>
+                    )}
+                  </div>
+                </div>
+              </>
             )}
           </div>
         )}
