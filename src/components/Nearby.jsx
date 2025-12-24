@@ -490,7 +490,13 @@ export default function Nearby({ userId, setActiveTab, setCurrentListingSlug }) 
 
       setSearchResults(data || [])
     } catch (err) {
-      console.error('Error searching:', err)
+      const errorMessage = err?.message || err?.details || String(err) || 'Unknown error'
+      console.error('Error searching:', {
+        message: errorMessage,
+        status: err?.status,
+        code: err?.code,
+        details: err?.details
+      })
       setError('Search failed')
     } finally {
       setIsSearching(false)
