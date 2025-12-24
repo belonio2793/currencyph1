@@ -243,8 +243,18 @@ export default function Auth({ onAuthSuccess, initialTab = 'login', isModal = fa
         throw new Error('Password must be at least 6 characters')
       }
 
+      // Validate identifier is not empty
+      if (!identifier || !identifier.trim()) {
+        throw new Error('Please enter your email, username, or phone number')
+      }
+
       // Build full name from first and last name
       const fullName = `${firstName.trim()} ${lastName.trim()}`.trim()
+
+      // Validate full name
+      if (fullName.length < 2) {
+        throw new Error('Please enter both first and last name')
+      }
 
       // Process main identifier field
       const identifierType = detectFieldType(identifier)
