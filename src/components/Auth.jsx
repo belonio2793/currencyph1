@@ -246,8 +246,23 @@ export default function Auth({ onAuthSuccess, initialTab = 'login', isModal = fa
         throw new Error('Please enter your email, username, or phone number')
       }
 
-      // Process main identifier field
+      // Check if identifier already exists
       const identifierType = detectFieldType(identifier)
+      const checkIdentifier = identifierType === 'email' ? identifier : identifier.toLowerCase().trim()
+      const { exists: identifierExists } = await flexibleAuthClient.checkIdentifierExists(checkIdentifier)
+
+      if (identifierExists) {
+        if (identifierType === 'email') {
+          throw new Error('This email is already registered')
+        } else if (identifierType === 'phone') {
+          throw new Error('This phone number is already registered')
+        } else {
+          throw new Error('This username is already taken')
+        }
+      }
+
+      // Process main identifier field
+      const identifierTypeForData = detectFieldType(identifier)
       let authEmail = null
       let userData = {
         username: null,
