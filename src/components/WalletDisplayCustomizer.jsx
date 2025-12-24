@@ -118,25 +118,26 @@ export default function WalletDisplayCustomizer({ userId, onClose, onUpdate, onW
 
     const currencyCode = initializingCurrency?.code
 
-    // Update local state
+    // State is already optimistically updated in handleCreateWallet
+    // Just ensure it's in the list (idempotent)
     setUserWallets(prev => {
       if (prev.includes(currencyCode)) return prev
       return [...prev, currencyCode]
     })
 
-    setSelectedCurrencies(prev => {
-      if (prev.includes(currencyCode)) return prev
-      return [...prev, currencyCode]
-    })
-
-    // Notify parent
+    // Notify parent with updated currencies
     if (onUpdate) {
-      onUpdate(selectedCurrencies)
+      setSelectedCurrencies(prev => {
+        const updated = prev.includes(currencyCode) ? prev : [...prev, currencyCode]
+        // Small delay to ensure state is updated before callback
+        setTimeout(() => onUpdate(updated), 0)
+        return updated
+      })
     }
 
     // Show brief success message
     setMessage(`✓ ${currencyCode} wallet created successfully!`)
-    setTimeout(() => setMessage(''), 3000)
+    setTimeout(() => setMessage(''), 2000)
   }
 
   const handleInitializationCancel = () => {
