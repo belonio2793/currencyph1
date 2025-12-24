@@ -215,10 +215,16 @@ export const currencyAPI = {
       throw new Error('Invalid userId: ' + userId)
     }
 
+    if (!currencyCode || typeof currencyCode !== 'string') {
+      throw new Error('Invalid currencyCode: ' + currencyCode)
+    }
+
     // Guest-local users cannot have wallets
     if (userId.includes('guest-local')) {
       throw new Error('Guest accounts cannot create wallets. Please sign up to create wallets.')
     }
+
+    const normalizedCode = currencyCode.toUpperCase().trim()
 
     // Try to verify user exists, handle gracefully if not found
     try {
@@ -240,48 +246,76 @@ export const currencyAPI = {
       .from('wallets')
       .select('*')
       .eq('user_id', userId)
-      .eq('currency_code', currencyCode)
+      .eq('currency_code', normalizedCode)
       .single()
 
     if (existing) {
+      console.debug(`Wallet already exists for ${normalizedCode}`)
       return existing
     }
 
-    // Fetch currency details to get the correct type
-    let walletType = 'fiat' // Default fallback
+    // Fetch currency details to get the correct type from currencies table
+    let walletType = null
+    let currencyName = normalizedCode
+    let symbol = null
+    let decimals = 2
+
     try {
       const { data: currencyData, error: currencyError } = await supabase
         .from('currencies')
-        .select('type')
-        .eq('code', currencyCode)
+        .select('code, name, type, symbol, decimals, active')
+        .eq('code', normalizedCode)
         .single()
 
-      if (!currencyError && currencyData && currencyData.type) {
-        walletType = currencyData.type
-        console.debug(`Setting wallet type to '${walletType}' for currency ${currencyCode}`)
-      } else {
-        console.warn(`Currency ${currencyCode} not found in currencies table, defaulting to 'fiat'`)
+      if (currencyError) {
+        console.error(`Currency ${normalizedCode} not found in currencies table:`, currencyError)
+        throw new Error(`Currency ${normalizedCode} does not exist in the system. Please contact support.`)
       }
+
+      if (!currencyData) {
+        throw new Error(`Currency ${normalizedCode} not found`)
+      }
+
+      // Verify currency is active
+      if (currencyData.active === false) {
+        throw new Error(`Currency ${normalizedCode} is not active. Please contact support.`)
+      }
+
+      // Get the type from the database (critical for fiat vs crypto distinction)
+      walletType = currencyData.type
+      if (!walletType || (walletType !== 'fiat' && walletType !== 'crypto' && walletType !== 'wire')) {
+        throw new Error(`Currency ${normalizedCode} has invalid type: ${walletType}. Expected 'fiat', 'crypto', or 'wire'.`)
+      }
+
+      currencyName = currencyData.name || normalizedCode
+      symbol = currencyData.symbol
+      decimals = currencyData.decimals || 2
+
+      console.debug(`Currency ${normalizedCode} validated: type=${walletType}, name=${currencyName}`)
     } catch (err) {
-      console.warn(`Could not fetch currency type for ${currencyCode}, defaulting to 'fiat':`, err)
+      if (err.message.includes('does not exist') || err.message.includes('not active') || err.message.includes('invalid type')) {
+        throw err
+      }
+      console.error(`Error validating currency ${normalizedCode}:`, err)
+      throw new Error(`Failed to validate currency ${normalizedCode}: ${err.message}`)
     }
 
     // Generate a unique account number for the wallet
     const accountNumber = await generateUniqueAccountNumber(12, 12)
 
-    // Create new wallet with explicit type
+    // Create new wallet with validated type
     const { data, error } = await supabase
       .from('wallets')
       .insert([
         {
           user_id: userId,
-          currency_code: currencyCode,
+          currency_code: normalizedCode,
           balance: 0,
           total_deposited: 0,
           total_withdrawn: 0,
           is_active: true,
           account_number: accountNumber,
-          type: walletType
+          type: walletType  // Explicitly set type from currency table
         }
       ])
       .select()
@@ -296,14 +330,25 @@ export const currencyAPI = {
         status: error.status,
         statusText: error.statusText,
         userId,
-        currencyCode,
+        currencyCode: normalizedCode,
+        expectedType: walletType,
         fullError: JSON.stringify(error)
       }
       console.error('Wallet creation failed:', errorInfo)
       throw new Error(`Wallet creation failed: ${error.message || error.code || 'Unknown error'}`)
     }
 
-    console.debug(`Wallet created successfully for ${currencyCode} with type '${walletType}'`)
+    if (!data) {
+      throw new Error(`Wallet insertion returned no data for ${normalizedCode}`)
+    }
+
+    // Verify the wallet was created with the correct type
+    if (data.type !== walletType) {
+      console.error(`Type mismatch for ${normalizedCode}: expected '${walletType}', got '${data.type}'`)
+      throw new Error(`Wallet type mismatch. Expected ${walletType}, got ${data.type}`)
+    }
+
+    console.debug(`Wallet created successfully for ${normalizedCode} with type '${walletType}'`)
     return data
   },
 
