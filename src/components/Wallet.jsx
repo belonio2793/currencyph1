@@ -493,14 +493,15 @@ export default function Wallet({ userId, globalCurrency = 'PHP' }) {
 
                 {/* Crypto Currencies Section */}
                 {(activeType === 'all' || activeType === 'cryptocurrency') && cryptoWallets.length > 0 && (
-                  <div>
-                    <div className="mb-4 flex items-center gap-3">
+                  <div className="bg-gradient-to-br from-orange-50/40 to-slate-50 border border-orange-100 rounded-xl p-6">
+                    <div className="mb-6 pb-4 border-b-2 border-orange-200 flex items-center gap-3">
+                      <div className="w-2 h-6 bg-orange-600 rounded-full"></div>
                       <h2 className="text-xl font-semibold text-slate-900">Cryptocurrencies</h2>
                       <span className="px-3 py-1 bg-orange-100 text-orange-700 rounded-full text-xs font-medium">
                         {cryptoWallets.length}
                       </span>
                     </div>
-                    <div className="bg-white border border-orange-200 rounded-lg overflow-hidden">
+                    <div className="bg-white border border-slate-200 rounded-lg overflow-hidden">
                       <div className="overflow-x-auto">
                         <table className="w-full">
                           <thead className="bg-orange-50 border-b border-orange-200">
