@@ -181,10 +181,22 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
   const [selectedAddressMethod, setSelectedAddressMethod] = useState(null)
   const [showDepositDetailsModal, setShowDepositDetailsModal] = useState(false)
   const [selectedDepositForDetails, setSelectedDepositForDetails] = useState(null)
+  const [initializingWallets, setInitializingWallets] = useState(new Set()) // Track wallets being initialized
 
   useEffect(() => {
     loadInitialData()
   }, [userId])
+
+  // Auto-refresh wallets while any are initializing
+  useEffect(() => {
+    if (initializingWallets.size === 0) return
+
+    const interval = setInterval(() => {
+      loadInitialData()
+    }, 2000) // Refresh every 2 seconds
+
+    return () => clearInterval(interval)
+  }, [initializingWallets, userId])
 
   useEffect(() => {
     fetchExchangeRates()
