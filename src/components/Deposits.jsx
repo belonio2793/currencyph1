@@ -490,6 +490,12 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
         return
       }
 
+      if (!selectedWallet) {
+        setError(`Please create a ${selectedCurrency} wallet first`)
+        setSubmitting(false)
+        return
+      }
+
       if (!selectedMethod) {
         setError('Please select a payment method')
         setSubmitting(false)
