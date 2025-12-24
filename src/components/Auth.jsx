@@ -18,10 +18,15 @@ export default function Auth({ onAuthSuccess, initialTab = 'login', isModal = fa
   const [phoneNumber, setPhoneNumber] = useState('') // optional phone
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
-  const [fullName, setFullName] = useState('')
+  const [firstName, setFirstName] = useState('')
+  const [lastName, setLastName] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
+
+  // Dynamic additional fields for registration
+  const [additionalFields, setAdditionalFields] = useState([])
+  const [nextFieldId, setNextFieldId] = useState(1)
 
   const [resendLoading, setResendLoading] = useState(false)
   const [resendError, setResendError] = useState('')
