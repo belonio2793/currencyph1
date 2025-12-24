@@ -250,7 +250,6 @@ export default function Auth({ onAuthSuccess, initialTab = 'login', isModal = fa
       const identifierType = detectFieldType(identifier)
       let authEmail = null
       let userData = {
-        full_name: fullName,
         username: null,
         email: null,
         phone_number: null
