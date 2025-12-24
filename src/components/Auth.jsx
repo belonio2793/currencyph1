@@ -354,13 +354,14 @@ export default function Auth({ onAuthSuccess, initialTab = 'login', isModal = fa
               <form onSubmit={handleLogin} className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-2">
-                    Username
+                    Username, Email, or Phone Number
                   </label>
+                  <p className="text-xs text-slate-500 mb-2">Enter any of your registered information</p>
                   <input
                     type="text"
                     value={identifier}
                     onChange={(e) => setIdentifier(e.target.value)}
-                    placeholder="your username"
+                    placeholder="e.g., username, email@example.com, or +63 9XX XXXX XXX"
                     className="w-full px-4 py-3 border-2 border-slate-300 rounded-lg focus:outline-none focus:border-blue-600 text-sm"
                     disabled={loading}
                   />
