@@ -4,7 +4,7 @@ import { getWalletDisplayPreferences, setWalletDisplayPreferences } from '../lib
 import { currencyAPI } from '../lib/payments'
 import WalletInitializationModal from './WalletInitializationModal'
 
-export default function WalletDisplayCustomizer({ userId, onClose, onUpdate }) {
+export default function WalletDisplayCustomizer({ userId, onClose, onUpdate, onWalletCreated }) {
   const [allFiatCurrencies, setAllFiatCurrencies] = useState([])
   const [allCryptoCurrencies, setAllCryptoCurrencies] = useState([])
   const [userWallets, setUserWallets] = useState([])
