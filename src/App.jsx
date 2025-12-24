@@ -103,6 +103,7 @@ export default function App() {
   })
   const [showAuth, setShowAuth] = useState(false)
   const [authInitialTab, setAuthInitialTab] = useState('login')
+  const [redirectAfterAuth, setRedirectAfterAuth] = useState(null)
   const [currentBusinessId, setCurrentBusinessId] = useState(null)
   const [currentListingSlug, setCurrentListingSlug] = useState(null)
   const [currentProductId, setCurrentProductId] = useState(null)
