@@ -248,33 +248,50 @@ export default function Auth({ onAuthSuccess, initialTab = 'login', isModal = fa
 
       // Process main identifier field
       const identifierType = detectFieldType(identifier)
-      let authEmail = identifier
+      let authEmail = null
       let userData = {
         full_name: fullName,
-        username: identifierType === 'username' ? identifier.toLowerCase() : null,
-        email: identifierType === 'email' ? identifier.toLowerCase() : null,
-        phone_number: identifierType === 'phone' ? identifier : null
+        username: null,
+        email: null,
+        phone_number: null
       }
 
-      // If identifier is username, generate an auth email
-      if (identifierType === 'username') {
-        authEmail = `${identifier.toLowerCase()}+${Date.now()}@currency.ph`
+      // Set identifier-based fields
+      if (identifierType === 'email') {
+        userData.email = identifier.toLowerCase().trim()
+        authEmail = userData.email
+      } else if (identifierType === 'username') {
+        userData.username = identifier.toLowerCase().trim()
+        // Generate a unique email for auth (use hash of username instead of timestamp for shorter email)
+        const usernameHash = Math.abs(identifier.toLowerCase().charCodeAt(0) * identifier.length).toString(36)
+        authEmail = `${identifier.toLowerCase()}${usernameHash}@currency.ph`.substring(0, 254)
+      } else if (identifierType === 'phone') {
+        userData.phone_number = identifier.trim()
+        // Generate email from phone number (use hash to keep it short)
+        const phoneHash = identifier.replace(/\D/g, '').substring(0, 8)
+        authEmail = `phone${phoneHash}${Math.random().toString(36).substring(2, 8)}@currency.ph`
       }
 
-      // Process additional fields
+      // Process additional fields - fill in any missing primary fields
       additionalFields.forEach(field => {
         if (!field.value.trim()) return
 
         if (field.type === 'email' && !userData.email) {
-          userData.email = field.value.toLowerCase()
+          userData.email = field.value.toLowerCase().trim()
+          if (!authEmail) authEmail = userData.email
         } else if (field.type === 'phone' && !userData.phone_number) {
-          userData.phone_number = field.value
+          userData.phone_number = field.value.trim()
         } else if (field.type === 'username' && !userData.username) {
-          userData.username = field.value.toLowerCase()
+          userData.username = field.value.toLowerCase().trim()
         }
       })
 
-      // Ensure we have a valid email for auth
+      // Ensure we have a valid email for auth (required)
+      if (!authEmail) {
+        // Fallback: create email from first+last name if no valid identifier found
+        authEmail = `${firstName.toLowerCase().trim()}${lastName.toLowerCase().trim()}${Math.random().toString(36).substring(2, 8)}@currency.ph`.substring(0, 254)
+      }
+
       if (!userData.email) {
         userData.email = authEmail
       }
