@@ -295,6 +295,7 @@ export default function OnlineUsers({ userId, userEmail }) {
               zoom={13}
               keyboard={false}
               style={{ height: '100%', width: '100%' }}
+              attributionControl={false}
             >
               <TileLayer
                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
