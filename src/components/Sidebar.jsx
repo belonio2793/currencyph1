@@ -419,6 +419,89 @@ function SidebarComponent({ activeTab, onTabChange, userEmail, onShowAuth, onSig
           )}
         </div>
       </div>
+
+      {/* Business Modal */}
+      {showBusinessModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-xl shadow-2xl max-w-md w-full max-h-[90vh] overflow-y-auto">
+            <div className="p-6 border-b border-slate-200 flex items-center justify-between sticky top-0 bg-white">
+              <h3 className="text-xl font-semibold text-slate-900">
+                {selectedBusinessSection ? selectedBusinessSection.replace('-', ' ').toUpperCase() : 'My Business'}
+              </h3>
+              <button
+                onClick={() => {
+                  setShowBusinessModal(false)
+                  setSelectedBusinessSection(null)
+                  setUserBusinesses([])
+                }}
+                className="text-slate-400 hover:text-slate-600 transition-colors"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            {businessLoading ? (
+              <div className="p-8 text-center">
+                <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                <p className="mt-4 text-slate-600">Loading businesses...</p>
+              </div>
+            ) : userBusinesses.length > 0 ? (
+              <div className="p-6 space-y-4">
+                <p className="text-sm text-slate-600 mb-4">
+                  Select a business to manage <span className="font-medium">{selectedBusinessSection?.replace('-', ' ')}</span>:
+                </p>
+                {userBusinesses.map(business => (
+                  <button
+                    key={business.id}
+                    onClick={() => {
+                      // Store the section in sessionStorage for later use
+                      try {
+                        sessionStorage.setItem('pendingBusinessSection', selectedBusinessSection)
+                      } catch (e) {
+                        console.debug('Could not store pending section:', e)
+                      }
+                      onTabChange('my-business')
+                      setShowBusinessModal(false)
+                      setSelectedBusinessSection(null)
+                    }}
+                    className="w-full p-4 border-2 border-slate-200 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-all text-left group"
+                  >
+                    <p className="font-medium text-slate-900 group-hover:text-blue-600 transition-colors">
+                      {business.business_name}
+                    </p>
+                    <p className="text-sm text-slate-500 mt-1">ID: {business.id.substring(0, 8)}...</p>
+                  </button>
+                ))}
+              </div>
+            ) : (
+              <div className="p-8 text-center space-y-4">
+                <div className="inline-flex items-center justify-center h-12 w-12 rounded-full bg-slate-100">
+                  <svg className="h-6 w-6 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                  </svg>
+                </div>
+                <h4 className="font-medium text-slate-900">No Business Found</h4>
+                <p className="text-sm text-slate-600">
+                  You don't have a business yet. Create one to access <span className="font-medium">{selectedBusinessSection?.replace('-', ' ')}</span>.
+                </p>
+                <button
+                  onClick={() => {
+                    onTabChange('nearby')
+                    setShowBusinessModal(false)
+                    setSelectedBusinessSection(null)
+                    // The nearby page has the AddBusinessModal functionality
+                  }}
+                  className="mt-4 w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
+                >
+                  Create Business
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </aside>
   )
 }
