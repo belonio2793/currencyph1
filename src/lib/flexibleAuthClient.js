@@ -166,48 +166,7 @@ export const flexibleAuthClient = {
       }
 
       // Profile is automatically created by trigger in database
-      // Wait a moment for the trigger to process
-      if (data.user) {
-        await new Promise(resolve => setTimeout(resolve, 200))
-
-        // Update profile with additional metadata fields (nickname, address, country, city, region)
-        // that aren't handled by the trigger (which only handles full_name, username, phone_number)
-        try {
-          const updateData = {}
-
-          if (metadata.nickname && metadata.nickname.trim()) {
-            updateData.nickname = metadata.nickname.trim()
-          }
-          if (metadata.address && metadata.address.trim()) {
-            updateData.address = metadata.address.trim()
-          }
-          if (metadata.country && metadata.country.trim()) {
-            updateData.country = metadata.country.trim()
-          }
-          if (metadata.city && metadata.city.trim()) {
-            updateData.city = metadata.city.trim()
-          }
-          if (metadata.region && metadata.region.trim()) {
-            updateData.region = metadata.region.trim()
-          }
-
-          // Only update if there are additional fields
-          if (Object.keys(updateData).length > 0) {
-            const { error: updateError } = await supabase
-              .from('profiles')
-              .update(updateData)
-              .eq('user_id', data.user.id)
-
-            if (updateError) {
-              console.warn('Warning: Could not update profile with additional metadata:', updateError.message)
-              // Don't fail signup if update fails - user is already created with basic profile
-            }
-          }
-        } catch (updateError) {
-          console.warn('Warning: Profile update error:', updateError.message)
-          // Don't fail signup if profile update fails
-        }
-      }
+      // All metadata has been passed to the database trigger via options.data
 
       return {
         user: data.user,
