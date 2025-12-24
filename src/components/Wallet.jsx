@@ -619,11 +619,12 @@ export default function Wallet({ userId, globalCurrency = 'PHP' }) {
                   onClose={() => {
                     setShowCustomizer(false)
                     setRefreshing(true)
-                    loadData().finally(() => setRefreshing(false))
+                    // Real-time subscription will handle the refresh
+                    // Just close the customizer
                   }}
                   onUpdate={() => {
-                    setRefreshing(true)
-                    loadData().finally(() => setRefreshing(false))
+                    // Real-time subscription will automatically refresh when wallet is created
+                    // No need to do anything here
                   }}
                 />
               </div>
