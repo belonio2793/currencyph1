@@ -7,12 +7,30 @@ import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 
 // Ensure Leaflet icons are configured (fix for certain build setups)
+// Fix Leaflet icon issues
 delete L.Icon.Default.prototype._getIconUrl
 L.Icon.Default.mergeOptions({
   iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon-2x.png',
   iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png',
   shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png'
 })
+
+// Route map component to show path from user to listing
+function RouteDisplay({ userLocation, listingLocation }) {
+  const map = useMap()
+
+  useEffect(() => {
+    if (userLocation && listingLocation) {
+      const bounds = L.latLngBounds(
+        [userLocation.latitude, userLocation.longitude],
+        [listingLocation.latitude, listingLocation.longitude]
+      )
+      map.fitBounds(bounds, { padding: [50, 50] })
+    }
+  }, [userLocation, listingLocation, map])
+
+  return null
+}
 
 export default function ListingDetail({ slug, onBack }) {
   const [listing, setListing] = useState(null)
