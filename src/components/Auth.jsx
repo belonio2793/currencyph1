@@ -443,6 +443,15 @@ export default function Auth({ onAuthSuccess, initialTab = 'login', isModal = fa
             {/* Register Form */}
             {activeTab === 'register' && (
               <form onSubmit={handleRegister} className="space-y-4">
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-4">
+                  <p className="text-xs font-medium text-blue-900 mb-2">
+                    ✓ Authentication Methods
+                  </p>
+                  <p className="text-xs text-blue-800 leading-relaxed">
+                    Add at least one way to authenticate (email or phone). You can use these details to log in later, along with your username.
+                  </p>
+                </div>
+
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-2">
                     Full Name
