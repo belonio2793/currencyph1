@@ -306,7 +306,13 @@ export default function Nearby({ userId, setActiveTab, setCurrentListingSlug }) 
 
       setListings(data || [])
     } catch (err) {
-      console.error('Error loading listings:', err)
+      const errorMessage = err?.message || err?.details || String(err) || 'Unknown error'
+      console.error('Error loading listings:', {
+        message: errorMessage,
+        status: err?.status,
+        code: err?.code,
+        details: err?.details
+      })
       setError('Failed to load listings')
     } finally {
       setLoading(false)
