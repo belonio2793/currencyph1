@@ -221,6 +221,7 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
 
       if (activeType === 'currency') {
         try {
+          // Fetch rates for ALL fiat currencies (not just wallet matches)
           const globalRates = await currencyAPI.getGlobalRates()
           if (globalRates) {
             Object.entries(globalRates).forEach(([code, data]) => {
@@ -231,18 +232,21 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
           console.warn('Failed to fetch fiat exchange rates:', e)
         }
       } else {
-        // For crypto, fetch rates for all available crypto currencies
-        // First collect all cryptos to fetch
-        const cryptoCurrenciesToFetch = new Set(Object.keys(cryptoAddresses))
+        // For crypto, fetch rates for ALL available crypto currencies
+        // This enables cross-currency deposits to any wallet
+        const cryptoCurrenciesToFetch = new Set()
 
-        // Also include any crypto wallets the user has
+        // Add all configured crypto addresses
+        Object.keys(cryptoAddresses).forEach(code => cryptoCurrenciesToFetch.add(code))
+
+        // Add any crypto wallets the user has
         wallets.forEach(wallet => {
           if (wallet.currency_type === 'crypto') {
             cryptoCurrenciesToFetch.add(wallet.currency_code)
           }
         })
 
-        // Fetch all crypto prices in one API call (more efficient than individual calls)
+        // Fetch all crypto prices in one API call
         if (cryptoCurrenciesToFetch.size > 0) {
           try {
             const cryptoCodes = Array.from(cryptoCurrenciesToFetch)
@@ -251,7 +255,7 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
             if (pricesFromApi && Object.keys(pricesFromApi).length > 0) {
               Object.assign(rates, pricesFromApi)
             } else {
-              // If batch fetch fails, try individual fetches as fallback
+              // Fallback to individual fetches
               console.warn('Batch crypto price fetch returned no data, trying individual fetches...')
               for (const cryptoCode of cryptoCodes) {
                 try {
