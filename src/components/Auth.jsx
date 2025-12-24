@@ -45,33 +45,13 @@ export default function Auth({ onAuthSuccess, initialTab = 'login', isModal = fa
   const normalizeIdentifier = (id) => {
     const v = (id || '').trim()
     if (!v) return ''
-    if (v === 'guest') return 'guest@currency.ph'
+
+    // Username-based identifier: convert to email format for internal use
+    // If it's already an email, return as-is
     if (v.includes('@')) return v
 
-    // Treat as phone number: strip non-digits/plus
-    const raw = v.replace(/[^+\d]/g, '')
-    let phone = raw
-    // If starts with +, assume full international provided
-    if (phone.startsWith('+')) {
-      // remove plus for email local part
-      phone = phone.replace(/^\+/, '')
-      return `${phone}@phone.currency.ph`
-    }
-
-    // If starts with 0 and 11 digits (e.g. 09171234567) -> convert to country code 63 (Philippines)
-    if (/^0\d{10}$/.test(phone)) {
-      const converted = '63' + phone.substring(1)
-      return `${converted}@phone.currency.ph`
-    }
-
-    // If 10 digits starting with 9 (e.g. 9171234567) -> assume Philippines, add 63
-    if (/^9\d{9}$/.test(phone)) {
-      const converted = '63' + phone
-      return `${converted}@phone.currency.ph`
-    }
-
-    // Fallback: treat as local username
-    return `${v}@currency.local`
+    // Otherwise, treat as username and create a local email
+    return `${v}@coconuts.local`
   }
 
   const startResendCooldown = (email) => {
