@@ -2800,7 +2800,7 @@ export default function PlanningChat() {
               </div>
             </div>
 
-            <div className="bg-gradient-to-r from-amber-600 to-orange-600 text-white rounded-xl p-12">
+            <div id="coconuts-products" className="bg-gradient-to-r from-amber-600 to-orange-600 text-white rounded-xl p-12">
               <h3 className="text-3xl font-bold mb-6">Products & Economics</h3>
               <div className="grid md:grid-cols-3 gap-6 mb-8">
                 <div className="bg-white/10 p-6 rounded-lg">
