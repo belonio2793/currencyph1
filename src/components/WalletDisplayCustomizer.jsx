@@ -319,8 +319,7 @@ export default function WalletDisplayCustomizer({ userId, onClose, onUpdate, onW
       {userWallets.length > 0 && (
         <div className="mb-10 pb-10 border-b border-slate-200">
           <div className="mb-4">
-            <h3 className="text-lg font-semibold text-slate-900 flex items-center gap-2">
-              <span className="text-2xl">💳</span>
+            <h3 className="text-lg font-semibold text-slate-900">
               My Wallets ({userWallets.length})
             </h3>
             <p className="text-sm text-slate-600 mt-1">Your existing wallets</p>
