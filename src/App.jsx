@@ -136,16 +136,16 @@ export default function App() {
             setUserId(session.user.id)
             setUserEmail(session.user.email)
 
-            // Ensure user profile and wallets exist
-            if (!session.user.id.includes('guest-local')) {
-              currencyAPI.getOrCreateUser(session.user.email, session.user.user_metadata?.full_name || 'User', session.user.id)
-                .then(() => console.log('User profile created/verified for:', session.user.id))
-                .catch((err) => console.error('Failed to create user profile:', err?.message))
-
-              currencyAPI.ensureUserWallets(session.user.id)
-                .then((result) => console.log('Wallets ensured for user:', session.user.id, 'created:', result?.length || 0))
-                .catch((err) => console.error('Failed to ensure wallets:', err?.message))
-            }
+            // Skip database initialization - it conflicts with RLS policies
+            // Profile and wallets will be created on-demand when accessed
+            // if (!session.user.id.includes('guest-local')) {
+            //   currencyAPI.getOrCreateUser(session.user.email, session.user.user_metadata?.full_name || 'User', session.user.id)
+            //     .then(() => console.log('User profile created/verified for:', session.user.id))
+            //     .catch((err) => console.error('Failed to create user profile:', err?.message))
+            //   currencyAPI.ensureUserWallets(session.user.id)
+            //     .then((result) => console.log('Wallets ensured for user:', session.user.id, 'created:', result?.length || 0))
+            //     .catch((err) => console.error('Failed to ensure wallets:', err?.message))
+            // }
 
             // Presence disabled due to network errors in edge/offline environments
             // Presence tracking is non-critical and causes "Failed to fetch" errors
@@ -519,14 +519,14 @@ export default function App() {
 
     // For guest-local users (not real Supabase auth), don't try database operations
     if (!user.id.includes('guest-local')) {
-      // Initialize user profile and wallets non-blocking (in background)
-      currencyAPI.getOrCreateUser(user.email, user.user_metadata?.full_name || 'User', user.id).catch(err => {
-        console.warn('Failed to initialize user profile:', err)
-      })
-      // Ensure user has wallets for all active currencies (non-blocking)
-      currencyAPI.ensureUserWallets(user.id).catch(err => {
-        console.warn('Failed to ensure user wallets during initialization:', err)
-      })
+      // Skip database initialization - RLS policies prevent getOrCreateUser from working
+      // Profile and wallets are created on-demand when accessed
+      // currencyAPI.getOrCreateUser(user.email, user.user_metadata?.full_name || 'User', user.id).catch(err => {
+      //   console.warn('Failed to initialize user profile:', err)
+      // })
+      // currencyAPI.ensureUserWallets(user.id).catch(err => {
+      //   console.warn('Failed to ensure user wallets during initialization:', err)
+      // })
       if (typeof isSupabaseConfigured === 'undefined' || isSupabaseConfigured) initializePresence(user.id)
     } else {
       // For guest-local accounts, persist to localStorage
