@@ -1,18 +1,19 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabaseClient'
-import { getWalletDisplayPreferences, setWalletDisplayPreferences, addWalletDisplayCurrency, removeWalletDisplayCurrency } from '../lib/walletPreferences'
+import { getWalletDisplayPreferences, setWalletDisplayPreferences } from '../lib/walletPreferences'
 import { currencyAPI } from '../lib/payments'
 
 export default function WalletDisplayCustomizer({ userId, onClose, onUpdate }) {
   const [allFiatCurrencies, setAllFiatCurrencies] = useState([])
   const [allCryptoCurrencies, setAllCryptoCurrencies] = useState([])
+  const [userWallets, setUserWallets] = useState([])
   const [selectedCurrencies, setSelectedCurrencies] = useState(['PHP'])
   const [searchInput, setSearchInput] = useState('')
   const [loading, setLoading] = useState(true)
-  const [showDropdown, setShowDropdown] = useState(false)
+  const [activeTab, setActiveTab] = useState('currency') // 'currency' or 'cryptocurrency'
   const [saving, setSaving] = useState(false)
   const [message, setMessage] = useState('')
-  const [activeTab, setActiveTab] = useState('currency') // 'currency' or 'cryptocurrency'
+  const [creatingWallet, setCreatingWallet] = useState(null) // Track which wallet is being created
 
   useEffect(() => {
     loadData()
@@ -22,25 +23,29 @@ export default function WalletDisplayCustomizer({ userId, onClose, onUpdate }) {
     try {
       setLoading(true)
 
-      // Fetch both fiat and crypto currencies
-      const { data: currencies, error: currError } = await supabase
+      // Fetch all currencies
+      const { data: currencies } = await supabase
         .from('currencies')
         .select('code, name, symbol, type')
         .eq('active', true)
         .order('code')
 
-      if (currError) {
-        console.error('Error fetching currencies:', currError)
-        return
+      if (currencies) {
+        setAllFiatCurrencies(currencies.filter(c => c.type === 'fiat'))
+        setAllCryptoCurrencies(currencies.filter(c => c.type === 'crypto'))
       }
 
-      const fiat = (currencies || []).filter(c => c.type === 'fiat')
-      const crypto = (currencies || []).filter(c => c.type === 'crypto')
+      // Fetch user's existing wallets
+      const { data: wallets } = await supabase
+        .from('wallets')
+        .select('currency_code')
+        .eq('user_id', userId)
 
-      setAllFiatCurrencies(fiat)
-      setAllCryptoCurrencies(crypto)
+      if (wallets) {
+        setUserWallets(wallets.map(w => w.currency_code))
+      }
 
-      // Load user preferences
+      // Load user's display preferences
       const prefs = await getWalletDisplayPreferences(userId)
       setSelectedCurrencies(prefs)
     } catch (err) {
@@ -50,10 +55,8 @@ export default function WalletDisplayCustomizer({ userId, onClose, onUpdate }) {
     }
   }
 
-  const handleToggleCurrency = async (currencyCode) => {
-    if (currencyCode === 'PHP') {
-      return // Don't allow unchecking PHP
-    }
+  const handleToggleDisplay = (currencyCode) => {
+    if (currencyCode === 'PHP') return
 
     let updated
     if (selectedCurrencies.includes(currencyCode)) {
@@ -61,53 +64,62 @@ export default function WalletDisplayCustomizer({ userId, onClose, onUpdate }) {
     } else {
       updated = [...selectedCurrencies, currencyCode]
     }
-
     setSelectedCurrencies(updated)
   }
 
-  const handleSave = async () => {
+  const handleCreateWallet = async (currencyCode) => {
+    try {
+      setCreatingWallet(currencyCode)
+      setMessage('')
+
+      // Create wallet
+      await currencyAPI.createWallet(userId, currencyCode)
+
+      // Update local wallet list
+      setUserWallets([...userWallets, currencyCode])
+
+      // Auto-add to display preferences if not already there
+      if (!selectedCurrencies.includes(currencyCode)) {
+        setSelectedCurrencies([...selectedCurrencies, currencyCode])
+      }
+
+      setMessage(`✓ ${currencyCode} wallet created successfully!`)
+    } catch (err) {
+      console.error('Error creating wallet:', err)
+      setMessage(`✗ Failed to create ${currencyCode} wallet`)
+    } finally {
+      setCreatingWallet(null)
+    }
+  }
+
+  const handleSavePreferences = async () => {
     try {
       setSaving(true)
       setMessage('')
 
-      // Save preferences
+      // Save display preferences
       await setWalletDisplayPreferences(userId, selectedCurrencies)
 
-      // Create wallets for selected currencies
-      try {
-        const { data: existingWallets, error: fetchErr } = await supabase
-          .from('wallets')
-          .select('currency_code')
-          .eq('user_id', userId)
+      // Create wallets for any selected currencies that don't have wallets yet
+      const missingCurrencies = selectedCurrencies.filter(code => !userWallets.includes(code))
 
-        if (!fetchErr) {
-          const existingCodes = (existingWallets || []).map(w => w.currency_code)
-          const missingCurrencies = selectedCurrencies.filter(code => !existingCodes.includes(code))
-
-          // Create wallets for missing currencies using currencyAPI (which generates account numbers)
-          if (missingCurrencies.length > 0) {
-            for (const currencyCode of missingCurrencies) {
-              try {
-                await currencyAPI.createWallet(userId, currencyCode)
-              } catch (err) {
-                // Continue with next currency if one fails
-                console.warn(`Warning: Could not create wallet for ${currencyCode}:`, err)
-              }
-            }
+      if (missingCurrencies.length > 0) {
+        for (const currencyCode of missingCurrencies) {
+          try {
+            await currencyAPI.createWallet(userId, currencyCode)
+            setUserWallets(prev => [...prev, currencyCode])
+          } catch (err) {
+            console.warn(`Warning: Could not create wallet for ${currencyCode}:`, err)
           }
         }
-      } catch (walletErr) {
-        console.warn('Warning: Wallet creation failed (preferences still saved):', walletErr)
       }
 
-      setMessage('✓ Preferences saved!')
+      setMessage('✓ Preferences saved! Wallets created.')
 
-      // Call callback if provided
       if (onUpdate) {
         onUpdate(selectedCurrencies)
       }
 
-      // Clear message after 2 seconds
       setTimeout(() => {
         setMessage('')
         if (onClose) {
@@ -122,18 +134,10 @@ export default function WalletDisplayCustomizer({ userId, onClose, onUpdate }) {
     }
   }
 
-  const handleReset = () => {
-    setSelectedCurrencies(['PHP'])
-    setSearchInput('')
-    setShowDropdown(false)
-  }
-
   const getFilteredCurrencies = () => {
     const currencies = activeTab === 'currency' ? allFiatCurrencies : allCryptoCurrencies
 
-    if (!searchInput) {
-      return currencies
-    }
+    if (!searchInput) return currencies
 
     const query = searchInput.toLowerCase()
     return currencies.filter(c =>
@@ -143,6 +147,8 @@ export default function WalletDisplayCustomizer({ userId, onClose, onUpdate }) {
   }
 
   const filteredCurrencies = getFilteredCurrencies()
+  const hasWallet = (currencyCode) => userWallets.includes(currencyCode)
+  const isDisplayed = (currencyCode) => selectedCurrencies.includes(currencyCode)
 
   if (loading) {
     return (
@@ -154,10 +160,11 @@ export default function WalletDisplayCustomizer({ userId, onClose, onUpdate }) {
 
   return (
     <div className="bg-white rounded-lg border border-slate-200 p-8">
+      {/* Header */}
       <div className="mb-8">
-        <h2 className="text-4xl font-light text-slate-900 mb-3">Add Currencies to Wallet</h2>
+        <h2 className="text-4xl font-light text-slate-900 mb-3">Manage Your Wallets</h2>
         <p className="text-base text-slate-600">
-          Select which currencies to add to your account. PHP is always included.
+          Create wallets for currencies or manage which ones appear on your dashboard. PHP wallet is always included.
         </p>
       </div>
 
@@ -172,189 +179,138 @@ export default function WalletDisplayCustomizer({ userId, onClose, onUpdate }) {
         </div>
       )}
 
-      {/* Currency Type Tabs */}
+      {/* Tabs */}
       <div className="mb-8 border-b border-slate-200">
         <div className="flex gap-6">
           <button
-            onClick={() => {
-              setActiveTab('currency')
-              setSearchInput('')
-            }}
+            onClick={() => setActiveTab('currency')}
             className={`pb-3 px-2 font-medium text-base border-b-2 transition-colors ${
               activeTab === 'currency'
                 ? 'border-blue-600 text-blue-600'
                 : 'border-transparent text-slate-600 hover:text-slate-900'
             }`}
           >
-            Fiat Currency ({allFiatCurrencies.length})
+            Fiat Currencies ({allFiatCurrencies.length})
           </button>
           <button
-            onClick={() => {
-              setActiveTab('cryptocurrency')
-              setSearchInput('')
-            }}
+            onClick={() => setActiveTab('cryptocurrency')}
             className={`pb-3 px-2 font-medium text-base border-b-2 transition-colors ${
               activeTab === 'cryptocurrency'
                 ? 'border-orange-600 text-orange-600'
                 : 'border-transparent text-slate-600 hover:text-slate-900'
             }`}
           >
-            Cryptocurrency ({allCryptoCurrencies.length})
+            Cryptocurrencies ({allCryptoCurrencies.length})
           </button>
         </div>
       </div>
 
-      {/* Search and Dropdown */}
+      {/* Search */}
       <div className="mb-8">
-        <label className="block text-lg font-medium text-slate-700 mb-3">
-          {activeTab === 'currency' ? 'Search Fiat Currencies' : 'Search Cryptocurrencies'}
+        <label className="block text-sm font-medium text-slate-700 mb-3">
+          Search {activeTab === 'currency' ? 'Fiat Currencies' : 'Cryptocurrencies'}
         </label>
-
-        <div className="relative">
-          <input
-            type="text"
-            placeholder={activeTab === 'currency' ? 'Search by code or name... (USD, EUR, GBP, etc.)' : 'Search by code... (BTC, ETH, SOL, etc.)'}
-            value={searchInput}
-            onChange={(e) => {
-              setSearchInput(e.target.value)
-              setShowDropdown(true)
-            }}
-            onFocus={() => setShowDropdown(true)}
-            className="w-full px-4 py-3 border border-slate-300 rounded-lg text-base focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent"
-          />
-
-          {/* Dropdown */}
-          {showDropdown && filteredCurrencies.length > 0 && (
-            <div className="absolute z-50 top-full left-0 right-0 mt-3 bg-white border border-slate-300 rounded-lg shadow-lg max-h-96 overflow-y-auto">
-              {filteredCurrencies.map(currency => (
-                <div
-                  key={currency.code}
-                  onClick={() => handleToggleCurrency(currency.code)}
-                  className={`px-5 py-4 border-b border-slate-100 last:border-b-0 cursor-pointer transition-colors ${
-                    selectedCurrencies.includes(currency.code)
-                      ? 'bg-blue-50'
-                      : 'hover:bg-slate-50'
-                  }`}
-                >
-                  <div className="flex items-center gap-4">
-                    <input
-                      type="checkbox"
-                      checked={selectedCurrencies.includes(currency.code)}
-                      onChange={() => {}}
-                      className="w-5 h-5 text-blue-600 rounded"
-                      disabled={currency.code === 'PHP'}
-                    />
-                    <div className="flex-1">
-                      <p className="font-medium text-slate-900 text-base">{currency.code}</p>
-                      <p className="text-sm text-slate-500">{currency.name}</p>
-                    </div>
-                    <p className="text-base text-slate-600">{currency.symbol}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-
-        <p className="text-sm text-slate-500 mt-3">
-          Type to search by currency code (USD, EUR, etc.) or currency name
-        </p>
+        <input
+          type="text"
+          placeholder={`Search by code or name... (${activeTab === 'currency' ? 'USD, EUR, GBP' : 'BTC, ETH, SOL'}, etc.)`}
+          value={searchInput}
+          onChange={(e) => setSearchInput(e.target.value)}
+          className="w-full px-4 py-3 border border-slate-300 rounded-lg text-base focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent"
+        />
       </div>
 
-      {/* Selected Currencies */}
-      <div className="mb-8">
-        <label className="block text-lg font-medium text-slate-700 mb-4">
-          Selected Currencies ({selectedCurrencies.length})
-        </label>
+      {/* Currency List */}
+      <div className="mb-8 space-y-3">
+        {filteredCurrencies.length === 0 ? (
+          <p className="text-slate-500 text-center py-6">No currencies found</p>
+        ) : (
+          filteredCurrencies.map(currency => {
+            const walletExists = hasWallet(currency.code)
+            const isDisplayed_ = isDisplayed(currency.code)
 
-        <div className="space-y-4">
-          {selectedCurrencies.length === 0 ? (
-            <p className="text-base text-slate-500">No currencies selected yet. Add one above.</p>
-          ) : (
-            <>
-              {/* Fiat currencies */}
-              {selectedCurrencies.some(code => {
-                const currency = allFiatCurrencies.find(c => c.code === code)
-                return !!currency
-              }) && (
-                <div>
-                  <p className="text-sm font-medium text-slate-600 mb-2">Fiat Currencies</p>
-                  <div className="flex flex-wrap gap-3">
-                    {selectedCurrencies.map(code => {
-                      const currency = allFiatCurrencies.find(c => c.code === code)
-                      if (!currency) return null
+            return (
+              <div
+                key={currency.code}
+                className={`px-5 py-4 rounded-lg border transition-all ${
+                  walletExists
+                    ? 'bg-slate-50 border-slate-200'
+                    : 'bg-slate-100 border-slate-300'
+                }`}
+              >
+                <div className="flex items-center justify-between gap-4">
+                  {/* Currency Info */}
+                  <div className="flex items-center gap-4 flex-1">
+                    <div className="flex-1">
+                      <p className="font-semibold text-slate-900">{currency.code}</p>
+                      <p className="text-sm text-slate-600">{currency.name}</p>
+                    </div>
+                    <p className="text-lg font-medium text-slate-700">{currency.symbol}</p>
+                  </div>
 
-                      return (
-                        <div
-                          key={code}
-                          className={`px-4 py-3 rounded-lg text-base font-medium flex items-center gap-3 ${
-                            code === 'PHP'
-                              ? 'bg-blue-100 text-blue-800 border border-blue-300'
-                              : 'bg-blue-50 text-blue-700 border border-blue-200'
-                          }`}
-                        >
-                          <span>{code}</span>
-                          {code !== 'PHP' && (
-                            <button
-                              onClick={() => handleToggleCurrency(code)}
-                              className="hover:text-red-600 font-bold text-lg"
-                            >
-                              ×
-                            </button>
-                          )}
-                        </div>
-                      )
-                    })}
+                  {/* Status and Actions */}
+                  <div className="flex items-center gap-3">
+                    {/* Wallet Status */}
+                    {walletExists ? (
+                      <span className="px-3 py-1 bg-emerald-100 text-emerald-700 text-xs font-semibold rounded-full">
+                        ✓ Wallet Created
+                      </span>
+                    ) : (
+                      <span className="px-3 py-1 bg-amber-100 text-amber-700 text-xs font-semibold rounded-full">
+                        No Wallet
+                      </span>
+                    )}
+
+                    {/* Actions */}
+                    {!walletExists ? (
+                      <button
+                        onClick={() => handleCreateWallet(currency.code)}
+                        disabled={creatingWallet === currency.code}
+                        className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
+                          creatingWallet === currency.code
+                            ? 'bg-slate-300 text-slate-600 cursor-not-allowed'
+                            : 'bg-blue-600 text-white hover:bg-blue-700'
+                        }`}
+                      >
+                        {creatingWallet === currency.code ? 'Creating...' : 'Create Wallet'}
+                      </button>
+                    ) : (
+                      <label className="flex items-center gap-3 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={isDisplayed_}
+                          onChange={() => handleToggleDisplay(currency.code)}
+                          disabled={currency.code === 'PHP'}
+                          className="w-5 h-5 text-blue-600 rounded cursor-pointer disabled:cursor-not-allowed"
+                        />
+                        <span className="text-sm text-slate-600">
+                          {currency.code === 'PHP' ? 'Always Shown' : 'Show on Dashboard'}
+                        </span>
+                      </label>
+                    )}
                   </div>
                 </div>
-              )}
+              </div>
+            )
+          })
+        )}
+      </div>
 
-              {/* Crypto currencies */}
-              {selectedCurrencies.some(code => {
-                const currency = allCryptoCurrencies.find(c => c.code === code)
-                return !!currency
-              }) && (
-                <div>
-                  <p className="text-sm font-medium text-slate-600 mb-2">Cryptocurrencies</p>
-                  <div className="flex flex-wrap gap-3">
-                    {selectedCurrencies.map(code => {
-                      const currency = allCryptoCurrencies.find(c => c.code === code)
-                      if (!currency) return null
-
-                      return (
-                        <div
-                          key={code}
-                          className="px-4 py-3 rounded-lg text-base font-medium flex items-center gap-3 bg-orange-50 text-orange-700 border border-orange-200"
-                        >
-                          <span>{code}</span>
-                          <button
-                            onClick={() => handleToggleCurrency(code)}
-                            className="hover:text-red-600 font-bold text-lg"
-                          >
-                            ×
-                          </button>
-                        </div>
-                      )
-                    })}
-                  </div>
-                </div>
-              )}
-            </>
-          )}
+      {/* Summary Section */}
+      <div className="mb-8 p-4 bg-slate-50 border border-slate-200 rounded-lg">
+        <div className="grid grid-cols-2 gap-4 text-sm">
+          <div>
+            <p className="text-slate-600 font-medium">Wallets Created</p>
+            <p className="text-2xl font-light text-slate-900">{userWallets.length}</p>
+          </div>
+          <div>
+            <p className="text-slate-600 font-medium">Displayed on Dashboard</p>
+            <p className="text-2xl font-light text-slate-900">{selectedCurrencies.length}</p>
+          </div>
         </div>
       </div>
 
       {/* Action Buttons */}
       <div className="flex gap-4 justify-end">
-        {selectedCurrencies.length > 1 && (
-          <button
-            onClick={handleReset}
-            className="px-6 py-3 text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors text-base font-medium"
-          >
-            Reset to PHP Only
-          </button>
-        )}
-
         {onClose && (
           <button
             onClick={onClose}
@@ -365,7 +321,7 @@ export default function WalletDisplayCustomizer({ userId, onClose, onUpdate }) {
         )}
 
         <button
-          onClick={handleSave}
+          onClick={handleSavePreferences}
           disabled={saving}
           className={`px-6 py-3 text-white rounded-lg transition-colors text-base font-medium ${
             saving
@@ -373,7 +329,7 @@ export default function WalletDisplayCustomizer({ userId, onClose, onUpdate }) {
               : 'bg-blue-600 hover:bg-blue-700'
           }`}
         >
-          {saving ? 'Saving...' : 'Save Preferences'}
+          {saving ? 'Saving...' : 'Save Dashboard Preferences'}
         </button>
       </div>
     </div>
