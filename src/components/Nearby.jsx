@@ -362,19 +362,11 @@ export default function Nearby({ userId, setActiveTab, setCurrentListingSlug }) 
           const lat = Number(row.latitude ?? row.lat ?? row.lat_float ?? 0)
           const lon = Number(row.longitude ?? row.lng ?? row.lon ?? row.lng_float ?? 0)
 
-          // Haversine distance in kilometers
-          const R = 6371
-          const toRad = (d) => d * Math.PI / 180
-          const dLat = toRad(lat - userLocation.latitude)
-          const dLon = toRad(lon - userLocation.longitude)
-          const a = Math.sin(dLat/2) * Math.sin(dLat/2) + Math.cos(toRad(userLocation.latitude)) * Math.cos(toRad(lat)) * Math.sin(dLon/2) * Math.sin(dLon/2)
-          const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a))
-          const distanceKm = isFinite(c) ? R * c : Number.POSITIVE_INFINITY
-
+          const distanceKm = calculateDistance(userLocation.latitude, userLocation.longitude, lat, lon)
           return { ...row, _distance_km: distanceKm }
         }).filter(r => isFinite(r._distance_km))
 
-        listingsWithDistance.sort((a,b) => a._distance_km - b._distance_km)
+        listingsWithDistance.sort((a, b) => a._distance_km - b._distance_km)
 
         const from = (page - 1) * itemsPerPage
         const pageSlice = listingsWithDistance.slice(from, from + itemsPerPage)
