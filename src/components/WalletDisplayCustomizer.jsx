@@ -274,8 +274,7 @@ export default function WalletDisplayCustomizer({ userId, onClose, onUpdate, onW
       {/* Top Currencies Section */}
       <div className="mb-10">
         <div className="mb-4">
-          <h3 className="text-lg font-semibold text-slate-900 flex items-center gap-2">
-            <span className="text-2xl">⭐</span>
+          <h3 className="text-lg font-semibold text-slate-900">
             Top Currencies
           </h3>
           <p className="text-sm text-slate-600 mt-1">Popular currencies at a glance</p>
