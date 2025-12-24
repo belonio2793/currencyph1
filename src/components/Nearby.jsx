@@ -177,10 +177,11 @@ export default function Nearby({ userId, setActiveTab, setCurrentListingSlug }) 
       const { data: ratingData } = await supabase
         .from('nearby_listings')
         .select('rating')
-        .neq('rating', null)
 
-      const avgRating = ratingData && ratingData.length > 0
-        ? (ratingData.reduce((sum, d) => sum + (d.rating || 0), 0) / ratingData.length).toFixed(1)
+      // Filter ratings client-side
+      const validRatings = (ratingData || []).filter(d => d.rating !== null && d.rating !== undefined)
+      const avgRating = validRatings.length > 0
+        ? (validRatings.reduce((sum, d) => sum + (d.rating || 0), 0) / validRatings.length).toFixed(1)
         : 0
 
       setListingStats({
