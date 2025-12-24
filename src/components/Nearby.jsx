@@ -775,7 +775,13 @@ export default function Nearby({ userId, setActiveTab, setCurrentListingSlug }) 
         [listingId]: voteData
       }))
     } catch (err) {
-      console.error('Error submitting vote:', err)
+      const errorMessage = err?.message || err?.details || String(err) || 'Unknown error'
+      console.error('Error submitting vote:', {
+        message: errorMessage,
+        status: err?.status,
+        code: err?.code,
+        details: err?.details
+      })
       setCommunityError('Failed to submit vote')
     }
   }
