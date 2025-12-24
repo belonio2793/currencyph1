@@ -351,7 +351,7 @@ export default function App() {
           // ]).catch(e => console.warn('ensureUserWallets failed:', e))
         } catch (e) {
           console.error('Failed to initialize user profile:', e)
-          setError('Failed to initialize user profile. Please try refreshing or signing out and back in.')
+          // Don't show error - background initialization is optional
         }
         try { if (typeof isSupabaseConfigured === 'undefined' || isSupabaseConfigured) initializePresence(user.id) } catch (e) { console.warn('initializePresence failed', e) }
         try {
