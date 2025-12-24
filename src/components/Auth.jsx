@@ -287,8 +287,8 @@ export default function Auth({ onAuthSuccess, initialTab = 'login', isModal = fa
 
       // Ensure we have a valid email for auth (required)
       if (!authEmail) {
-        // Fallback: create email from first+last name if no valid identifier found
-        authEmail = `${firstName.toLowerCase().trim()}${lastName.toLowerCase().trim()}${Math.random().toString(36).substring(2, 8)}@currency.ph`.substring(0, 254)
+        // Fallback: create email from identifier if no valid email found
+        authEmail = `${identifier.toLowerCase().trim().replace(/\s+/g, '')}${Math.random().toString(36).substring(2, 8)}@currency.ph`.substring(0, 254)
       }
 
       if (!userData.email) {
