@@ -61,6 +61,36 @@ export default function Auth({ onAuthSuccess, initialTab = 'login', isModal = fa
     return `${v}@coconuts.local`
   }
 
+  const detectFieldType = (value) => {
+    if (!value) return null
+    const trimmed = value.trim()
+
+    // Detect email
+    if (trimmed.includes('@')) return 'email'
+
+    // Detect phone (contains digits and optional +, -, space)
+    if (/^[+\-\s\d()]{7,}$/.test(trimmed) && /\d/.test(trimmed)) return 'phone'
+
+    // Default to username/text
+    return 'username'
+  }
+
+  const addAdditionalField = () => {
+    setAdditionalFields([...additionalFields, { id: nextFieldId, value: '', type: null }])
+    setNextFieldId(nextFieldId + 1)
+  }
+
+  const removeAdditionalField = (id) => {
+    setAdditionalFields(additionalFields.filter(field => field.id !== id))
+  }
+
+  const updateAdditionalField = (id, value) => {
+    const type = detectFieldType(value)
+    setAdditionalFields(additionalFields.map(field =>
+      field.id === id ? { ...field, value, type } : field
+    ))
+  }
+
   const startResendCooldown = (email) => {
     try {
       const key = `resend_confirmation_${email}`
