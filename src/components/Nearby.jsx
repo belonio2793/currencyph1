@@ -706,7 +706,13 @@ export default function Nearby({ userId, setActiveTab, setCurrentListingSlug }) 
         attractions: attrRes.data || []
       })
     } catch (err) {
-      console.error('Error loading letter categorized listings:', err)
+      const errorMessage = err?.message || err?.details || String(err) || 'Unknown error'
+      console.error('Error loading letter categorized listings:', {
+        message: errorMessage,
+        status: err?.status,
+        code: err?.code,
+        details: err?.details
+      })
       const msg = 'Failed to load listings'
       setLetterCategoryError({ restaurants: msg, attractions: msg, hotels: msg })
     } finally {
