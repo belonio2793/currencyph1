@@ -56,6 +56,12 @@ export default function WalletInitializationModal({
           console.log(`✓ Wallet created successfully on check ${checkCount + 1}:`, data)
           setWalletData(data)
           setStatus('success')
+
+          // Immediately notify parent component so it can refresh
+          if (onWalletDetected) {
+            onWalletDetected(data)
+          }
+
           return
         }
 
