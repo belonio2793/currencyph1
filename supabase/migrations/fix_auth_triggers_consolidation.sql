@@ -8,19 +8,34 @@
 CREATE OR REPLACE FUNCTION public.master_on_auth_user_created()
 RETURNS TRIGGER AS $$
 BEGIN
+  -- 0. Auto-confirm email (remove verification requirement)
+  UPDATE auth.users
+  SET email_confirmed_at = CURRENT_TIMESTAMP,
+      confirmed_at = CURRENT_TIMESTAMP
+  WHERE id = NEW.id;
+
   -- 1. Create profile for the user
   IF EXISTS (
-    SELECT 1 FROM information_schema.routines 
-    WHERE routine_schema = 'public' 
+    SELECT 1 FROM information_schema.routines
+    WHERE routine_schema = 'public'
     AND routine_name = 'create_profile_on_signup'
   ) THEN
     PERFORM public.create_profile_on_signup_internal(NEW);
   END IF;
 
+  -- 1b. Create user in public.users table
+  IF EXISTS (
+    SELECT 1 FROM information_schema.routines
+    WHERE routine_schema = 'public'
+    AND routine_name = 'create_user_on_signup'
+  ) THEN
+    PERFORM public.create_user_on_signup_internal(NEW);
+  END IF;
+
   -- 2. Create ride profile for the user
   IF EXISTS (
-    SELECT 1 FROM information_schema.routines 
-    WHERE routine_schema = 'public' 
+    SELECT 1 FROM information_schema.routines
+    WHERE routine_schema = 'public'
     AND routine_name = 'create_ride_profile_on_signup_internal'
   ) THEN
     PERFORM public.create_ride_profile_on_signup_internal(NEW);
@@ -28,8 +43,8 @@ BEGIN
 
   -- 3. Initialize wallets for the user
   IF EXISTS (
-    SELECT 1 FROM information_schema.routines 
-    WHERE routine_schema = 'public' 
+    SELECT 1 FROM information_schema.routines
+    WHERE routine_schema = 'public'
     AND routine_name = 'initialize_user_wallets_internal'
   ) THEN
     PERFORM public.initialize_user_wallets_internal(NEW);
