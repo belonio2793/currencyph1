@@ -337,11 +337,12 @@ export default function App() {
           console.warn('Could not store device fingerprint:', e)
         }
         try {
-          // Add timeouts to prevent indefinite blocking
-          await Promise.race([
-            currencyAPI.getOrCreateUser(user.email, user.user_metadata?.full_name || 'User', user.id),
-            new Promise((resolve) => setTimeout(() => resolve(null), 3000))
-          ]).catch(e => console.warn('getOrCreateUser failed:', e))
+          // Skip getOrCreateUser - RLS policies prevent it anyway
+          // User data is already created via Supabase auth
+          // await Promise.race([
+          //   currencyAPI.getOrCreateUser(user.email, user.user_metadata?.full_name || 'User', user.id),
+          //   new Promise((resolve) => setTimeout(() => resolve(null), 3000))
+          // ]).catch(e => console.warn('getOrCreateUser failed:', e))
 
           // Ensure user has wallets for all active currencies
           await Promise.race([
