@@ -53,6 +53,38 @@ export default function ListingDetail({ slug, onBack }) {
     }
   }
 
+  const calculateDistance = (lat1, lon1, lat2, lon2) => {
+    const R = 6371 // Earth's radius in km
+    const toRad = (deg) => deg * Math.PI / 180
+    const dLat = toRad(lat2 - lat1)
+    const dLon = toRad(lon2 - lon1)
+    const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
+      Math.sin(dLon / 2) * Math.sin(dLon / 2)
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
+    return R * c
+  }
+
+  const handleOpenDirections = () => {
+    if (!listing || !listing.latitude && !listing.lat) {
+      alert('Location coordinates not available')
+      return
+    }
+
+    const lat = listing.latitude || listing.lat
+    const lon = listing.longitude || listing.lng
+
+    if (userLocation) {
+      // Open Google Maps with directions
+      const url = `https://www.google.com/maps/dir/?api=1&origin=${userLocation.latitude},${userLocation.longitude}&destination=${lat},${lon}&travelmode=driving`
+      window.open(url, '_blank')
+    } else {
+      // Just open the location in Google Maps
+      const url = `https://www.google.com/maps/search/${listing.name}/@${lat},${lon},15z`
+      window.open(url, '_blank')
+    }
+  }
+
   async function loadListing() {
     setLoading(true)
     setError('')
