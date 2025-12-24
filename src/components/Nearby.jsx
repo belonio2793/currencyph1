@@ -632,8 +632,14 @@ export default function Nearby({ userId, setActiveTab, setCurrentListingSlug }) 
       await imageManager.batchDownloadImages(all)
       alert(`Queued photos for ${all.length} listings`)
     } catch (err) {
-      console.error('Error downloading images:', err)
-      setError(`Failed to download images: ${err.message}`)
+      const errorMessage = err?.message || err?.details || String(err) || 'Unknown error'
+      console.error('Error downloading images:', {
+        message: errorMessage,
+        status: err?.status,
+        code: err?.code,
+        details: err?.details
+      })
+      setError(`Failed to download images: ${errorMessage}`)
     } finally {
       setIsFetching(false)
     }
