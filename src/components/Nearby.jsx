@@ -1,4 +1,7 @@
 import React, { useEffect, useState } from 'react'
+import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet'
+import L from 'leaflet'
+import 'leaflet/dist/leaflet.css'
 import { supabase } from '../lib/supabaseClient'
 import ListingCard from './ListingCard'
 import { imageManager } from '../lib/imageManager'
@@ -6,6 +9,14 @@ import { nearbyUtils } from '../lib/nearbyUtils'
 import { useGeolocation } from '../lib/useGeolocation'
 import AddBusinessModal from './AddBusinessModal'
 import { formatDateOnly } from '../lib/dateTimeUtils'
+
+// Fix Leaflet icon issues
+delete L.Icon.Default.prototype._getIconUrl
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon-2x.png',
+  iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png',
+  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
+})
 
 const ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('')
 
