@@ -6,7 +6,7 @@ import { useDevice } from '../context/DeviceContext'
 
 export default function PokerAuthModal({ open, onClose, onSuccess }) {
   const { isMobile } = useDevice()
-  const [email, setEmail] = useState('')
+  const [identifier, setIdentifier] = useState('')
   const [password, setPassword] = useState('')
   const [isSignUp, setIsSignUp] = useState(true)
   const [loading, setLoading] = useState(false)
