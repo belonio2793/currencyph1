@@ -494,6 +494,18 @@ export default function WalletDisplayCustomizer({ userId, onClose, onUpdate, onW
             Done
           </button>
         )}
+
+        <button
+          onClick={handleSavePreferences}
+          disabled={saving}
+          className={`px-6 py-3 text-white rounded-lg transition-colors text-base font-medium ${
+            saving
+              ? 'bg-slate-300 cursor-not-allowed'
+              : 'bg-blue-600 hover:bg-blue-700'
+          }`}
+        >
+          {saving ? 'Saving...' : 'Save Preferences'}
+        </button>
       </div>
 
       {/* Wallet Initialization Modal */}
