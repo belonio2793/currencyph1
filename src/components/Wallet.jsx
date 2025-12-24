@@ -52,7 +52,10 @@ export default function Wallet({ userId, globalCurrency = 'PHP' }) {
 
   const loadData = async () => {
     try {
-      setLoading(true)
+      // Only set loading if not already refreshing
+      if (!refreshing) {
+        setLoading(true)
+      }
       setError('')
 
       if (!userId || userId === 'null' || userId === 'undefined' || userId.includes('guest-local')) {
