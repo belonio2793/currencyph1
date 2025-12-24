@@ -437,7 +437,13 @@ export default function Nearby({ userId, setActiveTab, setCurrentListingSlug }) 
       setShowAutocomplete(true)
       setSelectedSuggestionIndex(-1)
     } catch (err) {
-      console.error('Error fetching autocomplete:', err)
+      const errorMessage = err?.message || err?.details || String(err) || 'Unknown error'
+      console.error('Error fetching autocomplete:', {
+        message: errorMessage,
+        status: err?.status,
+        code: err?.code,
+        details: err?.details
+      })
     }
   }
 
