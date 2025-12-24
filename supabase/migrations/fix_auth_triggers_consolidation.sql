@@ -44,22 +44,46 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 -- ============================================================================
 
 -- Wrapper for create_profile_on_signup to accept a trigger row
+-- Handles all flexible auth metadata fields
 CREATE OR REPLACE FUNCTION public.create_profile_on_signup_internal(user_row auth.users)
 RETURNS void AS $$
 BEGIN
   INSERT INTO public.profiles (
     user_id,
     full_name,
+    username,
+    phone_number,
+    nickname,
+    address,
+    country,
+    city,
+    region,
     created_at,
     updated_at
   )
   VALUES (
     user_row.id,
     COALESCE(user_row.raw_user_meta_data->>'full_name', ''),
+    COALESCE(user_row.raw_user_meta_data->>'username', NULL),
+    COALESCE(user_row.raw_user_meta_data->>'phone_number', NULL),
+    COALESCE(user_row.raw_user_meta_data->>'nickname', NULL),
+    COALESCE(user_row.raw_user_meta_data->>'address', NULL),
+    COALESCE(user_row.raw_user_meta_data->>'country', NULL),
+    COALESCE(user_row.raw_user_meta_data->>'city', NULL),
+    COALESCE(user_row.raw_user_meta_data->>'region', NULL),
     NOW(),
     NOW()
   )
-  ON CONFLICT (user_id) DO NOTHING;
+  ON CONFLICT (user_id) DO UPDATE SET
+    full_name = COALESCE(EXCLUDED.full_name, public.profiles.full_name),
+    username = COALESCE(EXCLUDED.username, public.profiles.username),
+    phone_number = COALESCE(EXCLUDED.phone_number, public.profiles.phone_number),
+    nickname = COALESCE(EXCLUDED.nickname, public.profiles.nickname),
+    address = COALESCE(EXCLUDED.address, public.profiles.address),
+    country = COALESCE(EXCLUDED.country, public.profiles.country),
+    city = COALESCE(EXCLUDED.city, public.profiles.city),
+    region = COALESCE(EXCLUDED.region, public.profiles.region),
+    updated_at = NOW();
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
