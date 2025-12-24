@@ -391,13 +391,25 @@ export default function CommitmentMarketplace({ userId, isAuthenticated, onAuthS
           </h3>
 
           <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Contact Info - Optional */}
+            {/* Contact Info */}
             {!isAuthenticated && (
               <div className="space-y-4 pb-4 border-b border-slate-700">
                 <div className="space-y-4">
                   <div>
                     <label className="block text-slate-300 text-sm mb-2">
-                      Your Name <span className="text-slate-500">(optional)</span>
+                      Your Username
+                    </label>
+                    <input
+                      type="text"
+                      value={username}
+                      onChange={(e) => setUsername(e.target.value)}
+                      placeholder="Choose your username"
+                      className="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-2.5 text-white placeholder-slate-500 focus:outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-400/30 transition-all"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-slate-300 text-sm mb-2">
+                      Your Name
                     </label>
                     <input
                       type="text"
@@ -409,7 +421,7 @@ export default function CommitmentMarketplace({ userId, isAuthenticated, onAuthS
                   </div>
                   <div>
                     <label className="block text-slate-300 text-sm mb-2">
-                      Your Email <span className="text-slate-500">(optional)</span>
+                      Your Email
                     </label>
                     <input
                       type="email"
@@ -421,7 +433,7 @@ export default function CommitmentMarketplace({ userId, isAuthenticated, onAuthS
                   </div>
                   <div>
                     <label className="block text-slate-300 text-sm mb-2">
-                      Your Phone <span className="text-slate-500">(optional)</span>
+                      Your Phone
                     </label>
                     <input
                       type="tel"
