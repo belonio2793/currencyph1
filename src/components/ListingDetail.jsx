@@ -68,7 +68,13 @@ export default function ListingDetail({ slug, onBack }) {
         setRelatedListings(related || [])
       }
     } catch (err) {
-      console.error('Error loading listing:', err)
+      const errorMessage = err?.message || err?.details || String(err) || 'Unknown error'
+      console.error('Error loading listing:', {
+        message: errorMessage,
+        status: err?.status,
+        code: err?.code,
+        details: err?.details
+      })
       setError('Failed to load listing details')
     } finally {
       setLoading(false)
