@@ -64,43 +64,90 @@ export default function WalletDisplayCustomizer({ userId, onClose, onUpdate }) {
       setCreatingWallet(currencyCode)
       setMessage('')
 
-      // Create wallet
+      // Find the currency details
+      const allCurrencies = [...allFiatCurrencies, ...allCryptoCurrencies]
+      const currencyData = allCurrencies.find(c => c.code === currencyCode)
+
+      // Set the initializing currency for the modal
+      setInitializingCurrency({
+        code: currencyCode,
+        name: currencyData?.name || currencyCode,
+        symbol: currencyData?.symbol
+      })
+
+      // Show the initialization modal
+      setShowInitializationModal(true)
+
+      // Create wallet in the background
       const newWallet = await currencyAPI.createWallet(userId, currencyCode)
 
       if (newWallet) {
-        // Immediately update local wallet list (optimistic update)
+        console.log(`✓ Wallet created for ${currencyCode}:`, newWallet)
+        // The modal will handle polling and showing success
+        // Just update our local state
         setUserWallets(prev => {
           if (prev.includes(currencyCode)) return prev
           return [...prev, currencyCode]
         })
 
-        // Auto-add to display preferences if not already there
         setSelectedCurrencies(prev => {
           if (prev.includes(currencyCode)) return prev
           return [...prev, currencyCode]
         })
-
-        setMessage(`✓ ${currencyCode} wallet created successfully!`)
-
-        // Notify parent immediately - real-time subscriptions will handle the refresh
-        if (onUpdate) {
-          onUpdate(selectedCurrencies)
-        }
-
-        // Also refresh local data after a short delay to ensure DB is updated
-        // (This is just a backup, the parent's real-time listener will handle it)
-        setTimeout(() => {
-          loadData()
-        }, 200)
       } else {
         throw new Error('Wallet creation returned null')
       }
     } catch (err) {
       console.error('Error creating wallet:', err)
-      setMessage(`✗ Failed to create ${currencyCode} wallet: ${err.message}`)
+      // The modal will show this error via its error state
+      // based on timeout or polling failure
     } finally {
       setCreatingWallet(null)
     }
+  }
+
+  const handleInitializationSuccess = (walletData) => {
+    // Wallet was successfully created and found in database
+    console.log('Wallet initialization successful:', walletData)
+
+    const currencyCode = initializingCurrency?.code
+
+    // Update local state
+    setUserWallets(prev => {
+      if (prev.includes(currencyCode)) return prev
+      return [...prev, currencyCode]
+    })
+
+    setSelectedCurrencies(prev => {
+      if (prev.includes(currencyCode)) return prev
+      return [...prev, currencyCode]
+    })
+
+    // Notify parent
+    if (onUpdate) {
+      onUpdate(selectedCurrencies)
+    }
+
+    // Show brief success message
+    setMessage(`✓ ${currencyCode} wallet created successfully!`)
+    setTimeout(() => setMessage(''), 3000)
+  }
+
+  const handleInitializationCancel = () => {
+    // User cancelled the initialization process
+    const currencyCode = initializingCurrency?.code
+    console.log(`Wallet creation cancelled for ${currencyCode}`)
+
+    setMessage(`Wallet creation for ${currencyCode} was cancelled.`)
+    setTimeout(() => setMessage(''), 3000)
+  }
+
+  const handleInitializationModalClose = () => {
+    setShowInitializationModal(false)
+    setInitializingCurrency(null)
+
+    // Refresh wallet list to ensure we have latest data
+    loadData()
   }
 
   const handleSavePreferences = async () => {
