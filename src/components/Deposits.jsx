@@ -872,7 +872,7 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
               </div>
 
               {/* Conversion Display */}
-              {amount && selectedWallet && (activeType === 'cryptocurrency' || selectedCurrency !== selectedWalletData?.currency_code) && (
+              {amount && selectedWallet && (
                 <div className={`border rounded-lg p-6 ${!calculateConvertedAmount() && !exchangeRates[selectedCurrency] ? 'bg-amber-50 border-amber-200' : 'bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200'}`}>
                   {activeType === 'cryptocurrency' ? (
                     <>
