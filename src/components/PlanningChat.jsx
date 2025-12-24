@@ -3156,7 +3156,7 @@ export default function PlanningChat() {
         </section>
 
         {/* Call to Action */}
-        <section className="py-24 px-4 sm:px-6 lg:px-8 bg-gradient-to-r from-amber-600 to-orange-600 text-white">
+        <section id="coconuts-cta" className="py-24 px-4 sm:px-6 lg:px-8 bg-gradient-to-r from-amber-600 to-orange-600 text-white">
           <div className="max-w-4xl mx-auto text-center">
             <h2 className="text-5xl md:text-6xl font-bold mb-6">
               Join a Movement Transforming Philippine Agriculture
