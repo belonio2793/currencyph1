@@ -567,13 +567,7 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
         return
       }
 
-      // 3. Validate wallet currency match
-      const walletValidation = validateWalletCurrency(targetWalletData, selectedCurrency)
-      if (!walletValidation.isValid) {
-        setError(walletValidation.errors.join('; '))
-        setSubmitting(false)
-        return
-      }
+      // 3. Validate wallet exists (removed currency match requirement for cross-currency deposits)
 
       // 4. Validate payment method
       if (!selectedMethod) {
