@@ -439,11 +439,12 @@ export default function Wallet({ userId, globalCurrency = 'PHP' }) {
               </div>
             ) : (
               // List View
-              <div className="space-y-8">
+              <div className="space-y-12">
                 {/* Fiat Currencies Section */}
                 {(activeType === 'all' || activeType === 'currency') && fiatWallets.length > 0 && (
-                  <div>
-                    <div className="mb-4 flex items-center gap-3">
+                  <div className="bg-gradient-to-br from-blue-50/40 to-slate-50 border border-blue-100 rounded-xl p-6">
+                    <div className="mb-6 pb-4 border-b-2 border-blue-200 flex items-center gap-3">
+                      <div className="w-2 h-6 bg-blue-600 rounded-full"></div>
                       <h2 className="text-xl font-semibold text-slate-900">Fiat Currencies</h2>
                       <span className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-medium">
                         {fiatWallets.length}
