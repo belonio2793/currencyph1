@@ -623,8 +623,11 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
     setError('')
   }
 
-  // Filter wallets by type
-  const currencyWallets = wallets.filter(w => w.currency_type === 'fiat')
+  // Filter wallets by type AND matching currency
+  // For fiat deposits: only show wallets matching the selected currency
+  const currencyWallets = wallets.filter(
+    w => w.currency_type === 'fiat' && w.currency_code === selectedCurrency
+  )
   // For crypto deposits, only show PHP wallet to receive converted funds
   const cryptocurrencyWallets = wallets.filter(w => w.currency_code === 'PHP')
 
