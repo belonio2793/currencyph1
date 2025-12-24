@@ -48,10 +48,7 @@ export default function ListingDetail({ slug, onBack }) {
 
       console.log('Listing fetched:', {
         name: data?.name,
-        slug: data?.slug,
-        photo_urls: data?.photo_urls,
-        photo_urls_type: Array.isArray(data?.photo_urls) ? 'array' : typeof data?.photo_urls,
-        photo_urls_length: Array.isArray(data?.photo_urls) ? data.photo_urls.length : 'N/A'
+        slug: data?.slug
       })
 
       setListing(data)
