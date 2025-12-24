@@ -102,12 +102,15 @@ export default function PokerAuthModal({ open, onClose, onSuccess }) {
 
       <form onSubmit={handleSubmit} id="poker-auth-form" className="space-y-4">
         <div>
-          <label className="block text-sm font-semibold text-slate-700 mb-2">Email</label>
+          <label className="block text-sm font-semibold text-slate-700 mb-2">
+            {isSignUp ? 'Email or Username' : 'Email, Username, or Phone'}
+          </label>
+          {!isSignUp && <p className="text-xs text-slate-500 mb-2">Use any of your registered information</p>}
           <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="you@example.com"
+            type="text"
+            value={identifier}
+            onChange={(e) => setIdentifier(e.target.value)}
+            placeholder={isSignUp ? "you@example.com or username" : "e.g., username, email@example.com, or +63 9XX XXXX XXX"}
             required
             disabled={loading}
             className="w-full px-4 py-2 border border-slate-300 rounded-lg text-slate-900 placeholder-slate-500 focus:outline-none focus:border-emerald-500 transition disabled:opacity-50 disabled:cursor-not-allowed"
