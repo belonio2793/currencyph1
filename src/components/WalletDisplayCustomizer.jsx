@@ -91,7 +91,13 @@ export default function WalletDisplayCustomizer({ userId, onClose, onUpdate }) {
         setMessage(`✓ ${currencyCode} wallet created successfully!`)
 
         // Refresh wallet list after a short delay to ensure DB is updated
-        setTimeout(loadData, 500)
+        setTimeout(() => {
+          loadData()
+          // Notify parent to refresh if callback exists
+          if (onUpdate) {
+            onUpdate(selectedCurrencies)
+          }
+        }, 500)
       } else {
         throw new Error('Wallet creation returned null')
       }
