@@ -297,6 +297,27 @@ export default function Wallet({ userId, globalCurrency = 'PHP' }) {
                   </>
                 )}
               </div>
+            ) : activeType === 'cryptocurrency' && cryptoWallets.length === 0 ? (
+              // Empty crypto section - show helpful message
+              <div className="bg-gradient-to-br from-orange-50/40 to-slate-50 border border-orange-100 rounded-xl p-8 text-center">
+                <div className="mb-6 pb-6 border-b-2 border-orange-200 flex items-center gap-3">
+                  <div className="w-2 h-8 bg-orange-600 rounded-full"></div>
+                  <h2 className="text-2xl font-semibold text-slate-900">Cryptocurrencies</h2>
+                  <span className="px-3 py-1 bg-orange-100 text-orange-700 rounded-full text-sm font-medium">
+                    0
+                  </span>
+                </div>
+                <p className="text-slate-600 mb-6">You don't have any cryptocurrency wallets yet</p>
+                <p className="text-slate-500 text-sm mb-6">
+                  Add a cryptocurrency like Bitcoin (BTC), Ethereum (ETH), or other digital assets to get started.
+                </p>
+                <button
+                  onClick={() => setShowCustomizer(true)}
+                  className="inline-block px-6 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors font-medium"
+                >
+                  Add Cryptocurrency
+                </button>
+              </div>
             ) : viewMode === 'grid' ? (
               // Grid View
               <div className="space-y-16">
