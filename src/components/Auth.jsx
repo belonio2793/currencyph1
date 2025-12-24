@@ -322,7 +322,7 @@ export default function Auth({ onAuthSuccess, initialTab = 'login', isModal = fa
               <form onSubmit={handleLogin} className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-2">
-                    Email or Phone
+                    Username
                   </label>
                   <input
                     type="text"
