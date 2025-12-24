@@ -654,19 +654,6 @@ export default function ListingDetail({ slug, onBack }) {
               </a>
             </div>
           )}
-          {listing.web_url && (
-            <div className="md:col-span-2 border border-slate-200 p-4 rounded-lg">
-              <h3 className="font-semibold text-slate-900 mb-2">TripAdvisor</h3>
-              <a
-                href={listing.web_url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-blue-600 hover:underline inline-flex items-center gap-1"
-              >
-                View Full Profile on TripAdvisor ↗
-              </a>
-            </div>
-          )}
         </div>
 
         {/* Awards */}
