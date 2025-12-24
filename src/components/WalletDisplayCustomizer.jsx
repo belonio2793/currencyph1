@@ -422,6 +422,7 @@ export default function WalletDisplayCustomizer({ userId, onClose, onUpdate, onW
         onClose={handleInitializationModalClose}
         onSuccess={handleInitializationSuccess}
         onCancel={handleInitializationCancel}
+        onWalletDetected={onWalletCreated}
       />
     </div>
   )
