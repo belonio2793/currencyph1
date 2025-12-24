@@ -170,7 +170,7 @@ export default function WalletDisplayCustomizer({ userId, onClose, onUpdate }) {
       <div className="mb-8">
         <h2 className="text-4xl font-light text-slate-900 mb-3">Manage Your Wallets</h2>
         <p className="text-base text-slate-600">
-          Create wallets for currencies or manage which ones appear on your dashboard. PHP wallet is always included.
+          Create wallets for your currencies. All wallets are automatically displayed on your dashboard.
         </p>
       </div>
 
