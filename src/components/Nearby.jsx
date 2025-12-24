@@ -371,7 +371,13 @@ export default function Nearby({ userId, setActiveTab, setCurrentListingSlug }) 
         attractions: attrRes.data || []
       })
     } catch (err) {
-      console.error('Error loading categorized listings:', err)
+      const errorMessage = err?.message || err?.details || String(err) || 'Unknown error'
+      console.error('Error loading categorized listings:', {
+        message: errorMessage,
+        status: err?.status,
+        code: err?.code,
+        details: err?.details
+      })
       const msg = 'Failed to load listings'
       setCategoryError({ restaurants: msg, attractions: msg, hotels: msg })
     } finally {
