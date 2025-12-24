@@ -13,7 +13,8 @@ export default function Auth({ onAuthSuccess, initialTab = 'login', isModal = fa
     window.scrollTo(0, 0)
   }, [])
 
-  const [identifier, setIdentifier] = useState('') // email or phone or 'guest'
+  const [identifier, setIdentifier] = useState('') // username
+  const [email, setEmail] = useState('') // optional email
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [fullName, setFullName] = useState('')
