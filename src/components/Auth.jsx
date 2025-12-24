@@ -271,15 +271,15 @@ export default function Auth({ onAuthSuccess, initialTab = 'login', isModal = fa
       }
 
       // Set identifier-based fields
-      if (identifierType === 'email') {
+      if (identifierTypeForData === 'email') {
         userData.email = identifier.toLowerCase().trim()
         authEmail = userData.email
-      } else if (identifierType === 'username') {
+      } else if (identifierTypeForData === 'username') {
         userData.username = identifier.toLowerCase().trim()
-        // Generate a unique email for auth (use hash of username instead of timestamp for shorter email)
-        const usernameHash = Math.abs(identifier.toLowerCase().charCodeAt(0) * identifier.length).toString(36)
-        authEmail = `${identifier.toLowerCase()}${usernameHash}@currency.ph`.substring(0, 254)
-      } else if (identifierType === 'phone') {
+        // Generate a unique email for auth (use random suffix to ensure uniqueness)
+        const randomSuffix = Math.random().toString(36).substring(2, 8)
+        authEmail = `${identifier.toLowerCase().trim()}${randomSuffix}@currency.ph`.substring(0, 254)
+      } else if (identifierTypeForData === 'phone') {
         userData.phone_number = identifier.trim()
         // Generate email from phone number (use hash to keep it short)
         const phoneHash = identifier.replace(/\D/g, '').substring(0, 8)
