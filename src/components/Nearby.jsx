@@ -190,7 +190,13 @@ export default function Nearby({ userId, setActiveTab, setCurrentListingSlug }) 
         withRatings: ratingData?.length || 0
       })
     } catch (err) {
-      console.error('Error loading stats:', err)
+      const errorMessage = err?.message || err?.details || String(err) || 'Unknown error'
+      console.error('Error loading stats:', {
+        message: errorMessage,
+        status: err?.status,
+        code: err?.code,
+        details: err?.details
+      })
     }
   }
 
