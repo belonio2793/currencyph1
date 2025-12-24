@@ -350,6 +350,15 @@ export const currencyAPI = {
     }
 
     console.debug(`Wallet created successfully for ${normalizedCode} with type '${walletType}'`)
+
+    // Broadcast wallet creation event across the entire app
+    walletEventBus.broadcastWalletCreated({
+      ...data,
+      currency_name: currencyName,
+      currency_type: walletType,
+      created_by: 'currencyAPI'
+    })
+
     return data
   },
 
