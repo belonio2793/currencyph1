@@ -504,7 +504,7 @@ export default function CommitmentMarketplace({ userId, isAuthenticated, onAuthS
                 <span>🔗</span> Social Media Profiles
               </label>
               <p className="text-slate-400 text-xs">
-                Share your social media handles for easy connection (all optional)
+                Share your social media handles for easy connection
               </p>
 
               <div className="grid grid-cols-2 gap-3">
