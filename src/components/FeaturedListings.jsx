@@ -17,10 +17,10 @@ export default function FeaturedListings({ onNavigateToListing }) {
       const { data, error } = await supabase
         .from('nearby_listings')
         .select('*')
-        .not('rating', 'is', null)
+        .neq('rating', null)
         .gt('review_count', 10)
-        .order('rating', { ascending: false })
-        .order('review_count', { ascending: false })
+        .order('rating', { ascending: false, nullsLast: true })
+        .order('review_count', { ascending: false, nullsLast: true })
         .limit(6)
 
       if (error) throw error
