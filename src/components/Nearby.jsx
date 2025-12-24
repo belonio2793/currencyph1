@@ -238,9 +238,9 @@ export default function Nearby({ userId, setActiveTab, setCurrentListingSlug }) 
       const { data, error: fetchError } = await supabase
         .from('nearby_listings')
         .select('*')
-        .not('rating', 'is', null)
+        .neq('rating', null)
         .order('photo_count', { ascending: false, nullsLast: true })
-        .order('rating', { ascending: false })
+        .order('rating', { ascending: false, nullsLast: true })
         .limit(6)
 
       if (fetchError) throw fetchError
