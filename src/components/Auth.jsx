@@ -229,7 +229,7 @@ export default function Auth({ onAuthSuccess, initialTab = 'login', isModal = fa
     setLoading(true)
 
     try {
-      if (!identifier || !password || !confirmPassword || !firstName || !lastName) {
+      if (!identifier || !password || !confirmPassword) {
         throw new Error('Please fill in all required fields')
       }
 
@@ -244,14 +244,6 @@ export default function Auth({ onAuthSuccess, initialTab = 'login', isModal = fa
       // Validate identifier is not empty
       if (!identifier || !identifier.trim()) {
         throw new Error('Please enter your email, username, or phone number')
-      }
-
-      // Build full name from first and last name
-      const fullName = `${firstName.trim()} ${lastName.trim()}`.trim()
-
-      // Validate full name
-      if (fullName.length < 2) {
-        throw new Error('Please enter both first and last name')
       }
 
       // Process main identifier field
