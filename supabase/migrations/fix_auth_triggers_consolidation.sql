@@ -102,6 +102,34 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
+-- Wrapper for create_user_on_signup to accept a trigger row
+CREATE OR REPLACE FUNCTION public.create_user_on_signup_internal(user_row auth.users)
+RETURNS void AS $$
+BEGIN
+  INSERT INTO public.users (
+    auth_id,
+    email,
+    full_name,
+    region_code,
+    status,
+    created_at,
+    updated_at
+  )
+  VALUES (
+    user_row.id,
+    user_row.email,
+    COALESCE(user_row.raw_user_meta_data->>'full_name', ''),
+    COALESCE(user_row.raw_user_meta_data->>'region_code', 'PH'),
+    'active',
+    NOW(),
+    NOW()
+  )
+  ON CONFLICT (auth_id) DO UPDATE SET
+    email = EXCLUDED.email,
+    updated_at = NOW();
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
 -- Wrapper for create_ride_profile_on_signup to accept a trigger row
 CREATE OR REPLACE FUNCTION public.create_ride_profile_on_signup_internal(user_row auth.users)
 RETURNS void AS $$
