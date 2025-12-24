@@ -161,8 +161,13 @@ export default function WalletDisplayCustomizer({ userId, onClose, onUpdate, onW
     setShowInitializationModal(false)
     setInitializingCurrency(null)
 
-    // Refresh wallet list to ensure we have latest data
+    // Refresh wallet list immediately to ensure we have latest data
     loadData()
+
+    // Also trigger parent refresh via onWalletCreated callback
+    if (onWalletCreated) {
+      onWalletCreated({ refreshed: true })
+    }
   }
 
   const handleSavePreferences = async () => {
