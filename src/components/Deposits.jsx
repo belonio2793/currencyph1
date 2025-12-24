@@ -5,6 +5,13 @@ import { currencyAPI } from '../lib/currencyAPI'
 import { getCryptoPrice, getMultipleCryptoPrices } from '../lib/cryptoRatesService'
 import { coinsPhApi } from '../lib/coinsPhApi'
 import { formatNumber } from '../lib/currency'
+import {
+  validateDepositInput,
+  validateWalletCurrency,
+  validateGCashReference,
+  buildDepositRecord,
+  validateCompleteDeposit
+} from '../lib/depositValidationService'
 
 // Currency symbols
 const CURRENCY_SYMBOLS = {
