@@ -450,7 +450,8 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
         .insert([{
           user_id: userId,
           currency_code: newWalletCurrency,
-          balance: 0
+          balance: 0,
+          is_active: true
         }])
         .select()
         .single()
