@@ -455,11 +455,18 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
 
       if (err) throw err
 
-      setWallets([...wallets, data])
-      setSelectedWallet(data.id)
+      // Track this wallet as initializing
+      setInitializingWallets(prev => new Set([...prev, newWalletCurrency]))
+
+      // Close modal immediately
       setShowWalletModal(false)
-      setSuccess(`${newWalletCurrency} wallet created successfully`)
-      setTimeout(() => setSuccess(''), 2000)
+
+      // Show success message
+      setSuccess(`${newWalletCurrency} wallet is initializing... This may take 1-5 minutes`)
+      setTimeout(() => setSuccess(''), 5000)
+
+      // Start polling for wallet availability
+      await loadInitialData()
     } catch (err) {
       console.error('Error creating wallet:', err)
       setError(err.message || 'Failed to create wallet')
