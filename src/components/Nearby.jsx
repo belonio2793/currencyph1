@@ -819,7 +819,13 @@ export default function Nearby({ userId, setActiveTab, setCurrentListingSlug }) 
       await nearbyUtils.rejectPendingListing(listingId)
       setPendingListings(prev => prev.filter(l => l.id !== listingId))
     } catch (err) {
-      console.error('Error rejecting listing:', err)
+      const errorMessage = err?.message || err?.details || String(err) || 'Unknown error'
+      console.error('Error rejecting listing:', {
+        message: errorMessage,
+        status: err?.status,
+        code: err?.code,
+        details: err?.details
+      })
       setCommunityError('Failed to reject listing')
     }
   }
