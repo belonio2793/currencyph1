@@ -18,8 +18,6 @@ export default function Auth({ onAuthSuccess, initialTab = 'login', isModal = fa
   const [phoneNumber, setPhoneNumber] = useState('') // optional phone
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
-  const [firstName, setFirstName] = useState('')
-  const [lastName, setLastName] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
