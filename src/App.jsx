@@ -682,6 +682,7 @@ export default function App() {
                   activeTab={activeTab}
                   onTabChange={setActiveTab}
                   userEmail={userEmail}
+                  userId={userId}
                   onShowAuth={(tab) => {
                     setAuthInitialTab(tab || 'login')
                     setShowAuth(true)
