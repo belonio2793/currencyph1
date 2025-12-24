@@ -277,8 +277,8 @@ export default function Nearby({ userId, setActiveTab, setCurrentListingSlug }) 
         const { data, error: fetchError } = await supabase
           .from('nearby_listings')
           .select('*')
-          .not('latitude', 'is', null)
-          .not('longitude', 'is', null)
+          .neq('latitude', null)
+          .neq('longitude', null)
           .limit(1000)
 
         if (fetchError) throw fetchError
