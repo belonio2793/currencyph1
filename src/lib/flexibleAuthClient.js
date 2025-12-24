@@ -129,60 +129,52 @@ export const flexibleAuthClient = {
         }
       }
 
-      // Wait a moment for the trigger to create the public.users row
+      // Wait a moment for the trigger to create the public.profiles row
       if (data.user) {
         await new Promise(resolve => setTimeout(resolve, 100))
 
-        // Update both profiles and public.users with additional metadata
+        // Update profiles table with metadata
         try {
-          // Update profiles table
+          // Build profile data - only include non-empty values
           const profileData = {
             user_id: data.user.id,
-            full_name: metadata.full_name || '',
-            username: metadata.username || null,
-            nickname: metadata.nickname || null,
-            phone_number: metadata.phone_number || null,
-            address: metadata.address || null,
-            country: metadata.country || null,
-            city: metadata.city || null,
-            region: metadata.region || null
+            full_name: metadata.full_name && metadata.full_name.trim() ? metadata.full_name.trim() : '',
+            updated_at: new Date().toISOString()
           }
 
-          // Remove undefined/null optional fields
-          Object.keys(profileData).forEach(key => {
-            if (profileData[key] === null && key !== 'user_id') {
-              delete profileData[key]
-            }
-          })
+          // Add optional fields only if they have values
+          if (metadata.username && metadata.username.trim()) {
+            profileData.username = metadata.username.trim()
+          }
+          if (metadata.nickname && metadata.nickname.trim()) {
+            profileData.nickname = metadata.nickname.trim()
+          }
+          if (metadata.phone_number && metadata.phone_number.trim()) {
+            profileData.phone_number = metadata.phone_number.trim()
+          }
+          if (metadata.address && metadata.address.trim()) {
+            profileData.address = metadata.address.trim()
+          }
+          if (metadata.country && metadata.country.trim()) {
+            profileData.country = metadata.country.trim()
+          }
+          if (metadata.city && metadata.city.trim()) {
+            profileData.city = metadata.city.trim()
+          }
+          if (metadata.region && metadata.region.trim()) {
+            profileData.region = metadata.region.trim()
+          }
 
-          // Try to upsert profile
-          await supabase
+          // Upsert profile - this will insert or update
+          const { error: profileError } = await supabase
             .from('profiles')
-            .upsert(profileData)
-            .eq('user_id', data.user.id)
+            .upsert(profileData, { onConflict: 'user_id' })
 
-          // Also update public.users with metadata (will be synced by trigger from profiles)
-          const usersData = {
-            username: metadata.username || null,
-            full_name: metadata.full_name || '',
-            phone_number: metadata.phone_number || null
-          }
-
-          // Remove null fields for update
-          Object.keys(usersData).forEach(key => {
-            if (usersData[key] === null) {
-              delete usersData[key]
-            }
-          })
-
-          if (Object.keys(usersData).length > 0) {
-            await supabase
-              .from('users')
-              .update(usersData)
-              .eq('auth_id', data.user.id)
+          if (profileError && profileError.code !== 'PGRST116') {
+            console.warn('Warning: Could not update profile:', profileError.message)
           }
         } catch (profileError) {
-          console.warn('Warning: Could not update profile/user metadata:', profileError.message)
+          console.warn('Warning: Could not update profile metadata:', profileError.message)
           // Don't fail signup if profile update fails - user is already created
         }
       }
