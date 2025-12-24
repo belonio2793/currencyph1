@@ -277,10 +277,11 @@ export default function NetworkOrdersDashboard({ userId }) {
             center={mapCenter}
             zoom={zoomLevel}
             style={{ height: '100%', width: '100%' }}
+            attributionControl={false}
           >
             <TileLayer
               url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-              attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+              attribution=""
             />
             
             {filteredOrders.map(order => {
