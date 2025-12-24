@@ -416,6 +416,20 @@ export default function Auth({ onAuthSuccess, initialTab = 'login', isModal = fa
 
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-2">
+                    Email <span className="text-slate-500 font-normal">(optional)</span>
+                  </label>
+                  <input
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="your@email.com"
+                    className="w-full px-4 py-3 border-2 border-slate-300 rounded-lg focus:outline-none focus:border-blue-600 text-sm"
+                    disabled={loading}
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-2">
                     Password
                   </label>
                   <input
