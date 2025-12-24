@@ -372,13 +372,9 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
 
       setWallets(enrichedWallets)
 
-      // Set PHP as default wallet (it should always exist now)
-      const phpWallet = enrichedWallets.find(w => w.currency_code === 'PHP')
-      if (phpWallet) {
-        setSelectedWallet(phpWallet.id)
-      } else if (enrichedWallets.length > 0) {
-        setSelectedWallet(enrichedWallets[0].id)
-      }
+      // Don't auto-select a wallet - let currency selection trigger wallet selection
+      // The useEffect with selectedCurrency will handle selecting the appropriate wallet
+      setSelectedWallet(null)
 
       // For create wallet modal, show ALL active currencies (not just those with existing wallets)
       setCurrencies(allCurrencies)
