@@ -8,6 +8,145 @@ const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || 'eyJhbGciOiJIUzI1Ni
 
 const supabase = createClient(supabaseUrl, supabaseKey)
 
+async function fixWalletTypesForUser(userId) {
+  try {
+    console.log(`\n🔧 Fixing wallet types for user: ${userId}\n`)
+
+    // Get user details
+    const { data: user, error: userError } = await supabase
+      .from('users')
+      .select('id, full_name, email')
+      .eq('id', userId)
+      .single()
+
+    if (userError || !user) {
+      console.error(`❌ User not found: ${userId}`)
+      return false
+    }
+
+    console.log(`Found user: ${user.full_name} (${user.email})`)
+
+    // Get user's wallets
+    const { data: wallets, error: walletError } = await supabase
+      .from('wallets')
+      .select('id, currency_code, type')
+      .eq('user_id', userId)
+      .order('currency_code')
+
+    if (walletError) {
+      console.error('❌ Error fetching wallets:', walletError)
+      return false
+    }
+
+    console.log(`\nUser has ${wallets?.length || 0} wallet(s):`)
+
+    if (!wallets || wallets.length === 0) {
+      console.log('  - No wallets found')
+      return true
+    }
+
+    // Check each wallet and fix if needed
+    let fixedCount = 0
+    const issues = []
+
+    for (const wallet of wallets) {
+      // Check if this currency should be crypto
+      const { data: currency } = await supabase
+        .from('currencies')
+        .select('type')
+        .eq('code', wallet.currency_code)
+        .single()
+
+      const correctType = currency?.type || 'fiat'
+      const isIncorrect = wallet.type !== correctType
+
+      if (isIncorrect) {
+        console.log(`  ⚠️  ${wallet.currency_code}: currently '${wallet.type}', should be '${correctType}'`)
+        issues.push({ walletId: wallet.id, code: wallet.currency_code, currentType: wallet.type, correctType })
+
+        // Fix the wallet type
+        const { error: updateError } = await supabase
+          .from('wallets')
+          .update({ type: correctType })
+          .eq('id', wallet.id)
+
+        if (updateError) {
+          console.error(`    ❌ Failed to fix: ${updateError.message}`)
+        } else {
+          console.log(`    ✓ Fixed to '${correctType}'`)
+          fixedCount++
+        }
+      } else {
+        console.log(`  ✓ ${wallet.currency_code}: '${wallet.type}' (correct)`)
+      }
+    }
+
+    console.log(`\n📊 Summary: Fixed ${fixedCount}/${wallets.length} wallet(s)`)
+    
+    if (issues.length > 0) {
+      console.log('\nIssues fixed:')
+      for (const issue of issues) {
+        console.log(`  - ${issue.code}: ${issue.currentType} → ${issue.correctType}`)
+      }
+    }
+
+    return true
+
+  } catch (err) {
+    console.error('❌ Unexpected error:', err)
+    return false
+  }
+}
+
+async function listUsersWithWallets() {
+  try {
+    console.log('\n📋 Searching for users with wallets...\n')
+
+    // Get all users with wallets
+    const { data: wallets, error } = await supabase
+      .from('wallets')
+      .select('user_id')
+      .order('user_id')
+
+    if (error) {
+      console.error('Error fetching wallets:', error)
+      return
+    }
+
+    if (!wallets || wallets.length === 0) {
+      console.log('No wallets found in database')
+      return
+    }
+
+    // Get unique user IDs
+    const userIds = [...new Set(wallets.map(w => w.user_id))]
+    console.log(`Found ${userIds.length} user(s) with wallets\n`)
+
+    // Get user details
+    const { data: users, error: userError } = await supabase
+      .from('users')
+      .select('id, full_name, email')
+      .in('id', userIds)
+      .order('full_name')
+
+    if (userError) {
+      console.error('Error fetching users:', userError)
+      return
+    }
+
+    console.log('Users:')
+    for (const user of users) {
+      console.log(`  ID: ${user.id}`)
+      console.log(`     Name: ${user.full_name}`)
+      console.log(`     Email: ${user.email}`)
+      console.log('')
+    }
+
+  } catch (err) {
+    console.error('❌ Unexpected error:', err)
+  }
+}
+
 async function main() {
   try {
     console.log('🔧 Starting wallet type fix...\n')
@@ -48,90 +187,28 @@ async function main() {
       if (error) {
         console.warn(`⚠️  Error upserting ${crypto.code}:`, error.message)
       } else {
-        console.log(`✓ ${crypto.code} - ${crypto.name} (crypto)`)
+        console.log(`✓ ${crypto.code} - ${crypto.name}`)
       }
     }
 
-    console.log('\nStep 2: Finding user "roger"...')
+    console.log('\nStep 2: Checking for user argument...')
     
-    // Get user with email or username "roger"
-    const { data: users, error: userError } = await supabase
-      .from('users')
-      .select('id, full_name, email')
-      .or('full_name.ilike.%roger%,email.ilike.%roger%')
+    // Check if user ID is provided as argument
+    const userIdArg = process.argv[2]
 
-    if (userError) {
-      console.error('❌ Error fetching users:', userError)
-      return
+    if (userIdArg) {
+      const success = await fixWalletTypesForUser(userIdArg)
+      if (!success) {
+        process.exit(1)
+      }
+    } else {
+      // List users with wallets
+      await listUsersWithWallets()
+      console.log('\n📝 Usage: node fix-wallet-types-for-user.js <user_id>')
+      console.log('   Example: node fix-wallet-types-for-user.js 550e8400-e29b-41d4-a716-446655440000\n')
     }
 
-    if (!users || users.length === 0) {
-      console.log('⚠️  No user found with "roger" in name or email')
-      console.log('\nAvailable options:')
-      console.log('1. Check the actual username/email in the database')
-      console.log('2. Run with specific user ID: node fix-wallet-types-for-user.js <user_id>')
-      return
-    }
-
-    for (const user of users) {
-      console.log(`\nFound user: ${user.full_name} (${user.email}) - ID: ${user.id}`)
-
-      // Get user's wallets with incorrect type
-      const { data: wallets, error: walletError } = await supabase
-        .from('wallets')
-        .select('id, currency_code, type')
-        .eq('user_id', user.id)
-        .order('currency_code')
-
-      if (walletError) {
-        console.error('❌ Error fetching wallets:', walletError)
-        continue
-      }
-
-      console.log(`\nUser has ${wallets?.length || 0} wallet(s):`)
-
-      if (!wallets || wallets.length === 0) {
-        console.log('  - No wallets found')
-        continue
-      }
-
-      // Check each wallet and fix if needed
-      let fixedCount = 0
-      for (const wallet of wallets) {
-        // Check if this currency should be crypto
-        const { data: currency } = await supabase
-          .from('currencies')
-          .select('type')
-          .eq('code', wallet.currency_code)
-          .single()
-
-        const correctType = currency?.type || 'fiat'
-        const isIncorrect = wallet.type !== correctType
-
-        if (isIncorrect) {
-          console.log(`  ⚠️  ${wallet.currency_code}: currently '${wallet.type}', should be '${correctType}'`)
-
-          // Fix the wallet type
-          const { error: updateError } = await supabase
-            .from('wallets')
-            .update({ type: correctType })
-            .eq('id', wallet.id)
-
-          if (updateError) {
-            console.error(`    ❌ Failed to fix: ${updateError.message}`)
-          } else {
-            console.log(`    ✓ Fixed to '${correctType}'`)
-            fixedCount++
-          }
-        } else {
-          console.log(`  ✓ ${wallet.currency_code}: '${wallet.type}' (correct)`)
-        }
-      }
-
-      console.log(`\n📊 Summary: Fixed ${fixedCount} wallet(s)`)
-    }
-
-    console.log('\n✅ Wallet type fix completed!')
+    console.log('\n✅ Complete!')
 
   } catch (err) {
     console.error('❌ Unexpected error:', err)
