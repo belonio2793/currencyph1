@@ -197,15 +197,7 @@ export default function Auth({ onAuthSuccess, initialTab = 'login', isModal = fa
 
     try {
       if (!identifier || !password || !confirmPassword || !fullName) {
-        throw new Error('Please fill in all required fields (Full Name, Username, Password)')
-      }
-
-      // Validate that at least one authentication method is provided
-      const hasEmail = email && email.trim()
-      const hasPhone = phoneNumber && phoneNumber.trim()
-
-      if (!hasEmail && !hasPhone) {
-        throw new Error('Please fill in one way to authenticate your account (email or phone number - at least 1 field required, or all optional)')
+        throw new Error('Please fill in all required fields')
       }
 
       if (password !== confirmPassword) {
@@ -216,24 +208,9 @@ export default function Auth({ onAuthSuccess, initialTab = 'login', isModal = fa
         throw new Error('Password must be at least 6 characters')
       }
 
-      // Validate username format (alphanumeric, no spaces)
-      if (!/^[a-zA-Z0-9_-]+$/.test(identifier)) {
-        throw new Error('Username can only contain letters, numbers, underscores, and hyphens')
-      }
-
-      if (identifier.length < 3) {
-        throw new Error('Username must be at least 3 characters')
-      }
-
-      // Validate email format if provided
-      if (hasEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-        throw new Error('Please enter a valid email address')
-      }
-
-      // Validate phone format if provided (basic validation)
-      if (hasPhone && !/^[0-9+\-\s()]+$/.test(phoneNumber)) {
-        throw new Error('Please enter a valid phone number')
-      }
+      // Prepare optional email and phone
+      const hasEmail = email && email.trim()
+      const hasPhone = phoneNumber && phoneNumber.trim()
 
       // Generate a valid email for Supabase auth
       // If user provided an email, use it; otherwise generate one with username + timestamp
