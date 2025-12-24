@@ -108,16 +108,13 @@ export const flexibleAuthClient = {
       }
 
       // Sign up through Supabase auth (will auto-confirm email via trigger)
+      // Only pass minimal data to auth - store full metadata in profiles table instead
       const { data, error } = await supabase.auth.signUp({
         email: email.trim(),
         password,
         options: {
           data: {
-            full_name: metadata.full_name || '',
-            username: metadata.username || '',
-            nickname: metadata.nickname || '',
-            phone_number: metadata.phone_number || '',
-            region_code: metadata.region_code || 'PH'
+            full_name: metadata.full_name || ''
           }
         }
       })
