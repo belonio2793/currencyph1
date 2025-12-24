@@ -197,7 +197,15 @@ export default function Auth({ onAuthSuccess, initialTab = 'login', isModal = fa
 
     try {
       if (!identifier || !password || !confirmPassword || !fullName) {
-        throw new Error('Please fill in all required fields')
+        throw new Error('Please fill in all required fields (Full Name, Username, Password)')
+      }
+
+      // Validate that at least one authentication method is provided
+      const hasEmail = email && email.trim()
+      const hasPhone = phoneNumber && phoneNumber.trim()
+
+      if (!hasEmail && !hasPhone) {
+        throw new Error('Please fill in one way to authenticate your account (email or phone number - at least 1 field required, or all optional)')
       }
 
       if (password !== confirmPassword) {
@@ -208,26 +216,60 @@ export default function Auth({ onAuthSuccess, initialTab = 'login', isModal = fa
         throw new Error('Password must be at least 6 characters')
       }
 
+      // Validate username format (alphanumeric, no spaces)
+      if (!/^[a-zA-Z0-9_-]+$/.test(identifier)) {
+        throw new Error('Username can only contain letters, numbers, underscores, and hyphens')
+      }
+
+      if (identifier.length < 3) {
+        throw new Error('Username must be at least 3 characters')
+      }
+
+      // Validate email format if provided
+      if (hasEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        throw new Error('Please enter a valid email address')
+      }
+
+      // Validate phone format if provided (basic validation)
+      if (hasPhone && !/^[0-9+\-\s()]+$/.test(phoneNumber)) {
+        throw new Error('Please enter a valid phone number')
+      }
+
       // Generate a valid email for Supabase auth
       // If user provided an email, use it; otherwise generate one with username + timestamp
-      const authEmail = email && email.trim()
-        ? email
+      const authEmail = hasEmail
+        ? email.trim()
         : `${identifier.toLowerCase()}+${Date.now()}@currency.ph`
 
       // Use flexible auth registration - email verification will be auto-confirmed via DB trigger
       const result = await flexibleAuthClient.signUp(authEmail, password, {
         full_name: fullName,
         username: identifier,
-        email: email || null
+        email: hasEmail ? email.trim() : null,
+        phone_number: hasPhone ? phoneNumber.trim() : null
       })
 
       if (result.error) {
-        throw new Error(result.error)
+        // Provide more helpful error messages
+        let errorMsg = result.error
+        if (errorMsg.includes('unique') || errorMsg.includes('duplicate')) {
+          if (errorMsg.includes('email')) {
+            errorMsg = 'This email is already registered'
+          } else if (errorMsg.includes('username')) {
+            errorMsg = 'This username is already taken'
+          } else if (errorMsg.includes('phone')) {
+            errorMsg = 'This phone number is already registered'
+          } else {
+            errorMsg = 'This information is already registered'
+          }
+        }
+        throw new Error(errorMsg)
       }
 
       setSuccess('Registration successful! You can now log in.')
       setIdentifier('')
       setEmail('')
+      setPhoneNumber('')
       setPassword('')
       setConfirmPassword('')
       setFullName('')
