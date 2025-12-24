@@ -855,7 +855,7 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
                 <label className="block text-sm font-medium text-slate-700 mb-2">
                   {activeType === 'cryptocurrency' ? 'Receive in Wallet' : 'Deposit to Wallet'}
                 </label>
-                {activeType === 'currency' && currencyWallets.length === 0 ? (
+                {(activeType === 'currency' && currencyWallets.length === 0) || (activeType === 'cryptocurrency' && cryptocurrencyWallets.length === 0) ? (
                   <div className="p-4 bg-amber-50 border border-amber-200 rounded-lg">
                     <p className="text-sm text-amber-800 font-medium mb-3">
                       You don't have a {selectedCurrency} wallet yet
@@ -881,11 +881,6 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
                       selectedWallet={selectedWallet}
                       onChange={setSelectedWallet}
                     />
-                    {activeType === 'cryptocurrency' && (
-                      <p className="text-xs text-blue-600 mt-2 flex items-center gap-1">
-                        <span>ℹ️</span> Cryptocurrencies are automatically converted to your wallet currency
-                      </p>
-                    )}
                   </>
                 )}
               </div>
