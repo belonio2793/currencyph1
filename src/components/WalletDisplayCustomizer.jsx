@@ -280,18 +280,9 @@ export default function WalletDisplayCustomizer({ userId, onClose, onUpdate }) {
                         {creatingWallet === currency.code ? 'Creating...' : 'Create Wallet'}
                       </button>
                     ) : (
-                      <label className="flex items-center gap-3 cursor-pointer">
-                        <input
-                          type="checkbox"
-                          checked={isDisplayed_}
-                          onChange={() => handleToggleDisplay(currency.code)}
-                          disabled={currency.code === 'PHP'}
-                          className="w-5 h-5 text-blue-600 rounded cursor-pointer disabled:cursor-not-allowed"
-                        />
-                        <span className="text-sm text-slate-600">
-                          {currency.code === 'PHP' ? 'Always Shown' : 'Show on Dashboard'}
-                        </span>
-                      </label>
+                      <span className="px-3 py-1 bg-blue-100 text-blue-700 text-xs font-semibold rounded-full">
+                        On Dashboard
+                      </span>
                     )}
                   </div>
                 </div>
