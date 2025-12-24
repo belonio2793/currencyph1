@@ -173,10 +173,10 @@ GRANT EXECUTE ON FUNCTION public.master_on_auth_user_created TO anon, authentica
 -- No changes needed - they continue to work as before
 
 -- ============================================================================
--- 6. VERIFY SETUP
+-- 7. VERIFY SETUP
 -- ============================================================================
 -- Check that the master trigger exists and is the only trigger on auth.users
-SELECT trigger_name, event_object_table, action_statement
-FROM information_schema.triggers
-WHERE event_object_table = 'users' AND trigger_schema = 'auth'
-ORDER BY trigger_name;
+-- SELECT trigger_name, event_object_table, action_statement
+-- FROM information_schema.triggers
+-- WHERE event_object_table = 'users' AND trigger_schema = 'auth'
+-- ORDER BY trigger_name;
