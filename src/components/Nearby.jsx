@@ -1249,6 +1249,21 @@ export default function Nearby({ userId, setActiveTab, setCurrentListingSlug }) 
         </div>
       )}
 
+      {/* Distance-sorted listings header for user location view */}
+      {userLocation && !selectedCity && !expandedLetter && searchResults.length === 0 && listings.length > 0 && (
+        <div className="mb-8">
+          <div className="flex items-center gap-3 mb-4">
+            <h2 className="text-2xl font-bold text-slate-900">
+              📍 Closest Listings to You
+            </h2>
+            <span className="text-sm bg-green-100 text-green-700 px-3 py-1 rounded-full font-semibold">
+              Sorted by distance
+            </span>
+          </div>
+          <p className="text-slate-600">Discover nearby attractions, restaurants, and services ranked by closest proximity to your location</p>
+        </div>
+      )}
+
       {/* Listings - Show categorized sections for letter selection or city selection; otherwise general grid */}
       {selectedCity === null && expandedLetter !== null ? (
         <div className="space-y-10">
