@@ -344,11 +344,11 @@ export default function App() {
           //   new Promise((resolve) => setTimeout(() => resolve(null), 3000))
           // ]).catch(e => console.warn('getOrCreateUser failed:', e))
 
-          // Ensure user has wallets for all active currencies
-          await Promise.race([
-            currencyAPI.ensureUserWallets(user.id),
-            new Promise((resolve) => setTimeout(() => resolve([]), 3000))
-          ]).catch(e => console.warn('ensureUserWallets failed:', e))
+          // Skip ensureUserWallets - wallets are created on-demand when accessed
+          // await Promise.race([
+          //   currencyAPI.ensureUserWallets(user.id),
+          //   new Promise((resolve) => setTimeout(() => resolve([]), 3000))
+          // ]).catch(e => console.warn('ensureUserWallets failed:', e))
         } catch (e) {
           console.error('Failed to initialize user profile:', e)
           setError('Failed to initialize user profile. Please try refreshing or signing out and back in.')
