@@ -509,35 +509,30 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
         return
       }
 
-      // For crypto deposits, always use PHP wallet as target
-      let targetWalletId = selectedWallet
-      let targetWalletData = wallets.find(w => w.id === selectedWallet)
-
+      // Use selected wallet as target for both crypto and fiat
+      const targetWalletId = selectedWallet
+      const targetWalletData = wallets.find(w => w.id === selectedWallet)
       const isCryptoDeposit = activeType === 'cryptocurrency'
-      if (isCryptoDeposit) {
-        const phpWallet = wallets.find(w => w.currency_code === 'PHP')
-        if (!phpWallet) {
-          throw new Error('PHP wallet not found. Please create one first.')
-        }
-        targetWalletId = phpWallet.id
-        targetWalletData = phpWallet
-      }
 
       // Calculate converted amount using real-time rates
       let convertedAmount = null
-      if (isCryptoDeposit) {
-        // For crypto, convert from crypto to PHP using real-time rates
-        const cryptoRate = exchangeRates[selectedCurrency]
-        const phpRate = exchangeRates['PHP'] || 1
 
-        if (!cryptoRate) {
-          setError(`Could not fetch exchange rate for ${selectedCurrency}. Please try again.`)
+      // If depositing to same currency (crypto-to-crypto same type), no conversion needed
+      if (selectedCurrency === targetWalletData?.currency_code) {
+        convertedAmount = parseFloat(amount)
+      } else if (isCryptoDeposit) {
+        // For crypto to different currency, use exchange rates
+        const cryptoRate = exchangeRates[selectedCurrency]
+        const walletRate = exchangeRates[targetWalletData?.currency_code]
+
+        if (!cryptoRate || !walletRate) {
+          setError(`Could not fetch exchange rates. Please try again.`)
           setSubmitting(false)
           return
         }
 
-        // Convert: (amount in crypto) * (crypto rate / PHP rate)
-        convertedAmount = parseFloat(amount) * (cryptoRate / phpRate)
+        // Convert: (amount in crypto) * (crypto rate / wallet currency rate)
+        convertedAmount = parseFloat(amount) * (cryptoRate / walletRate)
         convertedAmount = Math.round(convertedAmount * 100) / 100
       } else {
         // For fiat deposits
