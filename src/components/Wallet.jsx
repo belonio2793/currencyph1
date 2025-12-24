@@ -545,11 +545,6 @@ export default function Wallet({ userId, globalCurrency = 'PHP' }) {
           <TransactionsList userId={userId} />
         </div>
 
-        {/* Diagnostic Panel - Debug Mode */}
-        {wallets.length === 0 && !loading && (
-          <div className="mt-8 p-4 bg-amber-50 border border-amber-200 rounded-lg">
-          </div>
-        )}
 
         {/* Customizer Modal */}
         {showCustomizer && (
