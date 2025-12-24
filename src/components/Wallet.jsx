@@ -615,10 +615,12 @@ export default function Wallet({ userId, globalCurrency = 'PHP' }) {
                   userId={userId}
                   onClose={() => {
                     setShowCustomizer(false)
-                    loadData()
+                    setRefreshing(true)
+                    loadData().finally(() => setRefreshing(false))
                   }}
                   onUpdate={() => {
-                    loadData()
+                    setRefreshing(true)
+                    loadData().finally(() => setRefreshing(false))
                   }}
                 />
               </div>
