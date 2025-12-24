@@ -60,7 +60,14 @@ INSERT INTO currencies (code, name, type, symbol, decimals, is_default) VALUES
   ('BUSD', 'Binance USD', 'crypto', 'BUSD', 6, FALSE),
   ('SHIB', 'Shiba Inu', 'crypto', 'SHIB', 8, FALSE),
   ('AVAX', 'Avalanche', 'crypto', 'AVAX', 8, FALSE),
-  ('DOT', 'Polkadot', 'crypto', 'DOT', 8, FALSE)
+  ('DOT', 'Polkadot', 'crypto', 'DOT', 8, FALSE),
+  ('BNB', 'Binance Coin', 'crypto', 'BNB', 8, FALSE),
+  ('TRX', 'Tron', 'crypto', 'TRX', 8, FALSE),
+  ('XLM', 'Stellar Lumens', 'crypto', 'XLM', 8, FALSE),
+  ('ADA', 'Cardano', 'crypto', 'ADA', 8, FALSE),
+  ('SUI', 'Sui', 'crypto', 'SUI', 8, FALSE),
+  ('HBAR', 'Hedera', 'crypto', 'HBAR', 8, FALSE),
+  ('TON', 'Telegram', 'crypto', 'TON', 8, FALSE)
 ON CONFLICT (code) DO NOTHING;
 
 -- 2️⃣ WALLETS TABLE - Per-user wallet balances
