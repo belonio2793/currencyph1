@@ -446,18 +446,38 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
       setSubmitting(true)
       setError('')
 
-      const { data, error: err } = await supabase
-        .from('wallets')
-        .insert([{
-          user_id: userId,
-          currency_code: newWalletCurrency,
-          balance: 0,
-          is_active: true
-        }])
-        .select()
+      if (!newWalletCurrency) {
+        setError('Please select a currency')
+        setSubmitting(false)
+        return
+      }
+
+      // First, verify the currency exists in the currencies table
+      const { data: currencyData, error: currencyError } = await supabase
+        .from('currencies')
+        .select('code, type, name, symbol')
+        .eq('code', newWalletCurrency)
         .single()
 
-      if (err) throw err
+      if (currencyError || !currencyData) {
+        setError(`Currency ${newWalletCurrency} not found in the system. Please contact support.`)
+        setSubmitting(false)
+        return
+      }
+
+      // Use the wallet service to create the wallet with proper type checking
+      const newWallet = await walletService.createWallet(userId, newWalletCurrency)
+
+      if (!newWallet) {
+        setError(`Failed to create ${newWalletCurrency} wallet. Please try again.`)
+        setSubmitting(false)
+        return
+      }
+
+      // Verify the wallet was created with the correct type
+      if (newWallet.type !== currencyData.type) {
+        console.warn(`Wallet type mismatch: expected ${currencyData.type}, got ${newWallet.type}`)
+      }
 
       // Track this wallet as initializing
       setInitializingWallets(prev => new Set([...prev, newWalletCurrency]))
@@ -466,7 +486,7 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
       setShowWalletModal(false)
 
       // Show success message
-      setSuccess(`${newWalletCurrency} wallet is initializing... This may take 1-5 minutes`)
+      setSuccess(`${newWalletCurrency} wallet created successfully!`)
       setTimeout(() => setSuccess(''), 5000)
 
       // Start polling for wallet availability
