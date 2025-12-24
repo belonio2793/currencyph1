@@ -115,6 +115,7 @@ export default function WalletDisplayCustomizer({ userId, onClose, onUpdate }) {
         for (const currencyCode of missingCurrencies) {
           try {
             await currencyAPI.createWallet(userId, currencyCode)
+            // Optimistically update the local list
             setUserWallets(prev => [...prev, currencyCode])
           } catch (err) {
             console.warn(`Warning: Could not create wallet for ${currencyCode}:`, err)
@@ -128,12 +129,13 @@ export default function WalletDisplayCustomizer({ userId, onClose, onUpdate }) {
         onUpdate(selectedCurrencies)
       }
 
+      // Close after a short delay to show success message
       setTimeout(() => {
         setMessage('')
         if (onClose) {
           onClose()
         }
-      }, 2000)
+      }, 800)
     } catch (err) {
       console.error('Error saving preferences:', err)
       setMessage('✗ Failed to save preferences')
