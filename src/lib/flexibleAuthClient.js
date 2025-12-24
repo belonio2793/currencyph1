@@ -107,19 +107,30 @@ export const flexibleAuthClient = {
         }
       }
 
+      // Validate email format
+      const trimmedEmail = (email || '').trim()
+      if (!trimmedEmail.includes('@') || trimmedEmail.length > 254) {
+        console.error('Invalid email:', trimmedEmail)
+        return {
+          user: null,
+          error: 'Invalid email address format'
+        }
+      }
+
       // Sign up through Supabase auth (will auto-confirm email via trigger)
       // Only pass minimal data to auth - store full metadata in profiles table instead
       const { data, error } = await supabase.auth.signUp({
-        email: email.trim(),
+        email: trimmedEmail,
         password,
         options: {
           data: {
-            full_name: metadata.full_name || ''
+            full_name: (metadata.full_name || '').substring(0, 255)
           }
         }
       })
 
       if (error) {
+        console.error('Supabase signup error:', error)
         return {
           user: null,
           error: error.message || 'Registration failed'
