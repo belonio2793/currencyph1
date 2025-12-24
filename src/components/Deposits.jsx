@@ -832,13 +832,36 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
               {/* Wallet Selection */}
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-2">Deposit to Wallet</label>
-                <WalletDropdown
-                  wallets={activeType === 'currency' ? currencyWallets : cryptocurrencyWallets}
-                  selectedWallet={selectedWallet}
-                  onChange={setSelectedWallet}
-                />
-                {!selectedWallet && (
-                  <p className="text-xs text-slate-500 mt-2">Create a wallet if you don't have one for this currency</p>
+                {activeType === 'currency' && currencyWallets.length === 0 ? (
+                  <div className="p-4 bg-amber-50 border border-amber-200 rounded-lg">
+                    <p className="text-sm text-amber-800 font-medium mb-3">
+                      You don't have a {selectedCurrency} wallet yet
+                    </p>
+                    <p className="text-xs text-amber-700 mb-4">
+                      To deposit {selectedCurrency}, you need to create a wallet for this currency first.
+                    </p>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setNewWalletCurrency(selectedCurrency)
+                        setShowWalletModal(true)
+                      }}
+                      className="w-full px-4 py-2 bg-amber-600 text-white rounded-lg font-medium hover:bg-amber-700 transition text-sm"
+                    >
+                      Create {selectedCurrency} Wallet
+                    </button>
+                  </div>
+                ) : (
+                  <>
+                    <WalletDropdown
+                      wallets={activeType === 'currency' ? currencyWallets : cryptocurrencyWallets}
+                      selectedWallet={selectedWallet}
+                      onChange={setSelectedWallet}
+                    />
+                    {!selectedWallet && cryptocurrencyWallets.length === 0 && activeType === 'cryptocurrency' && (
+                      <p className="text-xs text-slate-500 mt-2">Create a PHP wallet to receive cryptocurrency deposits</p>
+                    )}
+                  </>
                 )}
               </div>
 
