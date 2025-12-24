@@ -99,24 +99,15 @@ export default function CommitmentMarketplace({ userId, isAuthenticated, onAuthS
       return
     }
 
-    // Validate email or phone is provided for non-authenticated users
+    // Validate username is provided for non-authenticated users
     if (!isAuthenticated) {
-      const hasEmail = email && email.includes('@')
-      const hasPhone = phone && phone.trim().length >= 7
-
-      if (!hasEmail && !hasPhone) {
-        setError('Please enter either an email address or phone number to create an account')
+      if (!username || username.trim().length < 3) {
+        setError('Please enter a username (at least 3 characters)')
         return
       }
 
-      // If using email, proceed with signup
-      if (hasEmail && !email.includes('@')) {
-        setError('Please enter a valid email address')
-        return
-      }
-
-      // For phone-only accounts, use a generated email
-      const signupEmail = hasEmail ? email : `phone.${Date.now()}@coconuts.local`
+      // Use username as the signup identifier
+      const signupEmail = `${username}@coconuts.local`
 
       setNewUserEmail(signupEmail)
       setTempFormData({
