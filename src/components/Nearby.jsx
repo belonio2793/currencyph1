@@ -596,8 +596,14 @@ export default function Nearby({ userId, setActiveTab, setCurrentListingSlug }) 
       await loadListings()
       setPage(1)
     } catch (err) {
-      console.error('Error fetching comprehensive listings:', err)
-      setError(`Failed to fetch: ${err.message}`)
+      const errorMessage = err?.message || err?.details || String(err) || 'Unknown error'
+      console.error('Error fetching comprehensive listings:', {
+        message: errorMessage,
+        status: err?.status,
+        code: err?.code,
+        details: err?.details
+      })
+      setError(`Failed to fetch: ${errorMessage}`)
     } finally {
       setIsFetching(false)
     }
