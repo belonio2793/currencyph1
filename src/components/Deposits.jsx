@@ -286,12 +286,9 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
         }
       })
 
-      // Ensure PHP and USD base rates always exist
+      // Ensure PHP base rate exists (always 1 PHP = 1 PHP)
       if (!rates['PHP']) rates['PHP'] = 1
-      if (!rates['USD']) {
-        // If USD missing, try to calculate from other rates
-        rates['USD'] = rates['USD'] || (rates['PHP'] / 56.5) || 1
-      }
+      // Note: USD rate must come from database, no hardcoded fallback
 
       console.log(`[Deposits] ✅ Loaded ${Object.keys(rates).length} canonical rates from public.pairs (${canonicalPairs.length} rows, ~${Math.round(canonicalPairs.length * 0.1)}ms)`)
       setExchangeRates(rates)
