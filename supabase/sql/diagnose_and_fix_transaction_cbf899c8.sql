@@ -84,9 +84,12 @@ ORDER BY wt.created_at;
 -- PHASE 4: CALCULATE EXPECTED BALANCES FROM TRANSACTIONS
 -- ============================================================================
 
-RAISE NOTICE '';
-RAISE NOTICE '>> PHASE 4: CALCULATED BALANCES FROM TRANSACTIONS';
-RAISE NOTICE '═══════════════════════════════════════════════════════════';
+DO $$
+BEGIN
+  RAISE NOTICE '';
+  RAISE NOTICE '>> PHASE 4: CALCULATED BALANCES FROM TRANSACTIONS';
+  RAISE NOTICE '═══════════════════════════════════════════════════════════';
+END $$;
 
 SELECT
   w.id as wallet_id,
