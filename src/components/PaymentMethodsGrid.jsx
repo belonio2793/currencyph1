@@ -192,6 +192,9 @@ function PaymentMethodsGrid({
                   {filteredFiatMethods.map(method => {
                     const convertedAmount = getConvertedAmountForMethod(method)
                     const amountDisplay = formatAmountDisplay(method, convertedAmount)
+                    const phpEquivalent = getPhpEquivalent()
+                    const isGCash = method.id === 'gcash'
+
                     return (
                       <button
                         key={method.id}
@@ -216,10 +219,29 @@ function PaymentMethodsGrid({
                             <div className="text-blue-600 text-xl font-bold ml-2">✓</div>
                           )}
                         </div>
-                        {amount && selectedCurrency && amountDisplay && (
+                        {amount && selectedCurrency && (
                           <div className="pt-3 border-t border-slate-200 mt-3">
-                            <p className="text-xs text-slate-500 mb-1">You need to send:</p>
-                            <p className="text-sm font-semibold text-blue-600">{amountDisplay}</p>
+                            {isGCash ? (
+                              <>
+                                <p className="text-xs text-slate-500 mb-1">PHP Total:</p>
+                                <p className="text-sm font-semibold text-blue-600">
+                                  {phpEquivalent?.toLocaleString(undefined, {
+                                    minimumFractionDigits: 2,
+                                    maximumFractionDigits: 2
+                                  })} PHP
+                                </p>
+                                {selectedCurrency.toUpperCase() !== 'PHP' && (
+                                  <p className="text-xs text-slate-500 mt-2">
+                                    ({parseFloat(amount).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 8 })} {selectedCurrency})
+                                  </p>
+                                )}
+                              </>
+                            ) : (
+                              <>
+                                <p className="text-xs text-slate-500 mb-1">You need to send:</p>
+                                <p className="text-sm font-semibold text-blue-600">{amountDisplay}</p>
+                              </>
+                            )}
                           </div>
                         )}
                       </button>
