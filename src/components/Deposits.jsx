@@ -286,11 +286,37 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
               if (pricesFromApi && Object.keys(pricesFromApi).length > 0) {
                 Object.assign(rates, pricesFromApi)
               } else {
-                console.warn('Batch crypto price fetch returned no data')
+                console.warn('Batch crypto price fetch returned no data, trying public.pairs fallback...')
               }
             } catch (batchErr) {
               console.warn('Batch crypto fetch failed:', batchErr.message)
-              // Skip individual fallback to prevent timeout
+              // Will try public.pairs fallback below
+            }
+
+            // CRITICAL FALLBACK: Query public.pairs directly if API failed
+            const stillMissingCryptos = cryptoCodes.filter(code => !rates[code])
+            if (stillMissingCryptos.length > 0) {
+              try {
+                console.log(`[Deposits] Querying public.pairs for ${stillMissingCryptos.length} missing crypto rates (crypto mode)...`)
+                const { data: pairsData, error: pairsError } = await supabase
+                  .from('pairs')
+                  .select('from_currency, rate, updated_at')
+                  .eq('to_currency', 'PHP')
+                  .in('from_currency', stillMissingCryptos)
+
+                if (!pairsError && pairsData && pairsData.length > 0) {
+                  pairsData.forEach(row => {
+                    rates[row.from_currency] = parseFloat(row.rate)
+                  })
+                  console.log(`[Deposits] Loaded ${pairsData.length} rates from public.pairs (crypto mode)`)
+                } else if (pairsError) {
+                  console.warn('[Deposits] Public.pairs query failed:', pairsError.message)
+                } else {
+                  console.warn('[Deposits] Public.pairs returned no data for:', stillMissingCryptos.join(', '))
+                }
+              } catch (e) {
+                console.warn('[Deposits] Public.pairs fallback failed:', e.message)
+              }
             }
           } catch (e) {
             console.error('Failed to fetch crypto rates:', e.message)
