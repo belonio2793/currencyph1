@@ -52,11 +52,12 @@ export const onboardingService = {
     try {
       if (!this.isValidUUID(userId)) return false
 
+      // Use limit(1) instead of single() to avoid 406 error when no rows exist
       const { data, error } = await supabase
         .from('user_preferences')
         .select('preferred_currency')
         .eq('user_id', userId)
-        .single()
+        .limit(1)
 
       if (error) {
         // Handle missing column or table gracefully
@@ -65,7 +66,13 @@ export const onboardingService = {
         }
         throw error
       }
-      return !!(data?.preferred_currency)
+
+      // Handle case where no rows returned
+      if (!data || data.length === 0) {
+        return false
+      }
+
+      return !!(data[0]?.preferred_currency)
     } catch (err) {
       const errMsg = err?.message || String(err)
       // Don't log network errors - they're expected and non-critical
