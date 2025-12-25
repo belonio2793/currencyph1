@@ -42,6 +42,7 @@ const CURRENCY_SYMBOLS = {
 }
 
 const DEPOSIT_METHODS = {
+  // Fiat Payment Methods
   gcash: {
     id: 'gcash',
     name: 'GCash',
@@ -49,13 +50,32 @@ const DEPOSIT_METHODS = {
     type: 'fiat',
     description: 'Instant mobile payment (Philippines)'
   },
-  solana: {
-    id: 'solana',
-    name: 'Solana',
-    icon: '◎',
-    type: 'crypto',
-    description: 'Cryptocurrency transfer'
-  }
+
+  // Cryptocurrency Methods
+  btc: { id: 'btc', name: 'Bitcoin', icon: '₿', type: 'crypto', description: 'Bitcoin deposit' },
+  eth: { id: 'eth', name: 'Ethereum', icon: 'Ξ', type: 'crypto', description: 'Ethereum deposit' },
+  usdt: { id: 'usdt', name: 'Tether (USDT)', icon: '₮', type: 'crypto', description: 'USDT deposit' },
+  bnb: { id: 'bnb', name: 'Binance Coin', icon: '♡', type: 'crypto', description: 'BNB deposit' },
+  xrp: { id: 'xrp', name: 'XRP', icon: '✕', type: 'crypto', description: 'XRP deposit' },
+  usdc: { id: 'usdc', name: 'USD Coin', icon: 'Ⓒ', type: 'crypto', description: 'USDC deposit' },
+  sol: { id: 'sol', name: 'Solana', icon: '◎', type: 'crypto', description: 'SOL deposit' },
+  trx: { id: 'trx', name: 'Tron', icon: '⬢', type: 'crypto', description: 'TRX deposit' },
+  doge: { id: 'doge', name: 'Dogecoin', icon: 'Ð', type: 'crypto', description: 'DOGE deposit' },
+  ada: { id: 'ada', name: 'Cardano', icon: '₳', type: 'crypto', description: 'ADA deposit' },
+  bch: { id: 'bch', name: 'Bitcoin Cash', icon: '₿ℂ', type: 'crypto', description: 'BCH deposit' },
+  link: { id: 'link', name: 'Chainlink', icon: '⛓', type: 'crypto', description: 'LINK deposit' },
+  xlm: { id: 'xlm', name: 'Stellar', icon: '★', type: 'crypto', description: 'XLM deposit' },
+  ltc: { id: 'ltc', name: 'Litecoin', icon: 'Ł', type: 'crypto', description: 'LTC deposit' },
+  sui: { id: 'sui', name: 'Sui', icon: '◆', type: 'crypto', description: 'SUI deposit' },
+  avax: { id: 'avax', name: 'Avalanche', icon: '▲', type: 'crypto', description: 'AVAX deposit' },
+  hbar: { id: 'hbar', name: 'Hedera', icon: 'ℌ', type: 'crypto', description: 'HBAR deposit' },
+  shib: { id: 'shib', name: 'Shiba Inu', icon: '🐕', type: 'crypto', description: 'SHIB deposit' },
+  pyusd: { id: 'pyusd', name: 'PayPal USD', icon: 'P', type: 'crypto', description: 'PYUSD deposit' },
+  wld: { id: 'wld', name: 'Worldcoin', icon: 'W', type: 'crypto', description: 'WLD deposit' },
+  ton: { id: 'ton', name: 'The Open Network', icon: '◉', type: 'crypto', description: 'TON deposit' },
+  uni: { id: 'uni', name: 'Uniswap', icon: '∪', type: 'crypto', description: 'UNI deposit' },
+  dot: { id: 'dot', name: 'Polkadot', icon: '●', type: 'crypto', description: 'DOT deposit' },
+  aave: { id: 'aave', name: 'Aave', icon: 'Ⓐ', type: 'crypto', description: 'AAVE deposit' }
 }
 
 const SOLANA_ADDRESS = 'CbcWb97K3TEFJZJYLZRqdsMSdVXTFaMaUcF6yPQgY9yS'
