@@ -47,11 +47,11 @@ export function formatCurrency(amount, currency = 'PHP') {
 /**
  * Display both PHP and USD amounts
  * @param {number} phpAmount - Amount in PHP
- * @param {number} exchangeRate - PHP to USD exchange rate
+ * @param {number} exchangeRate - PHP to USD exchange rate (required)
  * @returns {string} Formatted string with both currencies
  */
-export function displayBothCurrencies(phpAmount, exchangeRate = DEFAULT_EXCHANGE_RATE) {
-  if (!phpAmount || isNaN(phpAmount)) {
+export function displayBothCurrencies(phpAmount, exchangeRate) {
+  if (!phpAmount || isNaN(phpAmount) || !exchangeRate || isNaN(exchangeRate)) {
     return `${formatCurrency(0, 'PHP')} / ${formatCurrency(0, 'USD')}`;
   }
 
