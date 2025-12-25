@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { supabase } from '../lib/supabaseClient'
 import CurrencyCryptoToggle from './FiatCryptoToggle'
+import EnhancedWalletDropdown from './EnhancedWalletDropdown'
 import { currencyAPI } from '../lib/currencyAPI'
 import { getCryptoPrice, getMultipleCryptoPrices } from '../lib/cryptoRatesService'
 import { coinsPhApi } from '../lib/coinsPhApi'
