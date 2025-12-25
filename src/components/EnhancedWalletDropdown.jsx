@@ -103,7 +103,7 @@ function EnhancedWalletDropdown({ wallets, selectedWallet, onChange }) {
       {isOpen && (
         <div className="absolute z-50 w-full mt-2 bg-white border border-slate-300 rounded-lg shadow-xl">
           {/* Search Input */}
-          <div className="sticky top-0 p-4 border-b border-slate-200 bg-slate-50 rounded-t-lg">
+          <div className="sticky top-0 z-10 p-4 border-b border-slate-200 bg-slate-50 rounded-t-lg">
             <input
               ref={searchInputRef}
               type="text"
