@@ -253,11 +253,12 @@ export const onboardingService = {
         return null
       }
 
+      // Use limit(1) instead of single() to avoid 406 error when no rows exist
       const { data, error } = await supabase
         .from('user_onboarding_state')
         .select('*')
         .eq('user_id', userId)
-        .single()
+        .limit(1)
 
       if (error) {
         // Handle table not found or other errors gracefully
@@ -267,7 +268,13 @@ export const onboardingService = {
         }
         throw error
       }
-      return data || null
+
+      // Handle case where no rows returned
+      if (!data || data.length === 0) {
+        return null
+      }
+
+      return data[0] || null
     } catch (err) {
       const errMsg = err?.message || String(err)
       // Don't log network errors - they're expected and non-critical
