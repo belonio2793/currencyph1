@@ -336,7 +336,7 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
             const stillMissingCryptos = cryptoCodes.filter(code => !rates[code])
             if (stillMissingCryptos.length > 0) {
               try {
-                console.log(`[Deposits] Querying public.pairs for ${stillMissingCryptos.length} missing crypto rates (crypto mode)...`)
+                console.log(`[Deposits] Querying public.pairs for ${stillMissingCryptos.length} missing crypto rates (crypto mode): ${stillMissingCryptos.join(', ')}`)
                 const { data: pairsData, error: pairsError } = await supabase
                   .from('pairs')
                   .select('from_currency, rate, updated_at')
@@ -345,16 +345,17 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
 
                 if (!pairsError && pairsData && pairsData.length > 0) {
                   pairsData.forEach(row => {
-                    rates[row.from_currency] = parseFloat(row.rate)
+                    const upperCode = row.from_currency.toUpperCase()
+                    rates[upperCode] = parseFloat(row.rate)
                   })
-                  console.log(`[Deposits] Loaded ${pairsData.length} rates from public.pairs (crypto mode)`)
+                  console.log(`[Deposits] Loaded ${pairsData.length} rates from public.pairs (crypto mode): ${pairsData.map(r => r.from_currency).join(', ')}`)
                 } else if (pairsError) {
-                  console.warn('[Deposits] Public.pairs query failed:', pairsError.message)
+                  console.error('[Deposits] Public.pairs query failed:', pairsError.message)
                 } else {
-                  console.warn('[Deposits] Public.pairs returned no data for:', stillMissingCryptos.join(', '))
+                  console.warn('[Deposits] Public.pairs returned NO rows for:', stillMissingCryptos.join(', '), '| Check if cryptocurrency_rates table is populated')
                 }
               } catch (e) {
-                console.warn('[Deposits] Public.pairs fallback failed:', e.message)
+                console.error('[Deposits] Public.pairs fallback threw error:', e.message)
               }
             }
           } catch (e) {
