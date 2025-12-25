@@ -879,15 +879,15 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
 
               {/* Last Fetched Rates Info */}
               {lastFetchedRates && (
-                <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                <div className={`mb-6 p-4 rounded-lg border ${lastFetchedRates.isFresh ? 'bg-blue-50 border-blue-200' : 'bg-amber-50 border-amber-200'}`}>
                   <div className="flex items-center justify-between flex-wrap gap-2">
                     <div>
-                      <p className="text-sm text-blue-900">
+                      <p className={`text-sm ${lastFetchedRates.isFresh ? 'text-blue-900' : 'text-amber-900'}`}>
                         <span className="font-semibold">Last Fetched Rates:</span>{' '}
                         {formatFullDateTime(lastFetchedRates.fetchedAt)}
                       </p>
                       {lastFetchedRates.isFresh !== undefined && (
-                        <p className="text-xs text-blue-700 mt-1">
+                        <p className={`text-xs mt-1 ${lastFetchedRates.isFresh ? 'text-blue-700' : 'text-amber-700'}`}>
                           {lastFetchedRates.isFresh ? (
                             <span>✓ Fresh (updated within last hour)</span>
                           ) : (
@@ -902,6 +902,14 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
                         </p>
                       )}
                     </div>
+                    {!ratesLoading && (
+                      <button
+                        onClick={() => fetchExchangeRates()}
+                        className="px-3 py-1 bg-blue-600 text-white text-xs font-medium rounded hover:bg-blue-700 transition whitespace-nowrap"
+                      >
+                        Refresh Rates
+                      </button>
+                    )}
                   </div>
                 </div>
               )}
