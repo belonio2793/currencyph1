@@ -84,39 +84,87 @@ const DEPOSIT_METHODS = {
 
 const SOLANA_ADDRESS = 'CbcWb97K3TEFJZJYLZRqdsMSdVXTFaMaUcF6yPQgY9yS'
 
-// Helper function to query public.pairs directly
+// Helper function to query public.pairs with canonical direction preference
 async function getRatesFromPublicPairs(currencies, toCurrency = 'PHP') {
   try {
     const toUpper = toCurrency.toUpperCase()
     const currencyUpperCase = currencies.map(c => c.toUpperCase())
 
-    console.log(`[Deposits] Querying public.pairs for rates: ${currencyUpperCase.join(', ')} → ${toUpper}`)
-
-    const { data, error } = await supabase
-      .from('pairs')
-      .select('from_currency, rate, updated_at, source_table')
-      .eq('to_currency', toUpper)
-      .in('from_currency', currencyUpperCase)
-
-    if (error) {
-      console.warn('[Deposits] Public.pairs query error:', error.message)
-      return {}
-    }
-
-    if (!data || data.length === 0) {
-      console.warn('[Deposits] Public.pairs returned no data for:', currencyUpperCase.join(', '))
-      return {}
-    }
+    console.log(`[Deposits] Querying canonical pairs for rates: ${currencyUpperCase.join(', ')} → ${toUpper}`)
 
     const rates = {}
-    data.forEach(row => {
-      rates[row.from_currency] = parseFloat(row.rate)
-    })
 
-    console.log(`[Deposits] Successfully loaded ${data.length} rates from public.pairs:`, Object.keys(rates).join(', '))
+    // Strategy 1: Query canonical pairs view first (X→PHP)
+    if (toUpper === 'PHP') {
+      const { data: canonicalData, error: canonicalError } = await supabase
+        .from('pairs_canonical')
+        .select('from_currency, rate, updated_at, source_table')
+        .in('from_currency', currencyUpperCase)
+
+      if (!canonicalError && canonicalData && canonicalData.length > 0) {
+        canonicalData.forEach(row => {
+          rates[row.from_currency] = parseFloat(row.rate)
+          console.log(`[Deposits] ✓ Canonical: ${row.from_currency} → PHP = ${row.rate}`)
+        })
+
+        if (Object.keys(rates).length > 0) {
+          console.log(`[Deposits] Successfully loaded ${canonicalData.length} canonical rates`)
+          return rates
+        }
+      }
+    }
+
+    // Strategy 2: Fallback to bidirectional view for any missing rates
+    const missingCurrencies = currencyUpperCase.filter(c => !rates[c])
+    if (missingCurrencies.length > 0) {
+      console.warn(`[Deposits] Missing canonical rates for: ${missingCurrencies.join(', ')}, trying bidirectional...`)
+
+      const { data: bidirectionalData, error: bidirectionalError } = await supabase
+        .from('pairs_bidirectional')
+        .select('from_currency, to_currency, rate, updated_at, source_table, pair_direction, is_inverted')
+        .eq('to_currency', toUpper)
+        .in('from_currency', missingCurrencies)
+
+      if (!bidirectionalError && bidirectionalData && bidirectionalData.length > 0) {
+        bidirectionalData.forEach(row => {
+          if (!rates[row.from_currency]) {
+            rates[row.from_currency] = parseFloat(row.rate)
+            const directionLabel = row.is_inverted ? '(inverse)' : '(canonical)'
+            console.log(`[Deposits] ${directionLabel}: ${row.from_currency} → ${toUpper} = ${row.rate}`)
+          }
+        })
+      }
+    }
+
+    // Strategy 3: Direct pairs table query as final fallback
+    if (Object.keys(rates).length < currencyUpperCase.length) {
+      const stillMissing = currencyUpperCase.filter(c => !rates[c])
+      console.warn(`[Deposits] Still missing rates for: ${stillMissing.join(', ')}, using direct query...`)
+
+      const { data: directData, error: directError } = await supabase
+        .from('pairs')
+        .select('from_currency, rate, updated_at, source_table')
+        .eq('to_currency', toUpper)
+        .in('from_currency', stillMissing)
+
+      if (!directError && directData && directData.length > 0) {
+        directData.forEach(row => {
+          if (!rates[row.from_currency]) {
+            rates[row.from_currency] = parseFloat(row.rate)
+          }
+        })
+      }
+    }
+
+    if (Object.keys(rates).length === 0) {
+      console.warn('[Deposits] Failed to load any rates for:', currencyUpperCase.join(', '))
+      return {}
+    }
+
+    console.log(`[Deposits] Successfully loaded ${Object.keys(rates).length} rates:`, Object.keys(rates).join(', '))
     return rates
   } catch (e) {
-    console.error('[Deposits] Public.pairs helper failed:', e.message)
+    console.error('[Deposits] Rates helper failed:', e.message)
     return {}
   }
 }
