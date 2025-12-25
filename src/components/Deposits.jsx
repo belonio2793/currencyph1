@@ -276,6 +276,18 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
 
       console.log(`[Deposits] Loaded ${Object.keys(rates).length} rates from public.pairs`)
       setExchangeRates(rates)
+
+      // Fetch and display last fetch info (from edge function execution)
+      try {
+        const fetchInfo = await getLastFetchInfo()
+        if (fetchInfo) {
+          setLastFetchedRates(fetchInfo)
+          console.log(`[Deposits] Last fetch info: ${fetchInfo.isoString}`)
+        }
+      } catch (e) {
+        console.warn('[Deposits] Could not fetch last fetch info:', e.message)
+      }
+
       setRatesLoading(false)
     } catch (err) {
       console.error('[Deposits] Error fetching exchange rates:', err.message)
