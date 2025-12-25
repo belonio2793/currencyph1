@@ -515,68 +515,31 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
       return numAmount
     }
 
-    // Get exchange rates for both currencies (try both uppercase and lowercase)
+    // Get exchange rates for both currencies (normalized to uppercase like /rates)
     const fromCurrencyUpper = selectedCurrency.toUpperCase()
     const toCurrencyUpper = selectedWalletData.currency_code.toUpperCase()
 
-    let fromRate = exchangeRates[selectedCurrency] || exchangeRates[fromCurrencyUpper]
-    let toRate = exchangeRates[selectedWalletData.currency_code] || exchangeRates[toCurrencyUpper]
+    const fromRate = exchangeRates[fromCurrencyUpper] || exchangeRates[selectedCurrency]
+    const toRate = exchangeRates[toCurrencyUpper] || exchangeRates[selectedWalletData.currency_code]
 
-    if (!fromRate || !toRate) {
-      console.warn('Missing exchange rates for conversion:', {
-        fromRate,
-        toRate,
-        from: selectedCurrency,
-        to: selectedWalletData.currency_code,
-        activeType,
-        availableRates: Object.keys(exchangeRates),
-        expectedFrom: [selectedCurrency, fromCurrencyUpper],
-        expectedTo: [selectedWalletData.currency_code, toCurrencyUpper]
+    // Both rates must be available and valid
+    if (!fromRate || !toRate || !isFinite(fromRate) || !isFinite(toRate) || fromRate <= 0 || toRate <= 0) {
+      console.warn('[Deposits] Missing or invalid exchange rates:', {
+        from: fromCurrencyUpper,
+        fromRate: fromRate,
+        to: toCurrencyUpper,
+        toRate: toRate,
+        availableRates: Object.keys(exchangeRates)
       })
       return null
     }
 
-    // Check if source is crypto or fiat
-    const sourceIsCrypto = activeType === 'cryptocurrency'
-    const targetIsCrypto = selectedWalletData.currency_type === 'crypto'
+    // Use the same simple conversion formula as /rates
+    // convertedAmount = (amount * toRate) / fromRate
+    const convertedAmount = (numAmount * toRate) / fromRate
 
-    let convertedAmount
-
-    if (sourceIsCrypto && !targetIsCrypto) {
-      // Crypto to fiat: amount in crypto * price per crypto (in fiat)
-      // fromRate = price of source crypto in target fiat (e.g., 1 BTC = 2,500,000 PHP)
-      convertedAmount = numAmount * fromRate
-    } else if (sourceIsCrypto && targetIsCrypto) {
-      // Crypto to crypto
-      // Both rates are prices in PHP: amount in PHP / price in PHP = amount in crypto
-      // fromRate = source crypto price in PHP
-      // toRate = target crypto price in PHP
-      convertedAmount = (numAmount * fromRate) / toRate
-    } else if (!sourceIsCrypto && targetIsCrypto) {
-      // Fiat to crypto
-      // fromRate = source fiat price in USD (e.g., 1 USD = 58.5 PHP, so PHP rate is 58.5)
-      // toRate = target crypto price in PHP (e.g., 1 BTC = 2,500,000 PHP)
-      // Convert: (amount in source / rate in USD) * (USD to PHP) / (crypto price in PHP)
-      // Simplified: amount / toRate gives crypto amount if everything is in PHP
-      // But fromRate is not in PHP directly... Let's use: (amount / fromRate) * USD_to_PHP_rate / toRate
-      // Or more directly: convert source to PHP: amount * (PHP rate / source rate)... no wait
-      // If fromRate = 58.5 (1 USD = 58.5 PHP), then 1 PHP = 1/58.5 USD
-      // So: amount_php * (1/fromRate) = amount_usd
-      // Then: amount_usd / (toRate / fromRate) = amount_crypto
-      // = amount * (1/fromRate) * (fromRate / toRate) = amount / toRate
-      // So the simple formula is: convertedAmount = numAmount / toRate (since everything is normalized to PHP)
-      convertedAmount = numAmount / toRate
-    } else {
-      // Fiat to fiat
-      // fromRate = source currency price in USD (e.g., 58.5)
-      // toRate = target currency price in USD (e.g., 1)
-      // Convert: amount * (USD to target) / (USD to source) = amount * toRate / fromRate
-      // = (amount / fromRate) * toRate
-      convertedAmount = (numAmount / fromRate) * toRate
-    }
-
-    // Round to appropriate decimal places
-    const decimals = targetIsCrypto ? 8 : 2
+    // Round to appropriate decimal places (crypto: 8, fiat: 2)
+    const decimals = selectedWalletData.currency_type === 'crypto' ? 8 : 2
     return Math.round(convertedAmount * Math.pow(10, decimals)) / Math.pow(10, decimals)
   }
 
