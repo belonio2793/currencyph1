@@ -1611,6 +1611,35 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
             </div>
 
             <div className="space-y-6">
+              {/* Amount to Send Section */}
+              {amount && selectedCurrency && getDepositMethodAmount() && (
+                <div className="p-6 bg-gradient-to-r from-blue-50 to-indigo-50 border-2 border-blue-200 rounded-lg">
+                  <h4 className="font-semibold text-slate-900 mb-4">💰 Amount to Send</h4>
+                  <div className="space-y-3">
+                    <div className="flex items-baseline justify-between">
+                      <span className="text-slate-700">You need to send:</span>
+                      <span className="text-3xl font-bold text-blue-600">
+                        {getDepositMethodAmount()?.toLocaleString(undefined, {
+                          minimumFractionDigits: isCryptoCurrency(selectedAddressMethod.cryptoSymbol) ? 2 : 2,
+                          maximumFractionDigits: isCryptoCurrency(selectedAddressMethod.cryptoSymbol) ? 8 : 2
+                        })} {selectedAddressMethod.cryptoSymbol}
+                      </span>
+                    </div>
+                    {selectedCurrency.toUpperCase() !== selectedAddressMethod.cryptoSymbol?.toUpperCase() && (
+                      <div className="flex items-baseline justify-between pt-3 border-t border-blue-200">
+                        <span className="text-slate-600 text-sm">Original amount:</span>
+                        <span className="text-lg font-semibold text-slate-900">
+                          {parseFloat(amount).toLocaleString(undefined, {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 8
+                          })} {selectedCurrency.toUpperCase()}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
               {/* Instructions */}
               <div>
                 <h4 className="font-semibold text-slate-900 mb-4">Steps to Deposit</h4>
