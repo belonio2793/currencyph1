@@ -602,12 +602,11 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
 
   // Filter currencies by type (show ALL currencies, not just wallet matches)
   // Users can now deposit ANY currency into ANY wallet
-  const currencyCurrencies = currencies.filter(c => c.type === 'fiat')
+  const fiatCurrencies = currencies.filter(c => c.type === 'fiat')
   const cryptoCurrencies = currencies.filter(c => c.type === 'crypto' && cryptoAddresses[c.code])
-  const displayedCurrencies = activeType === 'currency' ? currencyCurrencies : cryptoCurrencies
 
   // For Create Wallet modal, show currencies they don't have yet
-  const availableForNewWallets = activeType === 'currency'
+  const availableForNewWallets = activeType === 'currency' || activeType === 'all'
     ? currencies.filter(c => c.type === 'fiat' && !userCurrencyCodes.has(c.code))
     : currencies.filter(c => c.type === 'crypto' && !userCurrencyCodes.has(c.code))
 
