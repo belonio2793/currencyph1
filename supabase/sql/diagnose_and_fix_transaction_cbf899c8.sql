@@ -117,9 +117,12 @@ ORDER BY w.currency_code;
 -- PHASE 5: DEPOSIT DETAILS
 -- ============================================================================
 
-RAISE NOTICE '';
-RAISE NOTICE '>> PHASE 5: DEPOSIT DETAILS';
-RAISE NOTICE '═══════════════════════════════════════════════════════════';
+DO $$
+BEGIN
+  RAISE NOTICE '';
+  RAISE NOTICE '>> PHASE 5: DEPOSIT DETAILS';
+  RAISE NOTICE '═══════════════════════════════════════════════════════════';
+END $$;
 
 SELECT
   id as deposit_id,
