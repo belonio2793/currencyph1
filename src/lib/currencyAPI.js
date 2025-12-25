@@ -148,31 +148,31 @@ export const currencyAPI = {
   // Get Bitcoin and Ethereum prices in USD and other currencies from public.pairs (primary)
   async getCryptoPrices() {
     try {
-      // 1) PRIMARY: Try public.pairs table first for crypto prices with timeout
+      // 1) PRIMARY: Try pairs_canonical view first for canonical crypto prices
       try {
         const controller = new AbortController()
         const timeout = setTimeout(() => controller.abort(), 6000) // 6 second timeout
 
-        const pairsPromise = supabase
-          .from('pairs')
+        const canonicalPromise = supabase
+          .from('pairs_canonical')
           .select('from_currency, to_currency, rate, updated_at')
-          .limit(100) // Small limit for crypto-only queries
+          .limit(100)
 
-        const { data: pairsData, error: pairsError } = await Promise.race([
-          pairsPromise,
-          new Promise((_, reject) => setTimeout(() => reject(new Error('Public.pairs crypto query timeout')), 5000))
+        const { data: canonicalData, error: canonicalError } = await Promise.race([
+          canonicalPromise,
+          new Promise((_, reject) => setTimeout(() => reject(new Error('Canonical crypto query timeout')), 5000))
         ])
 
         clearTimeout(timeout)
 
-        if (!pairsError && pairsData && pairsData.length > 0) {
-          console.log('✅ Using crypto prices from public.pairs table')
-          const lastUpdated = new Date(pairsData[0].updated_at || Date.now())
+        if (!canonicalError && canonicalData && canonicalData.length > 0) {
+          console.log('✅ Using crypto prices from pairs_canonical view')
+          const lastUpdated = new Date(canonicalData[0].updated_at || Date.now())
 
-          // Extract crypto prices from pairs (e.g., BTC-USD, ETH-USD)
-          const btcUsd = pairsData.find(p => p.from_currency === 'BTC' && p.to_currency === 'USD')
-          const ethUsd = pairsData.find(p => p.from_currency === 'ETH' && p.to_currency === 'USD')
-          const dogeUsd = pairsData.find(p => p.from_currency === 'DOGE' && p.to_currency === 'USD')
+          // Extract crypto prices from canonical pairs
+          const btcUsd = canonicalData.find(p => p.from_currency === 'BTC' && p.to_currency === 'USD')
+          const ethUsd = canonicalData.find(p => p.from_currency === 'ETH' && p.to_currency === 'USD')
+          const dogeUsd = canonicalData.find(p => p.from_currency === 'DOGE' && p.to_currency === 'USD')
 
           const cryptoPrices = {
             BTC: {
