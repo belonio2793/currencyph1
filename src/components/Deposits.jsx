@@ -498,19 +498,26 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
 
       // ===== USE MULTI-CURRENCY DEPOSIT SERVICE =====
       // This handles all conversion and validation automatically
+
+      // Determine the deposit method identifier
+      let depositMethodId = selectedMethod
+      if (activeType === 'cryptocurrency' && selectedAddressMethod) {
+        depositMethodId = selectedAddressMethod.cryptoSymbol?.toLowerCase() || selectedCurrency.toLowerCase()
+      }
+
       const result = await multiCurrencyDepositService.createMultiCurrencyDeposit({
         userId,
         walletId: selectedWallet,
         amount,
         depositCurrency: selectedCurrency,
         walletCurrency: targetWalletData.currency_code,
-        depositMethod: activeType === 'cryptocurrency' ? selectedCurrency.toLowerCase() : selectedMethod,
+        depositMethod: depositMethodId,
         paymentReference: selectedMethod === 'gcash' ? gcashReferenceNumber : null,
         paymentAddress: activeMethodData?.address || null,
         metadata: {
           activeType,
-          methodName: selectedMethod || selectedCurrency,
-          networkInfo: activeMethodData ? { network: activeMethodData.network, provider: activeMethodData.provider } : null
+          methodName: activeMethodData?.name || selectedCurrency,
+          networkInfo: activeMethodData?.network ? { network: activeMethodData.network, provider: activeMethodData.provider } : null
         }
       })
 
