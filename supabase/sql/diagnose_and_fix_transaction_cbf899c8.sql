@@ -208,9 +208,12 @@ END $$;
 -- PHASE 7: VERIFY THE FIX
 -- ============================================================================
 
-RAISE NOTICE '';
-RAISE NOTICE '>> PHASE 7: VERIFICATION - NEW (CORRECTED) BALANCES';
-RAISE NOTICE '═══════════════════════════════════════════════════════════';
+DO $$
+BEGIN
+  RAISE NOTICE '';
+  RAISE NOTICE '>> PHASE 7: VERIFICATION - NEW (CORRECTED) BALANCES';
+  RAISE NOTICE '═══════════════════════════════════════════════════════════';
+END $$;
 
 SELECT
   SUBSTRING(w.id FROM 1 FOR 8) || '...' as wallet_id,
