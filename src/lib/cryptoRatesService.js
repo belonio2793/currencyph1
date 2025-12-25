@@ -400,7 +400,7 @@ async function fetchFromExconvert(cryptoCodes, toCurrency) {
 
     const prices = {}
     const controller = new AbortController()
-    const timeout = setTimeout(() => controller.abort(), 8000) // 8 second total timeout
+    const timeoutId = setTimeout(() => controller.abort(new Error('Request timeout after 8 seconds')), 8000) // 8 second total timeout
 
     try {
       // Fetch each crypto price from EXCONVERT
@@ -429,7 +429,12 @@ async function fetchFromExconvert(cryptoCodes, toCurrency) {
             }
           }
         } catch (e) {
-          console.warn(`[EXCONVERT] Individual request failed for ${cryptoCode}:`, e.message)
+          // Handle AbortError separately
+          if (e.name === 'AbortError') {
+            console.warn(`[EXCONVERT] Request aborted for ${cryptoCode}:`, e.message)
+          } else {
+            console.warn(`[EXCONVERT] Individual request failed for ${cryptoCode}:`, e.message)
+          }
           continue
         }
 
@@ -437,12 +442,17 @@ async function fetchFromExconvert(cryptoCodes, toCurrency) {
         await new Promise(resolve => setTimeout(resolve, 50))
       }
     } finally {
-      clearTimeout(timeout)
+      clearTimeout(timeoutId)
     }
 
     return Object.keys(prices).length > 0 ? prices : null
   } catch (error) {
-    console.error('[cryptoRatesService] EXCONVERT fetch error:', error.message)
+    // Handle AbortError specifically
+    if (error.name === 'AbortError') {
+      console.warn('[cryptoRatesService] EXCONVERT request aborted:', error.message)
+    } else {
+      console.error('[cryptoRatesService] EXCONVERT fetch error:', error.message)
+    }
     return null
   }
 }
