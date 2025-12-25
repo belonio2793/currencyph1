@@ -240,30 +240,31 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
 
           // Fetch crypto prices if needed
           if (cryptoCurrenciesToFetch.size > 0) {
-            try {
-              const cryptoCodes = Array.from(cryptoCurrenciesToFetch)
-              console.log(`[Deposits] Fetching crypto rates for fiat→crypto conversion: ${cryptoCodes.join(', ')}`)
+            const cryptoCodes = Array.from(cryptoCurrenciesToFetch)
+            console.log(`[Deposits] Fetching crypto rates for fiat→crypto conversion: ${cryptoCodes.join(', ')}`)
 
+            // TRY API FIRST (with timeout)
+            let apiSuccess = false
+            try {
               const pricesFromApi = await Promise.race([
                 getMultipleCryptoPrices(cryptoCodes, 'PHP'),
-                createTimeout(12000) // 12 second timeout for crypto rates
+                createTimeout(8000) // Shorter timeout - fall back quickly
               ])
 
               if (pricesFromApi && Object.keys(pricesFromApi).length > 0) {
                 Object.assign(rates, pricesFromApi)
-                console.log(`[Deposits] Successfully fetched ${Object.keys(pricesFromApi).length} crypto rates in PHP`)
-              } else {
-                console.warn('[Deposits] Crypto price fetch returned no data, trying public.pairs fallback...')
+                console.log(`[Deposits] Successfully fetched ${Object.keys(pricesFromApi).length} crypto rates from API`)
+                apiSuccess = true
               }
             } catch (e) {
-              console.warn('[Deposits] Failed to fetch crypto rates in fiat mode:', e.message)
+              console.warn('[Deposits] API fetch timed out or failed:', e.message)
             }
 
-            // CRITICAL FALLBACK: Query public.pairs directly if API failed
-            const stillMissingCryptos = Array.from(cryptoCurrenciesToFetch).filter(code => !rates[code])
+            // CRITICAL: Always try public.pairs for any missing rates
+            const stillMissingCryptos = cryptoCodes.filter(code => !rates[code])
             if (stillMissingCryptos.length > 0) {
               try {
-                console.log(`[Deposits] Querying public.pairs for ${stillMissingCryptos.length} missing crypto rates...`)
+                console.log(`[Deposits] Querying public.pairs for ${stillMissingCryptos.length} missing crypto rates: ${stillMissingCryptos.join(', ')}`)
                 const { data: pairsData, error: pairsError } = await supabase
                   .from('pairs')
                   .select('from_currency, rate, updated_at')
@@ -272,16 +273,17 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
 
                 if (!pairsError && pairsData && pairsData.length > 0) {
                   pairsData.forEach(row => {
-                    rates[row.from_currency] = parseFloat(row.rate)
+                    const upperCode = row.from_currency.toUpperCase()
+                    rates[upperCode] = parseFloat(row.rate)
                   })
-                  console.log(`[Deposits] Loaded ${pairsData.length} rates from public.pairs`)
+                  console.log(`[Deposits] Loaded ${pairsData.length} crypto rates from public.pairs: ${pairsData.map(r => r.from_currency).join(', ')}`)
                 } else if (pairsError) {
-                  console.warn('[Deposits] Public.pairs query failed:', pairsError.message)
+                  console.error('[Deposits] Public.pairs query failed:', pairsError.message)
                 } else {
-                  console.warn('[Deposits] Public.pairs returned no data for:', stillMissingCryptos.join(', '))
+                  console.warn('[Deposits] Public.pairs returned NO rows for:', stillMissingCryptos.join(', '), '| Check if cryptocurrency_rates table is populated')
                 }
               } catch (e) {
-                console.warn('[Deposits] Public.pairs fallback failed:', e.message)
+                console.error('[Deposits] Public.pairs fallback threw error:', e.message)
               }
             }
           }
