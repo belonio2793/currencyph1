@@ -215,48 +215,6 @@ export const currencyAPI = {
     }
   },
 
-  // Fallback rates (cached, updated manually)
-  getFallbackRates() {
-    const baseRates = {
-      AED: 3.67,
-      AFN: 71.5,
-      AUD: 1.52,
-      BRL: 5.02,
-      CAD: 1.36,
-      CHF: 0.88,
-      CNY: 7.09,
-      DKK: 6.88,
-      EUR: 0.93,
-      GBP: 0.80,
-      HKD: 7.78,
-      IDR: 16250,
-      INR: 83.8,
-      JPY: 152.5,
-      KRW: 1305,
-      MXN: 17.25,
-      MYR: 4.38,
-      NOK: 10.60,
-      NZD: 1.62,
-      PHP: 56.75,
-      SEK: 10.65,
-      SGD: 1.34,
-      THB: 35.0,
-      USD: 1,
-      VND: 24750,
-      ZAR: 17.85
-    }
-
-    const rates = {}
-    CURRENCIES.forEach(currency => {
-      rates[currency.code] = {
-        ...currency,
-        rate: baseRates[currency.code] || 0,
-        lastUpdated: new Date(Date.now() - 3600000) // 1 hour ago
-      }
-    })
-
-    return rates
-  },
 
   // Get all currencies for display
   getCurrencies() {
