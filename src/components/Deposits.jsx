@@ -535,9 +535,14 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
       // ===== USE MULTI-CURRENCY DEPOSIT SERVICE =====
       // This handles all conversion and validation automatically
 
-      // Determine the deposit method identifier
+      // Determine the deposit currency and method
+      // If a crypto method is selected, use its currency code; otherwise use selectedCurrency
+      let depositCurrency = selectedCurrency
       let depositMethodId = selectedMethod
-      if (activeType === 'cryptocurrency' && selectedAddressMethod) {
+
+      if (selectedAddressMethod) {
+        // For crypto method selections, use the method's currency code
+        depositCurrency = selectedAddressMethod.depositCurrencyCode || selectedAddressMethod.cryptoSymbol || selectedCurrency
         depositMethodId = selectedAddressMethod.cryptoSymbol?.toLowerCase() || selectedCurrency.toLowerCase()
       }
 
@@ -545,14 +550,14 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
         userId,
         walletId: selectedWallet,
         amount,
-        depositCurrency: selectedCurrency,
+        depositCurrency: depositCurrency,
         walletCurrency: targetWalletData.currency_code,
         depositMethod: depositMethodId,
         paymentReference: selectedMethod === 'gcash' ? gcashReferenceNumber : null,
         paymentAddress: activeMethodData?.address || null,
         metadata: {
           activeType,
-          methodName: activeMethodData?.name || selectedCurrency,
+          methodName: activeMethodData?.name || depositCurrency,
           networkInfo: activeMethodData?.network ? { network: activeMethodData.network, provider: activeMethodData.provider } : null
         }
       })
