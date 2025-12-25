@@ -192,47 +192,8 @@ async function fetchFiatRates(fiats: string[]): Promise<FetchResult[]> {
       }
     }
     
-    // Fallback: Use hardcoded rates when API unavailable
-    console.log("⚠️ Using fallback fiat rates (Open Exchange Rates API unavailable)");
-    
-    const fiatRates: Record<string, number> = {
-      "PHP": 56.5,
-      "EUR": 0.92,
-      "GBP": 0.79,
-      "JPY": 149.5,
-      "AUD": 1.54,
-      "CAD": 1.36,
-      "SGD": 1.34,
-      "HKD": 7.82,
-      "INR": 83.2
-    };
-    
-    // Create pairs: USD as base
-    for (const fiat of fiats) {
-      if (fiat === "USD") continue;
-      
-      const rate = fiatRates[fiat] || 1;
-      
-      results.push({
-        from_currency: fiat,
-        to_currency: "USD",
-        rate: 1 / rate,
-        source: "fallback",
-        success: true,
-        fetched_at: fetchedAt
-      });
-      
-      results.push({
-        from_currency: "USD",
-        to_currency: fiat,
-        rate: rate,
-        source: "fallback",
-        success: true,
-        fetched_at: fetchedAt
-      });
-    }
-    
-    console.log(`⚠️ Using ${results.length} fallback fiat rates`);
+    // No fallback: Require API to be available
+    console.error("❌ Cannot fetch fiat rates - Open Exchange Rates API unavailable or not configured");
   } catch (error) {
     console.error("Error fetching fiat rates:", error);
     results.push({
