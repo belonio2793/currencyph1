@@ -296,13 +296,19 @@ $$ LANGUAGE plpgsql;
 
 -- Add check constraint for reasonable balances
 -- NOTE: PostgreSQL doesn't support DEFERRABLE on CHECK constraints
-ALTER TABLE IF EXISTS wallets
-ADD CONSTRAINT check_wallet_balance_reasonable 
-CHECK (
-  (currency_code = 'BTC' AND balance < 21000000) OR  -- BTC max supply is ~21M
-  (currency_code = 'PHP' AND balance < 999999999999) OR  -- 1 trillion PHP max (reasonable)
-  (currency_code NOT IN ('BTC', 'PHP'))
-);
+DO $$
+BEGIN
+  ALTER TABLE wallets
+  ADD CONSTRAINT check_wallet_balance_reasonable
+  CHECK (
+    (currency_code = 'BTC' AND balance < 21000000) OR  -- BTC max supply is ~21M
+    (currency_code = 'PHP' AND balance < 999999999999) OR  -- 1 trillion PHP max (reasonable)
+    (currency_code NOT IN ('BTC', 'PHP'))
+  );
+EXCEPTION WHEN duplicate_object THEN
+  -- Constraint already exists, skip
+  NULL;
+END $$;
 
 -- ============================================================================
 -- STEP 8: Create audit log for wallet balance changes
