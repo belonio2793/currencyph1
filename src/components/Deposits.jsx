@@ -708,7 +708,7 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
               Deposit cryptocurrencies or fiat to your wallet quickly and securely
             </p>
           </div>
-          {(currencyCurrencies.length > 0 || cryptoCurrencies.length > 0) && (
+          {(fiatCurrencies.length > 0 || cryptoCurrencies.length > 0) && (
             <CurrencyCryptoToggle active={activeType} onChange={setActiveType} />
           )}
         </div>
