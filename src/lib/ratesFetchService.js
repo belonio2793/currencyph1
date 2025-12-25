@@ -69,32 +69,65 @@ export async function getLatestPairUpdateTime() {
 
 /**
  * Get information about the last rates fetch including source and status
+ * Checks freshness and falls back to pairs table if cached_rates is stale
  */
 export async function getLastFetchInfo() {
   try {
-    const { data, error } = await supabase
+    // Try cached_rates first (from edge function)
+    const { data: cachedData, error: cachedError } = await supabase
       .from('cached_rates')
       .select('fetched_at, source, exchange_rates, crypto_prices')
       .order('fetched_at', { ascending: false })
       .limit(1)
       .single()
 
-    if (error) {
-      console.warn('Error fetching rates info:', error.message)
-      return null
-    }
+    if (!cachedError && cachedData && cachedData.fetched_at) {
+      const fetchedAt = new Date(cachedData.fetched_at)
+      const minutesSinceFetch = Math.floor((Date.now() - fetchedAt.getTime()) / 1000 / 60)
 
-    if (data && data.fetched_at) {
-      return {
-        fetchedAt: new Date(data.fetched_at),
-        isoString: data.fetched_at,
-        source: data.source || 'unknown',
-        pairCount: Object.keys(data.exchange_rates || {}).length,
-        cryptoCount: Object.keys(data.crypto_prices || {}).length,
-        totalRates: Object.keys(data.exchange_rates || {}).length + Object.keys(data.crypto_prices || {}).length
+      // If cached_rates is recent (within 24 hours), use it
+      if (minutesSinceFetch < 1440) { // 1440 minutes = 24 hours
+        return {
+          fetchedAt: fetchedAt,
+          isoString: cachedData.fetched_at,
+          source: cachedData.source || 'edge-function',
+          pairCount: Object.keys(cachedData.exchange_rates || {}).length,
+          cryptoCount: Object.keys(cachedData.crypto_prices || {}).length,
+          totalRates: Object.keys(cachedData.exchange_rates || {}).length + Object.keys(cachedData.crypto_prices || {}).length,
+          isFresh: minutesSinceFetch < 60,
+          minutesSinceFetch: minutesSinceFetch
+        }
+      } else {
+        console.warn('cached_rates is stale (> 24 hours), falling back to pairs table...')
       }
     }
 
+    // Fallback: Use most recent pair update time (indicates data was updated from somewhere)
+    const { data: pairData, error: pairError } = await supabase
+      .from('pairs')
+      .select('updated_at')
+      .order('updated_at', { ascending: false })
+      .limit(1)
+      .single()
+
+    if (!pairError && pairData && pairData.updated_at) {
+      const fetchedAt = new Date(pairData.updated_at)
+      const minutesSinceFetch = Math.floor((Date.now() - fetchedAt.getTime()) / 1000 / 60)
+
+      return {
+        fetchedAt: fetchedAt,
+        isoString: pairData.updated_at,
+        source: 'pairs-table',
+        pairCount: 0, // Unknown from this query
+        cryptoCount: 0, // Unknown from this query
+        totalRates: 0, // Unknown from this query
+        isFresh: minutesSinceFetch < 60,
+        minutesSinceFetch: minutesSinceFetch,
+        isEstimated: true // Fallback value
+      }
+    }
+
+    console.warn('Could not fetch rates info from any source')
     return null
   } catch (err) {
     console.warn('Failed to get last fetch info:', err.message)
