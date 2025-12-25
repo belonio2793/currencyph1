@@ -257,7 +257,7 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
 
       if (canonicalError) {
         console.error('[Deposits] Error fetching canonical pairs:', canonicalError.message)
-        setExchangeRates({ PHP: 1, USD: 1 })
+        setExchangeRates({})
         setRatesLoading(false)
         return
       }
