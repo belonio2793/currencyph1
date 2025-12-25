@@ -107,6 +107,51 @@ async function fetchExConvertRates(fromCurrency: string, toCurrencies: string[])
   }
 }
 
+// Fetch all rates from ExConvert for all supported currencies
+async function fetchAllExConvertRates(): Promise<Record<string, Record<string, number>> | null> {
+  if (!EXCONVERT_KEY) {
+    console.warn('[ExConvert] API key not configured')
+    return null
+  }
+
+  console.log('[ExConvert] Fetching all rates from ExConvert...')
+  const allRates: Record<string, Record<string, number>> = {}
+
+  try {
+    // Fetch rates for each currency pair
+    // USD as base, then other major currencies
+    const baseCurrencies = ['USD']
+    const targetCurrencies = [...WORLD_CURRENCIES]
+
+    for (const baseCurrency of baseCurrencies) {
+      console.log(`[ExConvert] Fetching rates from ${baseCurrency}...`)
+      const rates = await fetchExConvertRates(baseCurrency, targetCurrencies)
+
+      if (rates) {
+        allRates[baseCurrency] = rates
+        console.log(`[ExConvert] Got ${Object.keys(rates).length} rates from ${baseCurrency}`)
+      }
+    }
+
+    // Also add crypto pairs (BTC, ETH to major currencies)
+    const cryptoSymbols = ['BTC', 'ETH', 'USDT', 'BNB', 'XRP', 'USDC', 'SOL']
+    for (const crypto of cryptoSymbols) {
+      console.log(`[ExConvert] Fetching rates from ${crypto}...`)
+      const rates = await fetchExConvertRates(crypto, ['USD', 'EUR', 'GBP', 'JPY', 'PHP', 'AUD', 'CAD', 'SGD'])
+
+      if (rates) {
+        allRates[crypto] = rates
+        console.log(`[ExConvert] Got ${Object.keys(rates).length} rates from ${crypto}`)
+      }
+    }
+
+    return Object.keys(allRates).length > 0 ? allRates : null
+  } catch (e) {
+    console.error('[ExConvert] Failed to fetch all rates:', e?.message || e)
+    return null
+  }
+}
+
 async function fetchAllRatesFromDatabase() {
   try {
     console.log('[Database] Fetching all pairs from database...')
