@@ -264,7 +264,7 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
 
       if (!canonicalPairs || canonicalPairs.length === 0) {
         console.warn('[Deposits] No canonical pairs available in database')
-        setExchangeRates({ PHP: 1, USD: 1 })
+        setExchangeRates({})
         setRatesLoading(false)
         return
       }
