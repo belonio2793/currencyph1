@@ -876,6 +876,23 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
                 )}
               </div>
 
+              {/* Last Fetched Rates Info */}
+              {lastFetchedRates && (
+                <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                  <p className="text-sm text-blue-900">
+                    <span className="font-semibold">Last Fetched Rates:</span>{' '}
+                    {new Date(lastFetchedRates.fetchedAt).toLocaleString(undefined, {
+                      year: 'numeric',
+                      month: 'short',
+                      day: 'numeric',
+                      hour: '2-digit',
+                      minute: '2-digit',
+                      second: '2-digit'
+                    })}
+                  </p>
+                </div>
+              )}
+
               {/* Conversion Display */}
               {amount && selectedWallet && (
                 <div className={`border rounded-lg p-6 ${!calculateConvertedAmount() ? 'bg-amber-50 border-amber-200' : 'bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200'}`}>
