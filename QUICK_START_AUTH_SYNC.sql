@@ -154,27 +154,31 @@ DO $$
 DECLARE
   v_count INTEGER := 0;
   v_auth_user RECORD;
+  v_first_name TEXT;
+  v_last_name TEXT;
   v_full_name TEXT;
   v_region_code TEXT;
 BEGIN
   RAISE NOTICE 'Starting backfill...';
-  
-  FOR v_auth_user IN 
+
+  FOR v_auth_user IN
     SELECT id, email, raw_user_meta_data, created_at, updated_at
     FROM auth.users
   LOOP
+    v_first_name := COALESCE(v_auth_user.raw_user_meta_data->>'first_name', '');
+    v_last_name := COALESCE(v_auth_user.raw_user_meta_data->>'last_name', '');
     v_full_name := COALESCE(v_auth_user.raw_user_meta_data->>'full_name', '');
     v_region_code := COALESCE(v_auth_user.raw_user_meta_data->>'region_code', 'PH');
 
     -- Insert/Update public.users
-    INSERT INTO public.users (auth_id, email, full_name, region_code, status, created_at, updated_at)
-    VALUES (v_auth_user.id, v_auth_user.email, v_full_name, v_region_code, 'active', v_auth_user.created_at, v_auth_user.updated_at)
-    ON CONFLICT (auth_id) DO UPDATE SET email = EXCLUDED.email;
+    INSERT INTO public.users (auth_id, email, first_name, last_name, full_name, region_code, status, created_at, updated_at)
+    VALUES (v_auth_user.id, v_auth_user.email, v_first_name, v_last_name, v_full_name, v_region_code, 'active', v_auth_user.created_at, v_auth_user.updated_at)
+    ON CONFLICT (auth_id) DO UPDATE SET email = EXCLUDED.email, first_name = COALESCE(EXCLUDED.first_name, public.users.first_name), last_name = COALESCE(EXCLUDED.last_name, public.users.last_name);
 
     -- Insert/Update public.profiles
-    INSERT INTO public.profiles (user_id, full_name, created_at, updated_at)
-    VALUES (v_auth_user.id, v_full_name, v_auth_user.created_at, v_auth_user.updated_at)
-    ON CONFLICT (user_id) DO UPDATE SET full_name = EXCLUDED.full_name;
+    INSERT INTO public.profiles (user_id, first_name, last_name, full_name, created_at, updated_at)
+    VALUES (v_auth_user.id, v_first_name, v_last_name, v_full_name, v_auth_user.created_at, v_auth_user.updated_at)
+    ON CONFLICT (user_id) DO UPDATE SET first_name = COALESCE(EXCLUDED.first_name, public.profiles.first_name), last_name = COALESCE(EXCLUDED.last_name, public.profiles.last_name), full_name = EXCLUDED.full_name;
 
     v_count := v_count + 1;
   END LOOP;
