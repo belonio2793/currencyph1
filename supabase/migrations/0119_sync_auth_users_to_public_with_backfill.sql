@@ -47,6 +47,8 @@ CREATE TABLE IF NOT EXISTS public.profiles (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID NOT NULL UNIQUE REFERENCES auth.users(id) ON DELETE CASCADE,
   username VARCHAR(255) UNIQUE,
+  first_name VARCHAR(255),
+  last_name VARCHAR(255),
   full_name VARCHAR(255),
   phone_number VARCHAR(20),
   profile_picture_url TEXT,
@@ -54,6 +56,11 @@ CREATE TABLE IF NOT EXISTS public.profiles (
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
+
+-- Add columns if they don't already exist
+ALTER TABLE IF EXISTS public.profiles
+ADD COLUMN IF NOT EXISTS first_name VARCHAR(255),
+ADD COLUMN IF NOT EXISTS last_name VARCHAR(255);
 
 -- ============================================================================
 -- Step 2: Create indexes
