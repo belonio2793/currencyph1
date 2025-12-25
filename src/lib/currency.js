@@ -25,33 +25,26 @@ export function formatNumber(amount) {
   return Number(amount).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
 }
 
-// Format conversion rates with intelligent decimal precision
+// Format conversion rates intelligently based on magnitude
 export function formatExchangeRate(rate) {
   if (rate == null || isNaN(rate)) return '0'
 
   const numRate = Number(rate)
 
-  // For very large numbers (e.g., BTC to PHP: 5,179,990), show 2 decimals
-  if (numRate >= 1000) {
-    return numRate.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+  // For very large numbers (e.g., BTC to PHP: 5,179,990.02), show 2 decimals max
+  if (numRate >= 100) {
+    return numRate.toLocaleString(undefined, { maximumFractionDigits: 2 })
   }
 
   // For numbers >= 1 (e.g., EUR to PHP: 62.50), show 2-4 decimals
   if (numRate >= 1) {
-    return numRate.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 4 })
+    return numRate.toLocaleString(undefined, { maximumFractionDigits: 4 })
   }
 
-  // For very small numbers (e.g., PHP to BTC: 0.00000019), show up to 10 significant digits
-  // This preserves precision for crypto-to-fiat conversions
-  const strRate = numRate.toExponential(10)
-  const decimalRate = parseFloat(strRate)
-
-  // Find how many leading zeros after decimal point
-  if (numRate < 0.001) {
-    return decimalRate.toLocaleString(undefined, { useGrouping: false, maximumFractionDigits: 10 })
-  }
-
-  return decimalRate.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 6 })
+  // For very small numbers (e.g., PHP to BTC: 0.00000019), use full precision
+  // Convert to string and ensure we show enough decimals
+  const str = numRate.toFixed(10).replace(/0+$/, '')
+  return str
 }
 
 export function formatCurrency(amount, code) {
