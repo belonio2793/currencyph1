@@ -111,9 +111,9 @@ export default function OfflineDisplay({ onShowAuth }) {
                 {section.features.map((feature, featureIdx) => (
                   <div
                     key={featureIdx}
-                    className={`rounded-lg border-2 p-4 sm:p-6 transition-all ${!isMobile && 'hover:shadow-lg hover:scale-105'} cursor-pointer ${feature.color}`}
+                    className={`rounded-lg border-2 p-3 sm:p-4 transition-all ${!isMobile && 'hover:shadow-lg hover:scale-105'} cursor-pointer ${feature.color}`}
                   >
-                    <div className="flex items-start gap-3 sm:gap-4">
+                    <div className="flex items-start gap-2 sm:gap-3">
                       <div className="w-10 sm:w-12 h-10 sm:h-12 rounded-lg bg-slate-200 flex items-center justify-center font-bold text-slate-700 flex-shrink-0 text-xs sm:text-sm">{feature.icon}</div>
                       <div className="flex-1 min-w-0">
                         <h3 className={`font-semibold text-slate-900 mb-1 ${isMobile ? 'text-sm' : 'text-base'}`}>{feature.title}</h3>
