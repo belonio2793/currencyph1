@@ -107,7 +107,7 @@ export default function OfflineDisplay({ onShowAuth }) {
                 </span>
                 <span className={isMobile ? 'text-sm' : 'text-base'}>{section.category}</span>
               </h2>
-              <div className={`grid gap-3 sm:gap-4 ${isMobile ? 'grid-cols-1' : 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3'}`}>
+              <div className={`grid gap-2 sm:gap-3 ${isMobile ? 'grid-cols-1' : 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3'}`}>
                 {section.features.map((feature, featureIdx) => (
                   <div
                     key={featureIdx}
