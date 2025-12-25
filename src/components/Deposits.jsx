@@ -870,7 +870,7 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
                     <label className="block text-sm font-medium text-slate-700">
                       {activeType === 'cryptocurrency' ? 'Blockchain Network' : 'Payment Method'}
                     </label>
-                    {activeType === 'cryptocurrency' && !exchangeRates[selectedCurrency] && (
+                    {!exchangeRates[selectedCurrency] && (
                       <button
                         onClick={fetchExchangeRates}
                         className="text-xs text-blue-600 hover:text-blue-700 font-medium"
@@ -885,15 +885,24 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
                         <button
                           key={method.id}
                           onClick={() => {
-                            setSelectedAddressMethod(method)
-                            setShowCryptoAddressModal(true)
+                            if (method.type === 'crypto') {
+                              // For crypto, show address modal
+                              setSelectedAddressMethod(method)
+                              setShowCryptoAddressModal(true)
+                            } else {
+                              // For fiat, set as selected method and proceed
+                              setSelectedMethod(method.id)
+                              setStep('confirm')
+                            }
                           }}
-                          className="p-4 border-2 border-slate-200 rounded-lg text-left transition-all hover:border-blue-400 hover:bg-blue-50"
+                          className={`p-4 border-2 rounded-lg text-left transition-all ${
+                            selectedMethod === method.id ? 'border-blue-500 bg-blue-50' : 'border-slate-200 hover:border-blue-400 hover:bg-blue-50'
+                          }`}
                         >
                           <div className="font-semibold text-slate-900">{method.name}</div>
                           <div className="text-sm text-slate-600">{method.description}</div>
                           {method.network && (
-                            <div className="text-xs text-blue-600 font-medium mt-2">{method.network}</div>
+                            <div className="text-xs text-blue-600 font-medium mt-2">🔗 {method.network}</div>
                           )}
                         </button>
                       ))}
@@ -906,7 +915,7 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
                           <p>This cryptocurrency may not be configured yet. Please select a different currency or contact support.</p>
                         </>
                       ) : (
-                        <p>No payment methods available for {selectedCurrency}. Please create a wallet first.</p>
+                        <p>No payment methods available for {selectedCurrency}. Please check your currency selection or contact support.</p>
                       )}
                     </div>
                   )}
