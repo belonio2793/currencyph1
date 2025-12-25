@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from 'react'
 import { supabase } from '../lib/supabaseClient'
 import { formatLastUpdated, formatFullDateTime } from '../lib/dateTimeUtils'
+import { getLastFetchInfo } from '../lib/ratesFetchService'
 import CurrencyCryptoToggle from './FiatCryptoToggle'
 
 export default function Rates() {
