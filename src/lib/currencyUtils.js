@@ -61,7 +61,7 @@ export function displayBothCurrencies(phpAmount, exchangeRate) {
 
 /**
  * Get current exchange rate from API
- * @returns {Promise<number>} Current PHP to USD exchange rate
+ * @returns {Promise<number|null>} Current PHP to USD exchange rate, or null if unavailable
  */
 export async function fetchExchangeRate() {
   try {
@@ -70,23 +70,20 @@ export async function fetchExchangeRate() {
     });
 
     if (!response.ok) {
-      console.warn('Exchange rate API returned error, using default rate');
-      return DEFAULT_EXCHANGE_RATE;
+      console.warn('Exchange rate API returned error');
+      return null;
     }
 
     const contentType = response.headers.get('content-type');
     if (!contentType || !contentType.includes('application/json')) {
-      console.warn('Exchange rate API returned non-JSON response, using default rate');
-      return DEFAULT_EXCHANGE_RATE;
+      console.warn('Exchange rate API returned non-JSON response');
+      return null;
     }
 
     const data = await response.json();
-    return data.rate || DEFAULT_EXCHANGE_RATE;
+    return data.rate || null;
   } catch (error) {
-    // Silently fail with default rate - this is a non-critical background operation
-    if (error?.name !== 'TypeError' || !error?.message?.includes('Failed to fetch')) {
-      console.error('Error fetching exchange rate:', error);
-    }
-    return DEFAULT_EXCHANGE_RATE;
+    console.error('Error fetching exchange rate:', error);
+    return null;
   }
 }
