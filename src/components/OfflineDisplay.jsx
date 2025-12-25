@@ -82,10 +82,10 @@ export default function OfflineDisplay({ onShowAuth }) {
   const { isMobile, isTablet } = useDevice()
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 py-8 sm:py-12 px-3 sm:px-4">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 py-4 sm:py-6 px-3 sm:px-4">
       <div className={`${isMobile ? 'mx-auto' : 'max-w-6xl mx-auto'}`}>
         {/* Header */}
-        <div className="text-center mb-8 sm:mb-12">
+        <div className="text-center mb-4 sm:mb-6">
           <h1 className={`font-bold text-slate-900 mb-4 ${isMobile ? 'text-2xl' : 'text-4xl'}`}>Welcome to Currency</h1>
           <div className={`flex gap-2 sm:gap-4 justify-center ${isMobile ? 'flex-col' : 'flex-row'}`}>
             <button onClick={() => onShowAuth?.('login')} className={`bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-semibold transition-colors ${isMobile ? 'px-6 py-2.5 text-sm' : 'px-8 py-3'}`}>
