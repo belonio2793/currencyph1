@@ -1025,6 +1025,33 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
                 </div>
               )}
 
+              {/* Rate Status Warning */}
+              {amount && selectedWallet && !calculateConvertedAmount() && (
+                <div className="mb-6 p-4 bg-amber-50 border border-amber-200 rounded-lg">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm font-medium text-amber-900">⚠️ Conversion Rate Not Available</p>
+                      <p className="text-xs text-amber-700 mt-1">
+                        {ratesLoading
+                          ? `Fetching rates for ${selectedCurrency}...`
+                          : `Unable to fetch rates for ${selectedCurrency} → ${selectedWalletData?.currency_code}. Please try again.`}
+                      </p>
+                    </div>
+                    {!ratesLoading && (
+                      <button
+                        onClick={() => {
+                          setExchangeRates({})
+                          fetchExchangeRates()
+                        }}
+                        className="ml-4 px-4 py-2 bg-amber-600 text-white text-sm font-medium rounded hover:bg-amber-700 transition"
+                      >
+                        Retry
+                      </button>
+                    )}
+                  </div>
+                </div>
+              )}
+
               {/* Select Deposit Method / Network */}
               {selectedWallet && (
                 <div>
@@ -1032,14 +1059,6 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
                     <label className="block text-sm font-medium text-slate-700">
                       {activeType === 'cryptocurrency' ? 'Blockchain Network' : 'Payment Method'}
                     </label>
-                    {!exchangeRates[selectedCurrency] && (
-                      <button
-                        onClick={fetchExchangeRates}
-                        className="text-xs text-blue-600 hover:text-blue-700 font-medium"
-                      >
-                        Retry Rate
-                      </button>
-                    )}
                   </div>
                   {availableMethods.length > 0 ? (
                     <SearchablePaymentMethodDropdown
