@@ -688,7 +688,8 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
         {/* Step 1: Enter Amount */}
         {step === 'amount' && (
           <div className="bg-white rounded-xl shadow-lg border border-slate-200 p-8 mb-6">
-            <h2 className="text-2xl font-semibold text-slate-900 mb-6">How much would you like to deposit?</h2>
+            <h2 className="text-2xl font-semibold text-slate-900 mb-2">How much would you like to deposit?</h2>
+            <p className="text-slate-600 text-sm mb-6">Deposit any currency to any wallet - we'll handle the conversion automatically</p>
 
             <div className="space-y-6">
               {/* Create Wallet Button - First Row */}
