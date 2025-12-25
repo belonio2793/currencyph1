@@ -118,15 +118,16 @@ export const onboardingService = {
       if (!this.isValidUUID(userId)) return false
 
       // Check user_onboarding_state table for email_verified status
+      // Use limit(1) instead of single() to avoid 406 error when no rows exist
       const { data, error } = await supabase
         .from('user_onboarding_state')
         .select('email_verified')
         .eq('user_id', userId)
-        .single()
+        .limit(1)
 
       if (error) {
         // If table doesn't exist or no record, check auth metadata
-        if (error.code === 'PGRST116') {
+        if (error.code === 'PGRST116' || error.message?.includes('Could not find the table')) {
           // Try getting current user from session
           const { data: session } = await supabase.auth.getSession()
           if (session?.user?.email_confirmed_at) {
@@ -136,7 +137,15 @@ export const onboardingService = {
         }
         throw error
       }
-      return !!(data?.email_verified)
+
+      // Handle case where no rows returned
+      if (!data || data.length === 0) {
+        // Check auth metadata if record doesn't exist in database
+        const { data: session } = await supabase.auth.getSession()
+        return !!(session?.user?.email_confirmed_at)
+      }
+
+      return !!(data[0]?.email_verified)
     } catch (err) {
       const errMsg = err?.message || String(err)
       // Don't log network errors - they're expected and non-critical
