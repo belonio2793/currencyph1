@@ -187,12 +187,22 @@ export const currencyAPI = {
   // Get Bitcoin and Ethereum prices in USD and other currencies from public.pairs (primary)
   async getCryptoPrices() {
     try {
-      // 1) PRIMARY: Try public.pairs table first for crypto prices
+      // 1) PRIMARY: Try public.pairs table first for crypto prices with timeout
       try {
-        const { data: pairsData, error: pairsError } = await supabase
+        const controller = new AbortController()
+        const timeout = setTimeout(() => controller.abort(), 6000) // 6 second timeout
+
+        const pairsPromise = supabase
           .from('pairs')
           .select('from_currency, to_currency, rate, updated_at')
-          .limit(500)
+          .limit(100) // Small limit for crypto-only queries
+
+        const { data: pairsData, error: pairsError } = await Promise.race([
+          pairsPromise,
+          new Promise((_, reject) => setTimeout(() => reject(new Error('Public.pairs crypto query timeout')), 5000))
+        ])
+
+        clearTimeout(timeout)
 
         if (!pairsError && pairsData && pairsData.length > 0) {
           console.log('Using crypto prices from public.pairs table')
@@ -227,7 +237,7 @@ export const currencyAPI = {
           console.warn('Error fetching crypto from public.pairs:', pairsError.message)
         }
       } catch (e) {
-        console.warn('Public.pairs crypto lookup failed:', e?.message)
+        console.warn('Public.pairs crypto lookup failed or timed out:', e?.message)
       }
 
       // 2) SECONDARY: Try edge function (cached rates) with timeout
