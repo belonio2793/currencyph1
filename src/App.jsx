@@ -426,6 +426,7 @@ export default function App() {
   }
 
   // Load aggregated total balance converted to PHP
+  // Calculate balance from wallet_transactions (source of truth), not from wallets.balance field
   const loadTotalBalance = async (uid) => {
     if (!uid) {
       setTotalBalancePHP(0)
@@ -439,25 +440,63 @@ export default function App() {
     }
 
     try {
-      const wallets = await currencyAPI.getWallets(uid)
-      const promises = (wallets || []).map(async (w) => {
+      // Get all wallets for this user
+      const { data: wallets, error: walletsError } = await supabase
+        .from('wallets')
+        .select('id, user_id, currency_code')
+        .eq('user_id', uid)
+
+      if (walletsError || !wallets || wallets.length === 0) {
+        setTotalBalancePHP(0)
+        return
+      }
+
+      // For each wallet, calculate balance from wallet_transactions (source of truth)
+      const promises = wallets.map(async (w) => {
         try {
-          const bal = Number(w.balance || 0)
-          if (!w.currency_code || w.currency_code === 'PHP') return bal
-          const rate = await currencyAPI.getExchangeRate(w.currency_code, 'PHP')
-          return rate ? bal * Number(rate) : bal
+          // Get all transactions for this wallet
+          const { data: transactions, error: txError } = await supabase
+            .from('wallet_transactions')
+            .select('type, amount')
+            .eq('wallet_id', w.id)
+
+          if (txError || !transactions) return 0
+
+          // Calculate balance: deposits(+) - withdrawals(-)
+          let balance = 0
+          transactions.forEach(tx => {
+            if (['deposit_pending', 'deposit_approved', 'transfer_in', 'refund'].includes(tx.type)) {
+              balance += Number(tx.amount || 0)
+            } else if (['deposit_reversed', 'withdrawal', 'transfer_out', 'payment', 'fee'].includes(tx.type)) {
+              balance -= Number(tx.amount || 0)
+            }
+          })
+
+          // If PHP, return as-is
+          if (!w.currency_code || w.currency_code === 'PHP') return balance
+
+          // For crypto, convert to PHP
+          try {
+            const rate = await currencyAPI.getExchangeRate(w.currency_code, 'PHP')
+            return rate ? balance * Number(rate) : balance
+          } catch (e) {
+            console.warn(`Failed to convert ${w.currency_code} to PHP:`, e?.message)
+            return balance // Return original if conversion fails
+          }
         } catch (e) {
-          console.warn(`Failed to convert ${w.currency_code}:`, e?.message)
-          return Number(w.balance || 0)
+          console.warn(`Failed to calculate balance for wallet ${w.id}:`, e?.message)
+          return 0
         }
       })
+
       const values = await Promise.allSettled(promises)
       const total = values.reduce((sum, result) => {
         return sum + (result.status === 'fulfilled' ? (result.value || 0) : 0)
       }, 0)
+
       setTotalBalancePHP(total)
     } catch (err) {
-      console.warn('Could not load wallets for total balance:', err?.message)
+      console.warn('Error loading total balance from wallet transactions:', err?.message)
       setTotalBalancePHP(0)
     }
   }
