@@ -1,33 +1,34 @@
 // Currency rates from Supabase edge function (avoids CORS issues)
 import { supabase } from './supabaseClient'
 
-// List of all global currencies to track
+// List of all global currencies to track - SORTED ALPHABETICALLY
 const CURRENCIES = [
-  { code: 'USD', symbol: '$', name: 'US Dollar' },
+  { code: 'AED', symbol: 'AED', name: 'UAE Dirham' },
+  { code: 'AFN', symbol: 'AFN', name: 'Afghan Afghani' },
+  { code: 'AUD', symbol: 'AUD', name: 'Australian Dollar' },
+  { code: 'BRL', symbol: 'BRL', name: 'Brazilian Real' },
+  { code: 'CAD', symbol: 'CAD', name: 'Canadian Dollar' },
+  { code: 'CHF', symbol: 'CHF', name: 'Swiss Franc' },
+  { code: 'CNY', symbol: 'CNY', name: 'Chinese Yuan' },
+  { code: 'DKK', symbol: 'DKK', name: 'Danish Krone' },
   { code: 'EUR', symbol: 'EUR', name: 'Euro' },
   { code: 'GBP', symbol: 'GBP', name: 'British Pound' },
-  { code: 'JPY', symbol: 'JPY', name: 'Japanese Yen' },
-  { code: 'CNY', symbol: 'CNY', name: 'Chinese Yuan' },
-  { code: 'INR', symbol: 'INR', name: 'Indian Rupee' },
-  { code: 'CAD', symbol: 'CAD', name: 'Canadian Dollar' },
-  { code: 'AUD', symbol: 'AUD', name: 'Australian Dollar' },
-  { code: 'CHF', symbol: 'CHF', name: 'Swiss Franc' },
-  { code: 'SEK', symbol: 'SEK', name: 'Swedish Krona' },
-  { code: 'NZD', symbol: 'NZD', name: 'New Zealand Dollar' },
-  { code: 'SGD', symbol: 'SGD', name: 'Singapore Dollar' },
   { code: 'HKD', symbol: 'HKD', name: 'Hong Kong Dollar' },
-  { code: 'PHP', symbol: 'PHP', name: 'Philippine Peso' },
   { code: 'IDR', symbol: 'IDR', name: 'Indonesian Rupiah' },
-  { code: 'MYR', symbol: 'MYR', name: 'Malaysian Ringgit' },
-  { code: 'THB', symbol: 'THB', name: 'Thai Baht' },
-  { code: 'VND', symbol: 'VND', name: 'Vietnamese Dong' },
+  { code: 'INR', symbol: 'INR', name: 'Indian Rupee' },
+  { code: 'JPY', symbol: 'JPY', name: 'Japanese Yen' },
   { code: 'KRW', symbol: 'KRW', name: 'South Korean Won' },
-  { code: 'ZAR', symbol: 'ZAR', name: 'South African Rand' },
-  { code: 'BRL', symbol: 'BRL', name: 'Brazilian Real' },
   { code: 'MXN', symbol: 'MXN', name: 'Mexican Peso' },
+  { code: 'MYR', symbol: 'MYR', name: 'Malaysian Ringgit' },
   { code: 'NOK', symbol: 'NOK', name: 'Norwegian Krone' },
-  { code: 'DKK', symbol: 'DKK', name: 'Danish Krone' },
-  { code: 'AED', symbol: 'AED', name: 'UAE Dirham' },
+  { code: 'NZD', symbol: 'NZD', name: 'New Zealand Dollar' },
+  { code: 'PHP', symbol: 'PHP', name: 'Philippine Peso' },
+  { code: 'SEK', symbol: 'SEK', name: 'Swedish Krona' },
+  { code: 'SGD', symbol: 'SGD', name: 'Singapore Dollar' },
+  { code: 'THB', symbol: 'THB', name: 'Thai Baht' },
+  { code: 'USD', symbol: '$', name: 'US Dollar' },
+  { code: 'VND', symbol: 'VND', name: 'Vietnamese Dong' },
+  { code: 'ZAR', symbol: 'ZAR', name: 'South African Rand' },
 ]
 
 export const currencyAPI = {
