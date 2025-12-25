@@ -592,56 +592,16 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
     }
   }
 
-  // When switching currencies, ensure wallet matches or handle accordingly
+  // When switching currencies, reset method selection since available methods change
   useEffect(() => {
-    if (activeType === 'cryptocurrency') {
-      // Check if selected method is still valid for the new currency
-      const isValidForCurrency = selectedCurrency && cryptoAddresses[selectedCurrency]
-      if (selectedMethod && !isValidForCurrency) {
-        setSelectedMethod(null)
-        // If we were in confirm step, go back to amount step since method is no longer valid
-        if (step === 'confirm') {
-          setStep('amount')
-        }
-      }
+    setSelectedMethod(null)
+    setSelectedAddressMethod(null)
 
-      // For crypto deposits, ensure selected wallet matches the selected cryptocurrency
-      const matchingWallets = wallets.filter(
-        w => w.currency_type === 'crypto' && w.currency_code === selectedCurrency
-      )
-
-      // Check if current selectedWallet is still valid
-      const currentWalletValid = matchingWallets.some(w => w.id === selectedWallet)
-
-      if (!currentWalletValid) {
-        if (matchingWallets.length > 0) {
-          // Auto-select the matching wallet if only one exists
-          setSelectedWallet(matchingWallets[0].id)
-        } else {
-          // No matching wallet - deselect
-          setSelectedWallet(null)
-        }
-      }
-    } else if (activeType === 'currency') {
-      // For fiat deposits, ensure selected wallet matches the currency
-      const matchingWallets = wallets.filter(
-        w => w.currency_type === 'fiat' && w.currency_code === selectedCurrency
-      )
-
-      // Check if current selectedWallet is still valid
-      const currentWalletValid = matchingWallets.some(w => w.id === selectedWallet)
-
-      if (!currentWalletValid) {
-        if (matchingWallets.length > 0) {
-          // Auto-select the matching wallet if only one exists
-          setSelectedWallet(matchingWallets[0].id)
-        } else {
-          // No matching wallet - deselect
-          setSelectedWallet(null)
-        }
-      }
+    // If we were in confirm step and changed currency, go back to method selection
+    if (step === 'confirm') {
+      setStep('amount')
     }
-  }, [selectedCurrency, activeType, wallets])
+  }, [selectedCurrency, activeType])
 
   const copyToClipboard = async (text) => {
     try {
