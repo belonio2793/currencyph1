@@ -265,9 +265,12 @@ WHERE wba.wallet_id IN (
 ORDER BY wba.created_at DESC
 LIMIT 20;
 
-RAISE NOTICE '';
-RAISE NOTICE '═══════════════════════════════════════════════════════════';
-RAISE NOTICE 'FIX COMPLETE!';
-RAISE NOTICE '═══════════════════════════════════════════════════════════';
+DO $$
+BEGIN
+  RAISE NOTICE '';
+  RAISE NOTICE '═══════════════════════════════════════════════════════════';
+  RAISE NOTICE 'FIX COMPLETE!';
+  RAISE NOTICE '═══════════════════════════════════════════════════════════';
+END $$;
 
 COMMIT;
