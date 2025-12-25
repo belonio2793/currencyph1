@@ -912,7 +912,7 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
                             }
                           }}
                           className={`p-4 border-2 rounded-lg text-left transition-all ${
-                            selectedMethod === method.id ? 'border-blue-500 bg-blue-50' : 'border-slate-200 hover:border-blue-400 hover:bg-blue-50'
+                            (method.type === 'fiat' && selectedMethod === method.id) || (method.type === 'crypto' && selectedAddressMethod?.id === method.id) ? 'border-blue-500 bg-blue-50' : 'border-slate-200 hover:border-blue-400 hover:bg-blue-50'
                           }`}
                         >
                           <div className="font-semibold text-slate-900">{method.name}</div>
