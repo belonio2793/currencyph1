@@ -180,7 +180,7 @@ export function calculateConvertedAmount(
       amount: rounded,
       isValid: true,
       conversionRate: Math.round(conversionRate * 1000000) / 1000000, // 6 decimal places
-      note: `1 ${fromCurrency} = ${conversionRate.toFixed(6)} ${toCurrency}`
+      note: `1 ${fromCurrency} = ${formatExchangeRate(conversionRate)} ${toCurrency}`
     }
   } catch (error) {
     return {
