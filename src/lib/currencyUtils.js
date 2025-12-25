@@ -3,27 +3,25 @@
  * Converts between PHP (Philippine Peso) and USD (US Dollar)
  */
 
-export const DEFAULT_EXCHANGE_RATE = 56.5; // PHP to USD
-
 /**
  * Convert PHP amount to USD
  * @param {number} phpAmount - Amount in PHP
- * @param {number} exchangeRate - PHP to USD exchange rate (default: 56.5)
+ * @param {number} exchangeRate - PHP to USD exchange rate (required)
  * @returns {number} Amount in USD
  */
-export function phpToUsd(phpAmount, exchangeRate = DEFAULT_EXCHANGE_RATE) {
-  if (!phpAmount || isNaN(phpAmount)) return 0;
+export function phpToUsd(phpAmount, exchangeRate) {
+  if (!phpAmount || isNaN(phpAmount) || !exchangeRate || isNaN(exchangeRate)) return 0;
   return parseFloat((phpAmount / exchangeRate).toFixed(2));
 }
 
 /**
  * Convert USD amount to PHP
  * @param {number} usdAmount - Amount in USD
- * @param {number} exchangeRate - PHP to USD exchange rate (default: 56.5)
+ * @param {number} exchangeRate - PHP to USD exchange rate (required)
  * @returns {number} Amount in PHP
  */
-export function usdToPhp(usdAmount, exchangeRate = DEFAULT_EXCHANGE_RATE) {
-  if (!usdAmount || isNaN(usdAmount)) return 0;
+export function usdToPhp(usdAmount, exchangeRate) {
+  if (!usdAmount || isNaN(usdAmount) || !exchangeRate || isNaN(exchangeRate)) return 0;
   return parseFloat((usdAmount * exchangeRate).toFixed(2));
 }
 
