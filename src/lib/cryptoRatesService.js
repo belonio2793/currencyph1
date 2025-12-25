@@ -551,6 +551,8 @@ export async function getMultipleCryptoPrices(cryptoCodes, toCurrency = 'PHP') {
               })
             }
           })
+        } else if (pairsError) {
+          console.warn('[cryptoRatesService] Pairs table query error:', pairsError.message)
         }
       } catch (pairsErr) {
         console.warn('[cryptoRatesService] Failed to fetch from pairs table:', pairsErr.message)
@@ -558,10 +560,10 @@ export async function getMultipleCryptoPrices(cryptoCodes, toCurrency = 'PHP') {
     }
 
     // 3) TERTIARY: Try cache for any remaining missing rates
-    const stillMissing = cryptoCodes.filter(code => !prices[code])
-    if (stillMissing.length > 0) {
-      console.log(`[cryptoRatesService] Attempting to use cache for ${stillMissing.length} remaining rates...`)
-      stillMissing.forEach(code => {
+    const stillMissingAfterDb = cryptoCodes.filter(code => !prices[code])
+    if (stillMissingAfterDb.length > 0) {
+      console.log(`[cryptoRatesService] Attempting to use cache for ${stillMissingAfterDb.length} remaining rates...`)
+      stillMissingAfterDb.forEach(code => {
         const cacheKey = `${code}_${toCurrency}`
         const cached = rateCache.get(cacheKey)
         if (cached) {
@@ -570,20 +572,53 @@ export async function getMultipleCryptoPrices(cryptoCodes, toCurrency = 'PHP') {
       })
     }
 
+    // 4) QUATERNARY: Use fallback hardcoded rates for common cryptos
+    const stillMissing = cryptoCodes.filter(code => !prices[code])
+    if (stillMissing.length > 0) {
+      console.log(`[cryptoRatesService] Using fallback rates for ${stillMissing.length} cryptos`)
+      stillMissing.forEach(code => {
+        const fallbackUsdRate = FALLBACK_RATES_USD[code]
+        if (fallbackUsdRate !== undefined) {
+          // Convert USD rate to target currency
+          if (toCurrency === 'USD') {
+            prices[code] = fallbackUsdRate
+          } else if (toCurrency === 'PHP') {
+            prices[code] = convertUsdToPhp(fallbackUsdRate)
+          } else {
+            // For other currencies, we'd need a more complex conversion
+            prices[code] = fallbackUsdRate
+          }
+          console.log(`[cryptoRatesService] Using fallback: ${code} = ${prices[code]} ${toCurrency}`)
+        }
+      })
+    }
+
+    // Log summary
+    const sourceInfo = {
+      exconvert: Object.keys(prices).filter(code => rateCache.get(`${code}_${toCurrency}`)?.source === 'exconvert').length,
+      pairs: Object.keys(prices).filter(code => rateCache.get(`${code}_${toCurrency}`)?.source === 'pairs').length,
+      fallback: Object.keys(prices).length - (Object.keys(prices).filter(code => rateCache.get(`${code}_${toCurrency}`)?.source === 'exconvert').length + Object.keys(prices).filter(code => rateCache.get(`${code}_${toCurrency}`)?.source === 'pairs').length)
+    }
+    console.log(`[cryptoRatesService] Returning ${Object.keys(prices).length}/${cryptoCodes.length} rates (exconvert: ${sourceInfo.exconvert}, pairs: ${sourceInfo.pairs}, fallback: ${sourceInfo.fallback})`)
+
     return prices
   } catch (error) {
     console.error('[cryptoRatesService] Unexpected error in getMultipleCryptoPrices:', error.message)
 
-    // Fallback: try to get from cache
+    // Last resort: return fallback rates for all requested cryptos
     const prices = {}
     cryptoCodes.forEach(code => {
-      const cacheKey = `${code}_${toCurrency}`
-      const cached = rateCache.get(cacheKey)
-      if (cached) {
-        prices[code] = cached.rate
+      const fallbackUsdRate = FALLBACK_RATES_USD[code]
+      if (fallbackUsdRate !== undefined) {
+        if (toCurrency === 'PHP') {
+          prices[code] = convertUsdToPhp(fallbackUsdRate)
+        } else {
+          prices[code] = fallbackUsdRate
+        }
       }
     })
 
+    console.warn(`[cryptoRatesService] Returning ${Object.keys(prices).length} fallback rates due to error`)
     return prices
   }
 }
