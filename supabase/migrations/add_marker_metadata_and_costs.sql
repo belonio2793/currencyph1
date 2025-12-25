@@ -29,7 +29,7 @@ BEGIN
       AND column_name = 'exchange_rate'
   ) THEN
     ALTER TABLE public.planning_markers
-      ADD COLUMN exchange_rate DECIMAL(10, 4) DEFAULT 56.5;
+      ADD COLUMN exchange_rate DECIMAL(10, 4) DEFAULT NULL;
   END IF;
 END $$;
 
