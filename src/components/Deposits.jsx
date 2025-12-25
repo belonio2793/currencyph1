@@ -562,23 +562,21 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
     ? currencies.filter(c => c.type === 'fiat' && !userCurrencyCodes.has(c.code))
     : currencies.filter(c => c.type === 'crypto' && !userCurrencyCodes.has(c.code))
 
-  // Filter deposit methods by type
-  let availableMethods = Object.values(DEPOSIT_METHODS).filter(m =>
-    activeType === 'currency' ? m.type === 'fiat' : m.type === 'crypto'
-  )
+  // Determine available payment methods based on deposit currency type
+  let availableMethods = []
 
-  // For crypto, add dynamic methods from wallets_house - ONLY for selected currency
-  if (activeType === 'cryptocurrency' && Object.keys(cryptoAddresses).length > 0) {
-    const dynamicMethods = []
-
-    // Only show methods for the selected currency
-    if (selectedCurrency && cryptoAddresses[selectedCurrency]) {
+  if (activeType === 'currency') {
+    // For fiat currencies: show available fiat payment methods
+    availableMethods = Object.values(DEPOSIT_METHODS).filter(m => m.type === 'fiat')
+  } else if (activeType === 'cryptocurrency') {
+    // For crypto currencies: show dynamic deposit methods from wallets_house
+    if (selectedCurrency && cryptoAddresses[selectedCurrency] && Object.keys(cryptoAddresses).length > 0) {
       const data = cryptoAddresses[selectedCurrency]
-      // Handle both single address and multiple networks
       const addresses = Array.isArray(data) ? data : [data]
+
       addresses.forEach((addressData, idx) => {
         const cryptoName = addressData.currency_name || selectedCurrency
-        dynamicMethods.push({
+        availableMethods.push({
           id: addresses.length > 1 ? `${selectedCurrency.toLowerCase()}-${idx}` : selectedCurrency.toLowerCase(),
           name: addresses.length > 1 ? `${selectedCurrency} (${addressData.network})` : selectedCurrency,
           icon: selectedCurrency,
@@ -592,8 +590,6 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
         })
       })
     }
-    // Replace hardcoded methods with dynamic ones
-    availableMethods = dynamicMethods
   }
 
   // When switching currencies, ensure wallet matches or handle accordingly
