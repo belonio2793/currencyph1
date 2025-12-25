@@ -88,10 +88,14 @@ DROP TRIGGER IF EXISTS on_profile_update_sync_users ON public.profiles;
 CREATE OR REPLACE FUNCTION public.sync_auth_user_to_public()
 RETURNS TRIGGER AS $$
 DECLARE
+  v_first_name TEXT;
+  v_last_name TEXT;
   v_full_name TEXT;
   v_region_code TEXT;
 BEGIN
   -- Extract metadata from auth.users raw_user_meta_data
+  v_first_name := COALESCE(NEW.raw_user_meta_data->>'first_name', NEW.user_metadata->>'first_name', '');
+  v_last_name := COALESCE(NEW.raw_user_meta_data->>'last_name', NEW.user_metadata->>'last_name', '');
   v_full_name := COALESCE(NEW.raw_user_meta_data->>'full_name', NEW.user_metadata->>'full_name', '');
   v_region_code := COALESCE(NEW.raw_user_meta_data->>'region_code', NEW.user_metadata->>'region_code', 'PH');
 
@@ -101,6 +105,8 @@ BEGIN
   INSERT INTO public.users (
     auth_id,
     email,
+    first_name,
+    last_name,
     full_name,
     region_code,
     status,
@@ -110,6 +116,8 @@ BEGIN
   VALUES (
     NEW.id,
     NEW.email,
+    v_first_name,
+    v_last_name,
     v_full_name,
     v_region_code,
     'active',
@@ -118,6 +126,8 @@ BEGIN
   )
   ON CONFLICT (auth_id) DO UPDATE SET
     email = EXCLUDED.email,
+    first_name = COALESCE(EXCLUDED.first_name, public.users.first_name),
+    last_name = COALESCE(EXCLUDED.last_name, public.users.last_name),
     full_name = COALESCE(EXCLUDED.full_name, public.users.full_name),
     region_code = COALESCE(EXCLUDED.region_code, public.users.region_code),
     updated_at = NOW();
@@ -127,17 +137,23 @@ BEGIN
   -- ========================================================================
   INSERT INTO public.profiles (
     user_id,
+    first_name,
+    last_name,
     full_name,
     created_at,
     updated_at
   )
   VALUES (
     NEW.id,
+    v_first_name,
+    v_last_name,
     v_full_name,
     NOW(),
     NOW()
   )
   ON CONFLICT (user_id) DO UPDATE SET
+    first_name = COALESCE(EXCLUDED.first_name, public.profiles.first_name),
+    last_name = COALESCE(EXCLUDED.last_name, public.profiles.last_name),
     full_name = COALESCE(EXCLUDED.full_name, public.profiles.full_name),
     updated_at = NOW();
 
