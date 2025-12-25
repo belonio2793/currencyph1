@@ -275,8 +275,7 @@ app.get('/api/exchange-rate', async (req, res) => {
     const apiKey = process.env.OPEN_EXCHANGE_RATES_API || process.env.VITE_OPEN_EXCHANGE_RATES_API
     if (!apiKey) {
       return res.status(400).json({
-        error: 'Exchange rate API key not configured',
-        defaultRate: 56.5
+        error: 'Exchange rate API key not configured'
       })
     }
 
@@ -292,15 +291,21 @@ app.get('/api/exchange-rate', async (req, res) => {
 
     if (!response.ok) {
       console.warn(`Exchange rate API error (${response.status})`)
-      return res.status(200).json({
-        rate: 56.5,
-        defaultRate: true,
-        error: 'API error, using default rate'
+      return res.status(503).json({
+        error: 'Exchange rate API error',
+        available: false
       })
     }
 
     const data = await response.json()
-    const rate = data.rates?.PHP || 56.5
+    const rate = data.rates?.PHP
+
+    if (!rate) {
+      return res.status(503).json({
+        error: 'No PHP rate in response',
+        available: false
+      })
+    }
 
     res.json({
       rate,
@@ -308,10 +313,9 @@ app.get('/api/exchange-rate', async (req, res) => {
     })
   } catch (error) {
     console.error('Exchange rate fetch error:', error.message)
-    res.status(200).json({
-      rate: 56.5,
-      defaultRate: true,
-      error: 'Failed to fetch, using default rate'
+    res.status(503).json({
+      error: 'Failed to fetch exchange rates',
+      available: false
     })
   }
 })
