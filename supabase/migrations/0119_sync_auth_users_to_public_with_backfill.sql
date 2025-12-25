@@ -23,6 +23,8 @@ CREATE TABLE IF NOT EXISTS public.users (
   auth_id UUID UNIQUE REFERENCES auth.users(id) ON DELETE CASCADE,
   email VARCHAR(255) UNIQUE,
   username VARCHAR(255) UNIQUE,
+  first_name VARCHAR(255),
+  last_name VARCHAR(255),
   full_name VARCHAR(255),
   phone_number VARCHAR(20),
   profile_picture_url TEXT,
@@ -34,6 +36,11 @@ CREATE TABLE IF NOT EXISTS public.users (
   created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
+
+-- Add columns if they don't already exist
+ALTER TABLE IF EXISTS public.users
+ADD COLUMN IF NOT EXISTS first_name VARCHAR(255),
+ADD COLUMN IF NOT EXISTS last_name VARCHAR(255);
 
 -- Ensure public.profiles exists
 CREATE TABLE IF NOT EXISTS public.profiles (
