@@ -454,10 +454,26 @@ export default function Rates() {
               <div className="bg-white rounded-2xl shadow-lg p-6 sm:p-8 border border-slate-200">
                 {/* Last Updated Info Banner */}
                 <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-                  <p className="text-sm text-blue-900">
-                    <span className="font-semibold">Last Fetched Rates:</span>{' '}
-                    {formatFullDateTime(lastUpdated)}
-                  </p>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm text-blue-900">
+                        <span className="font-semibold">Last Fetched Rates:</span>{' '}
+                        {formatFullDateTime(lastUpdated)}
+                      </p>
+                      {lastUpdated && (
+                        <p className="text-xs text-blue-700 mt-1">
+                          {(() => {
+                            const minutes = Math.floor((Date.now() - new Date(lastUpdated).getTime()) / 1000 / 60)
+                            if (minutes < 1) return '✓ Just now'
+                            if (minutes < 60) return `✓ ${minutes} minute${minutes !== 1 ? 's' : ''} ago`
+                            const hours = Math.floor(minutes / 60)
+                            if (hours < 24) return `✓ ${hours} hour${hours !== 1 ? 's' : ''} ago`
+                            return `⚠ ${Math.floor(hours / 24)} day${Math.floor(hours / 24) !== 1 ? 's' : ''} ago`
+                          })()}
+                        </p>
+                      )}
+                    </div>
+                  </div>
                 </div>
 
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
