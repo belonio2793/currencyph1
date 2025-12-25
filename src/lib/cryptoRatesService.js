@@ -399,45 +399,93 @@ async function fetchFromExconvert(cryptoCodes, toCurrency) {
     }
 
     const prices = {}
+    const controller = new AbortController()
+    const timeout = setTimeout(() => controller.abort(), 8000) // 8 second total timeout
 
-    // Fetch each crypto price from EXCONVERT
-    for (const cryptoCode of cryptoCodes) {
-      try {
-        const url = `https://api.exconvert.com/convert?access_key=${EXCONVERT_KEY}&from=${cryptoCode}&to=${toCurrency}&amount=1`
+    try {
+      // Fetch each crypto price from EXCONVERT
+      for (const cryptoCode of cryptoCodes) {
+        try {
+          const url = `https://api.exconvert.com/convert?access_key=${EXCONVERT_KEY}&from=${cryptoCode}&to=${toCurrency}&amount=1`
 
-        const response = await fetch(url, {
-          headers: { Accept: 'application/json' },
-          signal: AbortSignal.timeout(5000)
-        })
+          const response = await fetch(url, {
+            headers: { Accept: 'application/json' },
+            signal: controller.signal
+          })
 
-        if (!response.ok) {
-          console.warn(`[EXCONVERT] Failed for ${cryptoCode}→${toCurrency}: ${response.status}`)
+          if (!response.ok) {
+            console.warn(`[EXCONVERT] Failed for ${cryptoCode}→${toCurrency}: ${response.status}`)
+            continue
+          }
+
+          const json = await response.json()
+
+          // EXCONVERT returns: { base, amount, result: { [currency]: rate }, ms }
+          if (json.result && typeof json.result === 'object') {
+            const rateValue = json.result[toCurrency] || Object.values(json.result)[0]
+            if (typeof rateValue === 'number' && rateValue > 0) {
+              prices[cryptoCode] = rateValue
+              console.log(`[EXCONVERT] Got rate for ${cryptoCode}→${toCurrency}: ${rateValue}`)
+            }
+          }
+        } catch (e) {
+          console.warn(`[EXCONVERT] Individual request failed for ${cryptoCode}:`, e.message)
           continue
         }
 
-        const json = await response.json()
-
-        // EXCONVERT returns: { base, amount, result: { [currency]: rate }, ms }
-        if (json.result && typeof json.result === 'object') {
-          const rateValue = json.result[toCurrency] || Object.values(json.result)[0]
-          if (typeof rateValue === 'number' && rateValue > 0) {
-            prices[cryptoCode] = rateValue
-          }
-        }
-      } catch (e) {
-        console.warn(`[EXCONVERT] Failed to fetch ${cryptoCode}:`, e.message)
-        continue
+        // Small delay to avoid rate limiting
+        await new Promise(resolve => setTimeout(resolve, 50))
       }
-
-      // Small delay to avoid rate limiting
-      await new Promise(resolve => setTimeout(resolve, 100))
+    } finally {
+      clearTimeout(timeout)
     }
 
     return Object.keys(prices).length > 0 ? prices : null
   } catch (error) {
-    console.warn('[cryptoRatesService] EXCONVERT fetch failed:', error.message)
+    console.error('[cryptoRatesService] EXCONVERT fetch error:', error.message)
     return null
   }
+}
+
+// Fallback hardcoded rates for common cryptos (in USD)
+const FALLBACK_RATES_USD = {
+  'BTC': 45000,
+  'ETH': 2500,
+  'USDT': 1,
+  'BNB': 600,
+  'XRP': 2.5,
+  'USDC': 1,
+  'SOL': 150,
+  'TRX': 0.25,
+  'DOGE': 0.35,
+  'ADA': 1.2,
+  'BCH': 800,
+  'LINK': 25,
+  'XLM': 0.35,
+  'HYPE': 50,
+  'LTC': 150,
+  'SUI': 4,
+  'AVAX': 45,
+  'HBAR': 0.15,
+  'SHIB': 0.000035,
+  'PYUSD': 1,
+  'WLD': 5,
+  'TON': 8,
+  'UNI': 10,
+  'DOT': 8,
+  'AAVE': 300,
+  'XAUT': 60,
+  'PEPE': 0.000008,
+  'ASTER': 0.5,
+  'ENA': 1.5,
+  'SKY': 25
+}
+
+// PHP to USD rate (fallback)
+const PHP_TO_USD = 0.018
+
+function convertUsdToPhp(usdAmount) {
+  return usdAmount / PHP_TO_USD
 }
 
 export async function getMultipleCryptoPrices(cryptoCodes, toCurrency = 'PHP') {
