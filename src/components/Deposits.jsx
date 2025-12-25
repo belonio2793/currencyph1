@@ -985,10 +985,10 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
                             <span>⏳ Fetching rates...</span>
                           ) : selectedWalletData?.currency_type === 'crypto' ? (
                             // For fiat-to-crypto conversions
-                            `1 ${selectedCurrency} = ${(1 / exchangeRates[selectedWalletData?.currency_code]).toFixed(8)} ${selectedWalletData?.currency_code}`
+                            `1 ${selectedCurrency} = ${formatExchangeRate(1 / exchangeRates[selectedWalletData?.currency_code])} ${selectedWalletData?.currency_code}`
                           ) : (
                             // For fiat-to-fiat conversions (both rates are USD-based)
-                            `1 ${selectedCurrency} = ${(exchangeRates[selectedWalletData?.currency_code] / exchangeRates[selectedCurrency]).toFixed(6)} ${selectedWalletData?.currency_code}`
+                            `1 ${selectedCurrency} = ${formatExchangeRate(exchangeRates[selectedWalletData?.currency_code] / exchangeRates[selectedCurrency])} ${selectedWalletData?.currency_code}`
                           )}
                         </p>
                       </div>
