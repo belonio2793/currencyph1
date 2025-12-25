@@ -490,138 +490,74 @@ function convertUsdToPhp(usdAmount) {
   return usdAmount / PHP_TO_USD
 }
 
+/**
+ * Get multiple cryptocurrency prices at once
+ * OPTIMIZED: Database ONLY - no external API calls
+ * Fetches from public.pairs in a single batch query
+ */
 export async function getMultipleCryptoPrices(cryptoCodes, toCurrency = 'PHP') {
   try {
     const prices = {}
     const toCurrencyUpper = toCurrency.toUpperCase()
+    const codesUpper = cryptoCodes.map(c => c.toUpperCase())
 
-    // 1) PRIMARY: Fetch directly from EXCONVERT API
+    console.log(`[CryptoRates] Fetching ${cryptoCodes.length} crypto prices from public.pairs...`)
+
+    // 1) PRIMARY: Fetch all from public.pairs in one batch query
     try {
-      console.log(`[cryptoRatesService] Fetching ${cryptoCodes.length} crypto prices from EXCONVERT...`)
-      const exconvertPrices = await fetchFromExconvert(cryptoCodes, toCurrency)
+      const { data: pairsData, error: pairsError } = await supabase
+        .from('pairs')
+        .select('from_currency, rate')
+        .eq('to_currency', toCurrencyUpper)
+        .in('from_currency', codesUpper)
 
-      if (exconvertPrices && Object.keys(exconvertPrices).length > 0) {
-        Object.assign(prices, exconvertPrices)
-        console.log(`[cryptoRatesService] Got ${Object.keys(exconvertPrices).length} rates from EXCONVERT`)
-
-        // Cache the results
-        cryptoCodes.forEach(code => {
-          if (prices[code]) {
-            const cacheKey = `${code}_${toCurrency}`
+      if (!pairsError && pairsData && pairsData.length > 0) {
+        console.log(`[CryptoRates] ✓ Batch query: Got ${pairsData.length}/${cryptoCodes.length} rates from public.pairs`)
+        pairsData.forEach(row => {
+          if (row.rate && isFinite(row.rate) && row.rate > 0) {
+            prices[row.from_currency] = parseFloat(row.rate)
+            // Cache the result
+            const cacheKey = `${row.from_currency}_${toCurrency}`
             rateCache.set(cacheKey, {
-              rate: prices[code],
+              rate: prices[row.from_currency],
               timestamp: Date.now(),
-              source: 'exconvert'
+              source: 'pairs'
             })
           }
         })
-
-        // If we got all rates from EXCONVERT, return immediately
-        if (Object.keys(prices).length === cryptoCodes.length) {
-          return prices
-        }
+      } else if (pairsError) {
+        console.warn('[CryptoRates] Pairs table query error:', pairsError.message)
       }
-    } catch (exconvertErr) {
-      console.warn('[cryptoRatesService] EXCONVERT API failed:', exconvertErr.message)
+    } catch (pairsErr) {
+      console.warn('[CryptoRates] Failed to fetch from pairs table:', pairsErr.message)
     }
 
-    // 2) FALLBACK: Try to fetch from public.pairs table
+    // 2) FALLBACK: Try in-memory cache for any remaining rates
     const missingCodes = cryptoCodes.filter(code => !prices[code])
     if (missingCodes.length > 0) {
-      try {
-        console.log(`[cryptoRatesService] Fetching ${missingCodes.length} missing rates from pairs table...`)
-        const { data: pairsData, error: pairsError } = await supabase
-          .from('pairs')
-          .select('from_currency, rate')
-          .eq('to_currency', toCurrencyUpper)
-          .in('from_currency', missingCodes)
-
-        if (!pairsError && pairsData && pairsData.length > 0) {
-          console.log(`[cryptoRatesService] Got ${pairsData.length} rates from pairs table`)
-          pairsData.forEach(row => {
-            prices[row.from_currency] = parseFloat(row.rate)
-          })
-
-          // Cache the results
-          missingCodes.forEach(code => {
-            if (prices[code]) {
-              const cacheKey = `${code}_${toCurrency}`
-              rateCache.set(cacheKey, {
-                rate: prices[code],
-                timestamp: Date.now(),
-                source: 'pairs'
-              })
-            }
-          })
-        } else if (pairsError) {
-          console.warn('[cryptoRatesService] Pairs table query error:', pairsError.message)
-        }
-      } catch (pairsErr) {
-        console.warn('[cryptoRatesService] Failed to fetch from pairs table:', pairsErr.message)
-      }
-    }
-
-    // 3) TERTIARY: Try cache for any remaining missing rates
-    const stillMissingAfterDb = cryptoCodes.filter(code => !prices[code])
-    if (stillMissingAfterDb.length > 0) {
-      console.log(`[cryptoRatesService] Attempting to use cache for ${stillMissingAfterDb.length} remaining rates...`)
-      stillMissingAfterDb.forEach(code => {
+      console.log(`[CryptoRates] ${missingCodes.length} rates missing from pairs, checking cache...`)
+      missingCodes.forEach(code => {
         const cacheKey = `${code}_${toCurrency}`
         const cached = rateCache.get(cacheKey)
-        if (cached) {
+        if (cached && isCacheValid(cacheKey)) {
           prices[code] = cached.rate
+          console.debug(`[CryptoRates] Cache hit: ${code}/${toCurrency} = ${cached.rate}`)
         }
       })
     }
 
-    // 4) QUATERNARY: Use fallback hardcoded rates for common cryptos
-    const stillMissing = cryptoCodes.filter(code => !prices[code])
-    if (stillMissing.length > 0) {
-      console.log(`[cryptoRatesService] Using fallback rates for ${stillMissing.length} cryptos`)
-      stillMissing.forEach(code => {
-        const fallbackUsdRate = FALLBACK_RATES_USD[code]
-        if (fallbackUsdRate !== undefined) {
-          // Convert USD rate to target currency
-          if (toCurrency === 'USD') {
-            prices[code] = fallbackUsdRate
-          } else if (toCurrency === 'PHP') {
-            prices[code] = convertUsdToPhp(fallbackUsdRate)
-          } else {
-            // For other currencies, we'd need a more complex conversion
-            prices[code] = fallbackUsdRate
-          }
-          console.log(`[cryptoRatesService] Using fallback: ${code} = ${prices[code]} ${toCurrency}`)
-        }
-      })
+    // 3) Report results
+    const finalMissing = cryptoCodes.filter(code => !prices[code])
+    if (finalMissing.length > 0) {
+      console.warn(`[CryptoRates] ⚠️  MISSING RATES: ${finalMissing.join(', ')} not found in public.pairs`)
+      console.warn(`[CryptoRates] Please ensure these pairs exist in database: ${finalMissing.map(c => `${c}→${toCurrencyUpper}`).join(', ')}`)
     }
 
-    // Log summary
-    const sourceInfo = {
-      exconvert: Object.keys(prices).filter(code => rateCache.get(`${code}_${toCurrency}`)?.source === 'exconvert').length,
-      pairs: Object.keys(prices).filter(code => rateCache.get(`${code}_${toCurrency}`)?.source === 'pairs').length,
-      fallback: Object.keys(prices).length - (Object.keys(prices).filter(code => rateCache.get(`${code}_${toCurrency}`)?.source === 'exconvert').length + Object.keys(prices).filter(code => rateCache.get(`${code}_${toCurrency}`)?.source === 'pairs').length)
-    }
-    console.log(`[cryptoRatesService] Returning ${Object.keys(prices).length}/${cryptoCodes.length} rates (exconvert: ${sourceInfo.exconvert}, pairs: ${sourceInfo.pairs}, fallback: ${sourceInfo.fallback})`)
-
+    console.log(`[CryptoRates] Returning ${Object.keys(prices).length}/${cryptoCodes.length} rates`)
     return prices
   } catch (error) {
-    console.error('[cryptoRatesService] Unexpected error in getMultipleCryptoPrices:', error.message)
-
-    // Last resort: return fallback rates for all requested cryptos
-    const prices = {}
-    cryptoCodes.forEach(code => {
-      const fallbackUsdRate = FALLBACK_RATES_USD[code]
-      if (fallbackUsdRate !== undefined) {
-        if (toCurrency === 'PHP') {
-          prices[code] = convertUsdToPhp(fallbackUsdRate)
-        } else {
-          prices[code] = fallbackUsdRate
-        }
-      }
-    })
-
-    console.warn(`[cryptoRatesService] Returning ${Object.keys(prices).length} fallback rates due to error`)
-    return prices
+    console.error('[CryptoRates] Fatal error in getMultipleCryptoPrices:', error.message)
+    return {}
   }
 }
 
