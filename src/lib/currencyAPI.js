@@ -32,10 +32,49 @@ const CURRENCIES = [
 ]
 
 export const currencyAPI = {
-  // Get all currency rates relative to USD via edge function
+  // Get all currency rates relative to USD via public.pairs table (primary source)
   async getGlobalRates() {
     try {
-      // 1) Prefer Open Exchange Rates (hourly) when API key is configured
+      // 1) PRIMARY: Try public.pairs table directly - this is the authoritative source
+      try {
+        const { data: pairsData, error: pairsError } = await supabase
+          .from('pairs')
+          .select('from_currency, to_currency, rate, updated_at')
+          .limit(500)
+
+        if (!pairsError && pairsData && pairsData.length > 0) {
+          console.log('Using exchange rates from public.pairs table')
+          const lastUpdated = new Date(pairsData[0].updated_at || Date.now())
+          const rates = {}
+
+          // Build rates from USD conversions in pairs
+          CURRENCIES.forEach(currency => {
+            if (currency.code === 'USD') {
+              rates[currency.code] = { ...currency, rate: 1, lastUpdated }
+              return
+            }
+
+            // Find rate from USD to this currency
+            const pair = pairsData.find(p =>
+              p.from_currency === 'USD' && p.to_currency === currency.code
+            )
+
+            if (pair && typeof pair.rate === 'number' && pair.rate > 0) {
+              rates[currency.code] = { ...currency, rate: pair.rate, lastUpdated }
+            } else {
+              // If no direct pair, try to mark as missing but don't fail
+              rates[currency.code] = { ...currency, rate: 0, lastUpdated }
+            }
+          })
+          return rates
+        } else if (pairsError) {
+          console.warn('Error fetching from public.pairs:', pairsError.message)
+        }
+      } catch (e) {
+        console.warn('Public.pairs lookup failed:', e && e.message)
+      }
+
+      // 2) SECONDARY: Try Open Exchange Rates (if API key is configured)
       const OPEN_KEY = (typeof import.meta !== 'undefined' && import.meta.env && (import.meta.env.VITE_OPEN_EXCHANGE_RATES_API || import.meta.env.OPEN_EXCHANGE_RATES_API)) || (typeof process !== 'undefined' && (process.env.VITE_OPEN_EXCHANGE_RATES_API || process.env.OPEN_EXCHANGE_RATES_API)) || null
       if (OPEN_KEY) {
         try {
@@ -69,7 +108,7 @@ export const currencyAPI = {
         }
       }
 
-      // 2) Try edge function (cached rates) with timeout
+      // 3) Try edge function (cached rates) with timeout
       try {
         const controller = new AbortController()
         const timeout = setTimeout(() => controller.abort(), 8000)
@@ -102,42 +141,7 @@ export const currencyAPI = {
         console.warn('Edge function invocation failed:', e && e.message)
       }
 
-      // 2b) Fallback to public.pairs table
-      try {
-        const { data: pairsData, error: pairsError } = await supabase
-          .from('pairs')
-          .select('from_currency, to_currency, rate, updated_at')
-
-        if (!pairsError && pairsData && pairsData.length > 0) {
-          console.log('Using exchange rates from public.pairs table')
-          const lastUpdated = new Date(pairsData[0].updated_at || Date.now())
-          const rates = {}
-
-          // Build rates from USD conversions in pairs
-          CURRENCIES.forEach(currency => {
-            if (currency.code === 'USD') {
-              rates[currency.code] = { ...currency, rate: 1, lastUpdated }
-              return
-            }
-
-            // Find rate from USD to this currency
-            const pair = pairsData.find(p =>
-              p.from_currency === 'USD' && p.to_currency === currency.code
-            )
-
-            if (pair && typeof pair.rate === 'number' && pair.rate > 0) {
-              rates[currency.code] = { ...currency, rate: pair.rate, lastUpdated }
-            } else {
-              rates[currency.code] = { ...currency, rate: 0, lastUpdated }
-            }
-          })
-          return rates
-        }
-      } catch (e) {
-        console.warn('Public.pairs fallback for exchange rates failed:', e && e.message)
-      }
-
-      // 3) Fallback to public exchangerate.host
+      // 4) Fallback to public exchangerate.host
       try {
         const resp = await fetch('https://api.exchangerate.host/latest?base=USD')
         if (resp && resp.ok) {
