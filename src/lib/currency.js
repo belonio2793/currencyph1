@@ -59,3 +59,66 @@ export function formatPhp(amount) {
 export function formatUsd(amount) {
   return formatCurrency(amount, 'USD')
 }
+
+/**
+ * Convert amount from one currency to another using exchange rates
+ * Exchange rates should be normalized to a common base (e.g., all rates in PHP)
+ *
+ * @param {number} amount - The amount to convert
+ * @param {string} fromCurrency - Source currency code (e.g., 'BTC')
+ * @param {string} toCurrency - Destination currency code (e.g., 'PHP')
+ * @param {object} exchangeRates - Object with rates (e.g., { 'BTC': 2500000, 'PHP': 1, 'USD': 58 })
+ * @returns {number|null} - Converted amount or null if rates are unavailable
+ */
+export function convertCurrency(amount, fromCurrency, toCurrency, exchangeRates) {
+  // Handle null/undefined
+  if (amount == null || !fromCurrency || !toCurrency || !exchangeRates) {
+    return null
+  }
+
+  const numAmount = parseFloat(amount)
+  if (isNaN(numAmount) || numAmount < 0) return null
+
+  // Same currency, no conversion needed
+  if (fromCurrency.toUpperCase() === toCurrency.toUpperCase()) {
+    return numAmount
+  }
+
+  // Get rates (try both cases)
+  const fromUpper = fromCurrency.toUpperCase()
+  const toUpper = toCurrency.toUpperCase()
+  const fromRate = exchangeRates[fromUpper] || exchangeRates[fromCurrency]
+  const toRate = exchangeRates[toUpper] || exchangeRates[toCurrency]
+
+  // Both rates must be available and valid
+  if (!fromRate || !toRate || !isFinite(fromRate) || !isFinite(toRate) || fromRate <= 0 || toRate <= 0) {
+    return null
+  }
+
+  // Convert using the canonical formula: (amount * fromRate) / toRate
+  // This works when both rates are normalized to the same base
+  const converted = (numAmount * fromRate) / toRate
+
+  // Return with appropriate decimal places
+  const isTargetCrypto = isCryptoCurrency(toCurrency)
+  const decimals = isTargetCrypto ? 8 : 2
+  return Math.round(converted * Math.pow(10, decimals)) / Math.pow(10, decimals)
+}
+
+/**
+ * Format a converted amount with the target currency
+ * @param {number} amount - The converted amount
+ * @param {string} currency - Target currency code
+ * @param {string} label - Optional label to display before amount
+ * @returns {string} - Formatted string
+ */
+export function formatConvertedAmount(amount, currency, label = '') {
+  if (amount == null) return ''
+
+  const formatted = amount.toLocaleString(undefined, {
+    minimumFractionDigits: isCryptoCurrency(currency) ? 2 : 2,
+    maximumFractionDigits: isCryptoCurrency(currency) ? 8 : 2
+  })
+
+  return label ? `${label} ${formatted} ${currency}` : `${formatted} ${currency}`
+}
