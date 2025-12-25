@@ -1057,6 +1057,10 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
                         setSelectedAddressMethod(method)
                         setShowCryptoAddressModal(true)
                       }}
+                      amount={amount}
+                      selectedCurrency={selectedCurrency}
+                      exchangeRates={exchangeRates}
+                      walletData={selectedWalletData}
                     />
                   ) : (
                     <div className="p-4 bg-amber-50 border border-amber-200 rounded-lg text-amber-700 text-sm">
