@@ -772,7 +772,7 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
               {/* Wallet Selection */}
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-2">
-                  Select Wallet (Deposit to Any Wallet - Any Currency Accepted)
+                  Select Wallet
                 </label>
                 {wallets.length === 0 ? (
                   <div className="p-4 bg-amber-50 border border-amber-200 rounded-lg">
