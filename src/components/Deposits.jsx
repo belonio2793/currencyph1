@@ -292,9 +292,9 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
             }
           }
 
-          // Ensure PHP and USD rates are set properly
-          rates['PHP'] = rates['PHP'] || 58.5 // fallback PHP to USD rate
-          rates['USD'] = rates['USD'] || 1
+          // Ensure PHP and USD rates are set properly (normalized to uppercase)
+          if (!rates['PHP']) rates['PHP'] = 58.5 // fallback PHP to USD rate (1 USD = 58.5 PHP)
+          if (!rates['USD']) rates['USD'] = 1 // fallback USD rate
         } catch (e) {
           console.warn('Failed to fetch fiat exchange rates:', e.message)
           // Set minimal fallback rates
