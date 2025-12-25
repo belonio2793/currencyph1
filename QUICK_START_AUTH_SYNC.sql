@@ -112,9 +112,21 @@ CREATE TRIGGER on_auth_user_created_sync_all
 CREATE OR REPLACE FUNCTION public.sync_profile_to_users()
 RETURNS TRIGGER AS $$
 BEGIN
+  -- Only update username if it's not null AND not used by another user
+  IF NEW.username IS NOT NULL AND NOT EXISTS (
+    SELECT 1 FROM public.users
+    WHERE username = NEW.username AND auth_id <> NEW.user_id
+  ) THEN
+    UPDATE public.users
+    SET username = NEW.username
+    WHERE auth_id = NEW.user_id;
+  END IF;
+
+  -- Update other fields safely
   UPDATE public.users
   SET
-    username = COALESCE(NEW.username, username),
+    first_name = COALESCE(NEW.first_name, first_name),
+    last_name = COALESCE(NEW.last_name, last_name),
     full_name = COALESCE(NEW.full_name, full_name),
     phone_number = COALESCE(NEW.phone_number, phone_number),
     profile_picture_url = COALESCE(NEW.profile_picture_url, profile_picture_url),
