@@ -151,7 +151,7 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
     return () => {
       isMounted = false
     }
-  }, [activeType, cryptoAddresses])
+  }, [activeType, cryptoAddresses, selectedWallet, wallets])
 
   const fetchExchangeRates = async () => {
     try {
