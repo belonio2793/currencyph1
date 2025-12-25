@@ -170,56 +170,70 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
             currencyAPI.getGlobalRates(),
             timeoutPromise
           ])
+
+          let phpToUsdRate = 1 // fallback, will be overridden if found
+
           if (globalRates) {
             Object.entries(globalRates).forEach(([code, data]) => {
               rates[code] = data.rate
+              // Track PHP to USD rate for crypto conversion
+              if (code === 'PHP' && data.rate > 0) {
+                phpToUsdRate = 1 / data.rate // If 1 USD = 58.5 PHP, then 1 PHP = 1/58.5 USD
+              }
             })
           }
+
+          // Store the USD to PHP rate for later use in conversions
+          rates['_phpToUsdRate'] = phpToUsdRate
+
+          // IMPORTANT: Also fetch crypto prices when in fiat mode
+          // This enables fiat→crypto conversions (e.g., PHP→BTC)
+          const cryptoCurrenciesToFetch = new Set()
+
+          // If a crypto wallet is selected, fetch its crypto price
+          if (selectedWallet) {
+            const selectedWalletData = wallets.find(w => w.id === selectedWallet)
+            if (selectedWalletData && selectedWalletData.currency_type === 'crypto') {
+              cryptoCurrenciesToFetch.add(selectedWalletData.currency_code)
+            }
+          }
+
+          // Also add any crypto currencies with available addresses
+          Object.keys(cryptoAddresses).forEach(code => cryptoCurrenciesToFetch.add(code))
+
+          // Fetch crypto prices if needed
+          if (cryptoCurrenciesToFetch.size > 0) {
+            try {
+              const cryptoCodes = Array.from(cryptoCurrenciesToFetch)
+              console.log(`[Deposits] Fetching crypto rates for fiat→crypto conversion: ${cryptoCodes.join(', ')}`)
+
+              const pricesFromApi = await Promise.race([
+                getMultipleCryptoPrices(cryptoCodes, 'PHP'),
+                timeoutPromise
+              ])
+
+              if (pricesFromApi && Object.keys(pricesFromApi).length > 0) {
+                Object.assign(rates, pricesFromApi)
+                console.log(`[Deposits] Successfully fetched ${Object.keys(pricesFromApi).length} crypto rates in PHP`)
+              } else {
+                console.warn('[Deposits] Crypto price fetch returned no data')
+              }
+            } catch (e) {
+              console.warn('[Deposits] Failed to fetch crypto rates in fiat mode:', e.message)
+            }
+          }
+
+          // Ensure PHP and USD rates are set properly
+          rates['PHP'] = rates['PHP'] || 58.5 // fallback PHP to USD rate
+          rates['USD'] = rates['USD'] || 1
         } catch (e) {
           console.warn('Failed to fetch fiat exchange rates:', e.message)
+          // Set minimal fallback rates
+          rates['PHP'] = 58.5
+          rates['USD'] = 1
         }
-
-        // IMPORTANT: Also fetch crypto prices when in fiat mode
-        // This enables fiat→crypto conversions (e.g., PHP→BTC)
-        const cryptoCurrenciesToFetch = new Set()
-
-        // If a crypto wallet is selected, fetch its crypto price
-        if (selectedWallet) {
-          const selectedWalletData = wallets.find(w => w.id === selectedWallet)
-          if (selectedWalletData && selectedWalletData.currency_type === 'crypto') {
-            cryptoCurrenciesToFetch.add(selectedWalletData.currency_code)
-          }
-        }
-
-        // Also add any crypto currencies with available addresses
-        Object.keys(cryptoAddresses).forEach(code => cryptoCurrenciesToFetch.add(code))
-
-        // Fetch crypto prices if needed
-        if (cryptoCurrenciesToFetch.size > 0) {
-          try {
-            const cryptoCodes = Array.from(cryptoCurrenciesToFetch)
-            console.log(`Fetching crypto rates for fiat→crypto conversion: ${cryptoCodes.join(', ')}`)
-
-            const pricesFromApi = await Promise.race([
-              getMultipleCryptoPrices(cryptoCodes, 'PHP'),
-              timeoutPromise
-            ])
-
-            if (pricesFromApi && Object.keys(pricesFromApi).length > 0) {
-              Object.assign(rates, pricesFromApi)
-              console.log(`Successfully fetched ${Object.keys(pricesFromApi).length} crypto rates`)
-            } else {
-              console.warn('Crypto price fetch returned no data')
-            }
-          } catch (e) {
-            console.warn('Failed to fetch crypto rates in fiat mode:', e.message)
-          }
-        }
-
-        // Ensure PHP rate is set to 1 for conversion calculations
-        rates['PHP'] = 1
       } else {
-        // For crypto, fetch rates for only selected/available currencies (not all)
+        // For crypto mode, fetch rates for only selected/available currencies (not all)
         const cryptoCurrenciesToFetch = new Set()
 
         // Add only the selected currency and configured crypto addresses
@@ -265,7 +279,7 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
       setRatesLoading(false)
     } catch (err) {
       console.error('Error fetching exchange rates:', err.message)
-      setExchangeRates({ PHP: 1 })
+      setExchangeRates({ PHP: 1, USD: 1 })
       setRatesLoading(false)
     }
   }
