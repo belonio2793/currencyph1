@@ -178,11 +178,19 @@ export default function Rates() {
         }
       })
 
-      // Get the most recent timestamp
+      // Get the most recent timestamp - prefer actual fetch-rates execution time
       let mostRecentTimestamp = new Date()
-      if (timestamps.length > 0) {
+      const fetchInfo = await getLastFetchInfo()
+
+      if (fetchInfo && fetchInfo.fetchedAt) {
+        // Use the actual fetch-rates edge function execution time (most accurate)
+        mostRecentTimestamp = fetchInfo.fetchedAt
+        console.log(`🕐 Using fetch-rates execution time: ${fetchInfo.isoString}`)
+      } else if (timestamps.length > 0) {
+        // Fallback to most recent pair timestamp if fetch info not available
         timestamps.sort((a, b) => b - a)
         mostRecentTimestamp = timestamps[0]
+        console.log('🕐 Using most recent pair update timestamp (fallback)')
       }
 
       // Sort: rates with values first, then without
@@ -199,6 +207,7 @@ export default function Rates() {
       setRates(validRates)
       setLastUpdated(mostRecentTimestamp)
       console.log(`✅ Final rates list: ${validRates.length} items (${ratesWithValues.length} with rates)`)
+      console.log(`🕐 Last fetch date set to: ${formatFullDateTime(mostRecentTimestamp)}`)
       setError(null)
     } catch (err) {
       const errorMsg = err?.message || String(err) || 'Unknown error'
