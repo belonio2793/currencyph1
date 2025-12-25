@@ -14,12 +14,6 @@ export function getCurrencySymbol(currencyCode) {
   return CURRENCY_SYMBOLS[currencyCode?.toUpperCase()] || '$'
 }
 
-// Convert USD price to another currency
-export function convertUSDToLocalCurrency(usdPrice, targetCurrency) {
-  const rate = EXCHANGE_RATES[targetCurrency?.toUpperCase()] || 1
-  return usdPrice * rate
-}
-
 // Format price with currency symbol
 export function formatPriceWithCurrency(price, currencyCode) {
   const symbol = getCurrencySymbol(currencyCode)
