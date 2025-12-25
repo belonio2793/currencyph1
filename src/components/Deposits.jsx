@@ -749,29 +749,32 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
                 </button>
               </div>
 
-              {/* Amount Input - Full Width */}
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">Amount</label>
-                <input
-                  type="number"
-                  step="0.01"
-                  min="0"
-                  value={amount}
-                  onChange={(e) => setAmount(e.target.value)}
-                  placeholder="0.00"
-                  className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
+              {/* Amount and Currency in 1 Row - 50% Each */}
+              <div className="grid grid-cols-2 gap-4">
+                {/* Amount Input - 50% Width */}
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-2">Amount</label>
+                  <input
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    value={amount}
+                    onChange={(e) => setAmount(e.target.value)}
+                    placeholder="0.00"
+                    className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
 
-              {/* Currency Selection - Full Width */}
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">Currency</label>
-                <SearchableCurrencyDropdown
-                  currencies={currencies}
-                  selectedCurrency={selectedCurrency}
-                  onChange={setSelectedCurrency}
-                  defaultTab="all"
-                />
+                {/* Currency Selection - 50% Width */}
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-2">Currency</label>
+                  <SearchableCurrencyDropdown
+                    currencies={currencies}
+                    selectedCurrency={selectedCurrency}
+                    onChange={setSelectedCurrency}
+                    defaultTab="all"
+                  />
+                </div>
               </div>
 
               {/* Wallet Selection */}
