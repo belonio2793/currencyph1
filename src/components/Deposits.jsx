@@ -1677,6 +1677,22 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
                 </ol>
               </div>
 
+              {/* Deposit Summary - What you receive */}
+              {selectedWallet && calculateConvertedAmount() && selectedCurrency !== selectedWallet.currency_code && (
+                <div className="p-6 bg-emerald-50 border border-emerald-200 rounded-lg">
+                  <h4 className="font-semibold text-slate-900 mb-4">✓ What You Will Receive</h4>
+                  <div className="flex items-baseline justify-between">
+                    <span className="text-slate-700">Deposited to your {selectedWallet.currency_code} wallet:</span>
+                    <span className="text-3xl font-bold text-emerald-600">
+                      {calculateConvertedAmount()?.toLocaleString(undefined, {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 8
+                      })} {selectedWallet.currency_code}
+                    </span>
+                  </div>
+                </div>
+              )}
+
               {/* Deposit Address */}
               {selectedAddressMethod.address && (
                 <div className="p-6 bg-purple-50 border border-purple-200 rounded-lg">
@@ -1685,7 +1701,7 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
                   <div className="grid grid-cols-2 gap-4 mb-4">
                     <div>
                       <p className="text-xs text-slate-600">Currency</p>
-                      <p className="font-semibold text-slate-900">{selectedCurrency.toUpperCase()}</p>
+                      <p className="font-semibold text-slate-900">{selectedAddressMethod.cryptoSymbol}</p>
                     </div>
                     {selectedAddressMethod.network && (
                       <div>
