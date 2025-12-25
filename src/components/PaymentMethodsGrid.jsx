@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react'
+import { convertCurrency, formatConvertedAmount, isCryptoCurrency } from '../lib/currency'
 
 /**
  * Payment Method Grid Display with:
@@ -6,13 +7,18 @@ import React, { useState, useRef, useEffect } from 'react'
  * - Real-time search with auto-filter
  * - Fiat and Cryptocurrency tabs
  * - Grid layout for better visibility
+ * - Converted amounts for each payment method
  */
-function PaymentMethodsGrid({ 
-  methods, 
+function PaymentMethodsGrid({
+  methods,
   selectedMethod,
   selectedAddressMethod,
   onSelectMethod,
-  onSelectCryptoMethod
+  onSelectCryptoMethod,
+  amount = null,
+  selectedCurrency = null,
+  exchangeRates = {},
+  walletData = null
 }) {
   const [searchQuery, setSearchQuery] = useState('')
   const [activeTab, setActiveTab] = useState('all') // 'all', 'fiat', 'crypto'
