@@ -566,9 +566,12 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
       return null
     }
 
-    // Use the same simple conversion formula as /rates
-    // convertedAmount = (amount * toRate) / fromRate
-    const convertedAmount = (numAmount * toRate) / fromRate
+    // 🎯 CRITICAL: Correct conversion formula for canonical rates
+    // Both rates are "how much PHP per 1 unit of that currency"
+    // So: amount_in_php = amount * fromRate
+    // Then: amount_in_to_currency = amount_in_php / toRate
+    // Simplified: (amount * fromRate) / toRate
+    const convertedAmount = (numAmount * fromRate) / toRate
 
     // Round to appropriate decimal places (crypto: 8, fiat: 2)
     const decimals = selectedWalletData.currency_type === 'crypto' ? 8 : 2
