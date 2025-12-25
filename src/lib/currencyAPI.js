@@ -53,7 +53,7 @@ export const currencyAPI = {
         clearTimeout(timeout)
 
         if (!pairsError && pairsData && pairsData.length > 0) {
-          console.log('Using exchange rates from public.pairs table')
+          console.log('✅ Using exchange rates from public.pairs table')
           const lastUpdated = new Date(pairsData[0].updated_at || Date.now())
           const rates = {}
 
@@ -72,114 +72,23 @@ export const currencyAPI = {
             if (pair && typeof pair.rate === 'number' && pair.rate > 0) {
               rates[currency.code] = { ...currency, rate: pair.rate, lastUpdated }
             } else {
-              // If no direct pair, try to mark as missing but don't fail
+              // If no direct pair, mark as missing but don't fail
               rates[currency.code] = { ...currency, rate: 0, lastUpdated }
             }
           })
           return rates
         } else if (pairsError) {
-          console.warn('Error fetching from public.pairs:', pairsError.message)
+          console.warn('❌ Error fetching from public.pairs:', pairsError.message)
         }
       } catch (e) {
-        console.warn('Public.pairs lookup failed or timed out:', e && e.message)
+        console.warn('❌ Public.pairs lookup failed or timed out:', e && e.message)
       }
 
-      // 2) SECONDARY: Try Open Exchange Rates (if API key is configured)
-      const OPEN_KEY = (typeof import.meta !== 'undefined' && import.meta.env && (import.meta.env.VITE_OPEN_EXCHANGE_RATES_API || import.meta.env.OPEN_EXCHANGE_RATES_API)) || (typeof process !== 'undefined' && (process.env.VITE_OPEN_EXCHANGE_RATES_API || process.env.OPEN_EXCHANGE_RATES_API)) || null
-      if (OPEN_KEY) {
-        try {
-          const controller = new AbortController()
-          const timeout = setTimeout(() => controller.abort(), 15000)
-          const url = `https://openexchangerates.org/api/latest.json?app_id=${OPEN_KEY}`
-          const resp = await fetch(url, {
-            headers: { Accept: 'application/json' },
-            signal: controller.signal
-          })
-          clearTimeout(timeout)
-          if (resp && resp.ok) {
-            const json = await resp.json()
-            const ratesData = json && json.rates ? json.rates : null
-            if (ratesData) {
-              const now = new Date()
-              const rates = {}
-              CURRENCIES.forEach(currency => {
-                if (currency.code === 'USD') {
-                  rates[currency.code] = { ...currency, rate: 1, lastUpdated: now }
-                  return
-                }
-                const rateVal = ratesData[currency.code]
-                rates[currency.code] = { ...currency, rate: typeof rateVal === 'number' ? rateVal : 0, lastUpdated: now }
-              })
-              return rates
-            }
-          }
-        } catch (e) {
-          // Silently skip - error handling continues to fallback
-        }
-      }
-
-      // 3) Try edge function (cached rates) with timeout
-      try {
-        const controller = new AbortController()
-        const timeout = setTimeout(() => controller.abort(), 8000)
-        const { data, error } = await Promise.race([
-          supabase.functions.invoke('fetch-rates', { method: 'GET' }),
-          new Promise((_, reject) => setTimeout(() => reject(new Error('Edge function timeout')), 7000))
-        ])
-        clearTimeout(timeout)
-
-        // Check if service is unavailable
-        if (data && data.service_status === 'unavailable') {
-          console.warn('Rate service is unavailable')
-        } else if (!error && data && data.exchangeRates) {
-          const now = new Date()
-          const rates = {}
-          CURRENCIES.forEach(currency => {
-            if (currency.code === 'USD') {
-              rates[currency.code] = { ...currency, rate: 1, lastUpdated: now }
-              return
-            }
-            const rateVal = data.exchangeRates[currency.code]
-            // Validate rate is > 0 and finite
-            const validRate = typeof rateVal === 'number' && isFinite(rateVal) && rateVal > 0 ? rateVal : 0
-            rates[currency.code] = { ...currency, rate: validRate, lastUpdated: now }
-          })
-          return rates
-        }
-        if (error) console.warn('Edge function error:', error)
-      } catch (e) {
-        console.warn('Edge function invocation failed:', e && e.message)
-      }
-
-      // 4) Fallback to public exchangerate.host
-      try {
-        const resp = await fetch('https://api.exchangerate.host/latest?base=USD')
-        if (resp && resp.ok) {
-          const json = await resp.json()
-          const ratesData = json && json.rates ? json.rates : null
-          if (ratesData) {
-            const now = new Date()
-            const rates = {}
-            CURRENCIES.forEach(currency => {
-              if (currency.code === 'USD') {
-                rates[currency.code] = { ...currency, rate: 1, lastUpdated: now }
-                return
-              }
-              const rateVal = ratesData[currency.code]
-              rates[currency.code] = { ...currency, rate: typeof rateVal === 'number' ? rateVal : 0, lastUpdated: now }
-            })
-            return rates
-          }
-        }
-      } catch (e) {
-        // ignore and fall through
-        console.warn('Fallback exchangerate.host failed:', e && e.message)
-      }
-
-      // If all else fails, return fallback hard-coded rates
+      console.log('⚠️ Public.pairs lookup failed, returning fallback rates')
+      // If primary source fails, return fallback hard-coded rates
       return this.getFallbackRates()
     } catch (err) {
-      console.warn('Failed to fetch rates from primary and fallback sources:', err?.message || err)
+      console.warn('❌ Failed to fetch rates from public.pairs:', err?.message || err)
       return this.getFallbackRates()
     }
   },
