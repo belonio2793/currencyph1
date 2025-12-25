@@ -1110,7 +1110,7 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
                     </label>
                   </div>
                   {availableMethods.length > 0 ? (
-                    <SearchablePaymentMethodDropdown
+                    <PaymentMethodsGrid
                       methods={availableMethods}
                       selectedMethod={selectedMethod}
                       selectedAddressMethod={selectedAddressMethod}
