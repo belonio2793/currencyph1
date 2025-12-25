@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabaseClient'
 import { currencyAPI } from '../lib/payments'
 import { paymentTransferService } from '../lib/paymentTransferService'
-import { formatNumber, getCurrencySymbol } from '../lib/currency'
+import { formatNumber, getCurrencySymbol, formatExchangeRate } from '../lib/currency'
 
 export default function SendPaymentRequest({ userId, onClose }) {
   // Step management
