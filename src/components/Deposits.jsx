@@ -158,9 +158,9 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
       setRatesLoading(true)
       const rates = {}
 
-      // Set a timeout for the entire rate fetch operation (15 seconds)
-      const timeoutPromise = new Promise((_, reject) =>
-        setTimeout(() => reject(new Error('Rate fetch timeout')), 15000)
+      // Helper to create timeout promise - each call creates a new one
+      const createTimeout = (ms) => new Promise((_, reject) =>
+        setTimeout(() => reject(new Error('Rate fetch timeout')), ms)
       )
 
       if (activeType === 'currency') {
@@ -168,7 +168,7 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
           // Fetch rates for ALL fiat currencies (not just wallet matches)
           const globalRates = await Promise.race([
             currencyAPI.getGlobalRates(),
-            timeoutPromise
+            createTimeout(10000) // 10 second timeout for fiat rates
           ])
 
           let phpToUsdRate = 1 // fallback, will be overridden if found
