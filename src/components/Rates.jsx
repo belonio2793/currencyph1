@@ -454,7 +454,7 @@ export default function Rates() {
               <div className="bg-white rounded-2xl shadow-lg p-6 sm:p-8 border border-slate-200">
                 {/* Last Updated Info Banner */}
                 <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-                  <div className="flex items-center justify-between">
+                  <div className="flex items-center justify-between flex-wrap gap-2">
                     <div>
                       <p className="text-sm text-blue-900">
                         <span className="font-semibold">Last Fetched Rates:</span>{' '}
@@ -473,6 +473,15 @@ export default function Rates() {
                         </p>
                       )}
                     </div>
+                    {!loading && (
+                      <button
+                        onClick={loadData}
+                        disabled={loading}
+                        className="px-3 py-1 bg-blue-600 text-white text-xs font-medium rounded hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition whitespace-nowrap"
+                      >
+                        {loading ? 'Refreshing...' : 'Refresh Rates'}
+                      </button>
+                    )}
                   </div>
                 </div>
 
