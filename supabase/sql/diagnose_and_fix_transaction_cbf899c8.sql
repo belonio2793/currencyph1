@@ -61,11 +61,14 @@ ORDER BY w.currency_code;
 -- PHASE 3: ANALYZE WALLET TRANSACTIONS FOR THIS DEPOSIT
 -- ============================================================================
 
-RAISE NOTICE '';
-RAISE NOTICE '>> PHASE 3: WALLET TRANSACTIONS FOR THIS DEPOSIT';
-RAISE NOTICE '═══════════════════════════════════════════════════════════';
+DO $$
+BEGIN
+  RAISE NOTICE '';
+  RAISE NOTICE '>> PHASE 3: WALLET TRANSACTIONS FOR THIS DEPOSIT';
+  RAISE NOTICE '═══════════════════════════════════════════════════════════';
+END $$;
 
-SELECT 
+SELECT
   SUBSTRING(wt.id FROM 1 FOR 8) || '...' as tx_id,
   wt.type,
   wt.amount,
