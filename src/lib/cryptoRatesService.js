@@ -109,38 +109,61 @@ async function fetchWithRetry(url, options = {}, maxRetries = MAX_RETRIES) {
 }
 
 /**
- * Get cached rate from database (checks crypto_rates_valid view first, then pairs)
+ * Get cached rate from database
+ * Strategy: pairs_canonical → pairs (canonical preference) → crypto_rates_valid
  */
 async function getCachedRateFromDatabase(cryptoCode, toCurrency = 'PHP') {
   try {
-    // First try crypto_rates_valid view (non-expired rates with metadata)
-    const { data, error } = await supabase
-      .from('crypto_rates_valid')
-      .select('rate, source, updated_at')
-      .eq('from_currency', cryptoCode)
-      .eq('to_currency', toCurrency)
-      .single()
+    const cryptoUpper = cryptoCode.toUpperCase()
+    const toUpper = toCurrency.toUpperCase()
 
-    if (!error && data) {
-      return { rate: parseFloat(data.rate), source: 'crypto_rates_valid', cachedAt: data.updated_at }
+    // Strategy 1: Try pairs_canonical view first (canonical direction preferred)
+    try {
+      const { data: canonicalData, error: canonicalError } = await supabase
+        .from('pairs_canonical')
+        .select('rate, source_table, updated_at')
+        .eq('from_currency', cryptoUpper)
+        .eq('to_currency', toUpper)
+        .maybeSingle()
+
+      if (!canonicalError && canonicalData && typeof canonicalData.rate === 'number' && isFinite(canonicalData.rate) && canonicalData.rate > 0) {
+        console.debug(`[CryptoRates] Found canonical rate from pairs_canonical: ${cryptoCode}/${toCurrency}`)
+        return { rate: parseFloat(canonicalData.rate), source: 'pairs_canonical', cachedAt: canonicalData.updated_at }
+      }
+    } catch (err) {
+      console.debug(`[CryptoRates] pairs_canonical not available:`, err.message)
     }
 
-    // Fallback to public.pairs table
+    // Strategy 2: Try full pairs table with direction metadata
     const { data: pairData, error: pairError } = await supabase
       .from('pairs')
-      .select('rate, updated_at')
-      .eq('from_currency', cryptoCode)
-      .eq('to_currency', toCurrency)
-      .single()
+      .select('rate, updated_at, pair_direction')
+      .eq('from_currency', cryptoUpper)
+      .eq('to_currency', toUpper)
+      .maybeSingle()
 
     if (!pairError && pairData && typeof pairData.rate === 'number' && isFinite(pairData.rate) && pairData.rate > 0) {
-      return { rate: parseFloat(pairData.rate), source: 'pairs', cachedAt: pairData.updated_at }
+      console.debug(`[CryptoRates] Found ${pairData.pair_direction || 'unknown'} rate from pairs: ${cryptoCode}/${toCurrency}`)
+      return { rate: parseFloat(pairData.rate), source: 'pairs', cachedAt: pairData.updated_at, direction: pairData.pair_direction }
     }
 
-    console.debug(`No cached rate found in database for ${cryptoCode}/${toCurrency}`)
+    // Strategy 3: Fallback to crypto_rates_valid view (non-expired rates with metadata)
+    const { data: cryptoData, error: cryptoError } = await supabase
+      .from('crypto_rates_valid')
+      .select('rate, source, updated_at')
+      .eq('from_currency', cryptoUpper)
+      .eq('to_currency', toUpper)
+      .maybeSingle()
+
+    if (!cryptoError && cryptoData) {
+      console.debug(`[CryptoRates] Found cached rate from crypto_rates_valid: ${cryptoCode}/${toCurrency}`)
+      return { rate: parseFloat(cryptoData.rate), source: 'crypto_rates_valid', cachedAt: cryptoData.updated_at }
+    }
+
+    console.debug(`[CryptoRates] No cached rate found in any database source for ${cryptoCode}/${toCurrency}`)
     return null
   } catch (err) {
-    console.warn(`Failed to fetch cached rate from database:`, err.message)
+    console.warn(`[CryptoRates] Failed to fetch cached rate from database:`, err.message)
     return null
   }
 }
