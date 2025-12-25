@@ -605,35 +605,36 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
     ? currencies.filter(c => c.type === 'fiat' && !userCurrencyCodes.has(c.code))
     : currencies.filter(c => c.type === 'crypto' && !userCurrencyCodes.has(c.code))
 
-  // Determine available payment methods based on deposit currency type
+  // Determine available payment methods - show all methods regardless of currency type
   let availableMethods = []
 
-  if (activeType === 'currency') {
-    // For fiat currencies: show available fiat payment methods
-    availableMethods = Object.values(DEPOSIT_METHODS).filter(m => m.type === 'fiat')
-  } else if (activeType === 'cryptocurrency') {
-    // For crypto currencies: show dynamic deposit methods from wallets_house
-    if (selectedCurrency && cryptoAddresses[selectedCurrency] && Object.keys(cryptoAddresses).length > 0) {
-      const data = cryptoAddresses[selectedCurrency]
-      const addresses = Array.isArray(data) ? data : [data]
+  // Always include fiat payment methods (e.g., GCash) for all currency types
+  const fiatMethods = Object.values(DEPOSIT_METHODS).filter(m => m.type === 'fiat')
+  availableMethods.push(...fiatMethods)
 
-      addresses.forEach((addressData, idx) => {
-        const cryptoName = addressData.currency_name || selectedCurrency
-        availableMethods.push({
-          id: addresses.length > 1 ? `${selectedCurrency.toLowerCase()}-${idx}` : selectedCurrency.toLowerCase(),
-          name: addresses.length > 1 ? `${selectedCurrency} (${addressData.network})` : selectedCurrency,
-          icon: selectedCurrency,
-          type: 'crypto',
-          description: `Send ${cryptoName} directly to our wallet${addresses.length > 1 ? ` via ${addressData.network}` : ''}`,
-          address: addressData.address,
-          network: addressData.network,
-          provider: addressData.provider,
-          cryptoSymbol: selectedCurrency,
-          cryptoName: cryptoName
-        })
+  // Always include available crypto deposit methods from wallets_house
+  // Create crypto methods for all available cryptos, not just selected currency
+  Object.keys(cryptoAddresses).forEach(cryptoCode => {
+    const data = cryptoAddresses[cryptoCode]
+    const addresses = Array.isArray(data) ? data : [data]
+
+    addresses.forEach((addressData, idx) => {
+      const cryptoName = addressData.currency_name || cryptoCode
+      availableMethods.push({
+        id: addresses.length > 1 ? `${cryptoCode.toLowerCase()}-${idx}` : cryptoCode.toLowerCase(),
+        name: addresses.length > 1 ? `${cryptoCode} (${addressData.network})` : cryptoCode,
+        icon: cryptoCode,
+        type: 'crypto',
+        description: `Send ${cryptoName} directly to our wallet${addresses.length > 1 ? ` via ${addressData.network}` : ''}`,
+        address: addressData.address,
+        network: addressData.network,
+        provider: addressData.provider,
+        cryptoSymbol: cryptoCode,
+        cryptoName: cryptoName,
+        depositCurrencyCode: cryptoCode
       })
-    }
-  }
+    })
+  })
 
   // When switching currencies, reset method selection since available methods change
   useEffect(() => {
