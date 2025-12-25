@@ -49,6 +49,14 @@ export default function Rates() {
       console.log(`📥 Fetched ${pairsData?.length || 0} pairs from public.pairs`)
       setAllPairs(pairsData || [])
 
+      // Get the actual fetch-rates edge function execution time from cached_rates
+      const fetchInfo = await getLastFetchInfo()
+      if (fetchInfo) {
+        console.log(`✅ Last fetch-rates execution: ${fetchInfo.isoString} (source: ${fetchInfo.source})`)
+      } else {
+        console.warn('⚠️ Could not retrieve last fetch-rates execution time')
+      }
+
       // Get unique currency codes from pairs
       const codes = new Set()
       if (pairsData) {
