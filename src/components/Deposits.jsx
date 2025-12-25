@@ -575,6 +575,25 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
     return Math.round(convertedAmount * Math.pow(10, decimals)) / Math.pow(10, decimals)
   }
 
+  // Calculate the amount user needs to send in the deposit method's currency
+  const getDepositMethodAmount = () => {
+    if (!amount || !selectedCurrency) return null
+
+    let depositMethodCurrency = selectedCurrency
+
+    // If crypto method is selected, get the crypto currency code
+    if (selectedAddressMethod) {
+      depositMethodCurrency = selectedAddressMethod.depositCurrencyCode || selectedAddressMethod.cryptoSymbol || selectedCurrency
+    }
+
+    if (depositMethodCurrency === selectedCurrency) {
+      return parseFloat(amount)
+    }
+
+    // Convert from selected currency to deposit method currency
+    return convertCurrency(amount, selectedCurrency, depositMethodCurrency, exchangeRates)
+  }
+
   const handleInitiateDeposit = async () => {
     try {
       setSubmitting(true)
