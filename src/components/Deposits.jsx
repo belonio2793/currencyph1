@@ -608,9 +608,12 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
       return numAmount
     }
 
-    // Get exchange rates for both currencies
-    const fromRate = exchangeRates[selectedCurrency]
-    const toRate = exchangeRates[selectedWalletData.currency_code]
+    // Get exchange rates for both currencies (try both uppercase and lowercase)
+    const fromCurrencyUpper = selectedCurrency.toUpperCase()
+    const toCurrencyUpper = selectedWalletData.currency_code.toUpperCase()
+
+    let fromRate = exchangeRates[selectedCurrency] || exchangeRates[fromCurrencyUpper]
+    let toRate = exchangeRates[selectedWalletData.currency_code] || exchangeRates[toCurrencyUpper]
 
     if (!fromRate || !toRate) {
       console.warn('Missing exchange rates for conversion:', {
@@ -619,7 +622,9 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
         from: selectedCurrency,
         to: selectedWalletData.currency_code,
         activeType,
-        availableRates: Object.keys(exchangeRates)
+        availableRates: Object.keys(exchangeRates),
+        expectedFrom: [selectedCurrency, fromCurrencyUpper],
+        expectedTo: [selectedWalletData.currency_code, toCurrencyUpper]
       })
       return null
     }
