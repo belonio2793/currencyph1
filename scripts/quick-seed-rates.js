@@ -18,27 +18,13 @@ async function seedRates() {
   try {
     console.log('🌱 Starting quick seed...')
     
-    // Popular currency pairs with PHP base (rate = units of currency per 1 PHP)
-    const currencyPairs = [
-      { from_currency: 'PHP', to_currency: 'USD', rate: 0.0175 },
-      { from_currency: 'PHP', to_currency: 'EUR', rate: 0.016 },
-      { from_currency: 'PHP', to_currency: 'GBP', rate: 0.0138 },
-      { from_currency: 'PHP', to_currency: 'JPY', rate: 2.55 },
-      { from_currency: 'PHP', to_currency: 'CNY', rate: 0.126 },
-      { from_currency: 'PHP', to_currency: 'AED', rate: 0.064 },
-      { from_currency: 'PHP', to_currency: 'CAD', rate: 0.024 },
-      { from_currency: 'PHP', to_currency: 'AUD', rate: 0.027 },
-      { from_currency: 'PHP', to_currency: 'SGD', rate: 0.0235 },
-      { from_currency: 'PHP', to_currency: 'HKD', rate: 0.136 },
-      { from_currency: 'PHP', to_currency: 'INR', rate: 1.46 },
-      { from_currency: 'PHP', to_currency: 'MYR', rate: 0.077 },
-      { from_currency: 'PHP', to_currency: 'THB', rate: 0.615 },
-      { from_currency: 'PHP', to_currency: 'IDR', rate: 280.5 },
-      { from_currency: 'PHP', to_currency: 'VND', rate: 436 },
-      { from_currency: 'PHP', to_currency: 'KRW', rate: 23.8 },
-      { from_currency: 'USD', to_currency: 'PHP', rate: 57.0 },
-      { from_currency: 'EUR', to_currency: 'PHP', rate: 62.5 }
-    ]
+    // NOTE: Currency pair rates are now fetched from live APIs
+    // This is deprecated - use fetch-all-exconvert-rates.js instead
+    console.warn('⚠️  WARNING: This script uses old hardcoded rates.')
+    console.warn('     Please use: npm run fetch-rates')
+    console.warn('     Or run: node scripts/fetch-all-exconvert-rates.js\n')
+
+    const currencyPairs = []  // Intentionally empty - rates should come from fetch-rates
 
     console.log(`📝 Seeding ${currencyPairs.length} currency pairs...`)
     const { error: fiatError } = await supabase
