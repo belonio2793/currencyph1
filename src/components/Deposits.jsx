@@ -310,7 +310,7 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
       setRatesLoading(false)
     } catch (err) {
       console.error('[Deposits] Error fetching exchange rates:', err.message)
-      setExchangeRates({ PHP: 1, USD: 1 })
+      setExchangeRates({})
       setRatesLoading(false)
     }
   }
