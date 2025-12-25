@@ -880,10 +880,29 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
               {/* Last Fetched Rates Info */}
               {lastFetchedRates && (
                 <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-                  <p className="text-sm text-blue-900">
-                    <span className="font-semibold">Last Fetched Rates:</span>{' '}
-                    {formatFullDateTime(lastFetchedRates.fetchedAt)}
-                  </p>
+                  <div className="flex items-center justify-between flex-wrap gap-2">
+                    <div>
+                      <p className="text-sm text-blue-900">
+                        <span className="font-semibold">Last Fetched Rates:</span>{' '}
+                        {formatFullDateTime(lastFetchedRates.fetchedAt)}
+                      </p>
+                      {lastFetchedRates.isFresh !== undefined && (
+                        <p className="text-xs text-blue-700 mt-1">
+                          {lastFetchedRates.isFresh ? (
+                            <span>✓ Fresh (updated within last hour)</span>
+                          ) : (
+                            <span>
+                              {lastFetchedRates.minutesSinceFetch < 1440 ? (
+                                `✓ Updated ${lastFetchedRates.minutesSinceFetch < 60 ? Math.floor(lastFetchedRates.minutesSinceFetch) + ' min' : Math.floor(lastFetchedRates.minutesSinceFetch / 60) + ' hr'} ago`
+                              ) : (
+                                '⚠ Data may be stale'
+                              )}
+                            </span>
+                          )}
+                        </p>
+                      )}
+                    </div>
+                  </div>
                 </div>
               )}
 
