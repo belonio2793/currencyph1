@@ -35,37 +35,37 @@ export const currencyAPI = {
   // Get all currency rates relative to USD via public.pairs table (primary source)
   async getGlobalRates() {
     try {
-      // 1) PRIMARY: Try public.pairs table directly with timeout
+      // 1) PRIMARY: Try pairs_canonical view for canonical rates (faster and cleaner)
       try {
         const controller = new AbortController()
         const timeout = setTimeout(() => controller.abort(), 8000) // 8 second timeout
 
-        const pairsPromise = supabase
-          .from('pairs')
+        const canonicalPairsPromise = supabase
+          .from('pairs_canonical')
           .select('from_currency, to_currency, rate, updated_at')
-          .limit(200) // Reduced limit for faster queries
+          .limit(200)
 
-        const { data: pairsData, error: pairsError } = await Promise.race([
-          pairsPromise,
-          new Promise((_, reject) => setTimeout(() => reject(new Error('Public.pairs query timeout')), 7000))
+        const { data: canonicalData, error: canonicalError } = await Promise.race([
+          canonicalPairsPromise,
+          new Promise((_, reject) => setTimeout(() => reject(new Error('Canonical pairs query timeout')), 7000))
         ])
 
         clearTimeout(timeout)
 
-        if (!pairsError && pairsData && pairsData.length > 0) {
-          console.log('✅ Using exchange rates from public.pairs table')
-          const lastUpdated = new Date(pairsData[0].updated_at || Date.now())
+        if (!canonicalError && canonicalData && canonicalData.length > 0) {
+          console.log('✅ Using exchange rates from pairs_canonical view (canonical direction)')
+          const lastUpdated = new Date(canonicalData[0].updated_at || Date.now())
           const rates = {}
 
-          // Build rates from USD conversions in pairs
+          // Build rates from USD conversions in pairs (canonical direction)
           CURRENCIES.forEach(currency => {
             if (currency.code === 'USD') {
               rates[currency.code] = { ...currency, rate: 1, lastUpdated }
               return
             }
 
-            // Find rate from USD to this currency
-            const pair = pairsData.find(p =>
+            // Find canonical rate from USD to this currency
+            const pair = canonicalData.find(p =>
               p.from_currency === 'USD' && p.to_currency === currency.code
             )
 
@@ -76,19 +76,71 @@ export const currencyAPI = {
               rates[currency.code] = { ...currency, rate: 0, lastUpdated }
             }
           })
+
+          if (Object.keys(rates).length > 0) {
+            return rates
+          }
+        } else if (canonicalError) {
+          console.warn('⚠️ Error fetching from pairs_canonical:', canonicalError.message)
+        }
+      } catch (e) {
+        console.warn('⚠️ Canonical pairs lookup failed or timed out:', e && e.message)
+      }
+
+      // 2) FALLBACK: Try public.pairs table directly if canonical view fails
+      try {
+        const pairsPromise = supabase
+          .from('pairs')
+          .select('from_currency, to_currency, rate, updated_at, pair_direction')
+          .limit(200)
+
+        const { data: pairsData, error: pairsError } = await Promise.race([
+          pairsPromise,
+          new Promise((_, reject) => setTimeout(() => reject(new Error('Public.pairs query timeout')), 5000))
+        ])
+
+        if (!pairsError && pairsData && pairsData.length > 0) {
+          console.log('✅ Using exchange rates from public.pairs table (fallback)')
+          const lastUpdated = new Date(pairsData[0].updated_at || Date.now())
+          const rates = {}
+
+          // Build rates from USD conversions - prefer canonical pairs
+          CURRENCIES.forEach(currency => {
+            if (currency.code === 'USD') {
+              rates[currency.code] = { ...currency, rate: 1, lastUpdated }
+              return
+            }
+
+            // Find rate from USD to this currency, preferring canonical
+            const canonicalPair = pairsData.find(p =>
+              p.from_currency === 'USD' && p.to_currency === currency.code && p.pair_direction === 'canonical'
+            )
+
+            const anyPair = pairsData.find(p =>
+              p.from_currency === 'USD' && p.to_currency === currency.code
+            )
+
+            const pair = canonicalPair || anyPair
+
+            if (pair && typeof pair.rate === 'number' && pair.rate > 0) {
+              rates[currency.code] = { ...currency, rate: pair.rate, lastUpdated }
+            } else {
+              rates[currency.code] = { ...currency, rate: 0, lastUpdated }
+            }
+          })
           return rates
         } else if (pairsError) {
           console.warn('❌ Error fetching from public.pairs:', pairsError.message)
         }
       } catch (e) {
-        console.warn('❌ Public.pairs lookup failed or timed out:', e && e.message)
+        console.warn('❌ Public.pairs lookup failed:', e && e.message)
       }
 
-      console.log('⚠️ Public.pairs lookup failed, returning fallback rates')
-      // If primary source fails, return fallback hard-coded rates
+      console.log('⚠️ All pair lookups failed, returning fallback rates')
+      // If primary sources fail, return fallback hard-coded rates
       return this.getFallbackRates()
     } catch (err) {
-      console.warn('❌ Failed to fetch rates from public.pairs:', err?.message || err)
+      console.warn('❌ Failed to fetch rates from pairs:', err?.message || err)
       return this.getFallbackRates()
     }
   },
