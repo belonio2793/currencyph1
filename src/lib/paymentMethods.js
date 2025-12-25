@@ -72,15 +72,9 @@ export const cryptoAPI = {
   supportedTokens: ['ETH', 'MATIC', 'USDC', 'USDT', 'SOL'],
 
   async getExchangeRate(crypto, fiat = 'USD') {
-    // This would call a real price API (CoinGecko, etc.)
-    const rates = {
-      'ETH': 1800,
-      'MATIC': 0.5,
-      'USDC': 1,
-      'USDT': 1,
-      'SOL': 20
-    }
-    return rates[crypto] || 0
+    // Use currencyAPI to fetch real prices instead of hardcoded rates
+    const { currencyAPI } = await import('./payments')
+    return currencyAPI.getExchangeRate(crypto, fiat)
   },
 
   async initiateTransfer(walletAddress, amount, currency, network) {
