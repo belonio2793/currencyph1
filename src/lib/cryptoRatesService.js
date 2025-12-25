@@ -449,45 +449,11 @@ async function fetchFromExconvert(cryptoCodes, toCurrency) {
   }
 }
 
-// Fallback hardcoded rates for common cryptos (in USD)
-const FALLBACK_RATES_USD = {
-  'BTC': 45000,
-  'ETH': 2500,
-  'USDT': 1,
-  'BNB': 600,
-  'XRP': 2.5,
-  'USDC': 1,
-  'SOL': 150,
-  'TRX': 0.25,
-  'DOGE': 0.35,
-  'ADA': 1.2,
-  'BCH': 800,
-  'LINK': 25,
-  'XLM': 0.35,
-  'HYPE': 50,
-  'LTC': 150,
-  'SUI': 4,
-  'AVAX': 45,
-  'HBAR': 0.15,
-  'SHIB': 0.000035,
-  'PYUSD': 1,
-  'WLD': 5,
-  'TON': 8,
-  'UNI': 10,
-  'DOT': 8,
-  'AAVE': 300,
-  'XAUT': 60,
-  'PEPE': 0.000008,
-  'ASTER': 0.5,
-  'ENA': 1.5,
-  'SKY': 25
-}
+// Note: No hardcoded crypto rates - all rates must come from the database
 
-// PHP to USD rate (fallback)
-const PHP_TO_USD = 0.018
-
-function convertUsdToPhp(usdAmount) {
-  return usdAmount / PHP_TO_USD
+function convertUsdToPhp(usdAmount, exchangeRate) {
+  if (!exchangeRate || exchangeRate <= 0) return null
+  return usdAmount / exchangeRate
 }
 
 /**
