@@ -38,11 +38,14 @@ END $$;
 -- PHASE 2: SHOW CURRENT (CORRUPTED) STATE
 -- ============================================================================
 
-RAISE NOTICE '';
-RAISE NOTICE '>> PHASE 2: CURRENT WALLET STATE (CORRUPTED)';
-RAISE NOTICE '═══════════════════════════════════════════════════════════';
+DO $$
+BEGIN
+  RAISE NOTICE '';
+  RAISE NOTICE '>> PHASE 2: CURRENT WALLET STATE (CORRUPTED)';
+  RAISE NOTICE '═══════════════════════════════════════════════════════════';
+END $$;
 
-SELECT 
+SELECT
   SUBSTRING(w.id FROM 1 FOR 8) || '...' as wallet_id,
   w.currency_code,
   w.balance,
