@@ -178,8 +178,8 @@ export class ExchangeRateCache {
     if (!amount || isNaN(amount)) return null
 
     const data = await this.getRates()
-    const fromRate = data.rates?.[fromCurrency] || FALLBACK_RATES[fromCurrency]
-    const toRate = data.rates?.[toCurrency] || FALLBACK_RATES[toCurrency]
+    const fromRate = data.rates?.[fromCurrency]
+    const toRate = data.rates?.[toCurrency]
 
     if (!fromRate || !toRate) {
       console.warn(`[ExchangeRateCache] Missing rates for conversion:`, { fromCurrency, fromRate, toCurrency, toRate })
