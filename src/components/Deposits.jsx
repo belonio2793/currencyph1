@@ -139,6 +139,7 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
   const [submitting, setSubmitting] = useState(false)
   const [exchangeRates, setExchangeRates] = useState({})
   const [ratesLoading, setRatesLoading] = useState(false)
+  const [lastFetchedRates, setLastFetchedRates] = useState(null)
 
   // UI state
   const [error, setError] = useState('')
