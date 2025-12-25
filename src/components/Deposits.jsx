@@ -196,230 +196,88 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
       setRatesLoading(true)
       const rates = {}
 
-      // Helper to create timeout promise - each call creates a new one
-      const createTimeout = (ms) => new Promise((_, reject) =>
-        setTimeout(() => reject(new Error('Rate fetch timeout')), ms)
-      )
+      // Fetch all pairs from public.pairs (unified source like /rates does)
+      const { data: pairsData, error: pairsError } = await supabase
+        .from('pairs')
+        .select('from_currency, to_currency, rate, updated_at')
 
-      if (activeType === 'currency') {
-        try {
-          // Fetch rates for ALL fiat currencies (not just wallet matches)
-          const globalRates = await Promise.race([
-            currencyAPI.getGlobalRates(),
-            createTimeout(10000) // 10 second timeout for fiat rates
-          ])
-
-          let phpToUsdRate = 1 // fallback, will be overridden if found
-
-          if (globalRates) {
-            Object.entries(globalRates).forEach(([code, data]) => {
-              const codeUpper = code.toUpperCase()
-              rates[codeUpper] = data.rate
-              // Track PHP to USD rate for crypto conversion
-              if (codeUpper === 'PHP' && data.rate > 0) {
-                phpToUsdRate = 1 / data.rate // If 1 USD = 58.5 PHP, then 1 PHP = 1/58.5 USD
-              }
-            })
-          }
-
-          // Store the USD to PHP rate for later use in conversions
-          rates['_phpToUsdRate'] = phpToUsdRate
-
-          // IMPORTANT: Also fetch crypto prices when in fiat mode
-          // This enables fiat→crypto conversions (e.g., PHP→BTC)
-          const cryptoCurrenciesToFetch = new Set()
-
-          // If a crypto wallet is selected, fetch its crypto price
-          if (selectedWallet) {
-            const selectedWalletData = wallets.find(w => w.id === selectedWallet)
-            if (selectedWalletData && selectedWalletData.currency_type === 'crypto') {
-              cryptoCurrenciesToFetch.add(selectedWalletData.currency_code)
-            }
-          }
-
-          // Also add any crypto currencies with available addresses
-          Object.keys(cryptoAddresses).forEach(code => cryptoCurrenciesToFetch.add(code))
-
-          // Fetch crypto prices if needed
-          if (cryptoCurrenciesToFetch.size > 0) {
-            const cryptoCodes = Array.from(cryptoCurrenciesToFetch)
-            console.log(`[Deposits] Fetching crypto rates for fiat→crypto conversion: ${cryptoCodes.join(', ')}`)
-
-            // TRY API FIRST (with timeout)
-            let apiSuccess = false
-            try {
-              const pricesFromApi = await Promise.race([
-                getMultipleCryptoPrices(cryptoCodes, 'PHP'),
-                createTimeout(8000) // Shorter timeout - fall back quickly
-              ])
-
-              if (pricesFromApi && Object.keys(pricesFromApi).length > 0) {
-                // Normalize API response to uppercase keys
-                Object.entries(pricesFromApi).forEach(([code, rate]) => {
-                  rates[code.toUpperCase()] = rate
-                })
-                console.log(`[Deposits] Successfully fetched ${Object.keys(pricesFromApi).length} crypto rates from API`)
-                apiSuccess = true
-              }
-            } catch (e) {
-              console.warn('[Deposits] API fetch timed out or failed:', e.message)
-            }
-
-            // CRITICAL: Always try public.pairs for any missing rates
-            const stillMissingCryptos = cryptoCodes.filter(code => !rates[code])
-            if (stillMissingCryptos.length > 0) {
-              try {
-                console.log(`[Deposits] Querying public.pairs for ${stillMissingCryptos.length} missing crypto rates: ${stillMissingCryptos.join(', ')}`)
-
-                // Try direct pairs (CRYPTO -> PHP): BTC->PHP, ETH->PHP, etc.
-                const { data: pairsData, error: pairsError } = await supabase
-                  .from('pairs')
-                  .select('from_currency, to_currency, rate, updated_at')
-                  .eq('to_currency', 'PHP')
-                  .in('from_currency', stillMissingCryptos)
-
-                if (!pairsError && pairsData && pairsData.length > 0) {
-                  pairsData.forEach(row => {
-                    const upperCode = row.from_currency.toUpperCase()
-                    rates[upperCode] = parseFloat(row.rate)
-                  })
-                  console.log(`[Deposits] Loaded ${pairsData.length} crypto rates from public.pairs (direct): ${pairsData.map(r => r.from_currency).join(', ')}`)
-                }
-
-                // Also try inverse pairs (PHP -> CRYPTO) for missing rates
-                const stillMissingAfterDirect = cryptoCodes.filter(code => !rates[code])
-                if (stillMissingAfterDirect.length > 0) {
-                  console.log(`[Deposits] Trying inverse pairs (PHP -> CRYPTO) for: ${stillMissingAfterDirect.join(', ')}`)
-                  const { data: inversePairs, error: inverseError } = await supabase
-                    .from('pairs')
-                    .select('from_currency, to_currency, rate, updated_at')
-                    .eq('from_currency', 'PHP')
-                    .in('to_currency', stillMissingAfterDirect)
-
-                  if (!inverseError && inversePairs && inversePairs.length > 0) {
-                    inversePairs.forEach(row => {
-                      const upperCode = row.to_currency.toUpperCase()
-                      // Invert the rate: if 1 PHP = 0.00004 BTC, then 1 BTC = 25000 PHP
-                      rates[upperCode] = 1 / parseFloat(row.rate)
-                    })
-                    console.log(`[Deposits] Loaded ${inversePairs.length} crypto rates from public.pairs (inverted): ${inversePairs.map(r => r.to_currency).join(', ')}`)
-                  }
-                }
-
-                if (pairsError && !pairsData) {
-                  console.error('[Deposits] Public.pairs query failed:', pairsError.message)
-                }
-              } catch (e) {
-                console.error('[Deposits] Public.pairs fallback threw error:', e.message)
-              }
-            }
-          }
-
-          // Ensure PHP and USD rates are set properly (normalized to uppercase)
-          if (!rates['PHP']) rates['PHP'] = 58.5 // fallback PHP to USD rate (1 USD = 58.5 PHP)
-          if (!rates['USD']) rates['USD'] = 1 // fallback USD rate
-        } catch (e) {
-          console.warn('Failed to fetch fiat exchange rates:', e.message)
-          // Set minimal fallback rates
-          rates['PHP'] = 58.5
-          rates['USD'] = 1
-        }
-      } else {
-        // For crypto mode, fetch rates for only selected/available currencies (not all)
-        const cryptoCurrenciesToFetch = new Set()
-
-        // Add only the selected currency and configured crypto addresses
-        if (selectedCurrency && cryptoAddresses[selectedCurrency]) {
-          cryptoCurrenciesToFetch.add(selectedCurrency)
-        }
-
-        // Add first 5 crypto addresses to prevent too many API calls
-        const addressKeys = Object.keys(cryptoAddresses).slice(0, 5)
-        addressKeys.forEach(code => cryptoCurrenciesToFetch.add(code))
-
-        // Fetch crypto prices
-        if (cryptoCurrenciesToFetch.size > 0) {
-          try {
-            const cryptoCodes = Array.from(cryptoCurrenciesToFetch)
-
-            // Try batch fetch with timeout
-            try {
-              const pricesFromApi = await Promise.race([
-                getMultipleCryptoPrices(cryptoCodes, 'PHP'),
-                createTimeout(12000) // 12 second timeout for crypto rates
-              ])
-
-              if (pricesFromApi && Object.keys(pricesFromApi).length > 0) {
-                Object.assign(rates, pricesFromApi)
-              } else {
-                console.warn('Batch crypto price fetch returned no data, trying public.pairs fallback...')
-              }
-            } catch (batchErr) {
-              console.warn('Batch crypto fetch failed:', batchErr.message)
-              // Will try public.pairs fallback below
-            }
-
-            // CRITICAL FALLBACK: Query public.pairs directly if API failed
-            const stillMissingCryptos = cryptoCodes.filter(code => !rates[code])
-            if (stillMissingCryptos.length > 0) {
-              try {
-                console.log(`[Deposits] Querying public.pairs for ${stillMissingCryptos.length} missing crypto rates (crypto mode): ${stillMissingCryptos.join(', ')}`)
-
-                // Try direct pairs (CRYPTO -> PHP): BTC->PHP, ETH->PHP, etc.
-                const { data: pairsData, error: pairsError } = await supabase
-                  .from('pairs')
-                  .select('from_currency, to_currency, rate, updated_at')
-                  .eq('to_currency', 'PHP')
-                  .in('from_currency', stillMissingCryptos)
-
-                if (!pairsError && pairsData && pairsData.length > 0) {
-                  pairsData.forEach(row => {
-                    const upperCode = row.from_currency.toUpperCase()
-                    rates[upperCode] = parseFloat(row.rate)
-                  })
-                  console.log(`[Deposits] Loaded ${pairsData.length} rates from public.pairs (direct): ${pairsData.map(r => r.from_currency).join(', ')}`)
-                }
-
-                // Also try inverse pairs (PHP -> CRYPTO) for missing rates
-                const stillMissingAfterDirect = cryptoCodes.filter(code => !rates[code])
-                if (stillMissingAfterDirect.length > 0) {
-                  console.log(`[Deposits] Trying inverse pairs (PHP -> CRYPTO) for crypto mode: ${stillMissingAfterDirect.join(', ')}`)
-                  const { data: inversePairs, error: inverseError } = await supabase
-                    .from('pairs')
-                    .select('from_currency, to_currency, rate, updated_at')
-                    .eq('from_currency', 'PHP')
-                    .in('to_currency', stillMissingAfterDirect)
-
-                  if (!inverseError && inversePairs && inversePairs.length > 0) {
-                    inversePairs.forEach(row => {
-                      const upperCode = row.to_currency.toUpperCase()
-                      // Invert the rate: if 1 PHP = 0.00004 BTC, then 1 BTC = 25000 PHP
-                      rates[upperCode] = 1 / parseFloat(row.rate)
-                    })
-                    console.log(`[Deposits] Loaded ${inversePairs.length} rates from public.pairs (inverted): ${inversePairs.map(r => r.to_currency).join(', ')}`)
-                  }
-                }
-
-                if (pairsError && !pairsData) {
-                  console.error('[Deposits] Public.pairs query failed:', pairsError.message)
-                }
-              } catch (e) {
-                console.error('[Deposits] Public.pairs fallback threw error:', e.message)
-              }
-            }
-          } catch (e) {
-            console.error('Failed to fetch crypto rates:', e.message)
-          }
-        }
-
-        // Ensure PHP rate is set to 1 for conversion calculations
-        rates['PHP'] = 1
+      if (pairsError) {
+        console.error('[Deposits] Error fetching pairs:', pairsError.message)
+        // Fallback to minimal rates
+        setExchangeRates({ PHP: 1, USD: 1 })
+        setRatesLoading(false)
+        return
       }
 
+      if (!pairsData || pairsData.length === 0) {
+        console.warn('[Deposits] No pairs data available')
+        setExchangeRates({ PHP: 1, USD: 1 })
+        setRatesLoading(false)
+        return
+      }
+
+      // Build rates map - store rate for each currency code (like /rates does)
+      // Priority: PHP as base, then most recent updates
+      const ratesByCode = {}
+      const codes = new Set()
+
+      // First pass: collect all unique codes
+      pairsData.forEach(pair => {
+        if (pair.from_currency) codes.add(pair.from_currency.toUpperCase())
+        if (pair.to_currency) codes.add(pair.to_currency.toUpperCase())
+      })
+
+      // Initialize all codes
+      codes.forEach(code => {
+        ratesByCode[code] = null
+      })
+
+      // Second pass: populate rates with prioritization (PHP-based pairs first, then most recent)
+      pairsData.forEach(pair => {
+        const fromCode = pair.from_currency.toUpperCase()
+        const toCode = pair.to_currency.toUpperCase()
+        const rate = Number(pair.rate)
+
+        if (!isFinite(rate) || rate <= 0) return
+
+        // For from_currency: store its rate to to_currency
+        if (ratesByCode.hasOwnProperty(fromCode)) {
+          const isPHPTarget = toCode === 'PHP'
+          // Prioritize PHP-based rates, then use any available rate
+          if (ratesByCode[fromCode] === null || isPHPTarget) {
+            ratesByCode[fromCode] = rate
+          }
+        }
+
+        // For to_currency: store inverted rate from from_currency
+        if (ratesByCode.hasOwnProperty(toCode)) {
+          const invertedRate = 1 / rate
+          if (isFinite(invertedRate) && invertedRate > 0) {
+            const isPHPSource = fromCode === 'PHP'
+            // Prioritize PHP-based rates, then use any available inverted rate
+            if (ratesByCode[toCode] === null || isPHPSource) {
+              ratesByCode[toCode] = invertedRate
+            }
+          }
+        }
+      })
+
+      // Convert to object and ensure PHP and USD have valid rates
+      Object.entries(ratesByCode).forEach(([code, rate]) => {
+        if (rate !== null && isFinite(rate) && rate > 0) {
+          rates[code] = rate
+        }
+      })
+
+      // Ensure PHP and USD rates are always present
+      if (!rates['PHP']) rates['PHP'] = 1
+      if (!rates['USD']) rates['USD'] = 1
+
+      console.log(`[Deposits] Loaded ${Object.keys(rates).length} rates from public.pairs`)
       setExchangeRates(rates)
       setRatesLoading(false)
     } catch (err) {
-      console.error('Error fetching exchange rates:', err.message)
+      console.error('[Deposits] Error fetching exchange rates:', err.message)
       setExchangeRates({ PHP: 1, USD: 1 })
       setRatesLoading(false)
     }
