@@ -47,15 +47,13 @@ BEGIN
         INSERT INTO wallet_transactions (
           user_id,
           wallet_id,
-          transaction_type,
+          type,
           amount,
           currency_code,
           reference_id,
-          reference_type,
           description,
-          balance_after,
-          status,
-          created_at
+          balance_before,
+          balance_after
         ) VALUES (
           NEW.user_id,
           NEW.wallet_id,
@@ -63,15 +61,10 @@ BEGIN
           NEW.amount,
           NEW.currency_code,
           NEW.id,
-          'deposit',
           COALESCE(NEW.description, 'Deposit from ' || NEW.deposit_method),
-          v_new_balance,
-          'completed',
-          NOW()
-        ) RETURNING id INTO v_transaction_id;
-
-        -- Update deposit with transaction record
-        NEW.transaction_id = v_transaction_id;
+          v_wallet_balance,
+          v_new_balance
+        );
       EXCEPTION WHEN OTHERS THEN
         -- Continue even if wallet_transactions fails, log the error
         RAISE WARNING 'Failed to record wallet transaction: %', SQLERRM;
