@@ -209,7 +209,7 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
 
               const pricesFromApi = await Promise.race([
                 getMultipleCryptoPrices(cryptoCodes, 'PHP'),
-                timeoutPromise
+                createTimeout(12000) // 12 second timeout for crypto rates
               ])
 
               if (pricesFromApi && Object.keys(pricesFromApi).length > 0) {
