@@ -207,8 +207,18 @@ async function generateDeposits() {
           continue
         }
 
-        // Get exchange rate
-        const rate = await getExchangeRate(demo.fromCurrency, demo.toCurrency)
+        // Get exchange rate from public.pairs
+        let rate
+        try {
+          rate = await getExchangeRate(demo.fromCurrency, demo.toCurrency)
+        } catch (rateErr) {
+          console.log(
+            `⏭️  Skipping ${demo.fromCurrency}→${demo.toCurrency} (rate not found in public.pairs)`
+          )
+          failureCount++
+          continue
+        }
+
         const convertedAmount = parseFloat(demo.amount) * rate
 
         // Round to 2-8 decimal places based on currency
@@ -232,7 +242,8 @@ async function generateDeposits() {
             conversion_rate: rate,
             from_currency: demo.fromCurrency,
             to_currency: demo.toCurrency,
-            created_via: 'multi_currency_deposit_demo'
+            created_via: 'multi_currency_deposit_demo',
+            rate_source: 'public.pairs'
           },
           created_at: new Date().toISOString(),
           updated_at: new Date().toISOString(),
