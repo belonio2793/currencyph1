@@ -147,7 +147,7 @@ export default function OfflineDisplay({ onShowAuth }) {
         </div>
 
         {/* Footer */}
-        <div className="mt-8 sm:mt-12 text-center text-slate-600">
+        <div className="mt-6 sm:mt-8 text-center text-slate-600">
           <p className={`mb-4 ${isMobile ? 'text-sm' : 'text-base'}`}>Ready to get started?</p>
           <button onClick={() => onShowAuth?.('login')} className={`bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-semibold transition-colors ${isMobile ? 'px-6 py-2.5 text-sm' : 'px-8 py-3'}`}>
             Sign In or Create Account
