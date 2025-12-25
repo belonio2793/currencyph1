@@ -1108,30 +1108,62 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
 
             {/* Deposit Summary */}
             <div className="bg-slate-50 rounded-lg p-6 mb-6">
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Left side: What user sends */}
                 <div>
-                  <p className="text-xs text-slate-600 uppercase tracking-wide">Amount</p>
-                  <p className="text-xl font-semibold text-slate-900">{formatNumber(parseFloat(amount) || 0)} {selectedCurrency.toUpperCase()}</p>
-                </div>
-                <div>
-                  <p className="text-xs text-slate-600 uppercase tracking-wide">{activeType === 'cryptocurrency' ? 'Network' : 'Method'}</p>
-                  <p className="text-lg font-semibold text-slate-900">{activeMethodData.name}</p>
-                  {activeMethodData.network && (
-                    <p className="text-xs text-blue-600 font-medium mt-1">🔗 {activeMethodData.network}</p>
-                  )}
-                </div>
-                <div>
-                  <p className="text-xs text-slate-600 uppercase tracking-wide">Wallet</p>
-                  <p className="text-lg font-semibold text-slate-900">{selectedWalletData.currency_code}</p>
-                </div>
-                {calculateConvertedAmount() && selectedCurrency !== selectedWalletData.currency_code && (
-                  <div>
-                    <p className="text-xs text-slate-600 uppercase tracking-wide">You Receive</p>
-                    <p className="text-xl font-semibold text-blue-600">{formatNumber(calculateConvertedAmount())} {selectedWalletData.currency_code}</p>
+                  <div className="mb-4">
+                    <p className="text-xs text-slate-600 uppercase tracking-wide font-semibold">You Send</p>
                   </div>
-                )}
+                  <div className="space-y-3">
+                    <div>
+                      <p className="text-xs text-slate-500 mb-1">Amount</p>
+                      <p className="text-2xl font-bold text-slate-900">{formatNumber(parseFloat(amount) || 0)} {selectedCurrency.toUpperCase()}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-slate-500 mb-1">{activeType === 'cryptocurrency' ? 'Network' : 'Payment Method'}</p>
+                      <p className="text-lg font-semibold text-slate-900">{activeMethodData.name}</p>
+                      {activeMethodData.network && (
+                        <p className="text-xs text-blue-600 font-medium mt-1">🔗 {activeMethodData.network}</p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Right side: What user receives */}
+                <div>
+                  <div className="mb-4">
+                    <p className="text-xs text-slate-600 uppercase tracking-wide font-semibold">You Receive</p>
+                  </div>
+                  <div className="space-y-3">
+                    <div>
+                      <p className="text-xs text-slate-500 mb-1">Wallet</p>
+                      <p className="text-2xl font-bold text-blue-600">{formatNumber(calculateConvertedAmount())} {selectedWalletData.currency_code}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-slate-500 mb-1">Destination Wallet</p>
+                      <p className="text-lg font-semibold text-slate-900">{selectedWalletData.currency_code}</p>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
+
+            {/* Deposit Method Amount (what user needs to send in the method's currency) */}
+            {getDepositMethodAmount() && selectedCurrency !== (selectedAddressMethod?.depositCurrencyCode || selectedAddressMethod?.cryptoSymbol || selectedCurrency) && (
+              <div className="mb-8 p-6 bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-200 rounded-lg">
+                <h3 className="font-semibold text-slate-900 mb-4">📝 Exact Amount to Send</h3>
+                <div className="space-y-2">
+                  <div className="flex justify-between items-center">
+                    <span className="text-slate-700">Amount in {selectedAddressMethod?.depositCurrencyCode || selectedAddressMethod?.cryptoSymbol || selectedCurrency}:</span>
+                    <span className="text-2xl font-bold text-emerald-600">{getDepositMethodAmount()?.toLocaleString(undefined, {
+                      minimumFractionDigits: isCryptoCurrency(selectedAddressMethod?.depositCurrencyCode || selectedAddressMethod?.cryptoSymbol || selectedCurrency) ? 2 : 2,
+                      maximumFractionDigits: isCryptoCurrency(selectedAddressMethod?.depositCurrencyCode || selectedAddressMethod?.cryptoSymbol || selectedCurrency) ? 8 : 2
+                    })} {selectedAddressMethod?.depositCurrencyCode || selectedAddressMethod?.cryptoSymbol || selectedCurrency}</span>
+                  </div>
+                  <p className="text-xs text-emerald-700 mt-3">This is the exact amount you need to send via {activeMethodData.name}</p>
+                </div>
+              </div>
+            )}
 
             {/* Exchange Rate Summary */}
             {ratesLoading ? (
