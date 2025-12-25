@@ -76,23 +76,32 @@ DROP TRIGGER IF EXISTS on_profile_update_sync_users ON public.profiles;
 CREATE OR REPLACE FUNCTION public.sync_auth_user_to_public()
 RETURNS TRIGGER AS $$
 DECLARE
+  v_first_name TEXT;
+  v_last_name TEXT;
   v_full_name TEXT;
   v_region_code TEXT;
 BEGIN
+  v_first_name := COALESCE(NEW.raw_user_meta_data->>'first_name', '');
+  v_last_name := COALESCE(NEW.raw_user_meta_data->>'last_name', '');
   v_full_name := COALESCE(NEW.raw_user_meta_data->>'full_name', '');
   v_region_code := COALESCE(NEW.raw_user_meta_data->>'region_code', 'PH');
 
   -- Insert/Update public.users
-  INSERT INTO public.users (auth_id, email, full_name, region_code, status, created_at, updated_at)
-  VALUES (NEW.id, NEW.email, v_full_name, v_region_code, 'active', NOW(), NOW())
+  INSERT INTO public.users (auth_id, email, first_name, last_name, full_name, region_code, status, created_at, updated_at)
+  VALUES (NEW.id, NEW.email, v_first_name, v_last_name, v_full_name, v_region_code, 'active', NOW(), NOW())
   ON CONFLICT (auth_id) DO UPDATE SET
     email = EXCLUDED.email,
+    first_name = COALESCE(EXCLUDED.first_name, public.users.first_name),
+    last_name = COALESCE(EXCLUDED.last_name, public.users.last_name),
+    full_name = COALESCE(EXCLUDED.full_name, public.users.full_name),
     updated_at = NOW();
 
   -- Insert/Update public.profiles
-  INSERT INTO public.profiles (user_id, full_name, created_at, updated_at)
-  VALUES (NEW.id, v_full_name, NOW(), NOW())
+  INSERT INTO public.profiles (user_id, first_name, last_name, full_name, created_at, updated_at)
+  VALUES (NEW.id, v_first_name, v_last_name, v_full_name, NOW(), NOW())
   ON CONFLICT (user_id) DO UPDATE SET
+    first_name = COALESCE(EXCLUDED.first_name, public.profiles.first_name),
+    last_name = COALESCE(EXCLUDED.last_name, public.profiles.last_name),
     full_name = COALESCE(EXCLUDED.full_name, public.profiles.full_name),
     updated_at = NOW();
 
