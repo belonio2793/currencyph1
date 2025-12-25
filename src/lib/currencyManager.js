@@ -37,8 +37,3 @@ export function getSupportedCurrencies() {
     name: code
   }))
 }
-
-// Get exchange rate
-export function getExchangeRate(currencyCode) {
-  return EXCHANGE_RATES[currencyCode?.toUpperCase()] || 1
-}
