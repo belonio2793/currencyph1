@@ -13,31 +13,7 @@ const RETRY_CONFIG = {
   maxDelay: 10000 // 10 seconds
 }
 
-// Default fallback rates (updated manually as needed)
-const FALLBACK_RATES = {
-  'USD': 1,
-  'PHP': 56.5,
-  'EUR': 0.92,
-  'GBP': 0.79,
-  'JPY': 149.5,
-  'CNY': 7.08,
-  'INR': 83.2,
-  'CAD': 1.36,
-  'AUD': 1.54,
-  'SGD': 1.34,
-  'HKD': 7.82,
-  'IDR': 15600,
-  'MYR': 4.70,
-  'THB': 35.5,
-  'VND': 24500,
-  'KRW': 1310,
-  'ZAR': 18.5,
-  'BRL': 5.0,
-  'MXN': 17.0,
-  'NOK': 10.5,
-  'DKK': 6.85,
-  'AED': 3.67
-}
+// Note: No hardcoded fallback rates - all rates must come from the database
 
 export class ExchangeRateCache {
   constructor() {
