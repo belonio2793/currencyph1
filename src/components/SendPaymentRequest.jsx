@@ -323,7 +323,7 @@ export default function SendPaymentRequest({ userId, onClose }) {
               </span>
             </div>
             <div className="text-xs text-slate-500 mt-2">
-              1 {selectedCurrency} = {formatNumber(exchangeRate)} {recipientCurrency}
+              1 {selectedCurrency} = {formatExchangeRate(exchangeRate)} {recipientCurrency}
             </div>
           </div>
         )}
