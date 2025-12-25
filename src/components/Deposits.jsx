@@ -895,33 +895,19 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
                     )}
                   </div>
                   {availableMethods.length > 0 ? (
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                      {availableMethods.map(method => (
-                        <button
-                          key={method.id}
-                          onClick={() => {
-                            if (method.type === 'crypto') {
-                              // For crypto, show address modal
-                              setSelectedAddressMethod(method)
-                              setShowCryptoAddressModal(true)
-                            } else {
-                              // For fiat, set as selected method and proceed
-                              setSelectedMethod(method.id)
-                              setStep('confirm')
-                            }
-                          }}
-                          className={`p-4 border-2 rounded-lg text-left transition-all ${
-                            (method.type === 'fiat' && selectedMethod === method.id) || (method.type === 'crypto' && selectedAddressMethod?.id === method.id) ? 'border-blue-500 bg-blue-50' : 'border-slate-200 hover:border-blue-400 hover:bg-blue-50'
-                          }`}
-                        >
-                          <div className="font-semibold text-slate-900">{method.name}</div>
-                          <div className="text-sm text-slate-600">{method.description}</div>
-                          {method.network && (
-                            <div className="text-xs text-blue-600 font-medium mt-2">🔗 {method.network}</div>
-                          )}
-                        </button>
-                      ))}
-                    </div>
+                    <SearchablePaymentMethodDropdown
+                      methods={availableMethods}
+                      selectedMethod={selectedMethod}
+                      selectedAddressMethod={selectedAddressMethod}
+                      onSelectMethod={(method) => {
+                        setSelectedMethod(method.id)
+                        setStep('confirm')
+                      }}
+                      onSelectCryptoMethod={(method) => {
+                        setSelectedAddressMethod(method)
+                        setShowCryptoAddressModal(true)
+                      }}
+                    />
                   ) : (
                     <div className="p-4 bg-amber-50 border border-amber-200 rounded-lg text-amber-700 text-sm">
                       {activeType === 'cryptocurrency' ? (
