@@ -156,57 +156,62 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
       setRatesLoading(true)
       const rates = {}
 
+      // Set a timeout for the entire rate fetch operation (15 seconds)
+      const timeoutPromise = new Promise((_, reject) =>
+        setTimeout(() => reject(new Error('Rate fetch timeout')), 15000)
+      )
+
       if (activeType === 'currency') {
         try {
           // Fetch rates for ALL fiat currencies (not just wallet matches)
-          const globalRates = await currencyAPI.getGlobalRates()
+          const globalRates = await Promise.race([
+            currencyAPI.getGlobalRates(),
+            timeoutPromise
+          ])
           if (globalRates) {
             Object.entries(globalRates).forEach(([code, data]) => {
               rates[code] = data.rate
             })
           }
         } catch (e) {
-          console.warn('Failed to fetch fiat exchange rates:', e)
+          console.warn('Failed to fetch fiat exchange rates:', e.message)
         }
       } else {
-        // For crypto, fetch rates for ALL available crypto currencies
-        // This enables cross-currency deposits to any wallet
+        // For crypto, fetch rates for only selected/available currencies (not all)
         const cryptoCurrenciesToFetch = new Set()
 
-        // Add all configured crypto addresses
-        Object.keys(cryptoAddresses).forEach(code => cryptoCurrenciesToFetch.add(code))
+        // Add only the selected currency and configured crypto addresses
+        if (selectedCurrency && cryptoAddresses[selectedCurrency]) {
+          cryptoCurrenciesToFetch.add(selectedCurrency)
+        }
 
-        // Add any crypto wallets the user has
-        wallets.forEach(wallet => {
-          if (wallet.currency_type === 'crypto') {
-            cryptoCurrenciesToFetch.add(wallet.currency_code)
-          }
-        })
+        // Add first 5 crypto addresses to prevent too many API calls
+        const addressKeys = Object.keys(cryptoAddresses).slice(0, 5)
+        addressKeys.forEach(code => cryptoCurrenciesToFetch.add(code))
 
-        // Fetch all crypto prices in one API call
+        // Fetch crypto prices
         if (cryptoCurrenciesToFetch.size > 0) {
           try {
             const cryptoCodes = Array.from(cryptoCurrenciesToFetch)
-            const pricesFromApi = await getMultipleCryptoPrices(cryptoCodes, 'PHP')
 
-            if (pricesFromApi && Object.keys(pricesFromApi).length > 0) {
-              Object.assign(rates, pricesFromApi)
-            } else {
-              // Fallback to individual fetches
-              console.warn('Batch crypto price fetch returned no data, trying individual fetches...')
-              for (const cryptoCode of cryptoCodes) {
-                try {
-                  const price = await getCryptoPrice(cryptoCode, 'PHP')
-                  if (price) {
-                    rates[cryptoCode] = price
-                  }
-                } catch (e) {
-                  console.warn(`Failed to fetch individual rate for ${cryptoCode}:`, e.message)
-                }
+            // Try batch fetch with timeout
+            try {
+              const pricesFromApi = await Promise.race([
+                getMultipleCryptoPrices(cryptoCodes, 'PHP'),
+                timeoutPromise
+              ])
+
+              if (pricesFromApi && Object.keys(pricesFromApi).length > 0) {
+                Object.assign(rates, pricesFromApi)
+              } else {
+                console.warn('Batch crypto price fetch returned no data')
               }
+            } catch (batchErr) {
+              console.warn('Batch crypto fetch failed:', batchErr.message)
+              // Skip individual fallback to prevent timeout
             }
           } catch (e) {
-            console.error('Failed to fetch batch crypto rates:', e.message)
+            console.error('Failed to fetch crypto rates:', e.message)
           }
         }
 
@@ -217,7 +222,7 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
       setExchangeRates(rates)
       setRatesLoading(false)
     } catch (err) {
-      console.error('Error fetching exchange rates:', err)
+      console.error('Error fetching exchange rates:', err.message)
       setExchangeRates({ PHP: 1 })
       setRatesLoading(false)
     }
