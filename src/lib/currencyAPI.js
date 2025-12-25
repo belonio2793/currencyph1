@@ -136,12 +136,12 @@ export const currencyAPI = {
         console.warn('❌ Public.pairs lookup failed:', e && e.message)
       }
 
-      console.log('⚠️ All pair lookups failed, returning fallback rates')
-      // If primary sources fail, return fallback hard-coded rates
-      return this.getFallbackRates()
+      console.log('⚠️ All pair lookups failed, returning empty rates')
+      // If primary sources fail, return empty rates
+      return {}
     } catch (err) {
       console.warn('❌ Failed to fetch rates from pairs:', err?.message || err)
-      return this.getFallbackRates()
+      return {}
     }
   },
 
