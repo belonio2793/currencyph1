@@ -161,7 +161,7 @@ export default function PlanningChat() {
   const [showUserProfile, setShowUserProfile] = useState(false)
   const [selectedUserForProfile, setSelectedUserForProfile] = useState(null)
   const [selectedMarkerType, setSelectedMarkerType] = useState('Seller')
-  const [exchangeRate, setExchangeRate] = useState(DEFAULT_EXCHANGE_RATE)
+  const [exchangeRate, setExchangeRate] = useState(null)
   const [editingLocationId, setEditingLocationId] = useState(null)
   const [showMarkerTypeSelector, setShowMarkerTypeSelector] = useState(true)
   const [showFilterSelects, setShowFilterSelects] = useState(isMobile ? false : true)
