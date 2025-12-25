@@ -23,6 +23,34 @@ function PaymentMethodsGrid({
   const [searchQuery, setSearchQuery] = useState('')
   const [activeTab, setActiveTab] = useState('all') // 'all', 'fiat', 'crypto'
 
+  // Helper function to get converted amount for a payment method
+  const getConvertedAmountForMethod = (method) => {
+    if (!amount || !selectedCurrency || !exchangeRates || !walletData) {
+      return null
+    }
+
+    // For crypto payment methods, convert selected currency to the crypto currency
+    const targetCurrency = method.type === 'crypto'
+      ? method.cryptoSymbol || method.depositCurrencyCode || method.id.toUpperCase()
+      : method.id
+
+    return convertCurrency(amount, selectedCurrency, targetCurrency, exchangeRates)
+  }
+
+  // Helper function to format amount display
+  const formatAmountDisplay = (method, convertedAmount) => {
+    if (!convertedAmount) return null
+
+    const targetCurrency = method.type === 'crypto'
+      ? method.cryptoSymbol || method.depositCurrencyCode || method.id.toUpperCase()
+      : method.id
+
+    return `${convertedAmount.toLocaleString(undefined, {
+      minimumFractionDigits: isCryptoCurrency(targetCurrency) ? 2 : 2,
+      maximumFractionDigits: isCryptoCurrency(targetCurrency) ? 8 : 2
+    })} ${targetCurrency}`
+  }
+
   // Separate methods by type and sort
   const fiatMethods = methods
     .filter(m => m.type === 'fiat')
