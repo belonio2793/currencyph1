@@ -116,13 +116,15 @@ async function seedRates() {
     }
     console.log('✅ Currency metadata seeded successfully')
 
-    console.log('✅ All rates seeded successfully!')
+    console.log('✅ Metadata seeded successfully!')
     console.log('')
     console.log('📊 Summary:')
-    console.log(`   ✓ ${currencyPairs.length} currency pairs`)
-    console.log(`   ✓ ${cryptoPairs.length} cryptocurrency pairs`)
-    console.log(`   ✓ ${cryptoMetadata.length} cryptocurrencies`)
-    console.log(`   ✓ ${currencyMetadata.length} currencies`)
+    console.log(`   ✓ ${currencyMetadata.length} currencies (metadata only)`)
+    console.log(`   ✓ ${cryptoMetadata.length} cryptocurrencies (metadata only)`)
+    console.log('')
+    console.log('📡 Next Steps:')
+    console.log('   Run: npm run fetch-rates')
+    console.log('   Or: node scripts/fetch-all-exconvert-rates.js')
   } catch (err) {
     console.error('❌ Fatal error:', err)
     process.exit(1)
