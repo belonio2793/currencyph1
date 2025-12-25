@@ -26,43 +26,38 @@ async function seedRates() {
 
     const currencyPairs = []  // Intentionally empty - rates should come from fetch-rates
 
-    console.log(`📝 Seeding ${currencyPairs.length} currency pairs...`)
-    const { error: fiatError } = await supabase
-      .from('currency_rates')
-      .upsert(currencyPairs, { onConflict: 'from_currency,to_currency' })
+    if (currencyPairs.length > 0) {
+      console.log(`📝 Seeding ${currencyPairs.length} currency pairs...`)
+      const { error: fiatError } = await supabase
+        .from('currency_rates')
+        .upsert(currencyPairs, { onConflict: 'from_currency,to_currency' })
 
-    if (fiatError) {
-      console.error('❌ Error seeding currency_rates:', fiatError)
-      throw fiatError
+      if (fiatError) {
+        console.error('❌ Error seeding currency_rates:', fiatError)
+        throw fiatError
+      }
+      console.log('✅ Currency rates seeded successfully')
+    } else {
+      console.log('⏭️  Skipping currency pairs (use fetch-rates instead)\n')
     }
-    console.log('✅ Currency rates seeded successfully')
 
-    // Popular cryptocurrencies with PHP base (rate = units of crypto per 1 PHP)
-    const cryptoPairs = [
-      { from_currency: 'PHP', to_currency: 'BTC', rate: 0.00000315 },
-      { from_currency: 'PHP', to_currency: 'ETH', rate: 0.0000465 },
-      { from_currency: 'PHP', to_currency: 'USDT', rate: 0.0175 },
-      { from_currency: 'PHP', to_currency: 'BNB', rate: 0.0000275 },
-      { from_currency: 'PHP', to_currency: 'SOL', rate: 0.0000563 },
-      { from_currency: 'PHP', to_currency: 'XRP', rate: 0.0169 },
-      { from_currency: 'PHP', to_currency: 'ADA', rate: 0.0229 },
-      { from_currency: 'PHP', to_currency: 'DOGE', rate: 0.0463 },
-      { from_currency: 'PHP', to_currency: 'LINK', rate: 0.000109 },
-      { from_currency: 'PHP', to_currency: 'MATIC', rate: 0.00447 },
-      { from_currency: 'BTC', to_currency: 'PHP', rate: 318000 },
-      { from_currency: 'ETH', to_currency: 'PHP', rate: 21500 }
-    ]
+    // NOTE: Cryptocurrency pair rates are now fetched from live APIs
+    const cryptoPairs = []  // Intentionally empty - rates should come from fetch-rates
 
-    console.log(`📝 Seeding ${cryptoPairs.length} cryptocurrency pairs...`)
-    const { error: cryptoError } = await supabase
-      .from('cryptocurrency_rates')
-      .upsert(cryptoPairs, { onConflict: 'from_currency,to_currency' })
+    if (cryptoPairs.length > 0) {
+      console.log(`📝 Seeding ${cryptoPairs.length} cryptocurrency pairs...`)
+      const { error: cryptoError } = await supabase
+        .from('cryptocurrency_rates')
+        .upsert(cryptoPairs, { onConflict: 'from_currency,to_currency' })
 
-    if (cryptoError) {
-      console.error('❌ Error seeding cryptocurrency_rates:', cryptoError)
-      throw cryptoError
+      if (cryptoError) {
+        console.error('❌ Error seeding cryptocurrency_rates:', cryptoError)
+        throw cryptoError
+      }
+      console.log('✅ Cryptocurrency rates seeded successfully')
+    } else {
+      console.log('⏭️  Skipping crypto pairs (use fetch-rates instead)\n')
     }
-    console.log('✅ Cryptocurrency rates seeded successfully')
 
     // Seed some cryptocurrencies metadata
     const cryptoMetadata = [
