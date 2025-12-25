@@ -544,15 +544,9 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
     setError('')
   }
 
-  // Filter wallets by type (NOT by matching currency - enable cross-currency deposits)
+  // All wallets available for any currency deposit (EnhancedWalletDropdown handles fiat/crypto separation)
   // Users can now deposit any currency into any wallet with automatic conversion
-  const currencyWallets = wallets.filter(
-    w => w.currency_type === 'fiat'
-  )
-  // For crypto deposits: show all crypto wallets
-  const cryptocurrencyWallets = wallets.filter(
-    w => w.currency_type === 'crypto'
-  )
+  const allWallets = wallets
 
   // Get currency codes that user has wallets for
   const userCurrencyCodes = new Set(wallets.map(w => w.currency_code))
