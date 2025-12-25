@@ -218,23 +218,34 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
         return
       }
 
-      // Build rates map - store rate for each currency code (like /rates does)
-      // Priority: PHP as base, then most recent updates
+      // Build rates map - store rate for each currency code
+      // CRITICAL: Only store rates where TO_CURRENCY is PHP (canonical direction)
+      // This ensures crypto rates are large numbers (BTC→PHP: 2,500,000) not small decimals (PHP→BTC: 0.0000004)
       const ratesByCode = {}
       const codes = new Set()
 
-      // First pass: collect all unique codes
+      // First pass: collect all codes from pairs with PHP as target (canonical)
       pairsData.forEach(pair => {
-        if (pair.from_currency) codes.add(pair.from_currency.toUpperCase())
-        if (pair.to_currency) codes.add(pair.to_currency.toUpperCase())
+        const fromCode = pair.from_currency.toUpperCase()
+        const toCode = pair.to_currency.toUpperCase()
+
+        // ONLY use pairs where TO_CURRENCY is PHP (canonical direction)
+        // This prevents inverted rates like PHP→BTC (0.0000004) being stored
+        if (toCode === 'PHP') {
+          codes.add(fromCode)
+        }
       })
+
+      // Always include PHP and USD
+      codes.add('PHP')
+      codes.add('USD')
 
       // Initialize all codes
       codes.forEach(code => {
         ratesByCode[code] = null
       })
 
-      // Second pass: populate rates with prioritization (PHP-based pairs first, then most recent)
+      // Second pass: populate rates - ONLY from pairs where TO_CURRENCY is PHP
       pairsData.forEach(pair => {
         const fromCode = pair.from_currency.toUpperCase()
         const toCode = pair.to_currency.toUpperCase()
@@ -242,24 +253,12 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
 
         if (!isFinite(rate) || rate <= 0) return
 
-        // For from_currency: store its rate to to_currency
-        if (ratesByCode.hasOwnProperty(fromCode)) {
-          const isPHPTarget = toCode === 'PHP'
-          // Prioritize PHP-based rates, then use any available rate
-          if (ratesByCode[fromCode] === null || isPHPTarget) {
+        // CRITICAL FIX: Only store rates from canonical pairs (X→PHP)
+        if (toCode === 'PHP' && ratesByCode.hasOwnProperty(fromCode)) {
+          // If we don't have a rate yet, or this is a more recent update, use it
+          if (ratesByCode[fromCode] === null) {
             ratesByCode[fromCode] = rate
-          }
-        }
-
-        // For to_currency: store inverted rate from from_currency
-        if (ratesByCode.hasOwnProperty(toCode)) {
-          const invertedRate = 1 / rate
-          if (isFinite(invertedRate) && invertedRate > 0) {
-            const isPHPSource = fromCode === 'PHP'
-            // Prioritize PHP-based rates, then use any available inverted rate
-            if (ratesByCode[toCode] === null || isPHPSource) {
-              ratesByCode[toCode] = invertedRate
-            }
+            console.log(`[Deposits] Storing canonical rate: ${fromCode} = ${rate} PHP`)
           }
         }
       })
