@@ -480,7 +480,7 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
       // 3. Validate wallet exists (removed currency match requirement for cross-currency deposits)
 
       // 4. Validate payment method
-      if (!selectedMethod) {
+      if (!selectedMethod && !selectedAddressMethod) {
         setError('Please select a payment method')
         setSubmitting(false)
         return
