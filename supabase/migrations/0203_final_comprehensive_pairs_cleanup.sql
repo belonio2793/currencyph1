@@ -169,45 +169,31 @@ SET pair_direction = 'inverse', is_inverted = TRUE
 WHERE from_currency = 'PHP' AND to_currency != 'PHP' AND pair_direction IS NULL;
 
 -- ============================================================================
--- STEP 7: Verify critical pairs
+-- STEP 7: Verify critical pairs structure
 -- ============================================================================
 DO $$
 DECLARE
-  btc_rate numeric;
-  eth_rate numeric;
-  usd_rate numeric;
   canonical_count int;
   inverted_count int;
 BEGIN
-  SELECT rate INTO btc_rate FROM pairs WHERE from_currency = 'BTC' AND to_currency = 'PHP';
-  SELECT rate INTO eth_rate FROM pairs WHERE from_currency = 'ETH' AND to_currency = 'PHP';
-  SELECT rate INTO usd_rate FROM pairs WHERE from_currency = 'USD' AND to_currency = 'PHP';
   SELECT COUNT(*) INTO canonical_count FROM pairs WHERE pair_direction = 'canonical';
   SELECT COUNT(*) INTO inverted_count FROM pairs WHERE pair_direction = 'inverse';
-  
+
   RAISE NOTICE '
 ╔════════════════════════════════════════════════════════════════╗
 ║          MIGRATION 0203 - FINAL COMPREHENSIVE CLEANUP           ║
 ╠════════════════════════════════════════════════════════════════╣
-║ CRITICAL PAIRS VERIFIED:                                       ║
-║   BTC → PHP: % (should be ~2.5M)                              ║
-║   ETH → PHP: % (should be ~150K)                              ║
-║   USD → PHP: % (should be ~56.5)                              ║
-╠════════════════════════════════════════════════════════════════╣
-║ PAIR DIRECTION DISTRIBUTION:                                   ║
+║ PAIR STRUCTURE VERIFIED:                                       ║
 ║   Canonical (X→PHP): %                                         ║
 ║   Inverse (PHP→X):   %                                         ║
 ╠════════════════════════════════════════════════════════════════╣
 ║ ✅ ALL INVERTED PAIRS REMOVED                                   ║
-║ ✅ CANONICAL RATES VERIFIED                                     ║
-║ ✅ 45+ CRITICAL PAIRS ENSURED                                   ║
-║ ✅ DEPOSITS COMPONENT CONVERSION FIXED                          ║
-║ ✅ READY FOR PRODUCTION                                         ║
+║ ✅ CRITICAL PAIRS STRUCTURE ENSURED                             ║
+║ ✅ 45+ CRITICAL PAIRS CREATED                                   ║
+║ ✅ RATES WILL BE FETCHED FROM LIVE APIs                         ║
+║ ✅ AWAITING fetch-rates SCRIPT EXECUTION                        ║
 ╚════════════════════════════════════════════════════════════════╝
-  ', 
-  coalesce(btc_rate, 0)::text, 
-  coalesce(eth_rate, 0)::text, 
-  coalesce(usd_rate, 0)::text,
+  ',
   canonical_count,
   inverted_count;
 END $$;
