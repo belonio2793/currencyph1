@@ -749,31 +749,29 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
                 </button>
               </div>
 
-              {/* Amount Input */}
+              {/* Amount Input - Full Width */}
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-2">Amount</label>
-                <div className="flex gap-3">
-                  <input
-                    type="number"
-                    step="0.01"
-                    min="0"
-                    value={amount}
-                    onChange={(e) => setAmount(e.target.value)}
-                    placeholder="0.00"
-                    className="flex-1 px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  />
-                  <select
-                    value={selectedCurrency}
-                    onChange={(e) => setSelectedCurrency(e.target.value)}
-                    className="px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
-                  >
-                    {displayedCurrencies.map(c => (
-                      <option key={c.code} value={c.code}>
-                        {c.name} ({c.code})
-                      </option>
-                    ))}
-                  </select>
-                </div>
+                <input
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  value={amount}
+                  onChange={(e) => setAmount(e.target.value)}
+                  placeholder="0.00"
+                  className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+
+              {/* Currency Selection - Full Width */}
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-2">Currency</label>
+                <SearchableCurrencyDropdown
+                  currencies={currencies}
+                  selectedCurrency={selectedCurrency}
+                  onChange={setSelectedCurrency}
+                  defaultTab="all"
+                />
               </div>
 
               {/* Wallet Selection */}
