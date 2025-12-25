@@ -205,6 +205,33 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
     loadInitialData()
   }, [userId])
 
+  // Subscribe to real-time deposit updates
+  useEffect(() => {
+    if (!userId || userId.includes('guest')) return
+
+    const channel = supabase
+      .channel(`deposits-${userId}`)
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'deposits',
+          filter: `user_id=eq.${userId}`
+        },
+        (payload) => {
+          console.debug('[Deposits] Deposit update detected:', payload.eventType)
+          // Reload deposits when any change is detected
+          loadInitialData()
+        }
+      )
+      .subscribe()
+
+    return () => {
+      channel.unsubscribe()
+    }
+  }, [userId])
+
   // Auto-refresh wallets while any are initializing
   useEffect(() => {
     if (initializingWallets.size === 0) return
