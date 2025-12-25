@@ -256,45 +256,91 @@ async function storeRates(supabase: any, rates: FetchResult[]): Promise<{ stored
   let failed = 0;
   const confirmations: RateConfirmation[] = [];
   const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString();
-  
+
+  // Prepare records for both tables
+  const cryptoRatesRecords: any[] = [];
+  const pairsRecords: any[] = [];
+
   for (const rate of rates) {
     if (!rate.success || !rate.fetched_at) continue;
-    
+
     try {
-      const { error } = await supabase
-        .from("crypto_rates")
-        .upsert({
-          from_currency: rate.from_currency,
-          to_currency: rate.to_currency,
-          rate: rate.rate.toString(),
-          source: rate.source,
-          updated_at: rate.fetched_at,
-          expires_at: expiresAt
-        }, {
-          onConflict: "from_currency,to_currency"
-        });
-      
-      if (error) {
-        console.error(`Failed to store rate ${rate.from_currency}→${rate.to_currency}:`, error);
-        failed++;
-      } else {
-        stored++;
-        
-        // Store confirmation for user feedback
-        confirmations.push({
-          from_currency: rate.from_currency,
-          to_currency: rate.to_currency,
-          rate: rate.rate,
-          source: rate.source,
-          fetched_at: rate.fetched_at
-        });
-      }
+      // Prepare record for crypto_rates table (with string rate)
+      cryptoRatesRecords.push({
+        from_currency: rate.from_currency,
+        to_currency: rate.to_currency,
+        rate: rate.rate.toString(),
+        source: rate.source,
+        updated_at: rate.fetched_at,
+        expires_at: expiresAt
+      });
+
+      // Prepare record for pairs table (with numeric rate)
+      pairsRecords.push({
+        from_currency: rate.from_currency,
+        to_currency: rate.to_currency,
+        rate: rate.rate,
+        source_table: rate.source,
+        updated_at: rate.fetched_at
+      });
+
+      // Store confirmation for user feedback
+      confirmations.push({
+        from_currency: rate.from_currency,
+        to_currency: rate.to_currency,
+        rate: rate.rate,
+        source: rate.source,
+        fetched_at: rate.fetched_at
+      });
     } catch (error) {
-      console.error(`Error storing rate:`, error);
+      console.error(`Error preparing rate:`, error);
       failed++;
     }
   }
-  
+
+  // Upsert to crypto_rates table
+  if (cryptoRatesRecords.length > 0) {
+    try {
+      const { error } = await supabase
+        .from("crypto_rates")
+        .upsert(cryptoRatesRecords, {
+          onConflict: "from_currency,to_currency"
+        });
+
+      if (error) {
+        console.error(`Failed to store rates in crypto_rates:`, error);
+        failed += cryptoRatesRecords.length;
+      } else {
+        stored += cryptoRatesRecords.length;
+        console.log(`✓ Stored ${cryptoRatesRecords.length} rates in crypto_rates`);
+      }
+    } catch (error) {
+      console.error(`Error storing to crypto_rates:`, error);
+      failed += cryptoRatesRecords.length;
+    }
+  }
+
+  // Upsert to pairs table (primary source for currencyAPI)
+  if (pairsRecords.length > 0) {
+    try {
+      const { error } = await supabase
+        .from("pairs")
+        .upsert(pairsRecords, {
+          onConflict: "from_currency,to_currency"
+        });
+
+      if (error) {
+        console.error(`Failed to store rates in pairs:`, error);
+        // Don't double-count as failure since we already counted in crypto_rates
+      } else {
+        console.log(`✓ Stored ${pairsRecords.length} rates in pairs`);
+      }
+    } catch (error) {
+      console.error(`Error storing to pairs:`, error);
+      // Don't double-count as failure
+    }
+  }
+
   return { stored, failed, confirmations };
 }
 
