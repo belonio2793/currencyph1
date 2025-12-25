@@ -1066,10 +1066,10 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
               </button>
               <button
                 onClick={handleInitiateDeposit}
-                disabled={submitting || (selectedMethod === 'gcash' && !gcashReferenceNumber.trim())}
+                disabled={submitting || !selectedWalletData || (selectedMethod === 'gcash' && !gcashReferenceNumber.trim())}
                 className="flex-1 px-6 py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition disabled:opacity-50"
               >
-                {submitting ? 'Processing...' : 'Send Payment'}
+                {submitting ? 'Processing...' : 'Confirm Deposit'}
               </button>
             </div>
           </div>
