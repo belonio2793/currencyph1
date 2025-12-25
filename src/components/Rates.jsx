@@ -36,17 +36,19 @@ export default function Rates() {
       setLoading(true)
       setError(null)
 
-      // Fetch all pairs from public.pairs table
-      const { data: pairsData, error: pairsError } = await supabase
+      // Strategy 1: Try pairs view first (includes canonical and bidirectional pairs)
+      let pairsData = []
+      const { data: allPairsData, error: pairsError } = await supabase
         .from('pairs')
-        .select('from_currency, to_currency, rate, updated_at')
+        .select('from_currency, to_currency, rate, updated_at, pair_direction')
 
       if (pairsError) {
         console.error('Error fetching pairs:', pairsError)
         throw pairsError
       }
 
-      console.log(`📥 Fetched ${pairsData?.length || 0} pairs from public.pairs`)
+      pairsData = allPairsData || []
+      console.log(`📥 Fetched ${pairsData?.length || 0} pairs from public.pairs (including canonical & bidirectional)`)
       setAllPairs(pairsData || [])
 
       // Get unique currency codes from pairs
@@ -132,6 +134,7 @@ export default function Rates() {
       // Collect all rates from public.pairs table with proper prioritization
       // CRITICAL: ONLY use pairs where TO_CURRENCY is PHP (canonical direction)
       // This prevents reversed rates like PHP→BTC (0.0000004) instead of BTC→PHP (2,500,000)
+      // Now with pair_direction metadata for clearer tracking
       pairsData?.forEach(pair => {
         if (pair.updated_at) {
           timestamps.push(new Date(pair.updated_at))
@@ -144,6 +147,7 @@ export default function Rates() {
 
           // CRITICAL FIX: Only use canonical pairs (X→PHP)
           // Never invert or use PHP→X pairs, as they create small decimal rates that are backwards
+          // pair_direction will be 'canonical', 'inverse', or 'other' for clarity
           if (toCurrency === 'PHP' && fromCurrency && ratesByCode[fromCurrency]) {
             // Store the rate as-is (it's X→PHP, which is correct)
             const existingTime = new Date(ratesByCode[fromCurrency].updatedAt || 0)
@@ -154,7 +158,8 @@ export default function Rates() {
               ratesByCode[fromCurrency].rate = rate
               ratesByCode[fromCurrency].updatedAt = pair.updated_at || new Date().toISOString()
               ratesByCode[fromCurrency].isPHPBased = true
-              console.log(`📊 Storing canonical rate: ${fromCurrency} = ${rate} PHP`)
+              ratesByCode[fromCurrency].pairDirection = pair.pair_direction || 'canonical'
+              console.log(`📊 Storing ${pair.pair_direction || 'canonical'} rate: ${fromCurrency} = ${rate} PHP`)
             }
           }
         }
@@ -183,20 +188,23 @@ export default function Rates() {
 
       const stillMissing = codeArray.filter(code => !codesWithRates.has(code))
       if (stillMissing.length > 0) {
-        console.warn(`[Rates] Missing canonical rates for: ${stillMissing.join(', ')}, trying inverted pairs...`)
+        console.warn(`[Rates] Missing canonical rates for: ${stillMissing.join(', ')}, trying inverse pairs...`)
 
         pairsData?.forEach(pair => {
           const fromCode = pair.from_currency
           const toCode = pair.to_currency
           const rate = Number(pair.rate)
+          const pairDir = pair.pair_direction || 'unknown'
 
           // Try inverted pairs (PHP→X) but only if we don't have the canonical (X→PHP)
+          // Now using pair_direction metadata for clarity
           if (fromCode === 'PHP' && toCode && ratesByCode[toCode] && !codesWithRates.has(toCode) && isFinite(rate) && rate > 0) {
             const invertedRate = 1 / rate
             if (isFinite(invertedRate) && invertedRate > 0) {
               ratesByCode[toCode].rate = invertedRate
               ratesByCode[toCode].isPHPBased = true
-              console.log(`[Rates] WARNING: Using inverted rate for ${toCode} = ${invertedRate} PHP (from PHP→${toCode})`)
+              ratesByCode[toCode].pairDirection = pairDir
+              console.log(`[Rates] WARNING: Using ${pairDir} pair for ${toCode} = ${invertedRate} PHP (from PHP→${toCode})`)
             }
           }
         })
