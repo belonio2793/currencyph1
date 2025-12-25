@@ -128,9 +128,9 @@ export default function OfflineDisplay({ onShowAuth }) {
         </div>
 
         {/* Benefits Section */}
-        <div className={`mt-12 sm:mt-16 bg-white rounded-xl shadow-lg border border-slate-200 ${isMobile ? 'p-4' : 'p-8'}`}>
-          <h2 className={`font-bold text-slate-900 mb-6 sm:mb-8 ${isMobile ? 'text-lg' : 'text-2xl'}`}>Why Choose Currency?</h2>
-          <div className={`grid gap-4 sm:gap-6 ${isMobile ? 'grid-cols-1' : 'grid-cols-1 md:grid-cols-2 lg:grid-cols-4'}`}>
+        <div className={`mt-6 sm:mt-8 bg-white rounded-xl shadow-lg border border-slate-200 ${isMobile ? 'p-3' : 'p-6'}`}>
+          <h2 className={`font-bold text-slate-900 mb-4 sm:mb-5 ${isMobile ? 'text-lg' : 'text-2xl'}`}>Why Choose Currency?</h2>
+          <div className={`grid gap-3 sm:gap-4 ${isMobile ? 'grid-cols-1' : 'grid-cols-1 md:grid-cols-2 lg:grid-cols-4'}`}>
             {[
               { icon: 'S', title: 'Secure', desc: 'Bank-level encryption and security' },
               { icon: 'F', title: 'Fast', desc: 'Instant transactions and transfers' },
