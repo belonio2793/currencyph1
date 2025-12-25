@@ -391,47 +391,101 @@ async function convertUSDtoPhp(usdAmount) {
  */
 export async function getMultipleCryptoPrices(cryptoCodes, toCurrency = 'PHP') {
   try {
-    const coingeckoIds = cryptoCodes
-      .map(code => getCoingeckoId(code))
-      .join(',')
-
-    // Try primary API
-    const response = await fetchWithRetry(
-      `https://api.coingecko.com/api/v3/simple/price?ids=${coingeckoIds}&vs_currencies=${toCurrency.toLowerCase()}&precision=8`
-    )
-
-    if (!response.ok) {
-      throw new Error(`CoinGecko API returned ${response.status}`)
-    }
-
-    const data = await response.json()
     const prices = {}
-    const toCurrencyLower = toCurrency.toLowerCase()
+    const toCurrencyUpper = toCurrency.toUpperCase()
 
-    cryptoCodes.forEach(code => {
-      const coingeckoId = getCoingeckoId(code)
-      const price = data[coingeckoId]?.[toCurrencyLower]
-      if (price) {
-        prices[code] = price
+    // 1) PRIMARY: Try to fetch from public.pairs table (populated by EXCONVERT)
+    try {
+      const { data: pairsData, error: pairsError } = await supabase
+        .from('pairs')
+        .select('from_currency, rate')
+        .eq('to_currency', toCurrencyUpper)
+        .in('from_currency', cryptoCodes)
 
-        // Cache individually
-        const cacheKey = `${code}_${toCurrency}`
-        rateCache.set(cacheKey, {
-          rate: price,
-          timestamp: Date.now(),
-          source: 'api'
+      if (!pairsError && pairsData && pairsData.length > 0) {
+        console.log(`[cryptoRatesService] Got ${pairsData.length} rates from pairs table`)
+        pairsData.forEach(row => {
+          prices[row.from_currency] = parseFloat(row.rate)
         })
 
-        // Store in database asynchronously
-        storeRateInDatabase(code, toCurrency, price, 'coingecko').catch(e =>
-          console.warn(`Failed to cache ${code} in DB:`, e.message)
-        )
+        // Cache the results
+        cryptoCodes.forEach(code => {
+          if (prices[code]) {
+            const cacheKey = `${code}_${toCurrency}`
+            rateCache.set(cacheKey, {
+              rate: prices[code],
+              timestamp: Date.now(),
+              source: 'pairs'
+            })
+          }
+        })
+
+        // If we got all rates from pairs, return immediately
+        if (Object.keys(prices).length === cryptoCodes.length) {
+          return prices
+        }
       }
-    })
+    } catch (pairsErr) {
+      console.warn('[cryptoRatesService] Failed to fetch from pairs table:', pairsErr.message)
+    }
+
+    // 2) SECONDARY: Try CoinGecko API for missing rates
+    const missingCodes = cryptoCodes.filter(code => !prices[code])
+    if (missingCodes.length > 0) {
+      try {
+        const coingeckoIds = missingCodes
+          .map(code => getCoingeckoId(code))
+          .join(',')
+
+        const response = await fetchWithRetry(
+          `https://api.coingecko.com/api/v3/simple/price?ids=${coingeckoIds}&vs_currencies=${toCurrency.toLowerCase()}&precision=8`
+        )
+
+        if (response.ok) {
+          const data = await response.json()
+          const toCurrencyLower = toCurrency.toLowerCase()
+
+          missingCodes.forEach(code => {
+            const coingeckoId = getCoingeckoId(code)
+            const price = data[coingeckoId]?.[toCurrencyLower]
+            if (price) {
+              prices[code] = price
+
+              // Cache individually
+              const cacheKey = `${code}_${toCurrency}`
+              rateCache.set(cacheKey, {
+                rate: price,
+                timestamp: Date.now(),
+                source: 'coingecko'
+              })
+
+              // Store in database asynchronously
+              storeRateInDatabase(code, toCurrency, price, 'coingecko').catch(e =>
+                console.warn(`Failed to cache ${code} in DB:`, e.message)
+              )
+            }
+          })
+        }
+      } catch (coingeckoErr) {
+        console.warn('[cryptoRatesService] CoinGecko API failed:', coingeckoErr.message)
+      }
+    }
+
+    // 3) TERTIARY: Try cache for any remaining missing rates
+    const stillMissing = cryptoCodes.filter(code => !prices[code])
+    if (stillMissing.length > 0) {
+      stillMissing.forEach(code => {
+        const cacheKey = `${code}_${toCurrency}`
+        const cached = rateCache.get(cacheKey)
+        if (cached) {
+          prices[code] = cached.rate
+        }
+      })
+    }
 
     return prices
   } catch (error) {
-    console.warn('Failed to fetch multiple crypto prices:', error.message)
+    console.error('[cryptoRatesService] Unexpected error in getMultipleCryptoPrices:', error.message)
 
     // Fallback: try to get from cache
     const prices = {}
