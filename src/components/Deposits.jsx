@@ -127,18 +127,29 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
   }, [initializingWallets, userId])
 
   useEffect(() => {
-    fetchExchangeRates()
+    let isMounted = true
 
-    // When switching to crypto mode, select first available crypto currency
-    if (activeType === 'cryptocurrency') {
-      // Select the first available crypto currency
-      const availableCrypto = cryptoCurrencies.find(c => c.code in cryptoAddresses)
-      if (availableCrypto) {
-        setSelectedCurrency(availableCrypto.code)
-        // Don't auto-select wallet - let the currency selection trigger wallet selection via the other useEffect
+    const loadRates = async () => {
+      if (isMounted) {
+        await fetchExchangeRates()
       }
     }
-  }, [activeType, cryptoAddresses, wallets])
+
+    loadRates()
+
+    // When switching to crypto mode, select first available crypto currency
+    if (activeType === 'cryptocurrency' && cryptoAddresses && Object.keys(cryptoAddresses).length > 0) {
+      // Select first available crypto with an address
+      const availableCode = Object.keys(cryptoAddresses)[0]
+      if (availableCode && isMounted) {
+        setSelectedCurrency(availableCode)
+      }
+    }
+
+    return () => {
+      isMounted = false
+    }
+  }, [activeType, cryptoAddresses])
 
   const fetchExchangeRates = async () => {
     try {
