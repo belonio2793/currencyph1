@@ -82,6 +82,43 @@ const DEPOSIT_METHODS = {
 
 const SOLANA_ADDRESS = 'CbcWb97K3TEFJZJYLZRqdsMSdVXTFaMaUcF6yPQgY9yS'
 
+// Helper function to query public.pairs directly
+async function getRatesFromPublicPairs(currencies, toCurrency = 'PHP') {
+  try {
+    const toUpper = toCurrency.toUpperCase()
+    const currencyUpperCase = currencies.map(c => c.toUpperCase())
+
+    console.log(`[Deposits] Querying public.pairs for rates: ${currencyUpperCase.join(', ')} → ${toUpper}`)
+
+    const { data, error } = await supabase
+      .from('pairs')
+      .select('from_currency, rate, updated_at, source_table')
+      .eq('to_currency', toUpper)
+      .in('from_currency', currencyUpperCase)
+
+    if (error) {
+      console.warn('[Deposits] Public.pairs query error:', error.message)
+      return {}
+    }
+
+    if (!data || data.length === 0) {
+      console.warn('[Deposits] Public.pairs returned no data for:', currencyUpperCase.join(', '))
+      return {}
+    }
+
+    const rates = {}
+    data.forEach(row => {
+      rates[row.from_currency] = parseFloat(row.rate)
+    })
+
+    console.log(`[Deposits] Successfully loaded ${data.length} rates from public.pairs:`, Object.keys(rates).join(', '))
+    return rates
+  } catch (e) {
+    console.error('[Deposits] Public.pairs helper failed:', e.message)
+    return {}
+  }
+}
+
 function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
   // Form state
   const [amount, setAmount] = useState('')
