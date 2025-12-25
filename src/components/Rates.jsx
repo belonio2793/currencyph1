@@ -130,41 +130,31 @@ export default function Rates() {
       })
 
       // Collect all rates from public.pairs table with proper prioritization
-      // Priority: PHP as base, then most recent updates, then highest rate values
+      // CRITICAL: ONLY use pairs where TO_CURRENCY is PHP (canonical direction)
+      // This prevents reversed rates like PHP→BTC (0.0000004) instead of BTC→PHP (2,500,000)
       pairsData?.forEach(pair => {
         if (pair.updated_at) {
           timestamps.push(new Date(pair.updated_at))
         }
 
         if (pair.rate && isFinite(Number(pair.rate)) && Number(pair.rate) > 0) {
-          // For from_currency: store its rate to to_currency
-          if (pair.from_currency && ratesByCode[pair.from_currency]) {
-            const existingTime = new Date(ratesByCode[pair.from_currency].updatedAt || 0)
-            const pairTime = new Date(pair.updated_at || 0)
-            // Prioritize PHP-based rates, then use most recent
-            const isPHPTarget = pair.to_currency === 'PHP'
-            const currentIsPHP = ratesByCode[pair.from_currency].isPHPBased
-            if (!ratesByCode[pair.from_currency].rate || isPHPTarget || (!currentIsPHP && pairTime > existingTime)) {
-              ratesByCode[pair.from_currency].rate = Number(pair.rate)
-              ratesByCode[pair.from_currency].updatedAt = pair.updated_at || new Date().toISOString()
-              ratesByCode[pair.from_currency].isPHPBased = isPHPTarget
-            }
-          }
+          const rate = Number(pair.rate)
+          const fromCurrency = pair.from_currency
+          const toCurrency = pair.to_currency
 
-          // For to_currency: store inverted rate from from_currency
-          if (pair.to_currency && ratesByCode[pair.to_currency]) {
-            const invertedRate = 1 / Number(pair.rate)
-            if (isFinite(invertedRate) && invertedRate > 0) {
-              const existingTime = new Date(ratesByCode[pair.to_currency].updatedAt || 0)
-              const pairTime = new Date(pair.updated_at || 0)
-              // Prioritize PHP-based rates, then use most recent
-              const isPHPSource = pair.from_currency === 'PHP'
-              const currentIsPHP = ratesByCode[pair.to_currency].isPHPBased
-              if (!ratesByCode[pair.to_currency].rate || isPHPSource || (!currentIsPHP && pairTime > existingTime)) {
-                ratesByCode[pair.to_currency].rate = invertedRate
-                ratesByCode[pair.to_currency].updatedAt = pair.updated_at || new Date().toISOString()
-                ratesByCode[pair.to_currency].isPHPBased = isPHPSource
-              }
+          // CRITICAL FIX: Only use canonical pairs (X→PHP)
+          // Never invert or use PHP→X pairs, as they create small decimal rates that are backwards
+          if (toCurrency === 'PHP' && fromCurrency && ratesByCode[fromCurrency]) {
+            // Store the rate as-is (it's X→PHP, which is correct)
+            const existingTime = new Date(ratesByCode[fromCurrency].updatedAt || 0)
+            const pairTime = new Date(pair.updated_at || 0)
+
+            // Use if we don't have a rate yet, or this is more recent
+            if (!ratesByCode[fromCurrency].rate || pairTime > existingTime) {
+              ratesByCode[fromCurrency].rate = rate
+              ratesByCode[fromCurrency].updatedAt = pair.updated_at || new Date().toISOString()
+              ratesByCode[fromCurrency].isPHPBased = true
+              console.log(`📊 Storing canonical rate: ${fromCurrency} = ${rate} PHP`)
             }
           }
         }
