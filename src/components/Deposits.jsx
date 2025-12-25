@@ -10,6 +10,7 @@ import { coinsPhApi } from '../lib/coinsPhApi'
 import { formatNumber } from '../lib/currency'
 import { walletService } from '../lib/walletService'
 import { multiCurrencyDepositService } from '../lib/multiCurrencyDepositService'
+import { getLastFetchInfo } from '../lib/ratesFetchService'
 import {
   validateDepositInput,
   validateWalletCurrency,
