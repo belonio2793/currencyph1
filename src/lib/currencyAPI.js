@@ -35,12 +35,22 @@ export const currencyAPI = {
   // Get all currency rates relative to USD via public.pairs table (primary source)
   async getGlobalRates() {
     try {
-      // 1) PRIMARY: Try public.pairs table directly - this is the authoritative source
+      // 1) PRIMARY: Try public.pairs table directly with timeout
       try {
-        const { data: pairsData, error: pairsError } = await supabase
+        const controller = new AbortController()
+        const timeout = setTimeout(() => controller.abort(), 8000) // 8 second timeout
+
+        const pairsPromise = supabase
           .from('pairs')
           .select('from_currency, to_currency, rate, updated_at')
-          .limit(500)
+          .limit(200) // Reduced limit for faster queries
+
+        const { data: pairsData, error: pairsError } = await Promise.race([
+          pairsPromise,
+          new Promise((_, reject) => setTimeout(() => reject(new Error('Public.pairs query timeout')), 7000))
+        ])
+
+        clearTimeout(timeout)
 
         if (!pairsError && pairsData && pairsData.length > 0) {
           console.log('Using exchange rates from public.pairs table')
@@ -71,7 +81,7 @@ export const currencyAPI = {
           console.warn('Error fetching from public.pairs:', pairsError.message)
         }
       } catch (e) {
-        console.warn('Public.pairs lookup failed:', e && e.message)
+        console.warn('Public.pairs lookup failed or timed out:', e && e.message)
       }
 
       // 2) SECONDARY: Try Open Exchange Rates (if API key is configured)
