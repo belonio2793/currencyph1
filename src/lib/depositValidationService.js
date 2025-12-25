@@ -4,6 +4,8 @@
  * This prevents malformed SQL queries and RLS policy violations
  */
 
+import { formatExchangeRate } from './currency'
+
 /**
  * Validate deposit input data
  */
