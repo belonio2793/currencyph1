@@ -37,6 +37,19 @@ function PaymentMethodsGrid({
     return convertCurrency(amount, selectedCurrency, targetCurrency, exchangeRates)
   }
 
+  // Helper function to get PHP equivalent (for GCash and display purposes)
+  const getPhpEquivalent = () => {
+    if (!amount || !selectedCurrency || !exchangeRates) {
+      return null
+    }
+
+    if (selectedCurrency.toUpperCase() === 'PHP') {
+      return parseFloat(amount)
+    }
+
+    return convertCurrency(amount, selectedCurrency, 'PHP', exchangeRates)
+  }
+
   // Helper function to format amount display
   const formatAmountDisplay = (method, convertedAmount) => {
     if (!convertedAmount) return null
