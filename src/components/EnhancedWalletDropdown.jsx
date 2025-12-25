@@ -175,7 +175,7 @@ function EnhancedWalletDropdown({ wallets, selectedWallet, onChange }) {
                 {/* Crypto Wallets Section */}
                 {filteredCryptoWallets.length > 0 && (
                   <div>
-                    <div className="px-4 py-2 bg-slate-100 border-b border-slate-200 sticky top-12">
+                    <div className="px-4 py-2 bg-slate-100 border-b border-slate-200 sticky top-0 z-20">
                       <p className="text-xs font-semibold text-slate-600 uppercase tracking-wide">Cryptocurrencies</p>
                     </div>
                     {filteredCryptoWallets.map(w => (
