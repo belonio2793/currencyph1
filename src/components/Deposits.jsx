@@ -320,6 +320,7 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
 
       // Fallback: If we're missing rates, try inverted pairs (PHP→X)
       // This is a safety net if the database only has inverted pairs
+      const codeArray = Array.from(codes)
       const stillMissing = codeArray.filter(code => !rates[code])
       if (stillMissing.length > 0) {
         console.warn(`[Deposits] Missing canonical rates for: ${stillMissing.join(', ')}, trying inverted pairs...`)
