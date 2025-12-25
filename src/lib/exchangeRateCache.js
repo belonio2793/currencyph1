@@ -140,12 +140,12 @@ export class ExchangeRateCache {
       return { ...local, source: 'stale_cache', warning: 'Stale cache - rates may not be current' }
     }
 
-    // Final fallback to hardcoded defaults
-    console.warn('[ExchangeRateCache] Using hardcoded fallback rates')
+    // No fallback - rates must come from database
+    console.error('[ExchangeRateCache] Unable to fetch rates from any source')
     return {
-      rates: FALLBACK_RATES,
-      source: 'fallback',
-      warning: 'Using default fallback rates'
+      rates: {},
+      source: 'none',
+      warning: 'No rates available - database connection may be down'
     }
   }
 
