@@ -253,7 +253,10 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
               ])
 
               if (pricesFromApi && Object.keys(pricesFromApi).length > 0) {
-                Object.assign(rates, pricesFromApi)
+                // Normalize API response to uppercase keys
+                Object.entries(pricesFromApi).forEach(([code, rate]) => {
+                  rates[code.toUpperCase()] = rate
+                })
                 console.log(`[Deposits] Successfully fetched ${Object.keys(pricesFromApi).length} crypto rates from API`)
                 apiSuccess = true
               }
