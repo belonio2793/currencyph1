@@ -507,7 +507,14 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
     const toRate = exchangeRates[selectedWalletData.currency_code]
 
     if (!fromRate || !toRate) {
-      console.warn('Missing exchange rates for conversion:', { fromRate, toRate, from: selectedCurrency, to: selectedWalletData.currency_code })
+      console.warn('Missing exchange rates for conversion:', {
+        fromRate,
+        toRate,
+        from: selectedCurrency,
+        to: selectedWalletData.currency_code,
+        activeType,
+        targetCryptoType: selectedWalletData.currency_type
+      })
       return null
     }
 
@@ -516,20 +523,41 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
     const targetIsCrypto = selectedWalletData.currency_type === 'crypto'
 
     let convertedAmount
+
     if (sourceIsCrypto && !targetIsCrypto) {
       // Crypto to fiat: amount in crypto * price per crypto (in fiat)
-      // exchangeRates[crypto] = price in base fiat, so just multiply
+      // exchangeRates[crypto] = price in fiat currency
       convertedAmount = numAmount * fromRate
     } else if (sourceIsCrypto && targetIsCrypto) {
-      // Crypto to crypto: (amount in source crypto / source rate) * target rate
-      // This handles BTC -> ETH conversions
-      convertedAmount = (numAmount / fromRate) * toRate
+      // Crypto to crypto via USD base
+      // fromRate = source crypto price in PHP
+      // toRate = target crypto price in PHP
+      // Direct conversion: (numAmount / fromRate) * toRate converts to PHP, but we want target crypto
+      // Better: (numAmount * fromRate) / toRate (amount in PHP / target price in PHP)
+      convertedAmount = (numAmount * fromRate) / toRate
+    } else if (!sourceIsCrypto && targetIsCrypto) {
+      // Fiat to crypto: need to properly convert through USD base
+      // fromRate = USD→sourceCurrency (e.g., 1 USD = 58.5 PHP)
+      // toRate = targetCrypto price in PHP (e.g., 1 BTC = 2,500,000 PHP)
+      // usdAmount = numAmount / fromRate (e.g., 10000 PHP / 58.5 = 171 USD)
+      // btcAmount = usdAmount / (toRate / fromRate) = numAmount / toRate
+      // But toRate is in PHP, so we need: usdAmount / (toRate / fromRate)
+      // Actually: (numAmount / fromRate) gives USD, (toRate / fromRate) gives crypto price in USD
+      // So: usdAmount / cryptoPriceUSD = convertedAmount
+      convertedAmount = (numAmount / fromRate) / (toRate / fromRate)
+      convertedAmount = numAmount / toRate
     } else {
-      // Fiat to fiat (or fiat to crypto): (amount in from currency / from rate) * to rate
+      // Fiat to fiat: convert through USD base
+      // fromRate = USD→sourceCurrency (e.g., 58.5)
+      // toRate = USD→targetCurrency (e.g., 1)
+      // Convert source to USD: numAmount / fromRate
+      // Convert USD to target: (numAmount / fromRate) * toRate
       convertedAmount = (numAmount / fromRate) * toRate
     }
 
-    return Math.round(convertedAmount * 100) / 100
+    // Round to 8 decimals for cryptos, 2 for fiats
+    const decimals = targetIsCrypto ? 8 : 2
+    return Math.round(convertedAmount * Math.pow(10, decimals)) / Math.pow(10, decimals)
   }
 
   const handleInitiateDeposit = async () => {
