@@ -700,7 +700,7 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
       }
 
       // Success - Format rate with appropriate decimal places for very small rates
-      const formattedRate = formatExchangeRateForDisplay(result.conversion.rate)
+      const formattedRate = formatExchangeRate(result.conversion.rate)
       setDeposits([result.deposit, ...deposits])
       setSuccess(`Deposit initiated successfully! Converting ${selectedCurrency} to ${targetWalletData.currency_code} at rate ${formattedRate}`)
       setError('')
