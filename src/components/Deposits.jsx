@@ -212,9 +212,10 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
 
           if (globalRates) {
             Object.entries(globalRates).forEach(([code, data]) => {
-              rates[code] = data.rate
+              const codeUpper = code.toUpperCase()
+              rates[codeUpper] = data.rate
               // Track PHP to USD rate for crypto conversion
-              if (code === 'PHP' && data.rate > 0) {
+              if (codeUpper === 'PHP' && data.rate > 0) {
                 phpToUsdRate = 1 / data.rate // If 1 USD = 58.5 PHP, then 1 PHP = 1/58.5 USD
               }
             })
