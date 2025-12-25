@@ -167,7 +167,7 @@ export class ExchangeRateCache {
    */
   async getRate(currencyCode) {
     const data = await this.getRates()
-    return data.rates?.[currencyCode] || FALLBACK_RATES[currencyCode] || null
+    return data.rates?.[currencyCode] || null
   }
 
   /**
