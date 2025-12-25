@@ -1,15 +1,15 @@
 import { supabase } from './supabaseClient'
-import { currencyAPI } from './currencyAPI'
-import { getMultipleCryptoPrices, getCryptoPrice } from './cryptoRatesService'
+import { getPairRate } from './pairsRateService'
 
 /**
  * Service for handling deposits across any currency pair
+ * All exchange rates are sourced from the public.pairs table (exconvert data)
  * Supports fiat-to-fiat, crypto-to-crypto, and cross conversions
  */
 export const multiCurrencyDepositService = {
   /**
-   * Get exchange rate between two currencies
-   * Handles both fiat and crypto conversions
+   * Get exchange rate between two currencies from public.pairs table
+   * Falls back to base currency conversion if direct pair doesn't exist
    */
   async getExchangeRate(fromCurrency, toCurrency) {
     try {
@@ -18,65 +18,47 @@ export const multiCurrencyDepositService = {
         return { rate: 1, fromCurrency, toCurrency, timestamp: new Date() }
       }
 
-      // Get rates from database first (cached rates)
-      const { data: cachedRate, error: dbError } = await supabase
-        .from('rates')
-        .select('rate')
-        .eq('currency_code', fromCurrency)
-        .eq('base_currency', toCurrency)
-        .single()
+      const fromUpper = fromCurrency.toUpperCase()
+      const toUpper = toCurrency.toUpperCase()
 
-      if (!dbError && cachedRate) {
-        return { rate: cachedRate.rate, fromCurrency, toCurrency, timestamp: new Date(), source: 'cached' }
+      // Try direct pair first
+      let rate = await getPairRate(fromUpper, toUpper)
+
+      // If direct pair not found, try base currency conversion (USD)
+      if (!rate) {
+        const baseCurrency = 'USD'
+
+        // Only attempt base conversion if neither currency is USD
+        if (fromUpper !== baseCurrency && toUpper !== baseCurrency) {
+          const [fromBaseRate, baseToRate] = await Promise.all([
+            getPairRate(fromUpper, baseCurrency),
+            getPairRate(baseCurrency, toUpper)
+          ])
+
+          // If we have both rates, calculate the indirect conversion
+          if (fromBaseRate && baseToRate) {
+            rate = fromBaseRate * baseToRate
+          }
+        }
       }
 
-      // Determine currency types
-      const fromIsCrypto = ['BTC', 'ETH', 'SOL', 'ADA', 'XRP', 'DOGE', 'LTC', 'BCH', 'USDT', 'USDC'].includes(fromCurrency)
-      const toIsCrypto = ['BTC', 'ETH', 'SOL', 'ADA', 'XRP', 'DOGE', 'LTC', 'BCH', 'USDT', 'USDC'].includes(toCurrency)
-
-      let rate = null
-
-      if (fromIsCrypto && toIsCrypto) {
-        // Crypto to crypto: get both in USD, then calculate ratio
-        const [fromPrice, toPrice] = await Promise.all([
-          getCryptoPrice(fromCurrency, 'USD'),
-          getCryptoPrice(toCurrency, 'USD')
+      // If still no rate found, try with alternative base (PHP)
+      if (!rate && fromUpper !== 'PHP' && toUpper !== 'PHP') {
+        const altBaseCurrency = 'PHP'
+        const [fromAltRate, altToRate] = await Promise.all([
+          getPairRate(fromUpper, altBaseCurrency),
+          getPairRate(altBaseCurrency, toUpper)
         ])
-        if (fromPrice && toPrice) {
-          rate = fromPrice / toPrice
-        }
-      } else if (!fromIsCrypto && !toIsCrypto) {
-        // Fiat to fiat: use currencyAPI
-        const rates = await currencyAPI.getGlobalRates()
-        const fromRate = rates?.[fromCurrency]?.rate || rates?.[fromCurrency]
-        const toRate = rates?.[toCurrency]?.rate || rates?.[toCurrency]
-        if (fromRate && toRate) {
-          rate = fromRate / toRate
-        }
-      } else {
-        // Mixed: crypto to fiat or fiat to crypto via USD
-        let cryptoPrice = null
-        if (fromIsCrypto) {
-          // Crypto to fiat
-          cryptoPrice = await getCryptoPrice(fromCurrency, 'USD')
-          const rates = await currencyAPI.getGlobalRates()
-          const toRate = rates?.[toCurrency]?.rate || rates?.[toCurrency]
-          if (cryptoPrice && toRate) {
-            rate = cryptoPrice / toRate
-          }
-        } else {
-          // Fiat to crypto
-          cryptoPrice = await getCryptoPrice(toCurrency, 'USD')
-          const rates = await currencyAPI.getGlobalRates()
-          const fromRate = rates?.[fromCurrency]?.rate || rates?.[fromCurrency]
-          if (cryptoPrice && fromRate) {
-            rate = fromRate / cryptoPrice
-          }
+
+        if (fromAltRate && altToRate) {
+          rate = fromAltRate * altToRate
         }
       }
 
       if (!rate || !isFinite(rate) || rate <= 0) {
-        throw new Error(`Invalid rate calculated: ${rate}`)
+        throw new Error(
+          `No exchange rate found for ${fromCurrency}→${toCurrency} (tried direct, USD base, and PHP base)`
+        )
       }
 
       return {
@@ -84,7 +66,7 @@ export const multiCurrencyDepositService = {
         fromCurrency,
         toCurrency,
         timestamp: new Date(),
-        source: 'api'
+        source: 'public.pairs'
       }
     } catch (err) {
       console.error(`Error getting exchange rate ${fromCurrency}→${toCurrency}:`, err)
@@ -157,7 +139,7 @@ export const multiCurrencyDepositService = {
         throw new Error('Wallet not found or access denied')
       }
 
-      // Convert amount
+      // Convert amount using public.pairs rates
       const conversion = await this.convertAmount(amount, depositCurrency, walletCurrency)
 
       // Build deposit record
@@ -179,7 +161,8 @@ export const multiCurrencyDepositService = {
           conversion_rate: conversion.rateRounded,
           from_currency: depositCurrency,
           to_currency: walletCurrency,
-          created_via: 'multi_currency_deposit_service'
+          created_via: 'multi_currency_deposit_service',
+          rate_source: 'public.pairs'
         },
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString()
