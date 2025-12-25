@@ -263,12 +263,34 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
         }
       })
 
-      // Convert to object and ensure PHP and USD have valid rates
+      // Convert to object
       Object.entries(ratesByCode).forEach(([code, rate]) => {
         if (rate !== null && isFinite(rate) && rate > 0) {
           rates[code] = rate
         }
       })
+
+      // Fallback: If we're missing rates, try inverted pairs (PHP→X)
+      // This is a safety net if the database only has inverted pairs
+      const stillMissing = codeArray.filter(code => !rates[code])
+      if (stillMissing.length > 0) {
+        console.warn(`[Deposits] Missing canonical rates for: ${stillMissing.join(', ')}, trying inverted pairs...`)
+
+        pairsData?.forEach(pair => {
+          const fromCode = pair.from_currency.toUpperCase()
+          const toCode = pair.to_currency.toUpperCase()
+          const rate = Number(pair.rate)
+
+          // Try inverted pairs (PHP→X) but only if we don't have the canonical (X→PHP)
+          if (fromCode === 'PHP' && toCode && !rates[toCode] && isFinite(rate) && rate > 0) {
+            const invertedRate = 1 / rate
+            if (isFinite(invertedRate) && invertedRate > 0) {
+              rates[toCode] = invertedRate
+              console.log(`[Deposits] WARNING: Using inverted rate for ${toCode} = ${invertedRate} PHP (from PHP→${toCode})`)
+            }
+          }
+        })
+      }
 
       // Ensure PHP and USD rates are always present
       if (!rates['PHP']) rates['PHP'] = 1
