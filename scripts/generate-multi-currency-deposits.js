@@ -68,69 +68,93 @@ const DEMO_DEPOSITS = [
 
 async function getExchangeRate(fromCurrency, toCurrency) {
   try {
-    // Check database for cached rate
-    const { data: cachedRate, error: dbError } = await supabase
-      .from('rates')
+    // Return 1 if same currency
+    if (fromCurrency === toCurrency) {
+      return 1
+    }
+
+    const fromUpper = fromCurrency.toUpperCase()
+    const toUpper = toCurrency.toUpperCase()
+
+    // Try direct pair from public.pairs table (exconvert data)
+    const { data: directRate, error: directError } = await supabase
+      .from('pairs')
       .select('rate')
-      .eq('currency_code', fromCurrency)
-      .eq('base_currency', toCurrency)
+      .eq('from_currency', fromUpper)
+      .eq('to_currency', toUpper)
       .single()
 
-    if (!dbError && cachedRate) {
-      return cachedRate.rate
+    if (!directError && directRate && typeof directRate.rate === 'number' && directRate.rate > 0) {
+      return directRate.rate
     }
 
-    // For demo, use hardcoded realistic rates
-    const rates = {
-      'BTC_PHP': 2800000, // 1 BTC = 2.8M PHP
-      'BTC_USD': 45000,   // 1 BTC = 45k USD
-      'BTC_EUR': 42000,   // 1 BTC = 42k EUR
-      'BTC_CAD': 62000,   // 1 BTC = 62k CAD
-      'BTC_AUD': 70000,   // 1 BTC = 70k AUD
-      'ETH_PHP': 170000,  // 1 ETH = 170k PHP
-      'ETH_USD': 2500,    // 1 ETH = 2500 USD
-      'ETH_EUR': 2300,    // 1 ETH = 2300 EUR
-      'ETH_CAD': 3400,    // 1 ETH = 3400 CAD
-      'ETH_AUD': 4000,    // 1 ETH = 4000 AUD
-      'USD_PHP': 56,      // 1 USD = 56 PHP
-      'USD_EUR': 0.92,    // 1 USD = 0.92 EUR
-      'USD_CAD': 1.38,    // 1 USD = 1.38 CAD
-      'USD_AUD': 1.55,    // 1 USD = 1.55 AUD
-      'EUR_PHP': 61,      // 1 EUR = 61 PHP
-      'EUR_USD': 1.09,    // 1 EUR = 1.09 USD
-      'EUR_CAD': 1.51,    // 1 EUR = 1.51 CAD
-      'EUR_AUD': 1.69,    // 1 EUR = 1.69 AUD
-      'CAD_PHP': 41,      // 1 CAD = 41 PHP
-      'CAD_USD': 0.72,    // 1 CAD = 0.72 USD
-      'CAD_EUR': 0.66,    // 1 CAD = 0.66 EUR
-      'CAD_AUD': 1.12,    // 1 CAD = 1.12 AUD
-      'AUD_PHP': 37,      // 1 AUD = 37 PHP
-      'AUD_USD': 0.64,    // 1 AUD = 0.64 USD
-      'AUD_EUR': 0.59,    // 1 AUD = 0.59 EUR
-      'AUD_CAD': 0.89,    // 1 AUD = 0.89 CAD
-      'PHP_USD': 0.018,   // 1 PHP = 0.018 USD
-      'PHP_EUR': 0.016,   // 1 PHP = 0.016 EUR
-      'PHP_CAD': 0.024,   // 1 PHP = 0.024 CAD
-      'PHP_AUD': 0.027,   // 1 PHP = 0.027 AUD
-      'USDT_USD': 1,      // 1 USDT = 1 USD
-      'USDT_PHP': 56,     // 1 USDT = 56 PHP
-      'USDT_EUR': 0.92,   // 1 USDT = 0.92 EUR
-      'USDT_AUD': 1.55    // 1 USDT = 1.55 AUD
+    // Fallback: try base currency conversion (USD)
+    const baseCurrency = 'USD'
+    if (fromUpper !== baseCurrency && toUpper !== baseCurrency) {
+      const { data: fromBase, error: fromBaseError } = await supabase
+        .from('pairs')
+        .select('rate')
+        .eq('from_currency', fromUpper)
+        .eq('to_currency', baseCurrency)
+        .single()
+
+      const { data: baseToTarget, error: baseToError } = await supabase
+        .from('pairs')
+        .select('rate')
+        .eq('from_currency', baseCurrency)
+        .eq('to_currency', toUpper)
+        .single()
+
+      if (
+        !fromBaseError &&
+        !baseToError &&
+        fromBase &&
+        baseToTarget &&
+        typeof fromBase.rate === 'number' &&
+        typeof baseToTarget.rate === 'number' &&
+        fromBase.rate > 0 &&
+        baseToTarget.rate > 0
+      ) {
+        return fromBase.rate * baseToTarget.rate
+      }
     }
 
-    const key = `${fromCurrency}_${toCurrency}`
-    const rate = rates[key]
+    // Alternative fallback: try PHP base
+    const altBase = 'PHP'
+    if (fromUpper !== altBase && toUpper !== altBase) {
+      const { data: fromAlt, error: fromAltError } = await supabase
+        .from('pairs')
+        .select('rate')
+        .eq('from_currency', fromUpper)
+        .eq('to_currency', altBase)
+        .single()
 
-    if (rate) {
-      return rate
+      const { data: altToTarget, error: altToError } = await supabase
+        .from('pairs')
+        .select('rate')
+        .eq('from_currency', altBase)
+        .eq('to_currency', toUpper)
+        .single()
+
+      if (
+        !fromAltError &&
+        !altToError &&
+        fromAlt &&
+        altToTarget &&
+        typeof fromAlt.rate === 'number' &&
+        typeof altToTarget.rate === 'number' &&
+        fromAlt.rate > 0 &&
+        altToTarget.rate > 0
+      ) {
+        return fromAlt.rate * altToTarget.rate
+      }
     }
 
-    // Default fallback
-    console.warn(`No rate found for ${key}, using default`)
-    return 1
+    console.warn(`No rate found for ${fromCurrency}→${toCurrency}, check if pair exists in public.pairs`)
+    throw new Error(`No exchange rate available for ${fromCurrency}→${toCurrency}`)
   } catch (err) {
     console.error(`Error getting rate for ${fromCurrency}→${toCurrency}:`, err)
-    return 1
+    throw err
   }
 }
 
