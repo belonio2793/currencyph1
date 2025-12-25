@@ -205,7 +205,7 @@ export const currencyAPI = {
         clearTimeout(timeout)
 
         if (!pairsError && pairsData && pairsData.length > 0) {
-          console.log('Using crypto prices from public.pairs table')
+          console.log('✅ Using crypto prices from public.pairs table')
           const lastUpdated = new Date(pairsData[0].updated_at || Date.now())
 
           // Extract crypto prices from pairs (e.g., BTC-USD, ETH-USD)
@@ -213,7 +213,7 @@ export const currencyAPI = {
           const ethUsd = pairsData.find(p => p.from_currency === 'ETH' && p.to_currency === 'USD')
           const dogeUsd = pairsData.find(p => p.from_currency === 'DOGE' && p.to_currency === 'USD')
 
-          return {
+          const cryptoPrices = {
             BTC: {
               name: 'Bitcoin',
               symbol: 'BTC',
@@ -233,50 +233,23 @@ export const currencyAPI = {
               lastUpdated
             }
           }
-        } else if (pairsError) {
-          console.warn('Error fetching crypto from public.pairs:', pairsError.message)
-        }
-      } catch (e) {
-        console.warn('Public.pairs crypto lookup failed or timed out:', e?.message)
-      }
 
-      // 2) SECONDARY: Try edge function (cached rates) with timeout
-      try {
-        const { data, error } = await Promise.race([
-          supabase.functions.invoke('fetch-rates', { method: 'GET' }),
-          new Promise((_, reject) => setTimeout(() => reject(new Error('Crypto prices fetch timeout')), 7000))
-        ])
-
-        if (!error && data && data.cryptoPrices) {
-          return {
-            BTC: {
-              name: 'Bitcoin',
-              symbol: 'BTC',
-              prices: data.cryptoPrices.bitcoin || {},
-              lastUpdated: new Date()
-            },
-            ETH: {
-              name: 'Ethereum',
-              symbol: 'ETH',
-              prices: data.cryptoPrices.ethereum || {},
-              lastUpdated: new Date()
-            },
-            DOGE: {
-              name: 'Dogecoin',
-              symbol: 'DOGE',
-              prices: data.cryptoPrices.dogecoin || {},
-              lastUpdated: new Date()
-            }
+          // Only return if we have at least one valid price
+          const hasValidPrices = btcUsd?.rate || ethUsd?.rate || dogeUsd?.rate
+          if (hasValidPrices) {
+            return cryptoPrices
           }
+        } else if (pairsError) {
+          console.warn('❌ Error fetching crypto from public.pairs:', pairsError.message)
         }
-        if (error) console.warn('Edge function error:', error?.message)
       } catch (e) {
-        console.warn('Edge function invocation failed:', e?.message)
+        console.warn('❌ Public.pairs crypto lookup failed or timed out:', e?.message)
       }
 
+      console.log('⚠️ Public.pairs crypto lookup failed, returning null to disable crypto conversion fallback')
       return null
     } catch (error) {
-      console.warn('Error fetching crypto prices:', error?.message)
+      console.warn('❌ Error fetching crypto prices:', error?.message)
       return null
     }
   },
