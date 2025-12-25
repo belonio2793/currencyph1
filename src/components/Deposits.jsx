@@ -216,10 +216,36 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
                 Object.assign(rates, pricesFromApi)
                 console.log(`[Deposits] Successfully fetched ${Object.keys(pricesFromApi).length} crypto rates in PHP`)
               } else {
-                console.warn('[Deposits] Crypto price fetch returned no data')
+                console.warn('[Deposits] Crypto price fetch returned no data, trying public.pairs fallback...')
               }
             } catch (e) {
               console.warn('[Deposits] Failed to fetch crypto rates in fiat mode:', e.message)
+            }
+
+            // CRITICAL FALLBACK: Query public.pairs directly if API failed
+            const stillMissingCryptos = Array.from(cryptoCurrenciesToFetch).filter(code => !rates[code])
+            if (stillMissingCryptos.length > 0) {
+              try {
+                console.log(`[Deposits] Querying public.pairs for ${stillMissingCryptos.length} missing crypto rates...`)
+                const { data: pairsData, error: pairsError } = await supabase
+                  .from('pairs')
+                  .select('from_currency, rate, updated_at')
+                  .eq('to_currency', 'PHP')
+                  .in('from_currency', stillMissingCryptos)
+
+                if (!pairsError && pairsData && pairsData.length > 0) {
+                  pairsData.forEach(row => {
+                    rates[row.from_currency] = parseFloat(row.rate)
+                  })
+                  console.log(`[Deposits] Loaded ${pairsData.length} rates from public.pairs`)
+                } else if (pairsError) {
+                  console.warn('[Deposits] Public.pairs query failed:', pairsError.message)
+                } else {
+                  console.warn('[Deposits] Public.pairs returned no data for:', stillMissingCryptos.join(', '))
+                }
+              } catch (e) {
+                console.warn('[Deposits] Public.pairs fallback failed:', e.message)
+              }
             }
           }
 
