@@ -98,10 +98,10 @@ export default function OfflineDisplay({ onShowAuth }) {
         </div>
 
         {/* Features Sections */}
-        <div className="space-y-8 sm:space-y-12">
+        <div className="space-y-4 sm:space-y-6">
           {FEATURE_ROWS.map((section, sectionIdx) => (
             <div key={sectionIdx}>
-              <h2 className={`font-bold text-slate-900 mb-4 sm:mb-6 flex items-center gap-2 ${isMobile ? 'text-lg' : 'text-2xl'}`}>
+              <h2 className={`font-bold text-slate-900 mb-3 sm:mb-4 flex items-center gap-2 ${isMobile ? 'text-lg' : 'text-2xl'}`}>
                 <span className="inline-block w-8 h-8 rounded-lg bg-slate-200 flex items-center justify-center text-xs sm:text-sm font-bold text-slate-700 flex-shrink-0">
                   {sectionIdx === 0 ? 'FS' : sectionIdx === 1 ? 'PF' : sectionIdx === 2 ? 'BS' : 'GM'}
                 </span>
