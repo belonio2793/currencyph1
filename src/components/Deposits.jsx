@@ -947,7 +947,11 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
                         <p className="text-xs text-slate-500 mt-1">
                           {!exchangeRates[selectedCurrency] || !exchangeRates[selectedWalletData?.currency_code] ? (
                             <span>⏳ Fetching rates...</span>
+                          ) : selectedWalletData?.currency_type === 'crypto' ? (
+                            // For fiat-to-crypto conversions
+                            `1 ${selectedCurrency} = ${(1 / exchangeRates[selectedWalletData?.currency_code]).toFixed(8)} ${selectedWalletData?.currency_code}`
                           ) : (
+                            // For fiat-to-fiat conversions (both rates are USD-based)
                             `1 ${selectedCurrency} = ${(exchangeRates[selectedWalletData?.currency_code] / exchangeRates[selectedCurrency]).toFixed(6)} ${selectedWalletData?.currency_code}`
                           )}
                         </p>
@@ -956,7 +960,11 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
                         <p className="text-sm text-slate-600">You will receive</p>
                         <p className={`text-2xl font-bold ${calculateConvertedAmount() ? 'text-blue-600' : 'text-amber-600'}`}>
                           {calculateConvertedAmount() ? calculateConvertedAmount().toLocaleString(undefined, { maximumFractionDigits: 8 }) : (
-                            exchangeRates[selectedCurrency] && exchangeRates[selectedWalletData?.currency_code] ? (parseFloat(amount) * (exchangeRates[selectedCurrency] / exchangeRates[selectedWalletData?.currency_code])).toLocaleString(undefined, { maximumFractionDigits: 8 }) : '⏳'
+                            exchangeRates[selectedCurrency] && exchangeRates[selectedWalletData?.currency_code] ? (
+                              selectedWalletData?.currency_type === 'crypto'
+                                ? (parseFloat(amount) / exchangeRates[selectedWalletData?.currency_code]).toLocaleString(undefined, { maximumFractionDigits: 8 })
+                                : (parseFloat(amount) * (exchangeRates[selectedWalletData?.currency_code] / exchangeRates[selectedCurrency])).toLocaleString(undefined, { maximumFractionDigits: 8 })
+                            ) : '⏳'
                           )} {selectedWalletData?.currency_code}
                         </p>
                       </div>
