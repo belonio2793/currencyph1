@@ -450,13 +450,13 @@ export class DepositStatusChangeService {
     // Record wallet transaction
     const transactionDescription = impact.conversion
       ? `Deposit approved: ${impact.conversion.originalAmount} ${impact.conversion.fromCurrency} → ${impact.conversion.convertedAmount} ${impact.wallet_currency}`
-      : `Deposit approved: ${impact.amount_changed}`
+      : `Deposit approved: ${Math.abs(impact.amount_changed)} ${impact.wallet_currency}`
 
     const { error: txError } = await this.supabase
       .from('wallet_transactions')
       .insert([{
         wallet_id: walletId,
-        user_id: adminId, // Will be the user who approved it
+        user_id: deposit.user_id,
         type: impact.operation === 'credit' ? 'deposit' : 'deposit_reversal',
         amount: Math.abs(impact.amount_changed),
         balance_before: impact.balance_before,

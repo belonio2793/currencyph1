@@ -205,6 +205,33 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
     loadInitialData()
   }, [userId])
 
+  // Subscribe to real-time deposit updates
+  useEffect(() => {
+    if (!userId || userId.includes('guest')) return
+
+    const channel = supabase
+      .channel(`deposits-${userId}`)
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'deposits',
+          filter: `user_id=eq.${userId}`
+        },
+        (payload) => {
+          console.debug('[Deposits] Deposit update detected:', payload.eventType)
+          // Reload deposits when any change is detected
+          loadInitialData()
+        }
+      )
+      .subscribe()
+
+    return () => {
+      channel.unsubscribe()
+    }
+  }, [userId])
+
   // Auto-refresh wallets while any are initializing
   useEffect(() => {
     if (initializingWallets.size === 0) return
@@ -672,9 +699,22 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
         return
       }
 
-      // Success
+      // Success - Display rate with full precision in explicit format
+      const rate = result.conversion.rate
+      const formattedRate = formatExchangeRate(rate)
+
+      // Log the actual rate for debugging
+      console.debug('[Deposits] Deposit success - Rate details:', {
+        rate: rate,
+        fromAmount: result.conversion.fromAmount,
+        toAmount: result.conversion.toAmount,
+        fromCurrency: result.conversion.fromCurrency,
+        toCurrency: result.conversion.toCurrency,
+        formattedRate: formattedRate
+      })
+
       setDeposits([result.deposit, ...deposits])
-      setSuccess(`Deposit initiated successfully! Converting ${selectedCurrency} to ${targetWalletData.currency_code} at rate ${result.conversion.rate.toFixed(6)}`)
+      setSuccess(`Deposit initiated successfully! 1 ${selectedCurrency} = ${formattedRate} ${targetWalletData.currency_code}`)
       setError('')
       setStep('confirm')
     } catch (err) {
@@ -1181,7 +1221,7 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
                   {exchangeRates[selectedCurrency] && (
                     <div className="flex justify-between items-center text-sm text-slate-600">
                       <span>Rate:</span>
-                      <span>1 {selectedCurrency} = {formatNumber(exchangeRates[selectedCurrency]) || 'N/A'} {selectedWalletData.currency_code}</span>
+                      <span>1 {selectedCurrency} = {formatExchangeRate(exchangeRates[selectedCurrency]) || 'N/A'} {selectedWalletData.currency_code}</span>
                     </div>
                   )}
                   {calculateConvertedAmount() && selectedCurrency !== selectedWalletData.currency_code && (
