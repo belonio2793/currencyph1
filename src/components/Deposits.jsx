@@ -363,9 +363,11 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
             if (stillMissingCryptos.length > 0) {
               try {
                 console.log(`[Deposits] Querying public.pairs for ${stillMissingCryptos.length} missing crypto rates (crypto mode): ${stillMissingCryptos.join(', ')}`)
+
+                // Try direct pairs (CRYPTO -> PHP): BTC->PHP, ETH->PHP, etc.
                 const { data: pairsData, error: pairsError } = await supabase
                   .from('pairs')
-                  .select('from_currency, rate, updated_at')
+                  .select('from_currency, to_currency, rate, updated_at')
                   .eq('to_currency', 'PHP')
                   .in('from_currency', stillMissingCryptos)
 
@@ -374,11 +376,31 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
                     const upperCode = row.from_currency.toUpperCase()
                     rates[upperCode] = parseFloat(row.rate)
                   })
-                  console.log(`[Deposits] Loaded ${pairsData.length} rates from public.pairs (crypto mode): ${pairsData.map(r => r.from_currency).join(', ')}`)
-                } else if (pairsError) {
+                  console.log(`[Deposits] Loaded ${pairsData.length} rates from public.pairs (direct): ${pairsData.map(r => r.from_currency).join(', ')}`)
+                }
+
+                // Also try inverse pairs (PHP -> CRYPTO) for missing rates
+                const stillMissingAfterDirect = cryptoCodes.filter(code => !rates[code])
+                if (stillMissingAfterDirect.length > 0) {
+                  console.log(`[Deposits] Trying inverse pairs (PHP -> CRYPTO) for crypto mode: ${stillMissingAfterDirect.join(', ')}`)
+                  const { data: inversePairs, error: inverseError } = await supabase
+                    .from('pairs')
+                    .select('from_currency, to_currency, rate, updated_at')
+                    .eq('from_currency', 'PHP')
+                    .in('to_currency', stillMissingAfterDirect)
+
+                  if (!inverseError && inversePairs && inversePairs.length > 0) {
+                    inversePairs.forEach(row => {
+                      const upperCode = row.to_currency.toUpperCase()
+                      // Invert the rate: if 1 PHP = 0.00004 BTC, then 1 BTC = 25000 PHP
+                      rates[upperCode] = 1 / parseFloat(row.rate)
+                    })
+                    console.log(`[Deposits] Loaded ${inversePairs.length} rates from public.pairs (inverted): ${inversePairs.map(r => r.to_currency).join(', ')}`)
+                  }
+                }
+
+                if (pairsError && !pairsData) {
                   console.error('[Deposits] Public.pairs query failed:', pairsError.message)
-                } else {
-                  console.warn('[Deposits] Public.pairs returned NO rows for:', stillMissingCryptos.join(', '), '| Check if cryptocurrency_rates table is populated')
                 }
               } catch (e) {
                 console.error('[Deposits] Public.pairs fallback threw error:', e.message)
