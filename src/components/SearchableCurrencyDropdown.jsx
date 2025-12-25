@@ -20,9 +20,13 @@ function SearchableCurrencyDropdown({
 
   const selectedCurrencyData = currencies.find(c => c.code === selectedCurrency)
 
-  // Separate currencies by type
-  const fiatCurrencies = currencies.filter(c => c.type === 'fiat')
-  const cryptoCurrencies = currencies.filter(c => c.type === 'crypto')
+  // Separate currencies by type and sort alphabetically by name
+  const fiatCurrencies = currencies
+    .filter(c => c.type === 'fiat')
+    .sort((a, b) => a.code.localeCompare(b.code))
+  const cryptoCurrencies = currencies
+    .filter(c => c.type === 'crypto')
+    .sort((a, b) => a.code.localeCompare(b.code))
 
   // Filter currencies based on search query
   const filterCurrencies = (currencyList) => {
