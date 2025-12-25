@@ -699,10 +699,22 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
         return
       }
 
-      // Success - Format rate with appropriate decimal places for very small rates
-      const formattedRate = formatExchangeRate(result.conversion.rate)
+      // Success - Display rate with full precision in explicit format
+      const rate = result.conversion.rate
+      const formattedRate = formatExchangeRate(rate)
+
+      // Log the actual rate for debugging
+      console.debug('[Deposits] Deposit success - Rate details:', {
+        rate: rate,
+        fromAmount: result.conversion.fromAmount,
+        toAmount: result.conversion.toAmount,
+        fromCurrency: result.conversion.fromCurrency,
+        toCurrency: result.conversion.toCurrency,
+        formattedRate: formattedRate
+      })
+
       setDeposits([result.deposit, ...deposits])
-      setSuccess(`Deposit initiated successfully! Converting ${selectedCurrency} to ${targetWalletData.currency_code} at rate ${formattedRate}`)
+      setSuccess(`Deposit initiated successfully! 1 ${selectedCurrency} = ${formattedRate} ${targetWalletData.currency_code}`)
       setError('')
       setStep('confirm')
     } catch (err) {
