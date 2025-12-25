@@ -223,39 +223,49 @@ function PaymentMethodsGrid({
                   Cryptocurrency Networks
                 </h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                  {filteredCryptoMethods.map(method => (
-                    <button
-                      key={method.id}
-                      onClick={() => handleSelectMethod(method)}
-                      className={`p-4 rounded-lg border-2 text-left transition-all hover:shadow-md ${
-                        selectedAddressMethod?.id === method.id
-                          ? 'border-orange-500 bg-orange-50 shadow-md'
-                          : 'border-slate-200 bg-white hover:border-slate-300'
-                      }`}
-                    >
-                      <div className="flex items-start justify-between">
-                        <div className="flex-1">
-                          <div className="flex items-center gap-2 mb-1">
-                            <span className="text-2xl">{method.icon}</span>
-                            <div>
-                              <div className="text-slate-900 font-semibold text-sm">
-                                {method.name}
-                              </div>
-                              {method.network && (
-                                <div className="text-xs text-orange-600 font-medium mt-1">
-                                  🔗 {method.network}
+                  {filteredCryptoMethods.map(method => {
+                    const convertedAmount = getConvertedAmountForMethod(method)
+                    const amountDisplay = formatAmountDisplay(method, convertedAmount)
+                    return (
+                      <button
+                        key={method.id}
+                        onClick={() => handleSelectMethod(method)}
+                        className={`p-4 rounded-lg border-2 text-left transition-all hover:shadow-md ${
+                          selectedAddressMethod?.id === method.id
+                            ? 'border-orange-500 bg-orange-50 shadow-md'
+                            : 'border-slate-200 bg-white hover:border-slate-300'
+                        }`}
+                      >
+                        <div className="flex items-start justify-between mb-3">
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2 mb-1">
+                              <span className="text-2xl">{method.icon}</span>
+                              <div>
+                                <div className="text-slate-900 font-semibold text-sm">
+                                  {method.name}
                                 </div>
-                              )}
+                                {method.network && (
+                                  <div className="text-xs text-orange-600 font-medium mt-1">
+                                    🔗 {method.network}
+                                  </div>
+                                )}
+                              </div>
                             </div>
+                            <p className="text-xs text-slate-600 mt-2">{method.description}</p>
                           </div>
-                          <p className="text-xs text-slate-600 mt-2">{method.description}</p>
+                          {selectedAddressMethod?.id === method.id && (
+                            <div className="text-orange-600 text-xl font-bold ml-2">✓</div>
+                          )}
                         </div>
-                        {selectedAddressMethod?.id === method.id && (
-                          <div className="text-orange-600 text-xl font-bold ml-2">✓</div>
+                        {amount && selectedCurrency && amountDisplay && (
+                          <div className="pt-3 border-t border-slate-200 mt-3">
+                            <p className="text-xs text-slate-500 mb-1">You need to send:</p>
+                            <p className="text-sm font-semibold text-orange-600">{amountDisplay}</p>
+                          </div>
                         )}
-                      </div>
-                    </button>
-                  ))}
+                      </button>
+                    )
+                  })}
                 </div>
               </div>
             )}
