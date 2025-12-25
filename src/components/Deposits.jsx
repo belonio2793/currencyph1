@@ -892,7 +892,7 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
         )}
 
         {/* Step 2: Payment Instructions */}
-        {step === 'confirm' && activeMethodData && selectedWalletData && (
+        {step === 'confirm' && (activeMethodData || selectedMethod) && selectedWalletData && (
           <div className="bg-white rounded-xl shadow-lg border border-slate-200 p-8 mb-6">
             <h2 className="text-2xl font-semibold text-slate-900 mb-6">
               {formatNumber(parseFloat(amount) || 0)} {selectedCurrency.toUpperCase()} via {activeMethodData.name}
