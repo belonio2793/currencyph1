@@ -637,10 +637,16 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
   }
 
   const selectedWalletData = wallets.find(w => w.id === selectedWallet)
-  // For fiat methods, use DEPOSIT_METHODS; for crypto methods, use selectedAddressMethod
-  const selectedMethodData = selectedMethod && DEPOSIT_METHODS[selectedMethod] ? DEPOSIT_METHODS[selectedMethod] : null
-  // For the confirm step, use whichever method is available (fiat or crypto)
-  const activeMethodData = selectedMethodData || selectedAddressMethod
+
+  // Determine which method data to use based on the type of deposit
+  let activeMethodData = null
+  if (activeType === 'currency' && selectedMethod) {
+    // For fiat deposits, use DEPOSIT_METHODS
+    activeMethodData = DEPOSIT_METHODS[selectedMethod] || null
+  } else if (activeType === 'cryptocurrency' && selectedAddressMethod) {
+    // For crypto deposits, use the selected address method
+    activeMethodData = selectedAddressMethod
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 py-8 px-4">
