@@ -244,9 +244,12 @@ ORDER BY w.currency_code;
 -- PHASE 8: AUDIT TRAIL
 -- ============================================================================
 
-RAISE NOTICE '';
-RAISE NOTICE '>> PHASE 8: BALANCE CHANGE AUDIT TRAIL';
-RAISE NOTICE '═══════════════════════════════════════════════════════════';
+DO $$
+BEGIN
+  RAISE NOTICE '';
+  RAISE NOTICE '>> PHASE 8: BALANCE CHANGE AUDIT TRAIL';
+  RAISE NOTICE '═══════════════════════════════════════════════════════════';
+END $$;
 
 SELECT
   SUBSTRING(wba.wallet_id FROM 1 FOR 8) || '...' as wallet_id,
