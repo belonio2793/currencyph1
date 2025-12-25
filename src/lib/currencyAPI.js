@@ -174,43 +174,15 @@ export const currencyAPI = {
     }
   },
 
-  // Get Bitcoin and Ethereum prices in USD and other currencies
+  // Get Bitcoin and Ethereum prices in USD and other currencies from public.pairs (primary)
   async getCryptoPrices() {
     try {
-      const { data, error } = await Promise.race([
-        supabase.functions.invoke('fetch-rates', { method: 'GET' }),
-        new Promise((_, reject) => setTimeout(() => reject(new Error('Crypto prices fetch timeout')), 7000))
-      ])
-
-      if (!error && data && data.cryptoPrices) {
-        return {
-          BTC: {
-            name: 'Bitcoin',
-            symbol: 'BTC',
-            prices: data.cryptoPrices.bitcoin || {},
-            lastUpdated: new Date()
-          },
-          ETH: {
-            name: 'Ethereum',
-            symbol: 'ETH',
-            prices: data.cryptoPrices.ethereum || {},
-            lastUpdated: new Date()
-          },
-          DOGE: {
-            name: 'Dogecoin',
-            symbol: 'DOGE',
-            prices: data.cryptoPrices.dogecoin || {},
-            lastUpdated: new Date()
-          }
-        }
-      }
-
-      // Fallback: Try to fetch from public.pairs table
-      console.warn('Edge function failed, trying public.pairs fallback:', error?.message)
+      // 1) PRIMARY: Try public.pairs table first for crypto prices
       try {
         const { data: pairsData, error: pairsError } = await supabase
           .from('pairs')
           .select('from_currency, to_currency, rate, updated_at')
+          .limit(500)
 
         if (!pairsError && pairsData && pairsData.length > 0) {
           console.log('Using crypto prices from public.pairs table')
@@ -241,9 +213,45 @@ export const currencyAPI = {
               lastUpdated
             }
           }
+        } else if (pairsError) {
+          console.warn('Error fetching crypto from public.pairs:', pairsError.message)
         }
-      } catch (pairsErr) {
-        console.warn('Public.pairs fallback also failed:', pairsErr?.message)
+      } catch (e) {
+        console.warn('Public.pairs crypto lookup failed:', e?.message)
+      }
+
+      // 2) SECONDARY: Try edge function (cached rates) with timeout
+      try {
+        const { data, error } = await Promise.race([
+          supabase.functions.invoke('fetch-rates', { method: 'GET' }),
+          new Promise((_, reject) => setTimeout(() => reject(new Error('Crypto prices fetch timeout')), 7000))
+        ])
+
+        if (!error && data && data.cryptoPrices) {
+          return {
+            BTC: {
+              name: 'Bitcoin',
+              symbol: 'BTC',
+              prices: data.cryptoPrices.bitcoin || {},
+              lastUpdated: new Date()
+            },
+            ETH: {
+              name: 'Ethereum',
+              symbol: 'ETH',
+              prices: data.cryptoPrices.ethereum || {},
+              lastUpdated: new Date()
+            },
+            DOGE: {
+              name: 'Dogecoin',
+              symbol: 'DOGE',
+              prices: data.cryptoPrices.dogecoin || {},
+              lastUpdated: new Date()
+            }
+          }
+        }
+        if (error) console.warn('Edge function error:', error?.message)
+      } catch (e) {
+        console.warn('Edge function invocation failed:', e?.message)
       }
 
       return null
