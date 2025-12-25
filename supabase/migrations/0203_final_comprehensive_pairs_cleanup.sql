@@ -35,75 +35,76 @@ VALUES (
 
 -- ============================================================================
 -- STEP 3: Ensure ALL critical canonical pairs (X→PHP) exist
+-- NOTE: Rates are fetched from live APIs (ExConvert, CoinGecko, Open Exchange Rates)
+-- No hardcoded rates - all pairs must be populated by fetch-rates functions
 -- ============================================================================
 WITH critical_pairs AS (
   SELECT * FROM (VALUES
     -- Fiat currencies
-    ('USD', 'PHP', 56.5),
-    ('EUR', 'PHP', 62.0),
-    ('GBP', 'PHP', 71.0),
-    ('JPY', 'PHP', 0.37),
-    ('AUD', 'PHP', 38.0),
-    ('CAD', 'PHP', 42.0),
-    ('SGD', 'PHP', 42.0),
-    ('HKD', 'PHP', 7.2),
-    ('INR', 'PHP', 0.67),
-    ('MYR', 'PHP', 12.0),
-    ('THB', 'PHP', 1.57),
-    ('VND', 'PHP', 0.0022),
-    ('KRW', 'PHP', 0.043),
-    ('ZAR', 'PHP', 3.0),
-    ('BRL', 'PHP', 11.5),
-    ('MXN', 'PHP', 3.35),
-    ('NOK', 'PHP', 5.3),
-    ('DKK', 'PHP', 8.3),
-    ('AED', 'PHP', 15.4),
-    -- Cryptocurrencies - CANONICAL RATES (X→PHP)
-    ('BTC', 'PHP', 2500000),
-    ('ETH', 'PHP', 150000),
-    ('USDT', 'PHP', 56.5),
-    ('BNB', 'PHP', 25000),
-    ('XRP', 'PHP', 3.5),
-    ('ADA', 'PHP', 34),
-    ('DOGE', 'PHP', 0.41),
-    ('SOL', 'PHP', 195),
-    ('AVAX', 'PHP', 28),
-    ('BCH', 'PHP', 590),
-    ('LTC', 'PHP', 100),
-    ('XLM', 'PHP', 0.35),
-    ('LINK', 'PHP', 65),
-    ('DOT', 'PHP', 9),
-    ('UNI', 'PHP', 8.5),
-    ('AAVE', 'PHP', 550),
-    ('TON', 'PHP', 6.5),
-    ('TRX', 'PHP', 0.36),
-    ('SHIB', 'PHP', 0.000021),
-    ('WLD', 'PHP', 8),
-    ('HBAR', 'PHP', 0.15),
-    ('PYUSD', 'PHP', 56.5),
-    ('SUI', 'PHP', 5),
-    ('USDC', 'PHP', 56.5),
-    ('MATIC', 'PHP', 0.35)
-  ) AS t(currency, to_cur, fallback_rate)
+    ('USD', 'PHP'),
+    ('EUR', 'PHP'),
+    ('GBP', 'PHP'),
+    ('JPY', 'PHP'),
+    ('AUD', 'PHP'),
+    ('CAD', 'PHP'),
+    ('SGD', 'PHP'),
+    ('HKD', 'PHP'),
+    ('INR', 'PHP'),
+    ('MYR', 'PHP'),
+    ('THB', 'PHP'),
+    ('VND', 'PHP'),
+    ('KRW', 'PHP'),
+    ('ZAR', 'PHP'),
+    ('BRL', 'PHP'),
+    ('MXN', 'PHP'),
+    ('NOK', 'PHP'),
+    ('DKK', 'PHP'),
+    ('AED', 'PHP'),
+    -- Cryptocurrencies - CANONICAL PAIRS (X→PHP)
+    ('BTC', 'PHP'),
+    ('ETH', 'PHP'),
+    ('USDT', 'PHP'),
+    ('BNB', 'PHP'),
+    ('XRP', 'PHP'),
+    ('ADA', 'PHP'),
+    ('DOGE', 'PHP'),
+    ('SOL', 'PHP'),
+    ('AVAX', 'PHP'),
+    ('BCH', 'PHP'),
+    ('LTC', 'PHP'),
+    ('XLM', 'PHP'),
+    ('LINK', 'PHP'),
+    ('DOT', 'PHP'),
+    ('UNI', 'PHP'),
+    ('AAVE', 'PHP'),
+    ('TON', 'PHP'),
+    ('TRX', 'PHP'),
+    ('SHIB', 'PHP'),
+    ('WLD', 'PHP'),
+    ('HBAR', 'PHP'),
+    ('PYUSD', 'PHP'),
+    ('SUI', 'PHP'),
+    ('USDC', 'PHP'),
+    ('MATIC', 'PHP')
+  ) AS t(currency, to_cur)
 )
 INSERT INTO pairs (from_currency, to_currency, rate, source_table, updated_at, pair_direction, is_inverted)
-SELECT 
-  currency, 
-  to_cur, 
-  fallback_rate,
+SELECT
+  currency,
+  to_cur,
+  NULL,
   'currency_rates',
   NOW(),
   'canonical',
   FALSE
 FROM critical_pairs
-ON CONFLICT (from_currency, to_currency) 
-DO UPDATE SET 
-  rate = EXCLUDED.rate,
-  source_table = EXCLUDED.source_table,
+ON CONFLICT (from_currency, to_currency)
+DO UPDATE SET
+  source_table = 'currency_rates',
   updated_at = NOW(),
   pair_direction = 'canonical',
   is_inverted = FALSE
-WHERE pairs.rate != EXCLUDED.rate OR pairs.pair_direction != 'canonical';
+WHERE pairs.pair_direction != 'canonical';
 
 -- ============================================================================
 -- STEP 4: Ensure PHP and USD are always present
