@@ -482,49 +482,40 @@ async function handle(req: Request): Promise<Response> {
     }
 
     // Fallback if database is empty
-    console.warn('[fetch-rates] Database is empty, falling back to APIs...')
+    console.warn('[fetch-rates] Database is empty, falling back to OpenExchangeRates + CoinGecko...')
 
-    // Try ExConvert API (limited scope since database is meant to be pre-populated)
-    let exconvertRates: Record<string, Record<string, number>> | null = null
-    if (EXCONVERT_KEY) {
-      console.log('[fetch-rates] Attempting ExConvert API...')
-      exconvertRates = await fetchAllRatesFromDatabase() // Placeholder - would need implementation
-      if (exconvertRates) {
-        source = 'exconvert'
-      }
+    // Use OpenExchangeRates + CoinGecko (do NOT use EXCONVERT)
+    const [exchangeRates, cryptoPricesUSD, cryptoPricesPHP] = await Promise.all([
+      fetchOpenExchangeRates(),
+      fetchCoinGecko('usd'),
+      fetchCoinGecko('php')
+    ])
+
+    const fallbackRates: Record<string, Record<string, number>> = {}
+
+    // Add fiat currency rates from OpenExchangeRates
+    if (exchangeRates) {
+      fallbackRates['USD'] = exchangeRates
+      console.log('[fetch-rates] OpenExchangeRates succeeded')
+    } else {
+      console.warn('[fetch-rates] OpenExchangeRates failed')
     }
 
-    // Fallback to OpenExchangeRates + CoinGecko
-    if (!exconvertRates) {
-      console.warn('[fetch-rates] Falling back to OpenExchangeRates + CoinGecko...')
-      const [exchangeRates, cryptoPricesUSD, cryptoPricesPHP] = await Promise.all([
-        fetchOpenExchangeRates(),
-        fetchCoinGecko('usd'),
-        fetchCoinGecko('php')
-      ])
-
-      exconvertRates = {}
-
-      // Add fiat currency rates from OpenExchangeRates
-      if (exchangeRates) {
-        exconvertRates['USD'] = exchangeRates
-        console.log('[fetch-rates] OpenExchangeRates succeeded')
+    // Add crypto rates from CoinGecko
+    const cryptoPrices = { ...cryptoPricesUSD, ...cryptoPricesPHP }
+    if (Object.keys(cryptoPrices).length > 0) {
+      // Convert CoinGecko format to our format
+      for (const [coingeckoId, priceData] of Object.entries(cryptoPrices)) {
+        const cryptoCode = coingeckoIdToCryptoCode[coingeckoId as string] || (coingeckoId as string).toUpperCase()
+        fallbackRates[cryptoCode] = priceData as Record<string, number>
       }
-
-      // Add crypto rates from CoinGecko
-      const cryptoPrices = { ...cryptoPricesUSD, ...cryptoPricesPHP }
-      if (Object.keys(cryptoPrices).length > 0) {
-        // Convert CoinGecko format to our format
-        for (const [coingeckoId, priceData] of Object.entries(cryptoPrices)) {
-          const cryptoCode = coingeckoIdToCryptoCode[coingeckoId as string] || (coingeckoId as string).toUpperCase()
-          exconvertRates[cryptoCode] = priceData as Record<string, number>
-        }
-        console.log('[fetch-rates] CoinGecko succeeded with', Object.keys(cryptoPrices).length, 'cryptos')
-        source = 'fallback_openexchange_coingecko'
-      }
+      console.log('[fetch-rates] CoinGecko succeeded with', Object.keys(cryptoPrices).length, 'cryptos')
+      source = 'openexchange_coingecko'
+    } else {
+      console.warn('[fetch-rates] CoinGecko failed')
     }
 
-    allRates = exconvertRates
+    allRates = fallbackRates
 
     // If still no rates, try last cached (even if stale)
     if (!allRates || Object.keys(allRates).length === 0) {
