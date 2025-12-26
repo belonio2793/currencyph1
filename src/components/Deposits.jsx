@@ -1395,32 +1395,19 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
                       })
                     }
 
-                    // Helper function to get currency symbol
-                    const getCurrSymbol = (curr) => {
-                      if (!curr) return ''
-                      const symbol = CURRENCY_SYMBOLS[curr.toUpperCase()]
-                      return symbol || curr.toUpperCase()
-                    }
-
                     // Calculate exchange rate
                     const exchangeRate = convertedAmount && deposit.amount ? (convertedAmount / deposit.amount) : null
 
                     return (
                       <tr key={deposit.id} className="border-b border-slate-100 hover:bg-slate-50 transition">
                         <td className="py-3 px-4 font-semibold text-slate-900">
-                          {getCurrSymbol(originalCurrency)}{formatAmount(deposit.amount, originalCurrency)}
+                          {formatAmount(deposit.amount, originalCurrency)} {originalCurrency.toUpperCase()}
                         </td>
                         <td className="py-3 px-4 text-slate-700 text-xs">
                           {exchangeRate ? `1 ${originalCurrency.toUpperCase()} = ${formatExchangeRate(exchangeRate)} ${walletCurrency.toUpperCase()}` : '—'}
                         </td>
                         <td className="py-3 px-4 font-semibold text-emerald-600">
-                          {convertedAmount ? (
-                            <>
-                              {getCurrSymbol(walletCurrency)}{formatAmount(convertedAmount, walletCurrency)}
-                            </>
-                          ) : (
-                            '—'
-                          )}
+                          {convertedAmount ? `${formatAmount(convertedAmount, walletCurrency)} ${walletCurrency.toUpperCase()}` : '—'}
                         </td>
                         <td className="py-3 px-4 text-xs text-slate-600 font-mono">
                           {deposit.reference_number || deposit.phone_number || '—'}
