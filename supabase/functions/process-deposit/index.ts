@@ -194,19 +194,27 @@ async function enrichDepositDataWithMetadata(
     console.warn('Failed to fetch currency info:', error)
   }
 
+  // SCHEMA SEMANTICS:
+  // - currency_code: destination/wallet currency (what's received)
+  // - original_currency: source currency (what's deposited)
+  // - amount: source amount
+  // - received_amount: destination amount
+
   // Enrich with all metadata
   const enriched = {
     ...depositData,
 
-    // Ensure original currency tracking
+    // Ensure source currency tracking (what was deposited)
     original_currency: depositCurrency.toUpperCase(),
     original_currency_name: currencyMap[depositCurrency.toUpperCase()]?.name || depositCurrency,
     original_currency_symbol: currencyMap[depositCurrency.toUpperCase()]?.symbol || depositCurrency,
 
-    // Ensure wallet/received currency tracking
-    received_currency: walletCurrencyCode.toUpperCase(),
+    // Ensure destination/wallet currency tracking (what will be received)
+    // Note: currency_code should be the wallet currency, not the source currency
+    currency_code: walletCurrencyCode.toUpperCase(),
     currency_name: currencyMap[walletCurrencyCode.toUpperCase()]?.name || walletCurrencyCode,
     currency_symbol: currencyMap[walletCurrencyCode.toUpperCase()]?.symbol || walletCurrencyCode,
+    received_currency: walletCurrencyCode.toUpperCase(),
 
     // Add conversion details if available
     ...(conversionResult && {
@@ -224,9 +232,10 @@ async function enrichDepositDataWithMetadata(
       rate_fetched_at: now
     }),
 
-    // Add metadata object if not present
+    // Add metadata object with complete context
     metadata: {
       ...depositData.metadata,
+      original_amount: request.amount,
       original_currency: depositCurrency.toUpperCase(),
       received_currency: walletCurrencyCode.toUpperCase(),
       exchange_rate: conversionResult?.exchangeRate || 1,
@@ -242,6 +251,7 @@ async function enrichDepositDataWithMetadata(
       original_amount: request.amount,
       original_currency: depositCurrency.toUpperCase(),
       received_currency: walletCurrencyCode.toUpperCase(),
+      received_amount: conversionResult?.convertedAmount,
       exchange_rate: conversionResult?.exchangeRate || 1,
       rate_source: conversionResult?.source || 'none',
       deposit_method: depositData.deposit_method,
