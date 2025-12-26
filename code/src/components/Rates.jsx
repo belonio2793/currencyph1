@@ -157,7 +157,7 @@ export default function Rates() {
         }
       })
 
-      console.log(`📊 Selected base currency: ${baseCurrency} (${maxCount || targetCounts[baseCurrency] || 0} pairs)`)
+      console.log(`Chart Selected base currency: ${baseCurrency} (${maxCount || targetCounts[baseCurrency] || 0} pairs)`)
 
       // Second pass: collect rates using the best base currency
       pairsData?.forEach(pair => {
