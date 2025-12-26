@@ -114,19 +114,22 @@ export default function Rates() {
           .select('code,name,coingecko_id')
       ])
 
+      // Load metadata from both sources
       if (currenciesRes.data) {
         currenciesRes.data.forEach(c => {
           allMetadata[c.code] = { ...c, type: 'currency' }
         })
+        console.log(`Loaded metadata for ${currenciesRes.data.length} fiat currencies`)
       }
 
       if (cryptosRes.data) {
         cryptosRes.data.forEach(c => {
           allMetadata[c.code] = { ...c, type: 'cryptocurrency' }
         })
+        console.log(`Loaded metadata for ${cryptosRes.data.length} cryptocurrencies`)
       }
 
-      // Add entries for codes without metadata
+      // Add fallback entries for codes without metadata (rates that don't have metadata yet)
       codeArray.forEach(code => {
         if (!allMetadata[code]) {
           allMetadata[code] = {
@@ -140,7 +143,7 @@ export default function Rates() {
       })
 
       setCurrencies(allMetadata)
-      console.log(`List Loaded metadata for ${Object.keys(allMetadata).length} currencies and cryptos`)
+      console.log(`Total metadata loaded: ${Object.keys(allMetadata).length} items`)
 
       // Build rates list - one entry per unique currency/crypto code
       const ratesByCode = {}
