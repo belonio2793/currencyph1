@@ -145,7 +145,7 @@ function NavbarComponent({ activeTab, onTabChange, globalCurrency, setGlobalCurr
           </div>
         )}
 
-        {/* Row 2: Currency selector and Navigation */}
+        {/* Row 3: Currency selector and Navigation */}
         <div className="border-t border-slate-100 py-2 flex flex-wrap items-center gap-2">
           {globalCurrency && setGlobalCurrency && (
             <div className="flex items-center gap-4 flex-wrap">
