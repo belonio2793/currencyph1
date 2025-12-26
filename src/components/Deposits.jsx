@@ -1356,9 +1356,9 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b border-slate-200">
-                    <th className="text-left py-3 px-4 text-slate-600 font-medium">Amount</th>
-                    <th className="text-left py-3 px-4 text-slate-600 font-medium">Converted Amount</th>
-                    <th className="text-left py-3 px-4 text-slate-600 font-medium">Currency</th>
+                    <th className="text-left py-3 px-4 text-slate-600 font-medium">You Sent</th>
+                    <th className="text-left py-3 px-4 text-slate-600 font-medium">Exchange Rate</th>
+                    <th className="text-left py-3 px-4 text-slate-600 font-medium">You Received</th>
                     <th className="text-left py-3 px-4 text-slate-600 font-medium">Reference</th>
                     <th className="text-left py-3 px-4 text-slate-600 font-medium">Status</th>
                     <th className="text-left py-3 px-4 text-slate-600 font-medium">Action</th>
@@ -1394,19 +1394,32 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
                       })
                     }
 
-                    // Helper function to uppercase currency symbols
-                    const formatCurrency = (curr) => (curr ? curr.toUpperCase() : '—')
+                    // Helper function to get currency symbol
+                    const getCurrSymbol = (curr) => {
+                      if (!curr) return ''
+                      const symbol = CURRENCY_SYMBOLS[curr.toUpperCase()]
+                      return symbol || curr.toUpperCase()
+                    }
+
+                    // Calculate exchange rate
+                    const exchangeRate = convertedAmount && deposit.amount ? (convertedAmount / deposit.amount) : null
 
                     return (
                       <tr key={deposit.id} className="border-b border-slate-100 hover:bg-slate-50 transition">
                         <td className="py-3 px-4 font-semibold text-slate-900">
-                          {formatAmount(deposit.amount, originalCurrency)} {formatCurrency(originalCurrency)}
+                          {getCurrSymbol(originalCurrency)}{formatAmount(deposit.amount, originalCurrency)}
                         </td>
-                        <td className="py-3 px-4 text-slate-700">
-                          {convertedAmount ? formatAmount(convertedAmount, walletCurrency) : '—'}
+                        <td className="py-3 px-4 text-slate-700 text-xs">
+                          {exchangeRate ? `1 ${originalCurrency.toUpperCase()} = ${formatExchangeRate(exchangeRate)} ${walletCurrency.toUpperCase()}` : '—'}
                         </td>
-                        <td className="py-3 px-4 text-slate-700">
-                          {formatCurrency(walletCurrency)}
+                        <td className="py-3 px-4 font-semibold text-emerald-600">
+                          {convertedAmount ? (
+                            <>
+                              {getCurrSymbol(walletCurrency)}{formatAmount(convertedAmount, walletCurrency)}
+                            </>
+                          ) : (
+                            '—'
+                          )}
                         </td>
                         <td className="py-3 px-4 text-xs text-slate-600 font-mono">
                           {deposit.reference_number || deposit.phone_number || '—'}
