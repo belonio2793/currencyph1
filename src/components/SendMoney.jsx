@@ -322,7 +322,7 @@ export default function SendMoney({ userId }) {
                       {selectedSender && (() => {
                         const wallet = getWalletByCurrency(selectedSender)
                         return wallet ? (
-                          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                          <div className="bg-slate-50 border border-slate-300 rounded-lg p-4">
                             <h4 className="text-sm font-semibold text-slate-900 mb-3">Selected Account Details</h4>
                             <div className="space-y-2 text-sm">
                               <div className="flex justify-between">
