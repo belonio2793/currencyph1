@@ -66,8 +66,8 @@ export default function WalletDetailPanel({ wallet, userId, globalCurrency, onCl
         {/* Header */}
         <div className="bg-gradient-to-r from-slate-900 to-slate-800 px-8 py-6 flex items-center justify-between rounded-t-2xl">
           <div className="flex items-center gap-4">
-            <div className={`p-4 rounded-lg ${isCrypto ? 'bg-orange-100' : 'bg-blue-100'}`}>
-              <span className={`text-3xl ${isCrypto ? 'text-orange-600' : 'text-blue-600'}`}>
+            <div className="p-4 rounded-lg bg-slate-700">
+              <span className="text-3xl text-slate-300">
                 {isCrypto ? 'C' : 'F'}
               </span>
             </div>
