@@ -118,16 +118,14 @@ export default function OnboardingChecklist({ userId, userEmail, onTaskComplete,
     }
   }
 
-  if (!userId || loading) {
+  if (!userId || loading || !showChecklist) {
     return null
   }
 
   const incompleteTasks = tasks.filter(t => !t.completed)
 
-  // Don't show if all tasks are complete
-  if (allCompleted && !isExpanded) {
-    return null
-  }
+  // Auto-collapse after showing completion
+  const shouldShowExpanded = isExpanded || (allCompleted && progress.total > 0)
 
   return (
     <div className="bg-white rounded-lg shadow-sm border border-slate-200">
@@ -141,14 +139,14 @@ export default function OnboardingChecklist({ userId, userEmail, onTaskComplete,
             <span className="text-2xl">🎯</span>
             <div className="flex-1">
               <h3 className="text-base font-semibold text-slate-900">Welcome To Currency.ph</h3>
-              <p className="text-sm text-slate-500">Complete tasks to get started</p>
+              <p className="text-sm text-slate-500">{allCompleted ? '✓ All tasks completed!' : 'Complete tasks to get started'}</p>
             </div>
           </div>
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2">
               <div className="w-32 h-2 bg-slate-200 rounded-full overflow-hidden">
                 <div
-                  className="h-full bg-blue-600 transition-all duration-300"
+                  className="h-full bg-slate-900 transition-all duration-300"
                   style={{ width: `${progress.percentage}%` }}
                 />
               </div>
@@ -156,11 +154,25 @@ export default function OnboardingChecklist({ userId, userEmail, onTaskComplete,
                 {progress.percentage}%
               </span>
             </div>
+            {allCompleted && (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation()
+                  handleRemoveChecklist()
+                }}
+                className="text-slate-400 hover:text-slate-600 transition-colors p-1"
+                title="Remove checklist"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            )}
             <button
               className="text-slate-400 hover:text-slate-600 transition-colors"
-              title={isExpanded ? 'Collapse' : 'Expand'}
+              title={shouldShowExpanded ? 'Collapse' : 'Expand'}
             >
-              {isExpanded ? (
+              {shouldShowExpanded ? (
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
                 </svg>
