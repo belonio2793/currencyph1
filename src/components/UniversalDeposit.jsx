@@ -480,7 +480,6 @@ export default function UniversalDeposit({ onSuccess, onClose }) {
       <div className="deposit-step processing">
         <div className="success-icon">✓</div>
         <h2>Deposit Initiated</h2>
-        <p className="success-message">{success}</p>
 
         {depositResult?.bankDetails && (
           <div className="bank-details">
