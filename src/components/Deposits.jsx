@@ -879,12 +879,6 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
           </div>
         )}
 
-        {/* Success Message */}
-        {success && (
-          <div className="mb-6 p-4 bg-emerald-50 border border-emerald-200 rounded-lg text-emerald-700 text-sm">
-            {success}
-          </div>
-        )}
 
         {/* Step 1: Enter Amount */}
         {step === 'amount' && (
