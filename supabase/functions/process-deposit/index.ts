@@ -290,21 +290,13 @@ async function processStripeDeposit(
     const stripeData = await stripeResponse.json()
 
     // Calculate received amount if currency is not PHP
-    let receivedAmount: number | null = null
-    let exchangeRate: number | null = null
-    let rateSource = 'openexchangerates'
-
+    let conversionResult = null
     if (request.currency !== 'PHP') {
-      const conversionResult = await convertToPhp(request.amount, request.currency)
-      if (conversionResult) {
-        receivedAmount = conversionResult.convertedAmount
-        exchangeRate = conversionResult.exchangeRate
-        rateSource = conversionResult.source
-      }
+      conversionResult = await convertToPhp(request.amount, request.currency)
     }
 
-    // Store deposit intent
-    const depositData: Record<string, any> = {
+    // Build deposit data
+    let depositData: Record<string, any> = {
       user_id: request.userId,
       wallet_id: request.walletId,
       amount: request.amount,
@@ -315,13 +307,8 @@ async function processStripeDeposit(
       external_tx_id: stripeData.id
     }
 
-    // Add conversion details if available
-    if (receivedAmount !== null && exchangeRate !== null && request.currency !== 'PHP') {
-      depositData.received_amount = receivedAmount
-      depositData.exchange_rate = exchangeRate
-      depositData.rate_source = rateSource
-      depositData.rate_fetched_at = new Date().toISOString()
-    }
+    // Enrich with all metadata fields
+    depositData = await enrichDepositDataWithMetadata(depositData, request, conversionResult || undefined)
 
     const { data: deposit, error: depositError } = await supabase
       .from('deposits')
