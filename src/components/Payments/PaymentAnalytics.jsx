@@ -184,47 +184,47 @@ export default function PaymentAnalytics({ merchant, userId, globalCurrency = 'P
 
       {/* Key Metrics */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div className="bg-gradient-to-br from-blue-50 to-blue-100 border border-blue-200 rounded-lg p-6">
-          <p className="text-xs font-semibold text-blue-700 uppercase mb-2">Gross Revenue</p>
-          <p className="text-3xl font-bold text-blue-900">{globalCurrency} {metrics.totalRevenue.toFixed(2)}</p>
-          <p className="text-xs text-blue-600 mt-2">{metrics.totalTransactions} transactions</p>
+        <div className="bg-white border border-slate-300 rounded-lg p-6">
+          <p className="text-xs font-semibold text-slate-600 uppercase mb-2">Gross Revenue</p>
+          <p className="text-sm font-mono font-semibold text-slate-900 truncate">{globalCurrency} {metrics.totalRevenue.toFixed(2)}</p>
+          <p className="text-xs text-slate-500 mt-2">{metrics.totalTransactions} transactions</p>
         </div>
 
-        <div className="bg-gradient-to-br from-emerald-50 to-emerald-100 border border-emerald-200 rounded-lg p-6">
-          <p className="text-xs font-semibold text-emerald-700 uppercase mb-2">Net Revenue</p>
-          <p className="text-3xl font-bold text-emerald-900">{globalCurrency} {metrics.netRevenue.toFixed(2)}</p>
-          <p className="text-xs text-emerald-600 mt-2">After fees</p>
+        <div className="bg-white border border-slate-300 rounded-lg p-6">
+          <p className="text-xs font-semibold text-slate-600 uppercase mb-2">Net Revenue</p>
+          <p className="text-sm font-mono font-semibold text-slate-900 truncate">{globalCurrency} {metrics.netRevenue.toFixed(2)}</p>
+          <p className="text-xs text-slate-500 mt-2">After fees</p>
         </div>
 
-        <div className="bg-gradient-to-br from-amber-50 to-amber-100 border border-amber-200 rounded-lg p-6">
-          <p className="text-xs font-semibold text-amber-700 uppercase mb-2">Total Fees</p>
-          <p className="text-3xl font-bold text-amber-900">{globalCurrency} {metrics.totalFees.toFixed(2)}</p>
-          <p className="text-xs text-amber-600 mt-2">{((metrics.totalFees / metrics.totalRevenue) * 100 || 0).toFixed(2)}% of revenue</p>
+        <div className="bg-white border border-slate-300 rounded-lg p-6">
+          <p className="text-xs font-semibold text-slate-600 uppercase mb-2">Total Fees</p>
+          <p className="text-sm font-mono font-semibold text-slate-900 truncate">{globalCurrency} {metrics.totalFees.toFixed(2)}</p>
+          <p className="text-xs text-slate-500 mt-2">{((metrics.totalFees / metrics.totalRevenue) * 100 || 0).toFixed(2)}% of revenue</p>
         </div>
 
-        <div className="bg-gradient-to-br from-purple-50 to-purple-100 border border-purple-200 rounded-lg p-6">
-          <p className="text-xs font-semibold text-purple-700 uppercase mb-2">Avg Transaction</p>
-          <p className="text-3xl font-bold text-purple-900">{globalCurrency} {metrics.avgTransactionValue.toFixed(2)}</p>
-          <p className="text-xs text-purple-600 mt-2">Average value per transaction</p>
+        <div className="bg-white border border-slate-300 rounded-lg p-6">
+          <p className="text-xs font-semibold text-slate-600 uppercase mb-2">Avg Transaction</p>
+          <p className="text-sm font-mono font-semibold text-slate-900 truncate">{globalCurrency} {metrics.avgTransactionValue.toFixed(2)}</p>
+          <p className="text-xs text-slate-500 mt-2">Average value per transaction</p>
         </div>
       </div>
 
       {/* Transaction Status Overview */}
-      <div className="bg-white rounded-lg border border-slate-200 p-6">
+      <div className="bg-white rounded-lg border border-slate-300 p-6">
         <h3 className="text-lg font-semibold text-slate-900 mb-4">Transaction Status Overview</h3>
         <div className="grid grid-cols-3 gap-4">
           <div className="text-center">
-            <p className="text-4xl font-bold text-emerald-600">{metrics.totalTransactions}</p>
+            <p className="text-sm font-mono font-semibold text-slate-900">{metrics.totalTransactions}</p>
             <p className="text-sm text-slate-600 mt-1">Succeeded</p>
             <p className="text-xs text-slate-500">{metrics.totalTransactions > 0 ? '100%' : '0%'} success rate</p>
           </div>
-          <div className="text-center border-l border-r border-slate-200">
-            <p className="text-4xl font-bold text-blue-600">{metrics.pendingTransactions}</p>
+          <div className="text-center border-l border-r border-slate-300">
+            <p className="text-sm font-mono font-semibold text-slate-900">{metrics.pendingTransactions}</p>
             <p className="text-sm text-slate-600 mt-1">Pending</p>
             <p className="text-xs text-slate-500">Awaiting confirmation</p>
           </div>
           <div className="text-center">
-            <p className="text-4xl font-bold text-red-600">{metrics.failedTransactions}</p>
+            <p className="text-sm font-mono font-semibold text-slate-900">{metrics.failedTransactions}</p>
             <p className="text-sm text-slate-600 mt-1">Failed</p>
             <p className="text-xs text-slate-500">Requires attention</p>
           </div>
