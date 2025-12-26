@@ -148,7 +148,7 @@ export default function CheckoutPage() {
         <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
           <div className="text-center mb-6">
             <div className="text-5xl font-bold text-blue-600 mb-2">
-              {getCurrencySymbol(paymentDetails.transfer.currency)}{formatNumber(paymentDetails.transfer.amount)}
+              {formatNumber(paymentDetails.transfer.amount)} {paymentDetails.transfer.currency}
             </div>
             <p className="text-slate-600">{paymentDetails.transfer.description}</p>
           </div>
