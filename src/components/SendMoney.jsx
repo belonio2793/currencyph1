@@ -733,8 +733,8 @@ export default function SendMoney({ userId }) {
                     </div>
 
                     {/* Confirmation Disclaimer */}
-                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                      <p className="text-xs text-blue-700">
+                    <div className="bg-slate-50 border border-slate-300 rounded-lg p-4">
+                      <p className="text-xs text-slate-700">
                         <span className="font-semibold">Please review carefully:</span> Once you confirm this transaction, the funds will be transferred to {selectedRecipient?.full_name || selectedRecipient?.email}. This action cannot be reversed.
                       </p>
                     </div>
