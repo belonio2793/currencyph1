@@ -559,6 +559,28 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
     }
   }
 
+  // Calculate the exchange rate between two currencies from pairs data
+  const getExchangeRate = (fromCurrency, toCurrency) => {
+    if (!fromCurrency || !toCurrency) return null
+
+    if (fromCurrency === toCurrency) return 1
+
+    const fromCurrencyUpper = fromCurrency.toUpperCase()
+    const toCurrencyUpper = toCurrency.toUpperCase()
+
+    const fromRate = exchangeRates[fromCurrencyUpper]
+    const toRate = exchangeRates[toCurrencyUpper]
+
+    // Both rates must be available (both relative to PHP)
+    if (!fromRate || !toRate || !isFinite(fromRate) || !isFinite(toRate) || fromRate <= 0 || toRate <= 0) {
+      return null
+    }
+
+    // Rate = fromCurrency to PHP / toCurrency to PHP
+    // This gives us: 1 fromCurrency = ? toCurrency
+    return fromRate / toRate
+  }
+
   const calculateConvertedAmount = () => {
     if (!amount || !selectedWallet) return null
 
@@ -572,31 +594,20 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
       return numAmount
     }
 
-    // Get exchange rates for both currencies (normalized to uppercase like /rates)
-    const fromCurrencyUpper = selectedCurrency.toUpperCase()
-    const toCurrencyUpper = selectedWalletData.currency_code.toUpperCase()
+    // Get exchange rate between the two currencies
+    const rate = getExchangeRate(selectedCurrency, selectedWalletData.currency_code)
 
-    const fromRate = exchangeRates[fromCurrencyUpper] || exchangeRates[selectedCurrency]
-    const toRate = exchangeRates[toCurrencyUpper] || exchangeRates[selectedWalletData.currency_code]
-
-    // Both rates must be available and valid
-    if (!fromRate || !toRate || !isFinite(fromRate) || !isFinite(toRate) || fromRate <= 0 || toRate <= 0) {
+    if (rate === null) {
       console.warn('[Deposits] Missing or invalid exchange rates:', {
-        from: fromCurrencyUpper,
-        fromRate: fromRate,
-        to: toCurrencyUpper,
-        toRate: toRate,
+        from: selectedCurrency,
+        to: selectedWalletData.currency_code,
         availableRates: Object.keys(exchangeRates)
       })
       return null
     }
 
-    // 🎯 CRITICAL: Correct conversion formula for canonical rates
-    // Both rates are "how much PHP per 1 unit of that currency"
-    // So: amount_in_php = amount * fromRate
-    // Then: amount_in_to_currency = amount_in_php / toRate
-    // Simplified: (amount * fromRate) / toRate
-    const convertedAmount = (numAmount * fromRate) / toRate
+    // Convert: amount in destination currency = amount * rate
+    const convertedAmount = numAmount * rate
 
     // Round to appropriate decimal places (crypto: 8, fiat: 2)
     const decimals = selectedWalletData.currency_type === 'crypto' ? 8 : 2
