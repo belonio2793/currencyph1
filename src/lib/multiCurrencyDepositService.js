@@ -90,29 +90,46 @@ export const multiCurrencyDepositService = {
   },
 
   /**
-   * Convert amount from one currency to another
+   * Convert amount from one currency to another with proper rate handling
+   * Validates that conversion math is correct
    */
   async convertAmount(amount, fromCurrency, toCurrency) {
     try {
-      const rateData = await this.getExchangeRate(fromCurrency, toCurrency)
-      const convertedAmount = parseFloat(amount) * rateData.rate
-
-      // Validate result
-      if (!isFinite(convertedAmount) || convertedAmount <= 0) {
-        throw new Error('Invalid conversion result')
+      const sourceAmount = parseFloat(amount)
+      if (!isFinite(sourceAmount) || sourceAmount <= 0) {
+        throw new Error(`Invalid source amount: ${amount}`)
       }
 
-      // Round to appropriate decimal places
-      const decimals = ['USD', 'EUR', 'GBP', 'PHP', 'JPY'].includes(toCurrency) ? 2 : 8
+      const rateData = await this.getExchangeRate(fromCurrency, toCurrency)
+      const convertedAmount = sourceAmount * rateData.rate
+
+      // Validate conversion result
+      if (!isFinite(convertedAmount) || convertedAmount <= 0) {
+        throw new Error(
+          `Invalid conversion result: ${sourceAmount} ${fromCurrency} × ${rateData.rate} = ${convertedAmount}. ` +
+          `Expected positive finite number.`
+        )
+      }
+
+      // Determine decimal places based on currency type
+      const fiatCurrencies = ['USD', 'EUR', 'GBP', 'PHP', 'JPY', 'CHF', 'CAD', 'AUD']
+      const decimals = fiatCurrencies.includes(toCurrency.toUpperCase()) ? 2 : 8
       const rounded = Math.round(convertedAmount * Math.pow(10, decimals)) / Math.pow(10, decimals)
 
+      // Log conversion for audit trail
+      console.debug(
+        `[Conversion] ${sourceAmount} ${fromCurrency} → ${rounded} ${toCurrency} ` +
+        `(rate: ${rateData.rate}, inverted: ${rateData.isInverted})`
+      )
+
       return {
-        fromAmount: parseFloat(amount),
+        fromAmount: sourceAmount,
         fromCurrency,
         toAmount: rounded,
         toCurrency,
         rate: rateData.rate,
-        rateRounded: Math.round(rateData.rate * 1000000) / 1000000
+        rateRounded: Math.round(rateData.rate * 1000000) / 1000000,
+        isInverted: rateData.isInverted
       }
     } catch (err) {
       console.error(`Error converting ${amount} ${fromCurrency} to ${toCurrency}:`, err)
