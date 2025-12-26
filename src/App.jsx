@@ -550,14 +550,14 @@ export default function App() {
         const balanceValues = await Promise.all(balancePromises)
         const balanceTotal = balanceValues.reduce((s, v) => s + v, 0)
 
-        const loans = await currencyAPI.getLoans(userId).catch(() => [])
-        const debtPromises = (loans || []).map(async (l) => {
-          const d = Number(l.remaining_balance || l.total_owed || 0)
-          if (!d) return 0
-          const from = l.currency || l.currency_code || globalCurrency
-          if (from === globalCurrency) return d
+        const debts = await currencyAPI.getDebts(userId).catch(() => [])
+        const debtPromises = (debts || []).map(async (d) => {
+          const debtAmount = Number(d.outstanding_balance || d.total_owed || 0)
+          if (!debtAmount) return 0
+          const from = d.currency_code || globalCurrency
+          if (from === globalCurrency) return debtAmount
           const rate = await currencyAPI.getExchangeRate(from, globalCurrency)
-          return rate ? d * Number(rate) : 0
+          return rate ? debtAmount * Number(rate) : 0
         })
         const debtValues = await Promise.all(debtPromises)
         const debtTotal = debtValues.reduce((s, v) => s + v, 0)
