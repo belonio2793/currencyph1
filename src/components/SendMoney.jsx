@@ -645,8 +645,8 @@ export default function SendMoney({ userId }) {
                               const recipientWallet = recipientWallets.find(w => w.currency_code === recipientCurrency)
                               return recipientWallet ? (
                                 <>
-                                  <div className="pt-2 border-t border-emerald-200">
-                                    <p className="text-xs text-emerald-700 font-medium mb-1">Wallet ID</p>
+                                  <div className="pt-2 border-t border-slate-300">
+                                    <p className="text-xs text-slate-700 font-medium mb-1">Wallet ID</p>
                                     <p className="text-xs font-mono text-slate-900 break-all">{recipientWallet.id}</p>
                                   </div>
                                   {recipientWallet.account_number && (
