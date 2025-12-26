@@ -38,22 +38,17 @@ export class DepositConversionService {
       const fromCode = deposit.currency_code.toUpperCase()
       const toCode = wallet.currency_code.toUpperCase()
 
-      // Fetch rate from public.pairs (unified source for all rates)
-      const { data: rateData, error: pairsError } = await this.supabase
-        .from('pairs')
-        .select('rate, source_table, updated_at')
-        .eq('from_currency', fromCode)
-        .eq('to_currency', toCode)
-        .single()
+      // SECURITY FIX: Use safe rate lookup with proper inversion (1/rate)
+      const { getPairRateWithMetadata } = await import('./pairsRateService.js')
 
-      if (pairsError || !rateData || !(typeof rateData.rate === 'number' && isFinite(rateData.rate) && rateData.rate > 0)) {
+      const rateData = await getPairRateWithMetadata(fromCode, toCode)
+
+      if (!rateData || !rateData.rate || !(typeof rateData.rate === 'number' && isFinite(rateData.rate) && rateData.rate > 0)) {
         console.warn(`No exchange rate available for ${fromCode}/${toCode}`)
         return null
       }
 
-      const rateSource = 'pairs'
-
-      const exchangeRate = parseFloat(rateData.rate)
+      const exchangeRate = rateData.rate
       const convertedAmount = deposit.amount * exchangeRate
 
       return {
@@ -62,9 +57,10 @@ export class DepositConversionService {
         originalAmount: deposit.amount,
         exchangeRate: exchangeRate,
         convertedAmount: convertedAmount,
-        rateSource: rateSource,
+        rateSource: rateData.source || 'pairs',
         rateUpdatedAt: rateData.updated_at,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
+        isInverted: rateData.is_inverted  // Track if rate was calculated via inversion
       }
     } catch (error) {
       console.error('Failed to get conversion details:', error)
