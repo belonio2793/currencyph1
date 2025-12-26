@@ -399,51 +399,6 @@ export default function HomePage({ userId, userEmail, globalCurrency = 'PHP', se
 
   return (
     <div className="min-h-screen bg-slate-50">
-      <div className="w-full border-b border-black">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          {/* Total Holdings Hero Section */}
-          <div className="mb-8">
-            <p className="text-xs text-slate-600 font-medium uppercase tracking-widest mb-3">Total User Holdings Value</p>
-            <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-6">
-              <div>
-                <p className="text-5xl sm:text-6xl font-light text-black mb-2">
-                  {loadingCryptoConversion ? (
-                    <span className="text-slate-400">loading...</span>
-                  ) : totalBalanceInCrypto !== null && totalBalanceInCrypto !== undefined && totalBalanceInCrypto !== 0 ? (
-                    formatNumber(totalBalanceInCrypto.toFixed(8))
-                  ) : (
-                    formatNumber(Number(totalBalanceConverted || 0) + Number(totalCryptoBalancePHP || 0))
-                  )}
-                </p>
-                <p className="text-sm text-slate-600">
-                  {globalCryptocurrency} • All Assets Combined
-                </p>
-              </div>
-              <div className="flex flex-col sm:flex-row gap-4 sm:gap-6">
-                <div>
-                  <p className="text-xs text-slate-500 font-medium uppercase tracking-wider mb-2">Fiat Holdings</p>
-                  <p className="text-2xl font-semibold text-black">
-                    {formatNumber(totalBalanceConverted || 0)} {globalCurrency}
-                  </p>
-                </div>
-                <div>
-                  <p className="text-xs text-slate-500 font-medium uppercase tracking-wider mb-2">Crypto Holdings</p>
-                  <p className="text-2xl font-semibold text-black">
-                    {loadingCryptoHoldingsConversion ? (
-                      <span className="text-slate-400 italic">loading...</span>
-                    ) : cryptoWallets.length > 0 ? (
-                      formatNumber(totalCryptoInSelectedCrypto.toFixed(8)) + ' ' + globalCryptocurrency
-                    ) : (
-                      '0 ' + globalCryptocurrency
-                    )}
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Welcome Header */}
         <div className="mb-12">
