@@ -281,7 +281,11 @@ export default function DraggableQuickAccessCards({
             >
               <button
                 onClick={() => onCardClick && onCardClick(cardKey)}
-                className={`cursor-pointer bg-white rounded-xl shadow-lg p-8 border border-slate-200 hover:shadow-xl transition-all w-full h-full ${CARD_CONFIG[cardKey]?.borderClasses || ''} ${
+                className={`cursor-pointer rounded-xl shadow-lg p-8 border hover:shadow-xl transition-all w-full h-full ${
+                  isLargeMode
+                    ? `${config.colorClasses.split(' ').slice(0, 2).join(' ')} border-slate-200 opacity-90`
+                    : 'bg-white border-slate-200'
+                } ${CARD_CONFIG[cardKey]?.borderClasses || ''} ${
                   isDragOver ? 'ring-2 ring-blue-400 ring-offset-2' : ''
                 }`}
               >
