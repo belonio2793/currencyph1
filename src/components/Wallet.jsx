@@ -419,15 +419,15 @@ export default function Wallet({ userId, globalCurrency = 'PHP' }) {
                           </div>
 
                           {/* Wallet ID */}
-                          <div className="bg-blue-50 rounded-lg p-3 mb-4 border border-blue-200">
-                            <p className="text-xs text-blue-700 font-medium mb-2">Wallet ID</p>
+                          <div className="bg-slate-50 rounded-lg p-3 mb-4 border border-slate-300">
+                            <p className="text-xs text-slate-700 font-medium mb-2">Wallet ID</p>
                             <div className="flex items-center gap-2">
                               <p className="text-xs font-mono text-slate-900 break-all flex-1">
                                 {wallet.id}
                               </p>
                               <button
                                 onClick={() => copyToClipboard(wallet.id, wallet.id)}
-                                className="flex-shrink-0 px-2 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors text-xs font-medium"
+                                className="flex-shrink-0 px-2 py-1 bg-slate-700 text-white rounded hover:bg-slate-800 transition-colors text-xs font-medium"
                               >
                                 {copied === wallet.id ? '✓' : 'Copy'}
                               </button>
