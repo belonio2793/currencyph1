@@ -90,10 +90,10 @@ export default function Dashboard({ userId, onNavigate, globalCurrency = 'PHP', 
   }
 
   const actions = [
-    { id: 'send', label: 'Send Money', icon: '→', color: 'blue' },
-    { id: 'wallet', label: 'My Wallets', icon: '○', color: 'emerald' },
-    { id: 'bills', label: 'Pay Bills', icon: '⋮', color: 'amber' },
-    { id: 'transactions', label: 'History', icon: '↻', color: 'slate' }
+    { id: 'send', label: 'Send Money', icon: '→', color: 'blue', bgColor: 'bg-blue-50 hover:bg-blue-100' },
+    { id: 'wallet', label: 'My Wallets', icon: '○', color: 'emerald', bgColor: 'bg-emerald-50 hover:bg-emerald-100' },
+    { id: 'bills', label: 'Pay Bills', icon: '⋮', color: 'amber', bgColor: 'bg-amber-50 hover:bg-amber-100' },
+    { id: 'transactions', label: 'History', icon: '↻', color: 'purple', bgColor: 'bg-purple-50 hover:bg-purple-100' }
   ]
 
   return (
