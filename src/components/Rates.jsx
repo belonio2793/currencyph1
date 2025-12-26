@@ -36,7 +36,7 @@ export default function Rates() {
       let pairsData = []
       const { data: allPairsData, error: pairsError } = await supabase
         .from('pairs')
-        .select('from_currency, to_currency, rate, updated_at, pair_direction')
+        .select('from_currency, to_currency, rate, updated_at, pair_direction, from_type, to_type')
 
       if (pairsError) {
         console.error('Error fetching pairs:', pairsError)
