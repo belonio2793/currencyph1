@@ -200,12 +200,12 @@ export default function PaymentsOverview({ merchant, userId, globalCurrency }) {
   }
 
   const StatCard = ({ title, value, subtitle, color }) => (
-    <div className={`bg-white rounded-lg border ${color} p-6`}>
+    <div className="bg-white rounded-lg border border-slate-300 p-6">
       <div className="flex items-center justify-between">
-        <div>
+        <div className="w-full">
           <p className="text-sm font-medium text-slate-600">{title}</p>
-          <p className="text-3xl font-light text-slate-900 mt-2">{value}</p>
-          {subtitle && <p className="text-xs text-slate-500 mt-1">{subtitle}</p>}
+          <p className="text-sm font-mono font-semibold text-slate-900 mt-2 truncate">{value}</p>
+          {subtitle && <p className="text-xs text-slate-500 mt-1 truncate">{subtitle}</p>}
         </div>
       </div>
     </div>
