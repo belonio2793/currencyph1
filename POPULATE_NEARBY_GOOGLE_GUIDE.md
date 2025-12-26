@@ -69,9 +69,9 @@ This guide explains how to populate the `nearby_listings` table with real, accur
 
 ### Environment Variables (Already Set)
 ```
-GOOGLE_CUSTOM_SEARCH_API=AIzaSyC1hNFq1m4sL2WevJSfP4sAVQ5dJ_jRCHc
-CX=37b25d5fc2be342d7
-VITE_PROJECT_URL=https://corcofbmafdxehvlbesx.supabase.co
+GOOGLE_CUSTOM_SEARCH_API=your-api-key
+CX=your-custom-search-engine-id
+VITE_PROJECT_URL=your-supabase-url
 VITE_SUPABASE_ANON_KEY=[your-key]
 SUPABASE_SERVICE_ROLE_KEY=[your-service-key]
 ```
