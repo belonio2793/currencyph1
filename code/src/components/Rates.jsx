@@ -671,7 +671,6 @@ export default function Rates() {
               {/* Favorites Card */}
               <div className="bg-white rounded-2xl shadow-lg p-6 border border-slate-200">
                 <div className="flex items-center gap-2 mb-4">
-                  <span className="text-2xl">⭐</span>
                   <h3 className="text-lg font-semibold text-slate-900">Favorite Rates</h3>
                 </div>
                 <div className="space-y-3">
