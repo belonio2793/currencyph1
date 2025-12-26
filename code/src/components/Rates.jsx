@@ -741,7 +741,7 @@ export default function Rates() {
                 <div className="pb-4 border-b border-slate-300">
                   <p className="text-xs text-slate-600 font-medium mb-1 uppercase tracking-wider">Data Source</p>
                   <p className="text-xs text-slate-500">
-                    ✓ Real-time rates from fiat & crypto markets
+                    OK Real-time rates from fiat and crypto markets
                   </p>
                 </div>
 
