@@ -246,26 +246,22 @@ export async function getCryptoPrice(cryptoCode, toCurrency = 'PHP') {
 
 /**
  * Fetch crypto rate directly from public.pairs table
+ * FIXED: Now uses safe inversion logic from pairsRateService
+ * If direct pair not found, calculates inverse using 1/rate formula
  */
 async function getPriceFromPairs(cryptoCode, toCurrency) {
   try {
-    const { data, error } = await supabase
-      .from('pairs')
-      .select('rate, updated_at')
-      .eq('from_currency', cryptoCode)
-      .eq('to_currency', toCurrency)
-      .single()
+    // Import the safe rate lookup function
+    const { getPairRate } = await import('./pairsRateService.js')
 
-    if (error) {
-      console.debug(`No pair found in public.pairs for ${cryptoCode}/${toCurrency}`)
-      return null
+    const rate = await getPairRate(cryptoCode.toUpperCase(), toCurrency.toUpperCase())
+
+    if (rate && typeof rate === 'number' && isFinite(rate) && rate > 0) {
+      console.debug(`[CryptoRates] Rate from pairs (safe inversion): ${cryptoCode}/${toCurrency} = ${rate}`)
+      return rate
     }
 
-    if (data && typeof data.rate === 'number' && isFinite(data.rate) && data.rate > 0) {
-      return data.rate
-    }
-
-    console.warn(`Invalid rate from public.pairs for ${cryptoCode}/${toCurrency}:`, data?.rate)
+    console.debug(`No rate found in public.pairs for ${cryptoCode}/${toCurrency}`)
     return null
   } catch (err) {
     console.debug(`Error fetching from public.pairs for ${cryptoCode}/${toCurrency}:`, err.message)
