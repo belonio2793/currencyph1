@@ -1230,10 +1230,16 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
                     <span className="text-slate-700">You Send:</span>
                     <span className="font-semibold text-slate-900 break-words">{formatNumber(parseFloat(amount) || 0, selectedCurrency)} {selectedCurrency}</span>
                   </div>
-                  {exchangeRates[selectedCurrency] && (
+                  {selectedCurrency !== selectedWalletData.currency_code && (
                     <div className="flex justify-between items-center text-sm text-slate-600 gap-4 flex-wrap">
                       <span>Rate:</span>
-                      <span className="break-words">1 {selectedCurrency} = {formatExchangeRate(exchangeRates[selectedCurrency]) || 'N/A'} {selectedWalletData.currency_code}</span>
+                      <span className="break-words">
+                        {getExchangeRate(selectedCurrency, selectedWalletData.currency_code) ? (
+                          <>1 {selectedCurrency} = {formatExchangeRate(getExchangeRate(selectedCurrency, selectedWalletData.currency_code))} {selectedWalletData.currency_code}</>
+                        ) : (
+                          '⏳ Loading rate...'
+                        )}
+                      </span>
                     </div>
                   )}
                   {calculateConvertedAmount() && selectedCurrency !== selectedWalletData.currency_code && (
