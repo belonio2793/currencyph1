@@ -122,16 +122,16 @@ function NavbarComponent({ activeTab, onTabChange, globalCurrency, setGlobalCurr
                 {globalCryptocurrency} • All Assets Combined
               </p>
             </div>
-            <div className="flex gap-8">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-6">
               <div>
                 <p className="text-xs text-slate-500 font-medium uppercase tracking-wider mb-2">Fiat Holdings</p>
-                <p className="text-xl font-semibold text-black">
+                <p className="text-lg font-semibold text-black">
                   {formatNumber(totalBalanceConverted || 0)} {globalCurrency}
                 </p>
               </div>
               <div>
                 <p className="text-xs text-slate-500 font-medium uppercase tracking-wider mb-2">Crypto Holdings</p>
-                <p className="text-xl font-semibold text-black">
+                <p className="text-lg font-semibold text-black">
                   {loadingCryptoConversion ? (
                     <span className="text-slate-400 italic">loading...</span>
                   ) : totalCryptoBalancePHP > 0 ? (
@@ -139,6 +139,18 @@ function NavbarComponent({ activeTab, onTabChange, globalCurrency, setGlobalCurr
                   ) : (
                     <span className="text-slate-400">0 {globalCryptocurrency}</span>
                   )}
+                </p>
+              </div>
+              <div>
+                <p className="text-xs text-slate-500 font-medium uppercase tracking-wider mb-2">Net Worth</p>
+                <p className="text-lg font-semibold text-black">
+                  {formatNumber(totalNet || 0)} {globalCurrency}
+                </p>
+              </div>
+              <div>
+                <p className="text-xs text-slate-500 font-medium uppercase tracking-wider mb-2">Total Debt</p>
+                <p className="text-lg font-semibold text-black">
+                  {formatNumber(totalDebtConverted || 0)} {globalCurrency}
                 </p>
               </div>
             </div>
