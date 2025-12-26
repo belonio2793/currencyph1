@@ -198,13 +198,10 @@ function SearchableCurrencyDropdown({
                         }`}
                       >
                         <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-3 flex-1">
-                            <span className="text-lg">💵</span>
-                            <div>
-                              <div className="text-slate-900 font-semibold text-sm">
-                                {c.name}
-                                <span className="text-xs text-slate-500 font-normal ml-2">({c.code})</span>
-                              </div>
+                          <div className="flex-1">
+                            <div className="text-slate-900 font-semibold text-sm">
+                              {c.name}
+                              <span className="text-xs text-slate-500 font-normal ml-2">({c.code})</span>
                             </div>
                           </div>
                           {selectedCurrency === c.code && (
