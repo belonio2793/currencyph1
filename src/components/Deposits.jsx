@@ -1835,6 +1835,95 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
         </div>
       )}
 
+      {/* Deposit Success Modal */}
+      {showSuccessModal && lastSuccessDeposit && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50" onClick={() => setShowSuccessModal(false)}>
+          <div className="bg-white rounded-xl shadow-2xl max-w-md w-full p-8" onClick={(e) => e.stopPropagation()}>
+            {/* Celebration Animation */}
+            <div className="text-center mb-6">
+              <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-emerald-50 to-teal-50 rounded-full mb-4">
+                <span className="text-5xl animate-bounce">✓</span>
+              </div>
+              <h2 className="text-2xl font-bold text-slate-900 mb-2">Deposit Confirmed!</h2>
+              <p className="text-slate-600">Your deposit has been initiated successfully</p>
+            </div>
+
+            {/* Deposit Summary */}
+            <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg p-6 mb-6 border border-blue-100">
+              <div className="space-y-4">
+                <div>
+                  <p className="text-xs text-slate-600 uppercase tracking-wide mb-1">Amount Sent</p>
+                  <p className="text-2xl font-bold text-slate-900">
+                    {lastSuccessDeposit.amount.toLocaleString(undefined, {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 8
+                    })} {lastSuccessDeposit.currency_code.toUpperCase()}
+                  </p>
+                </div>
+
+                {lastSuccessDeposit.converted_amount && (
+                  <div className="pt-4 border-t border-blue-200">
+                    <p className="text-xs text-slate-600 uppercase tracking-wide mb-1">You'll Receive</p>
+                    <p className="text-2xl font-bold text-emerald-600">
+                      {lastSuccessDeposit.converted_amount.toLocaleString(undefined, {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 8
+                      })} {lastSuccessDeposit.wallet_currency || 'PHP'}
+                    </p>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Reference Number */}
+            {lastSuccessDeposit.reference_number && (
+              <div className="bg-slate-50 rounded-lg p-4 mb-6 border border-slate-200">
+                <p className="text-xs text-slate-600 uppercase tracking-wide mb-2">Reference Number</p>
+                <p className="text-sm font-mono font-semibold text-slate-900 break-all">{lastSuccessDeposit.reference_number}</p>
+                <p className="text-xs text-slate-600 mt-2">Save this for your records</p>
+              </div>
+            )}
+
+            {/* Next Steps */}
+            <div className="bg-amber-50 rounded-lg p-4 mb-6 border border-amber-200">
+              <h4 className="font-semibold text-slate-900 mb-3">📝 What's Next?</h4>
+              <ul className="space-y-2 text-sm text-slate-700">
+                <li className="flex gap-2">
+                  <span className="text-amber-600 font-semibold">•</span>
+                  <span>Your deposit is being processed</span>
+                </li>
+                <li className="flex gap-2">
+                  <span className="text-amber-600 font-semibold">•</span>
+                  <span>Status will update to Approved shortly</span>
+                </li>
+                <li className="flex gap-2">
+                  <span className="text-amber-600 font-semibold">•</span>
+                  <span>Check the Recent Deposits table for updates</span>
+                </li>
+              </ul>
+            </div>
+
+            {/* Action Button */}
+            <button
+              onClick={() => {
+                setShowSuccessModal(false)
+                handleStartNewDeposit()
+              }}
+              className="w-full px-6 py-3 bg-emerald-600 text-white rounded-lg font-semibold hover:bg-emerald-700 transition"
+            >
+              Start New Deposit
+            </button>
+
+            <button
+              onClick={() => setShowSuccessModal(false)}
+              className="w-full px-6 py-3 mt-3 bg-slate-200 text-slate-900 rounded-lg font-semibold hover:bg-slate-300 transition"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
+
     </div>
   )
 }
