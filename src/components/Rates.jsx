@@ -299,48 +299,6 @@ export default function Rates() {
     return rates.filter(r => favorites.includes(r.code))
   }, [rates, favorites])
 
-  const calculateConversion = () => {
-    const numAmount = parseFloat(amount)
-    if (!isNaN(numAmount) && numAmount > 0) {
-      const fromRate = rates.find(r => r.code === selectedFrom)
-      const toRate = rates.find(r => r.code === selectedTo)
-
-      // Check if rates exist
-      if (!fromRate || !toRate) {
-        setResult({
-          error: 'Rate not available',
-          message: `Exchange rate for ${!fromRate ? selectedFrom : selectedTo} is not available.`
-        })
-        return
-      }
-
-      // Check if rates are valid (not 0.00 or invalid)
-      const fromRateValid = isFinite(fromRate.rate) && fromRate.rate > 0
-      const toRateValid = isFinite(toRate.rate) && toRate.rate > 0
-
-      if (!fromRateValid || !toRateValid) {
-        setResult({
-          error: 'Rate not available',
-          message: 'Exchange rate data is not available for the selected currencies.'
-        })
-        return
-      }
-
-      const convertedAmount = (numAmount * toRate.rate) / fromRate.rate
-      const toDecimals = toRate.metadata?.decimals || 2
-      setResult({
-        amount: convertedAmount.toFixed(toDecimals),
-        decimals: toDecimals,
-        rate: toRate.rate / fromRate.rate
-      })
-    } else {
-      setResult(null)
-    }
-  }
-
-  useEffect(() => {
-    calculateConversion()
-  }, [amount, selectedFrom, selectedTo, rates])
 
   const toggleFavorite = (code) => {
     setFavorites(prev =>
