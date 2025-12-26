@@ -215,6 +215,20 @@ export default function App() {
       backgroundSync.start(24) // Sync every 24 hours
     }
 
+    // Initialize exchange rates refresh on app load (1-hour cooldown)
+    // This triggers the fetch-rates edge function to update all rates if needed
+    checkAndRefreshRatesIfNeeded()
+      .then(result => {
+        if (result.triggered) {
+          console.log('[App] Exchange rates refresh triggered:', result.message)
+        } else {
+          console.debug('[App] Exchange rates refresh skipped:', result.message)
+        }
+      })
+      .catch(err => {
+        console.warn('[App] Error checking rates:', err)
+      })
+
     // Register Service Worker for offline support and caching
     registerServiceWorker().catch(err => {
       console.debug('Service Worker registration failed:', err)
