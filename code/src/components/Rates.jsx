@@ -438,20 +438,12 @@ export default function Rates() {
                   </div>
 
                   {/* To Currency */}
-                  <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-2">To</label>
-                    <select
-                      value={selectedTo}
-                      onChange={(e) => setSelectedTo(e.target.value)}
-                      className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    >
-                      {rates.map(r => (
-                        <option key={r.code} value={r.code}>
-                          {r.code} - {r.metadata?.name || r.code}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
+                  <SearchableSelect
+                    value={selectedTo}
+                    onChange={setSelectedTo}
+                    options={rates}
+                    label="To"
+                  />
 
                   {/* Result */}
                   {result && !result.error && (
