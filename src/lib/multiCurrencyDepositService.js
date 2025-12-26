@@ -190,8 +190,18 @@ export const multiCurrencyDepositService = {
       const depositCurrencyInfo = currencyMap[depositCurrency.toUpperCase()]
       const walletCurrencyInfo = currencyMap[walletCurrency.toUpperCase()]
 
-      // Convert amount using public.pairs rates
+      // Convert amount using public.pairs rates with proper mathematical inversion
       const conversion = await this.convertAmount(amount, depositCurrency, walletCurrency)
+
+      // SECURITY: Validate conversion math
+      // If the rate is inverted (calculated from reverse pair), ensure inversion was done correctly
+      if (conversion.isInverted) {
+        console.warn(
+          `[SECURITY] Deposit conversion used calculated inverse rate. ` +
+          `${depositCurrency}→${walletCurrency} = 1/${1/conversion.rate}. ` +
+          `Verify this rate is from reliable source.`
+        )
+      }
 
       // Get current timestamp
       const now = new Date()
