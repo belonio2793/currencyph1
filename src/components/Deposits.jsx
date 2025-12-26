@@ -1016,7 +1016,7 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
                         {!exchangeRates[selectedCurrency] ? (
                           <span>⏳ Fetching rate for {selectedCurrency}...</span>
                         ) : (
-                          `${amount} ${selectedCurrency} = ${(parseFloat(amount) * exchangeRates[selectedCurrency]).toLocaleString(undefined, { maximumFractionDigits: 2 })} ${selectedWalletData?.currency_code} as of ${new Date().toLocaleString(undefined, { month: 'short', day: 'numeric' })}`
+                          `${amount} ${selectedCurrency} = ${(parseFloat(amount) * exchangeRates[selectedCurrency]).toLocaleString(undefined, { maximumFractionDigits: isCryptoCurrency(selectedWalletData?.currency_code) ? 8 : 2 })} ${selectedWalletData?.currency_code} as of ${new Date().toLocaleString(undefined, { month: 'short', day: 'numeric' })}`
                         )}
                       </p>
                       <div className="flex gap-4 items-center justify-between flex-wrap">
