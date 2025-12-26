@@ -752,19 +752,25 @@ async function processModernFintechDeposit(
   try {
     const paymentReference = generateDepositReference(providerName.toUpperCase())
 
+    // Build deposit data
+    let depositData: Record<string, any> = {
+      user_id: request.userId,
+      wallet_id: request.walletId,
+      amount: request.amount,
+      currency_code: request.currency,
+      deposit_method: request.depositMethod,
+      status: 'pending',
+      payment_reference: paymentReference,
+      description: `${providerName} deposit (Coming Soon) - ${request.amount} ${request.currency}`
+    }
+
+    // Enrich with all metadata fields
+    depositData = await enrichDepositDataWithMetadata(depositData, request)
+
     // Store deposit with "coming_soon" status
     const { data: deposit, error: depositError } = await supabase
       .from('deposits')
-      .insert([{
-        user_id: request.userId,
-        wallet_id: request.walletId,
-        amount: request.amount,
-        currency_code: request.currency,
-        deposit_method: request.depositMethod,
-        status: 'pending',
-        payment_reference: paymentReference,
-        description: `${providerName} deposit (Coming Soon) - ${request.amount} ${request.currency}`
-      }])
+      .insert([depositData])
       .select()
       .single()
 
