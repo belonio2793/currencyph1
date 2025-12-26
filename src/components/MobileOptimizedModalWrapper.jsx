@@ -88,7 +88,7 @@ export function MobileOptimizedModalWrapper({
             ? 'inset-0 rounded-t-2xl rounded-b-none'
             : `top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 ${getSizeClasses()}`
         } ${className}`}
-        style={{ maxHeight: isMobile ? '100vh' : '90vh' }}
+        style={{ maxHeight: isMobile ? 'calc(100dvh - 16px)' : '90vh', display: 'flex', flexDirection: 'column' }}
       >
         {/* Header */}
         {title && (
