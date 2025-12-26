@@ -121,7 +121,9 @@ export default function ExpandableModal({
             : `top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 ${sizeClasses}`
         } ${className}`}
         style={{
-          maxHeight: isMobile ? '100vh' : '90vh'
+          maxHeight: isMobile ? 'calc(100dvh - 16px)' : '90vh',
+          display: 'flex',
+          flexDirection: 'column'
         }}
       >
         {/* Header with collapse button */}
