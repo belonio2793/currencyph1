@@ -15,35 +15,31 @@ import { supabase } from './supabaseClient'
 /**
  * Get latest rate with timestamp for user confirmation
  * Returns rate data that can be displayed with time/date info
- * Fetches from public.pairs (unified source for all rates)
+ * SECURITY FIX: Uses safe rate lookup with proper inversion (1/rate)
  */
 export async function getLatestRateWithConfirmation(fromCurrency, toCurrency = 'PHP') {
   try {
     const fromCode = fromCurrency.toUpperCase()
     const toCode = toCurrency.toUpperCase()
 
-    // Fetch from public.pairs (unified source for all rates - fiat and crypto)
-    const { data, error } = await supabase
-      .from('pairs')
-      .select('rate, source_table, updated_at')
-      .eq('from_currency', fromCode)
-      .eq('to_currency', toCode)
-      .single()
+    // SECURITY FIX: Use safe rate lookup with proper mathematical inversion
+    const { getPairRateWithMetadata } = await import('./pairsRateService.js')
+    const rateData = await getPairRateWithMetadata(fromCode, toCode)
 
-    if (error || !data) {
+    if (!rateData || !rateData.rate) {
       console.warn(`No rate found for ${fromCode}/${toCode}`)
       return null
     }
 
     // Validate rate is valid
-    if (!(typeof data.rate === 'number' && isFinite(data.rate) && data.rate > 0)) {
-      console.warn(`Invalid rate returned for ${fromCode}/${toCode}: ${data.rate}`)
+    if (!(typeof rateData.rate === 'number' && isFinite(rateData.rate) && rateData.rate > 0)) {
+      console.warn(`Invalid rate returned for ${fromCode}/${toCode}: ${rateData.rate}`)
       return null
     }
 
-    const source = data.source_table || 'pairs'
-    const rate = parseFloat(data.rate)
-    const updatedAt = new Date(data.updated_at)
+    const source = rateData.source || 'pairs'
+    const rate = parseFloat(rateData.rate)
+    const updatedAt = new Date(rateData.updated_at || new Date())
 
     return {
       from_currency: fromCode,
