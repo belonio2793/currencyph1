@@ -1841,8 +1841,8 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
 
       {/* Deposit Success Modal */}
       {showSuccessModal && lastSuccessDeposit && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50" onClick={() => setShowSuccessModal(false)}>
-          <div className="bg-white rounded-xl shadow-2xl max-w-md w-full p-8" onClick={(e) => e.stopPropagation()}>
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50 overflow-y-auto" onClick={() => setShowSuccessModal(false)}>
+          <div className="bg-white rounded-xl shadow-2xl max-w-md w-full p-4 sm:p-6 md:p-8 my-8" onClick={(e) => e.stopPropagation()}>
             {/* Celebration Animation */}
             <div className="text-center mb-6">
               <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-emerald-50 to-teal-50 rounded-full mb-4">
