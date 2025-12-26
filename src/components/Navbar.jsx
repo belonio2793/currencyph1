@@ -75,16 +75,16 @@ function NavbarComponent({ activeTab, onTabChange, globalCurrency, setGlobalCurr
             {userEmail && (
               <div className="ml-2 flex items-center gap-2 hidden sm:inline-flex">
                 {/* FIAT Section */}
-                <div className="flex items-center gap-2 px-3 py-2 rounded-lg border border-black">
-                  <span className="inline-block px-2 py-0.5 bg-black text-white text-xs font-bold rounded">FIAT</span>
+                <div className="flex items-center gap-2 px-3 py-2 rounded-lg">
+                  <span className="text-xs text-slate-500 font-medium uppercase tracking-wider">Fiat</span>
                   <span className="font-semibold text-black text-xs sm:text-sm">
                     {formatNumber(totalBalanceConverted || 0)} {globalCurrency}
                   </span>
                 </div>
 
                 {/* CRYPTO Section */}
-                <div className="flex items-center gap-2 px-3 py-2 rounded-lg border border-black">
-                  <span className="inline-block px-2 py-0.5 bg-black text-white text-xs font-bold rounded">CRYPTO</span>
+                <div className="flex items-center gap-2 px-3 py-2 rounded-lg">
+                  <span className="text-xs text-slate-500 font-medium uppercase tracking-wider">Crypto</span>
                   <span className="font-semibold text-black text-xs sm:text-sm">
                     {loadingConsolidated ? (
                       <span className="text-slate-400 italic">loading...</span>
