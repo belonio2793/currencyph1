@@ -85,84 +85,54 @@ const DEPOSIT_METHODS = {
 
 const SOLANA_ADDRESS = 'CbcWb97K3TEFJZJYLZRqdsMSdVXTFaMaUcF6yPQgY9yS'
 
-// Helper function to query public.pairs with canonical direction preference
+// Helper function to query public.pairs with safe inversion (1/rate formula)
+// SECURITY FIX: Uses getPairRate which properly calculates inverse if needed
 async function getRatesFromPublicPairs(currencies, toCurrency = 'PHP') {
   try {
     const toUpper = toCurrency.toUpperCase()
     const currencyUpperCase = currencies.map(c => c.toUpperCase())
 
-    console.log(`[Deposits] Querying canonical pairs for rates: ${currencyUpperCase.join(', ')} → ${toUpper}`)
+    console.log(`[Deposits] Querying rates with safe inversion: ${currencyUpperCase.join(', ')} → ${toUpper}`)
+
+    // Import safe rate lookup function
+    const { getPairRate, getPairRateWithMetadata } = await import('../lib/pairsRateService.js')
 
     const rates = {}
+    const rateMetadata = {}
 
-    // Strategy 1: Query canonical pairs view first (X→PHP)
-    if (toUpper === 'PHP') {
-      const { data: canonicalData, error: canonicalError } = await supabase
-        .from('pairs_canonical')
-        .select('from_currency, rate, updated_at, source_table')
-        .in('from_currency', currencyUpperCase)
+    // Fetch all rates using safe inversion logic
+    const ratePromises = currencyUpperCase.map(async (currency) => {
+      try {
+        // Get rate with metadata (includes is_inverted flag)
+        const metadata = await getPairRateWithMetadata(currency, toUpper)
 
-      if (!canonicalError && canonicalData && canonicalData.length > 0) {
-        canonicalData.forEach(row => {
-          rates[row.from_currency] = parseFloat(row.rate)
-          console.log(`[Deposits] ✓ Canonical: ${row.from_currency} → PHP = ${row.rate}`)
-        })
+        if (metadata && metadata.rate && isFinite(metadata.rate) && metadata.rate > 0) {
+          rates[currency] = metadata.rate
+          rateMetadata[currency] = metadata
 
-        if (Object.keys(rates).length > 0) {
-          console.log(`[Deposits] Successfully loaded ${canonicalData.length} canonical rates`)
-          return rates
+          const inversionLabel = metadata.is_inverted ? '(calculated via 1/rate)' : '(direct)'
+          console.log(`[Deposits] ✓ ${inversionLabel}: ${currency} → ${toUpper} = ${metadata.rate}`)
+          return { success: true, currency }
+        } else {
+          console.warn(`[Deposits] ✗ No rate found for ${currency} → ${toUpper}`)
+          return { success: false, currency }
         }
+      } catch (err) {
+        console.warn(`[Deposits] Error fetching rate for ${currency} → ${toUpper}:`, err.message)
+        return { success: false, currency }
       }
-    }
+    })
 
-    // Strategy 2: Fallback to bidirectional view for any missing rates
-    const missingCurrencies = currencyUpperCase.filter(c => !rates[c])
-    if (missingCurrencies.length > 0) {
-      console.warn(`[Deposits] Missing canonical rates for: ${missingCurrencies.join(', ')}, trying bidirectional...`)
+    // Wait for all rate fetches to complete
+    const results = await Promise.all(ratePromises)
+    const successCount = results.filter(r => r.success).length
 
-      const { data: bidirectionalData, error: bidirectionalError } = await supabase
-        .from('pairs_bidirectional')
-        .select('from_currency, to_currency, rate, updated_at, source_table, pair_direction, is_inverted')
-        .eq('to_currency', toUpper)
-        .in('from_currency', missingCurrencies)
-
-      if (!bidirectionalError && bidirectionalData && bidirectionalData.length > 0) {
-        bidirectionalData.forEach(row => {
-          if (!rates[row.from_currency]) {
-            rates[row.from_currency] = parseFloat(row.rate)
-            const directionLabel = row.is_inverted ? '(inverse)' : '(canonical)'
-            console.log(`[Deposits] ${directionLabel}: ${row.from_currency} → ${toUpper} = ${row.rate}`)
-          }
-        })
-      }
-    }
-
-    // Strategy 3: Direct pairs table query as final fallback
-    if (Object.keys(rates).length < currencyUpperCase.length) {
-      const stillMissing = currencyUpperCase.filter(c => !rates[c])
-      console.warn(`[Deposits] Still missing rates for: ${stillMissing.join(', ')}, using direct query...`)
-
-      const { data: directData, error: directError } = await supabase
-        .from('pairs')
-        .select('from_currency, rate, updated_at, source_table')
-        .eq('to_currency', toUpper)
-        .in('from_currency', stillMissing)
-
-      if (!directError && directData && directData.length > 0) {
-        directData.forEach(row => {
-          if (!rates[row.from_currency]) {
-            rates[row.from_currency] = parseFloat(row.rate)
-          }
-        })
-      }
-    }
-
-    if (Object.keys(rates).length === 0) {
+    if (successCount === 0) {
       console.warn('[Deposits] Failed to load any rates for:', currencyUpperCase.join(', '))
       return {}
     }
 
-    console.log(`[Deposits] Successfully loaded ${Object.keys(rates).length} rates:`, Object.keys(rates).join(', '))
+    console.log(`[Deposits] Successfully loaded ${successCount}/${currencyUpperCase.length} rates`)
     return rates
   } catch (e) {
     console.error('[Deposits] Rates helper failed:', e.message)
