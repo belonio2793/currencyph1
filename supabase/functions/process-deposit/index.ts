@@ -549,19 +549,18 @@ async function processCryptoDeposit(
     }
 
     // Get crypto price in PHP to calculate received amount
-    let receivedAmount: number | null = null
-    let exchangeRate: number | null = null
-    let rateSource = 'coingecko'
-
+    let conversionResult = null
     const priceData = await getCryptoPriceInPHP(cryptoSymbol as string)
     if (priceData) {
-      exchangeRate = priceData.price
-      receivedAmount = request.amount * exchangeRate
-      rateSource = priceData.source
+      conversionResult = {
+        exchangeRate: priceData.price,
+        convertedAmount: request.amount * priceData.price,
+        source: priceData.source
+      }
     }
 
-    // Store deposit with conversion details
-    const depositData: Record<string, any> = {
+    // Build deposit data
+    let depositData: Record<string, any> = {
       user_id: request.userId,
       wallet_id: request.walletId,
       amount: request.amount,
@@ -573,13 +572,8 @@ async function processCryptoDeposit(
       description: `Direct ${cryptoSymbol} transfer expected`
     }
 
-    // Add conversion details if available
-    if (receivedAmount !== null && exchangeRate !== null) {
-      depositData.received_amount = receivedAmount
-      depositData.exchange_rate = exchangeRate
-      depositData.rate_source = rateSource
-      depositData.rate_fetched_at = new Date().toISOString()
-    }
+    // Enrich with all metadata fields
+    depositData = await enrichDepositDataWithMetadata(depositData, request, conversionResult || undefined)
 
     const { data: deposit, error: depositError } = await supabase
       .from('deposits')
