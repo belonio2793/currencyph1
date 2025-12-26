@@ -1036,10 +1036,10 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
                       </div>
                     </>
                   ) : (
-                    <div className="flex items-center justify-between">
-                      <div>
+                    <div className="flex items-center justify-between flex-wrap gap-4">
+                      <div className="flex-1 min-w-0">
                         <p className="text-sm text-slate-600">Conversion Rate</p>
-                        <p className="text-xs text-slate-500 mt-1">
+                        <p className="text-xs text-slate-500 mt-1 break-words">
                           {!exchangeRates[selectedCurrency] || !exchangeRates[selectedWalletData?.currency_code] ? (
                             <span>⏳ Fetching rates...</span>
                           ) : selectedWalletData?.currency_type === 'crypto' ? (
@@ -1051,9 +1051,9 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
                           )}
                         </p>
                       </div>
-                      <div className="text-right">
+                      <div className="text-right flex-1 min-w-0">
                         <p className="text-sm text-slate-600">You will receive</p>
-                        <p className={`text-2xl font-bold ${calculateConvertedAmount() ? 'text-blue-600' : 'text-amber-600'}`}>
+                        <p className={`text-2xl font-bold break-words ${calculateConvertedAmount() ? 'text-blue-600' : 'text-amber-600'}`}>
                           {calculateConvertedAmount() ? calculateConvertedAmount().toLocaleString(undefined, { maximumFractionDigits: 8 }) : (
                             exchangeRates[selectedCurrency] && exchangeRates[selectedWalletData?.currency_code] ? (
                               selectedWalletData?.currency_type === 'crypto'
