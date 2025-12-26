@@ -263,7 +263,7 @@ export default function DynamicCheckoutPage() {
                   <div>
                     <div className="text-sm text-slate-600 mb-1">Amount</div>
                     <div className="text-3xl font-bold text-blue-600">
-                      {getCurrencySymbol(transfer.recipient_currency)}{formatNumber(transfer.recipient_amount)}
+                      {formatNumber(transfer.recipient_amount)} {transfer.recipient_currency}
                     </div>
                   </div>
                   
@@ -275,7 +275,7 @@ export default function DynamicCheckoutPage() {
                         1 {transfer.sender_currency} = {formatNumber(transfer.exchange_rate)} {transfer.recipient_currency}
                       </div>
                       <div className="text-xs text-slate-600 mt-2">
-                        Sender paid: {getCurrencySymbol(transfer.sender_currency)}{formatNumber(transfer.sender_amount)}
+                        Sender paid: {formatNumber(transfer.sender_amount)} {transfer.sender_currency}
                       </div>
                     </div>
                   )}
@@ -337,7 +337,7 @@ export default function DynamicCheckoutPage() {
                     <div className="flex justify-between items-center">
                       <span className="text-slate-600">Amount:</span>
                       <span className="text-2xl font-bold text-blue-600">
-                        {getCurrencySymbol(transfer.recipient_currency)}{formatNumber(transfer.recipient_amount)}
+                        {formatNumber(transfer.recipient_amount)} {transfer.recipient_currency}
                       </span>
                     </div>
                     {transfer.description && (
@@ -353,7 +353,7 @@ export default function DynamicCheckoutPage() {
                     <p className="text-sm text-slate-700">
                       By confirming, you acknowledge receiving this payment of{' '}
                       <span className="font-bold text-blue-600">
-                        {getCurrencySymbol(transfer.recipient_currency)}{formatNumber(transfer.recipient_amount)}
+                        {formatNumber(transfer.recipient_amount)} {transfer.recipient_currency}
                       </span>{' '}
                       from{' '}
                       <span className="font-semibold">
@@ -441,7 +441,7 @@ export default function DynamicCheckoutPage() {
                     <p className="text-sm text-slate-700">
                       You are confirming receipt of{' '}
                       <span className="font-bold text-yellow-700">
-                        {getCurrencySymbol(transfer.recipient_currency)}{formatNumber(transfer.recipient_amount)}
+                        {formatNumber(transfer.recipient_amount)} {transfer.recipient_currency}
                       </span>
                       . This action cannot be undone.
                     </p>
