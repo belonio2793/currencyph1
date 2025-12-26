@@ -305,17 +305,17 @@ export default function HomePage({ userId, userEmail, globalCurrency = 'PHP', se
   const loadData = async () => {
     try {
       if (userId && !userId.includes('guest-local')) {
-        const [walletsData, loansData] = await Promise.all([
+        const [walletsData, debtsData] = await Promise.all([
           currencyAPI.getWallets(userId).catch(() => []),
-          currencyAPI.getLoans(userId).catch(() => [])
+          currencyAPI.getDebts(userId).catch(() => [])
         ])
         const w = walletsData || []
-        const l = loansData || []
+        const d = debtsData || []
         setWallets(w)
-        setLoans(l)
+        setLoans(d)
 
         // compute converted totals
-        await convertTotals(w, l)
+        await convertTotals(w, d)
       }
     } catch (err) {
       console.error('Error loading data:', err)
