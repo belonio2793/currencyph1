@@ -200,7 +200,7 @@ export default function OnboardingChecklist({ userId, userEmail, onTaskComplete,
                         <h4 className={`font-semibold text-sm ${
                           task.completed ? 'text-slate-500 line-through' : 'text-slate-900'
                         }`}>
-                          {task.icon} {task.title}
+                          {task.title}
                         </h4>
                         <p className={`text-sm mt-1.5 ${
                           task.completed ? 'text-slate-400' : 'text-slate-600'
