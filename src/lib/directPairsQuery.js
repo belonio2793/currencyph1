@@ -132,6 +132,7 @@ export async function getDirectRateWithMetadata(fromCurrency, toCurrency) {
 
 /**
  * Get multiple rates in single batch query (most efficient)
+ * SECURITY FIX: Falls back to safe inversion for any missing pairs
  * @param {string[]} fromCurrencies - Array of source currencies
  * @param {string} toCurrency - Target currency
  * @returns {Promise<Object>} Map of currency -> rate
@@ -160,6 +161,26 @@ export async function getDirectRatesBatch(fromCurrencies, toCurrency = 'PHP') {
         rates[row.from_currency] = row.rate
       }
     })
+
+    // For any missing rates, try safe inversion (1/rate formula)
+    const missingCurrencies = fromUpper.filter(c => !rates[c])
+    if (missingCurrencies.length > 0) {
+      console.debug(`[DirectPairs] ${missingCurrencies.length} missing, trying safe inversion...`)
+      const { getPairRate } = await import('./pairsRateService.js')
+
+      const invertedRates = await Promise.all(
+        missingCurrencies.map(async (currency) => {
+          const rate = await getPairRate(currency, to)
+          return { currency, rate }
+        })
+      )
+
+      invertedRates.forEach(({ currency, rate }) => {
+        if (rate) {
+          rates[currency] = rate
+        }
+      })
+    }
 
     console.log(`[DirectPairs] ✓ Batch query returned ${Object.keys(rates).length}/${fromCurrencies.length} rates`)
     return rates
