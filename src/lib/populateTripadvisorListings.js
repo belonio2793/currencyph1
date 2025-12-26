@@ -29,19 +29,7 @@ const SEARCH_CATEGORIES = [
   'churches'
 ]
 
-// High-quality mock data for key attractions (fallback when API fails)
-const PREMIUM_ATTRACTIONS = {
-  'Intramuros': { rating: 4.5, category: 'Historical Site', reviewCount: 5000 },
-  'Manila Cathedral': { rating: 4.3, category: 'Religious Site', reviewCount: 2100 },
-  'Rizal Park': { rating: 4.6, category: 'Park', reviewCount: 12000 },
-  'National Museum': { rating: 4.7, category: 'Museum', reviewCount: 8000 },
-  'Fort Santiago': { rating: 4.4, category: 'Historical Site', reviewCount: 6000 },
-  'Boracay Beach': { rating: 4.8, category: 'Beach', reviewCount: 25000 },
-  'Cebu Cathedral': { rating: 4.3, category: 'Religious Site', reviewCount: 3000 },
-  'Magellan Cross': { rating: 4.2, category: 'Historical Site', reviewCount: 4500 },
-  'Chocolate Hills': { rating: 4.7, category: 'Natural Wonder', reviewCount: 18000 },
-  'Mayon Volcano': { rating: 4.6, category: 'Natural Wonder', reviewCount: 9000 }
-}
+// Note: No hardcoded mock data - all data must come from TripAdvisor API only
 
 /**
  * Fetch listings from TripAdvisor API or use mock data
