@@ -160,7 +160,7 @@ export default function CurrencyConverter({ rates = [] }) {
                   ? 'bg-orange-100 text-orange-700'
                   : 'bg-blue-100 text-blue-700'
               }`}>
-                {fromCurrency.type === 'crypto' ? '₿ Cryptocurrency' : '💵 Fiat'}
+                {fromCurrency.type === 'crypto' ? 'Crypto' : 'Fiat'}
               </span>
             )}
           </label>
