@@ -704,19 +704,25 @@ async function processWiseDeposit(
 
     const quoteData = await quoteResponse.json()
 
+    // Build deposit data
+    let depositData: Record<string, any> = {
+      user_id: request.userId,
+      wallet_id: request.walletId,
+      amount: request.amount,
+      currency_code: request.currency,
+      deposit_method: 'wise',
+      status: 'pending',
+      payment_reference: paymentReference,
+      external_tx_id: quoteData.id
+    }
+
+    // Enrich with all metadata fields
+    depositData = await enrichDepositDataWithMetadata(depositData, request)
+
     // Store deposit
     const { data: deposit, error: depositError } = await supabase
       .from('deposits')
-      .insert([{
-        user_id: request.userId,
-        wallet_id: request.walletId,
-        amount: request.amount,
-        currency_code: request.currency,
-        deposit_method: 'wise',
-        status: 'pending',
-        payment_reference: paymentReference,
-        external_tx_id: quoteData.id
-      }])
+      .insert([depositData])
       .select()
       .single()
 
