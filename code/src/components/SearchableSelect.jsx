@@ -116,7 +116,7 @@ export default function SearchableSelect({ value, onChange, options = [], label 
   }
 
   const getCurrencyTypeLabel = (type) => {
-    return type === 'cryptocurrency' ? '₿' : '💵'
+    return type === 'cryptocurrency' ? 'CRYPTO' : 'FIAT'
   }
 
   return (
