@@ -623,9 +623,19 @@ export default function Rates() {
                     </thead>
                     <tbody>
                       {filteredRates.map(currency => (
-                        <tr key={currency.code} className="border-b border-slate-100 hover:bg-slate-50 transition">
+                        <tr
+                          key={currency.code}
+                          className={`border-b border-slate-100 hover:bg-slate-50 transition ${
+                            currency.metadata?.type === 'cryptocurrency' ? 'hover:bg-orange-50' : 'hover:bg-blue-50'
+                          }`}
+                        >
                           <td className="py-3 px-4">
-                            <span className="font-semibold text-slate-900">{currency.code}</span>
+                            <div className="flex items-center gap-2">
+                              <span className="text-lg">
+                                {currency.metadata?.type === 'cryptocurrency' ? '₿' : '💵'}
+                              </span>
+                              <span className="font-semibold text-slate-900">{currency.code}</span>
+                            </div>
                           </td>
                           <td className="py-3 px-4 text-slate-600">{currency.metadata?.name || currency.code}</td>
                           <td className="py-3 px-4">
@@ -634,10 +644,10 @@ export default function Rates() {
                                 ? 'bg-orange-100 text-orange-700'
                                 : 'bg-blue-100 text-blue-700'
                             }`}>
-                              {currency.metadata?.type === 'cryptocurrency' ? 'Cryptocurrency' : 'Currency'}
+                              {currency.metadata?.type === 'cryptocurrency' ? 'Cryptocurrency' : 'FIAT'}
                             </span>
                           </td>
-                          <td className="py-3 px-4 text-right font-mono text-slate-900">
+                          <td className="py-3 px-4 text-right font-mono text-slate-900 font-medium">
                             {formatNumber(currency.rate, currency.metadata?.decimals || 2)}
                           </td>
                           <td className="py-3 px-4 text-center">
@@ -645,9 +655,10 @@ export default function Rates() {
                               onClick={() => toggleFavorite(currency.code)}
                               className={`text-xl transition ${
                                 favorites.includes(currency.code)
-                                  ? 'text-yellow-400 hover:text-yellow-500'
+                                  ? 'text-yellow-400 hover:text-yellow-500 animate-pulse'
                                   : 'text-slate-300 hover:text-yellow-400'
                               }`}
+                              title={favorites.includes(currency.code) ? 'Remove from favorites' : 'Add to favorites'}
                             >
                               ★
                             </button>
