@@ -62,7 +62,7 @@ export default function Rates() {
       }
 
       const codeArray = Array.from(codes)
-      console.log(`📊 Found ${codeArray.length} unique currencies/cryptos`)
+      console.log(`Chart Found ${codeArray.length} unique currencies and cryptos`)
 
       if (codeArray.length === 0) {
         setRates([])
