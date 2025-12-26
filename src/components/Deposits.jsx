@@ -1193,9 +1193,9 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
               <div className="mb-8 p-6 bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-200 rounded-lg">
                 <h3 className="font-semibold text-slate-900 mb-4">📝 Exact Amount to Send</h3>
                 <div className="space-y-2">
-                  <div className="flex justify-between items-center">
+                  <div className="flex justify-between items-center gap-4 flex-wrap">
                     <span className="text-slate-700">Amount in {selectedAddressMethod?.depositCurrencyCode || selectedAddressMethod?.cryptoSymbol || selectedCurrency}:</span>
-                    <span className="text-2xl font-bold text-emerald-600">{getDepositMethodAmount()?.toLocaleString(undefined, {
+                    <span className="text-2xl font-bold text-emerald-600 break-words">{getDepositMethodAmount()?.toLocaleString(undefined, {
                       minimumFractionDigits: isCryptoCurrency(selectedAddressMethod?.depositCurrencyCode || selectedAddressMethod?.cryptoSymbol || selectedCurrency) ? 2 : 2,
                       maximumFractionDigits: isCryptoCurrency(selectedAddressMethod?.depositCurrencyCode || selectedAddressMethod?.cryptoSymbol || selectedCurrency) ? 8 : 2
                     })} {selectedAddressMethod?.depositCurrencyCode || selectedAddressMethod?.cryptoSymbol || selectedCurrency}</span>
