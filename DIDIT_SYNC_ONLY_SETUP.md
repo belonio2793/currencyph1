@@ -225,8 +225,8 @@ Made `id_type` and `id_number` nullable to avoid NOT NULL constraint failures.
 **How to Run**:
 
 ```bash
-# Manual trigger
-curl -X POST https://corcofbmafdxehvlbesx.supabase.co/functions/v1/didit-sync \
+# Manual trigger (replace YOUR_SUPABASE_URL with your project URL)
+curl -X POST https://YOUR_SUPABASE_URL/functions/v1/didit-sync \
   -H "Content-Type: application/json"
 
 # Or call from code
