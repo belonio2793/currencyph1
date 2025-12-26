@@ -20,7 +20,8 @@ export default function Rates() {
   const [sortDirection, setSortDirection] = useState('asc')
   const [favorites, setFavorites] = useState(['PHP', 'USD', 'EUR', 'BTC', 'ETH'])
 
-  // Load all pairs from public.pairs table
+  // Load all rates from currency_rates and cryptocurrency_rates tables
+  // Refreshes every 5 minutes
   useEffect(() => {
     loadData()
     const interval = setInterval(loadData, 5 * 60 * 1000)
