@@ -9,14 +9,14 @@ The DIDIT integration has been simplified to use **only the `didit-sync` edge fu
 ### Hardcoded Session URL
 ```javascript
 // src/components/DiditVerificationModal.jsx:6
-const DEFAULT_DIDIT_SESSION_URL = 'https://verify.didit.me/session/0YcwjP8Jj41H'
+const DEFAULT_DIDIT_SESSION_URL = 'https://verify.didit.me/session/your-session-id'
 ```
 
 All users verify through the same URL. This is intentional and works reliably.
 
 ### Required Environment Variable
 ```
-DIDIT_API_KEY=UjUxKvHnFXL1wBvZpL5XLlQhAe0GXqsheFU9k1Clrxo
+DIDIT_API_KEY=your-didit-api-key
 ```
 
 That's it. Everything else is hardcoded or derived.
