@@ -108,13 +108,14 @@ export const multiCurrencyDepositService = {
   /**
    * Create a multi-currency deposit record
    * Handles all validation and conversion
+   * Populates all metadata fields for complete audit trail
    */
   async createMultiCurrencyDeposit({
     userId,
     walletId,
     amount,
-    depositCurrency, // Currency being deposited
-    walletCurrency, // Target wallet currency
+    depositCurrency, // Currency being deposited (source)
+    walletCurrency, // Target wallet currency (destination)
     depositMethod, // 'gcash', 'solana', etc.
     paymentReference = null,
     paymentAddress = null,
@@ -127,7 +128,7 @@ export const multiCurrencyDepositService = {
         throw new Error('Missing required fields for deposit')
       }
 
-      // Fetch wallet data to ensure it exists
+      // Fetch wallet data to ensure it exists and get wallet currency info
       const { data: wallet, error: walletError } = await supabase
         .from('wallets')
         .select('id, user_id, currency_code')
@@ -139,33 +140,93 @@ export const multiCurrencyDepositService = {
         throw new Error('Wallet not found or access denied')
       }
 
+      // Fetch currency information for both deposit and wallet currencies
+      const { data: currencies, error: currError } = await supabase
+        .from('currencies')
+        .select('code, name, symbol, type')
+        .in('code', [depositCurrency.toUpperCase(), walletCurrency.toUpperCase()])
+
+      if (currError) {
+        console.warn('Error fetching currency info:', currError)
+      }
+
+      const currencyMap = {}
+      currencies?.forEach(curr => {
+        currencyMap[curr.code] = curr
+      })
+
+      const depositCurrencyInfo = currencyMap[depositCurrency.toUpperCase()]
+      const walletCurrencyInfo = currencyMap[walletCurrency.toUpperCase()]
+
       // Convert amount using public.pairs rates
       const conversion = await this.convertAmount(amount, depositCurrency, walletCurrency)
 
-      // Build deposit record
+      // Get current timestamp
+      const now = new Date()
+      const isoTimestamp = now.toISOString()
+
+      // Build comprehensive deposit record with all metadata
       const depositRecord = {
         user_id: userId,
         wallet_id: walletId,
+
+        // Original deposit amount and currency
         amount: conversion.fromAmount,
-        currency_code: depositCurrency, // Source currency
-        received_currency: walletCurrency, // Destination currency
+        original_currency: depositCurrency.toUpperCase(),
+        original_currency_name: depositCurrencyInfo?.name || depositCurrency,
+        original_currency_symbol: depositCurrencyInfo?.symbol || depositCurrency,
+
+        // Wallet/received currency info
+        currency_code: walletCurrency.toUpperCase(),
+        received_currency: walletCurrency.toUpperCase(),
+        currency_name: walletCurrencyInfo?.name || walletCurrency,
+        currency_symbol: walletCurrencyInfo?.symbol || walletCurrency,
+
+        // Conversion details
+        received_amount: conversion.toAmount,
         exchange_rate: conversion.rateRounded,
-        converted_amount: conversion.toAmount,
+        exchange_rate_at_time: conversion.rateRounded,
+        time_based_rate: conversion.rateRounded,
+        rate_source: 'public.pairs',
+        rate_fetched_at: isoTimestamp,
+
+        // Deposit method and references
         deposit_method: depositMethod,
         payment_reference: paymentReference,
         payment_address: paymentAddress,
         external_tx_id: externalTxId,
+
+        // Status and timestamps
         status: 'pending',
+        created_at: isoTimestamp,
+        updated_at: isoTimestamp,
+
+        // Metadata with complete transaction context
         metadata: {
           ...metadata,
           conversion_rate: conversion.rateRounded,
-          from_currency: depositCurrency,
-          to_currency: walletCurrency,
+          from_currency: depositCurrency.toUpperCase(),
+          to_currency: walletCurrency.toUpperCase(),
           created_via: 'multi_currency_deposit_service',
-          rate_source: 'public.pairs'
+          rate_source: 'public.pairs',
+          deposit_type: 'cross_currency',
+          created_at: isoTimestamp,
+          rate_fetched_at: isoTimestamp
         },
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString()
+
+        // Transaction details for audit trail
+        notes: {
+          original_amount: conversion.fromAmount,
+          original_currency: depositCurrency.toUpperCase(),
+          converted_amount: conversion.toAmount,
+          received_currency: walletCurrency.toUpperCase(),
+          exchange_rate: conversion.rateRounded,
+          rate_source: 'public.pairs',
+          conversion_type: depositCurrency !== walletCurrency ? 'cross_currency' : 'same_currency',
+          initiator_type: 'user_deposit',
+          user_id: userId,
+          wallet_id: walletId
+        }
       }
 
       // Insert into database
