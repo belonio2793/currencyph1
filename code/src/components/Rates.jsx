@@ -630,8 +630,8 @@ export default function Rates() {
                         >
                           <td className="py-3 px-4">
                             <div className="flex items-center gap-2">
-                              <span className="text-lg">
-                                {currency.metadata?.type === 'cryptocurrency' ? '₿' : '💵'}
+                              <span className="text-sm font-semibold text-slate-600">
+                                {currency.metadata?.type === 'cryptocurrency' ? 'CRY' : 'FIA'}
                               </span>
                               <span className="font-semibold text-slate-900">{currency.code}</span>
                             </div>
