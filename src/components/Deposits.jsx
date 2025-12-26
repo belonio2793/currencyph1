@@ -1544,13 +1544,15 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
                     <div className="grid grid-cols-2 gap-4">
                       <div>
                         <p className="text-xs text-slate-600 uppercase tracking-wide mb-2">Original Amount</p>
-                        <p className="text-2xl font-bold text-slate-900">{deposit.amount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: isCryptoCurrency(originalCurrency) ? 8 : 2 })}</p>
-                        <p className="text-sm text-slate-600 mt-1">{originalCurrency.toUpperCase()}</p>
+                        <p className="text-2xl font-bold text-slate-900">
+                          {deposit.amount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: isCryptoCurrency(originalCurrency) ? 8 : 2 })} {originalCurrency.toUpperCase()}
+                        </p>
                       </div>
                       <div>
                         <p className="text-xs text-slate-600 uppercase tracking-wide mb-2">Received Amount</p>
-                        <p className="text-2xl font-bold text-emerald-600">{convertedAmount ? convertedAmount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: isCryptoCurrency(walletCurrency) ? 8 : 2 }) : '—'}</p>
-                        <p className="text-sm text-slate-600 mt-1">{walletCurrency.toUpperCase()}</p>
+                        <p className="text-2xl font-bold text-emerald-600">
+                          {convertedAmount ? `${convertedAmount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: isCryptoCurrency(walletCurrency) ? 8 : 2 })} ${walletCurrency.toUpperCase()}` : '—'}
+                        </p>
                       </div>
                     </div>
 
