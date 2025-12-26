@@ -161,7 +161,6 @@ export default function OnboardingChecklist({ userId, userEmail, onTaskComplete,
       <div className="p-6">
         {incompleteTasks.length === 0 ? (
           <div className="py-12 text-center">
-            <span className="text-5xl mb-4 block">🎉</span>
             <p className="text-lg font-semibold text-slate-900 mb-2">All set!</p>
             <p className="text-slate-600">You've completed all your onboarding tasks</p>
           </div>
