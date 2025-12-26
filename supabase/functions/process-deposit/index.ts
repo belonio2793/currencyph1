@@ -215,7 +215,8 @@ async function enrichDepositDataWithMetadata(
       time_based_rate: conversionResult.exchangeRate,
       rate_source: conversionResult.source,
       rate_fetched_at: now,
-      received_amount: conversionResult.convertedAmount
+      received_amount: conversionResult.convertedAmount,
+      converted_amount: conversionResult.convertedAmount
     }),
 
     // Ensure rate_fetched_at is set even without conversion
