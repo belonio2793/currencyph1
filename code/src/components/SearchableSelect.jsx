@@ -12,15 +12,24 @@ export default function SearchableSelect({ value, onChange, options = [], label 
   const fiatCurrencies = options.filter(opt => opt.metadata?.type === 'currency')
   const cryptoCurrencies = options.filter(opt => opt.metadata?.type === 'cryptocurrency')
 
-  // Filter options based on search term
+  // Filter options based on search term with priority for code matches
   const filterOptions = (list) => {
     if (!searchTerm) return list
 
     const search = searchTerm.toLowerCase()
-    return list.filter(opt =>
-      opt.code.toLowerCase().includes(search) ||
-      opt.metadata?.name?.toLowerCase().includes(search)
+
+    // First, prioritize exact code prefix matches, then name matches
+    const codeMatches = list.filter(opt =>
+      opt.code.toLowerCase().startsWith(search)
     )
+
+    const nameMatches = list.filter(opt =>
+      !opt.code.toLowerCase().startsWith(search) &&
+      (opt.code.toLowerCase().includes(search) ||
+       opt.metadata?.name?.toLowerCase().includes(search))
+    )
+
+    return [...codeMatches, ...nameMatches]
   }
 
   const filteredFiat = filterOptions(fiatCurrencies)
@@ -49,7 +58,7 @@ export default function SearchableSelect({ value, onChange, options = [], label 
   // Handle keyboard navigation
   const handleKeyDown = (e) => {
     if (!isOpen) {
-      if (e.key === 'Enter' || e.key === ' ') {
+      if (e.key === 'Enter' || e.key === ' ' || e.key === 'ArrowDown') {
         setIsOpen(true)
         e.preventDefault()
       }
@@ -83,6 +92,16 @@ export default function SearchableSelect({ value, onChange, options = [], label 
         setSearchTerm('')
         break
       default:
+        // Support typing to jump to items (autopropagation)
+        if (e.key.length === 1 && !e.ctrlKey && !e.metaKey && !e.altKey) {
+          const char = e.key.toLowerCase()
+          const matchingIndex = flatOptions.findIndex(opt =>
+            opt.code.toLowerCase().startsWith(searchTerm.toLowerCase() + char)
+          )
+          if (matchingIndex !== -1) {
+            setHighlightedIndex(matchingIndex)
+          }
+        }
         break
     }
   }
@@ -104,10 +123,10 @@ export default function SearchableSelect({ value, onChange, options = [], label 
     }
   }, [isOpen])
 
-  // Reset highlighted index when search changes
+  // Reset highlighted index and auto-highlight first result when search changes
   useEffect(() => {
     setHighlightedIndex(0)
-  }, [searchTerm])
+  }, [searchTerm, isOpen])
 
   const getCurrencyTypeColor = (type) => {
     return type === 'cryptocurrency'
