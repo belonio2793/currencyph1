@@ -182,6 +182,8 @@ WHERE deposit_id = '<deposit_id>';
 3. **Query Performance**: Dedicated indexes on deposit_id for fast lookups
 4. **Data Integrity**: Foreign key prevents orphaned transactions
 5. **Compliance**: Complete transaction history linked to originating deposits
+6. **Audit Trail Survival**: Balance sync records persist even after deposit deletion
+7. **Complete History**: Can reconstruct exactly what happened to a wallet when deposits are deleted
 
 ## Testing Checklist
 
