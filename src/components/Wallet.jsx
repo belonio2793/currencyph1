@@ -521,9 +521,9 @@ export default function Wallet({ userId, globalCurrency = 'PHP' }) {
                                 <td className="px-6 py-4 text-sm text-slate-600">
                                   {wallet.symbol || (wallet.currency_code === 'PHP' ? '₱' : wallet.currency_code === 'USD' ? '$' : wallet.currency_code === 'EUR' ? '€' : wallet.currency_code === 'GBP' ? '£' : wallet.currency_code)}
                                 </td>
-                                <td className="px-6 py-4 text-sm font-mono text-slate-900 text-right">{formatNumber(wallet.balance || 0)}</td>
+                                <td className="px-6 py-4 text-sm font-mono text-slate-900 text-right break-all">{wallet.balance != null ? String(wallet.balance) : '0.00'}</td>
                                 <td className="px-6 py-4 text-sm font-mono text-slate-600 text-right">{formatNumber(wallet.total_deposited || 0)}</td>
-                                <td className="px-6 py-4 text-sm font-mono text-slate-600 truncate max-w-xs">{wallet.id}</td>
+                                <td className="px-6 py-4 text-sm font-mono text-slate-600 truncate max-w-xs" title={wallet.id}>{wallet.id}</td>
                                 <td className="px-6 py-4 text-sm text-slate-600">{wallet.account_number || 'N/A'}</td>
                                 <td className="px-6 py-4 text-sm">
                                   {wallet.is_active && (
@@ -570,9 +570,9 @@ export default function Wallet({ userId, globalCurrency = 'PHP' }) {
                               <tr key={wallet.id} className={idx % 2 === 0 ? 'bg-white' : 'bg-orange-50/40'}>
                                 <td className="px-6 py-4 text-sm font-medium text-slate-900">{wallet.currency_code}</td>
                                 <td className="px-6 py-4 text-sm text-orange-600 font-medium">Crypto</td>
-                                <td className="px-6 py-4 text-sm font-mono text-slate-900 text-right">{formatNumber(wallet.balance || 0)}</td>
+                                <td className="px-6 py-4 text-sm font-mono text-slate-900 text-right break-all">{wallet.balance != null ? String(wallet.balance) : '0.00'}</td>
                                 <td className="px-6 py-4 text-sm font-mono text-slate-600 text-right">{formatNumber(wallet.total_deposited || 0)}</td>
-                                <td className="px-6 py-4 text-sm font-mono text-slate-600 truncate max-w-xs">{wallet.id}</td>
+                                <td className="px-6 py-4 text-sm font-mono text-slate-600 truncate max-w-xs" title={wallet.id}>{wallet.id}</td>
                                 <td className="px-6 py-4 text-sm text-slate-600">{wallet.account_number || 'Blockchain'}</td>
                                 <td className="px-6 py-4 text-sm">
                                   {wallet.is_active && (
