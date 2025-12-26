@@ -548,8 +548,7 @@ export default function Rates() {
                     favoriteRates.map(curr => (
                       <div
                         key={curr.code}
-                        className="p-4 border border-slate-200 rounded-lg hover:border-blue-300 hover:bg-blue-50 transition cursor-pointer"
-                        onClick={() => setSelectedFrom(curr.code)}
+                        className="p-4 border border-slate-200 rounded-lg hover:border-blue-300 hover:bg-blue-50 transition"
                       >
                         <div className="flex items-center justify-between mb-2">
                           <div>
@@ -557,11 +556,8 @@ export default function Rates() {
                             <div className="text-xs text-slate-500">{curr.metadata?.name}</div>
                           </div>
                           <button
-                            onClick={(e) => {
-                              e.stopPropagation()
-                              toggleFavorite(curr.code)
-                            }}
-                            className="text-yellow-400 hover:text-yellow-500 text-lg"
+                            onClick={() => toggleFavorite(curr.code)}
+                            className="text-yellow-400 hover:text-yellow-500 text-lg transition"
                           >
                             ★
                           </button>
