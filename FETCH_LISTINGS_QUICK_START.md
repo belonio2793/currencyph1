@@ -3,11 +3,11 @@
 ## ⚡ TL;DR - 3 Simple Steps
 
 ### Step 1: Verify Environment Variables
-Make sure you have these set in your environment:
+Make sure you have these set in your `.env.local`:
 ```
-PROJECT_URL=https://corcofbmafdxehvlbesx.supabase.co
-SUPABASE_SERVICE_ROLE_KEY=eyJhbGci...
-TRIPADVISOR=451510296B594353B4EA0CD052DA6603
+PROJECT_URL=your-supabase-url
+SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
+TRIPADVISOR=your-tripadvisor-api-key
 ```
 
 ### Step 2: Run the Fetcher
