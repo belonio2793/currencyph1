@@ -8,17 +8,17 @@ The `/nearby` page displays listings from the `nearby_listings` database table. 
 
 ### Environment Variables
 
-The application uses the following environment variables to connect to Supabase:
+The application uses the following environment variables to connect to Supabase (set in `.env.local`):
 
 ```env
 # Supabase Project URL
-VITE_PROJECT_URL=https://corcofbmafdxehvlbesx.supabase.co
+VITE_PROJECT_URL=your-project-url
 
 # Supabase Anonymous Key (for client-side operations)
-VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+VITE_SUPABASE_ANON_KEY=your-anon-key
 
 # Supabase Service Role Key (for server-side operations)
-VITE_SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+VITE_SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
 ```
 
 These variables are automatically loaded from `.env.local` and made available via Vite's `import.meta.env` object.
