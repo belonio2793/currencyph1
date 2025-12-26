@@ -41,6 +41,29 @@ function NavbarComponent({ activeTab, onTabChange, globalCurrency, setGlobalCurr
   const [totalCryptoInSelectedCrypto, setTotalCryptoInSelectedCrypto] = useState(0)
   const [loadingCryptoConversion, setLoadingCryptoConversion] = useState(false)
 
+  // Convert crypto holdings to selected cryptocurrency
+  useEffect(() => {
+    const convertCryptoHoldings = async () => {
+      if (!globalCryptocurrency || !globalCurrency || !userEmail || totalCryptoBalancePHP === 0) {
+        setTotalCryptoInSelectedCrypto(0)
+        return
+      }
+
+      setLoadingCryptoConversion(true)
+      try {
+        const converted = await convertFiatToCryptoDb(totalCryptoBalancePHP, globalCurrency, globalCryptocurrency)
+        setTotalCryptoInSelectedCrypto(converted || 0)
+      } catch (error) {
+        console.error('Failed to convert crypto holdings to selected cryptocurrency:', error)
+        setTotalCryptoInSelectedCrypto(0)
+      } finally {
+        setLoadingCryptoConversion(false)
+      }
+    }
+
+    convertCryptoHoldings()
+  }, [totalCryptoBalancePHP, globalCryptocurrency, globalCurrency, userEmail])
+
   // Convert consolidated balance (fiat + crypto) to selected cryptocurrency
   useEffect(() => {
     if (userEmail && globalCryptocurrency && globalCurrency) {
