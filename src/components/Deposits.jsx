@@ -1328,7 +1328,7 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
                 className={`flex-1 px-6 py-3 bg-blue-600 text-white rounded-lg font-medium transition flex items-center justify-center gap-2 ${
                   submitting
                     ? 'opacity-75 cursor-wait'
-                    : 'hover:bg-blue-700 active:scale-95'
+                    : 'hover:bg-slate-800 active:scale-95'
                 } ${submitting || !selectedWalletData || (selectedMethod === 'gcash' && !gcashReferenceNumber.trim()) ? 'opacity-50 cursor-not-allowed' : ''}`}
               >
                 {submitting && (
