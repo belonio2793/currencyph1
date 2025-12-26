@@ -508,8 +508,8 @@ export default function SendMoney({ userId }) {
                                   <span className="text-slate-600">Currency</span>
                                   <span className="font-semibold text-emerald-700">{wallet.currency_code} ({getCurrencySymbol(wallet.currency_code)})</span>
                                 </div>
-                                <div className="pt-2 border-t border-emerald-200">
-                                  <p className="text-xs text-emerald-700 font-medium mb-2">Wallet ID</p>
+                                <div className="pt-2 border-t border-slate-300">
+                                  <p className="text-xs text-slate-700 font-medium mb-2">Wallet ID</p>
                                   <p className="text-xs font-mono text-slate-900 break-all bg-white p-2 rounded border border-emerald-200">{wallet.id}</p>
                                 </div>
                                 {wallet.account_number && (
