@@ -431,7 +431,8 @@ LIMIT 10;
 ### Test didit-sync
 
 ```bash
-curl -X POST https://corcofbmafdxehvlbesx.supabase.co/functions/v1/didit-sync \
+# Replace YOUR_SUPABASE_URL with your project URL
+curl -X POST https://YOUR_SUPABASE_URL/functions/v1/didit-sync \
   -H "Content-Type: application/json"
 ```
 
