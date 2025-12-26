@@ -245,8 +245,8 @@ export default function Rates() {
 
       setRates(validRates)
       setLastUpdated(mostRecentTimestamp)
-      console.log(`✅ Final rates list: ${validRates.length} items (${ratesWithValues.length} with rates)`)
-      console.log(`🕐 Last fetch date set to: ${formatFullDateTime(mostRecentTimestamp)}`)
+      console.log(`OK Final rates list: ${validRates.length} items (${ratesWithValues.length} with rates)`)
+      console.log(`Clock Last fetch date set to: ${formatFullDateTime(mostRecentTimestamp)}`)
       setError(null)
     } catch (err) {
       const errorMsg = err?.message || String(err) || 'Unknown error'
