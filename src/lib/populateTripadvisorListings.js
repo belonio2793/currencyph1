@@ -82,47 +82,6 @@ async function fetchTripAdvisorListings(query, limit = 20) {
   }
 }
 
-/**
- * Generate enhanced mock attractions with realistic data
- */
-function generateEnhancedMockAttractionsForCity(city, category) {
-  const categories = {
-    'attractions': ['Temple', 'Museum', 'Park', 'Monument'],
-    'things to do': ['Adventure Tour', 'Water Sports', 'Local Experience', 'Cultural Tour'],
-    'historical sites': ['Historic Building', 'Fort', 'Ancient Site', 'Historic District'],
-    'parks': ['National Park', 'City Park', 'Nature Reserve', 'Botanical Garden'],
-    'beaches': ['Beach Resort', 'Beach Club', 'Beach', 'Cove'],
-    'museums': ['Art Museum', 'History Museum', 'Science Museum', 'Maritime Museum'],
-    'restaurants': ['Fine Dining', 'Local Restaurant', 'Seafood Restaurant', 'Cafe'],
-    'churches': ['Cathedral', 'Basilica', 'Church', 'Shrine']
-  }
-
-  const categoryList = categories[category] || ['Attraction']
-  const attractions = []
-
-  for (let i = 1; i <= 3; i++) {
-    const catIndex = Math.floor(Math.random() * categoryList.length)
-    const attractionCategory = categoryList[catIndex]
-    attractions.push({
-      tripadvisor_id: `${city.toLowerCase().replace(/\s+/g, '-')}-${category}-${i}-${Date.now()}`,
-      name: `${attractionCategory} in ${city}`,
-      address: `${attractionCategory}, ${city}, Philippines`,
-      latitude: parseFloat((Math.random() * 14 + 5).toFixed(4)),
-      longitude: parseFloat((Math.random() * 7 + 120).toFixed(4)),
-      rating: Math.round((Math.random() * 1 + 4) * 10) / 10,
-      category: attractionCategory,
-      reviewCount: Math.floor(Math.random() * 5000) + 200,
-      raw: {
-        source: 'mock_data',
-        city,
-        category,
-        description: `Popular ${attractionCategory.toLowerCase()} in ${city}. A must-visit attraction with excellent ratings and reviews.`
-      }
-    })
-  }
-
-  return attractions
-}
 
 /**
  * Main population function
