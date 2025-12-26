@@ -268,8 +268,54 @@ wallets (id, currency_code, balance, ...)
 - Must run **before** code that explicitly passes `deposit_id` to wallet transaction creation
 - Both migrations should be applied together as a unit
 
+## Implementation Summary
+
+### What Gets Linked to Deposits
+
+| Transaction Type | deposit_id | reference_id | Purpose |
+|-----------------|-----------|--------------|---------|
+| `deposit_approved` | ✓ Set | deposit id | Normal deposit approval |
+| `deposit_reversed` | ✓ Set | deposit id | Deposit reversal |
+| `balance_sync_on_delete` | ✗ NULL | deleted deposit id | Audit trail after deletion |
+| Other (transfer, etc) | ✗ NULL | - | Non-deposit transactions |
+
+### Cascade Delete Behavior
+
+```
+DELETE deposits WHERE id = 'xyz'
+    ↓
+wallet_transactions with deposit_id = 'xyz'
+    ↓
+All cascade-deleted (via FK constraint)
+    ↓
+Balance sync transaction created with deposit_id = NULL
+    ↓
+Audit trail survives permanently
+```
+
+### Data Migration Note
+
+For existing deposits that have been approved:
+- Existing `wallet_transactions` rows will have `deposit_id = NULL`
+- This is **safe and valid** - they represent transactions before this feature was added
+- New deposits after the migration will have `deposit_id` properly set
+- Optional: Can run a backfill script to populate `deposit_id` for historical transactions if needed
+
 ---
 
-**Status**: Ready for deployment  
-**Risk Level**: Low (additive change with backwards compatibility)  
-**Tested**: Schema validation included in migration
+## Deployment Checklist
+
+- [ ] Run migrations 0121 and 0122 in order
+- [ ] Verify foreign key constraint is active
+- [ ] Test cascade delete behavior
+- [ ] Monitor query performance with new indexes
+- [ ] Verify balance sync audit trail is created on deletion
+- [ ] Update any admin tools/reports that query wallet_transactions
+- [ ] Document the new deposit_id column in API/DB docs
+
+---
+
+**Status**: Ready for deployment
+**Risk Level**: Low (additive change with backwards compatibility)
+**Tested**: Schema validation included in both migrations
+**Reversibility**: High (can drop column and FK if needed, but not recommended)
