@@ -680,11 +680,7 @@ export default function Rates() {
                     favoriteRates.map(curr => (
                       <div
                         key={curr.code}
-                        className={`p-4 border-2 rounded-lg transition cursor-pointer ${
-                          curr.metadata?.type === 'cryptocurrency'
-                            ? 'border-orange-200 hover:border-orange-400 hover:bg-orange-50'
-                            : 'border-blue-200 hover:border-blue-400 hover:bg-blue-50'
-                        }`}
+                        className="p-4 border-2 border-slate-300 hover:border-slate-400 hover:bg-slate-50 rounded-lg transition cursor-pointer"
                         onClick={() => setSelectedFrom(curr.code)}
                       >
                         <div className="flex items-center justify-between mb-2">
