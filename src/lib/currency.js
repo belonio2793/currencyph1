@@ -20,9 +20,10 @@ export function isCryptoCurrency(code) {
   return !isFiatCurrency(code) && code?.length > 0
 }
 
-export function formatNumber(amount) {
+export function formatNumber(amount, currency = null) {
   if (amount == null || isNaN(amount)) return '0.00'
-  return Number(amount).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+  const isCrypto = currency && isCryptoCurrency(currency)
+  return Number(amount).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: isCrypto ? 8 : 2 })
 }
 
 // Format conversion rates intelligently based on magnitude
@@ -49,7 +50,7 @@ export function formatExchangeRate(rate) {
 
 export function formatCurrency(amount, code) {
   const symbol = getCurrencySymbol(code)
-  return `${symbol}${formatNumber(amount)}`
+  return `${symbol}${formatNumber(amount, code)}`
 }
 
 export function formatPhp(amount) {
