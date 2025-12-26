@@ -493,15 +493,15 @@ export default function Rates() {
               {/* Rates Table */}
               <div className="bg-white rounded-2xl shadow-lg p-6 sm:p-8 border border-slate-200">
                 {/* Last Updated Info Banner */}
-                <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                <div className="mb-6 p-4 bg-gradient-to-r from-blue-50 to-cyan-50 border border-blue-200 rounded-lg">
                   <div className="flex items-center justify-between flex-wrap gap-2">
                     <div>
-                      <p className="text-sm text-blue-900">
-                        <span className="font-semibold">Last Fetched Rates:</span>{' '}
-                        {formatFullDateTime(lastUpdated)}
+                      <p className="text-sm text-slate-900">
+                        <span className="font-semibold">📊 Last Fetched:</span>{' '}
+                        <span className="text-blue-700">{formatFullDateTime(lastUpdated)}</span>
                       </p>
                       {lastUpdated && (
-                        <p className="text-xs text-blue-700 mt-1">
+                        <p className="text-xs text-slate-600 mt-1">
                           {(() => {
                             const minutes = Math.floor((Date.now() - new Date(lastUpdated).getTime()) / 1000 / 60)
                             if (minutes < 1) return '✓ Just now'
@@ -517,29 +517,24 @@ export default function Rates() {
                       <button
                         onClick={loadData}
                         disabled={loading}
-                        className="px-3 py-1 bg-blue-600 text-white text-xs font-medium rounded hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition whitespace-nowrap"
+                        className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition whitespace-nowrap"
                       >
-                        {loading ? 'Refreshing...' : 'Refresh Rates'}
+                        {loading ? 'Refreshing...' : '🔄 Refresh'}
                       </button>
                     )}
                   </div>
                 </div>
 
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
-                  <div>
-                    <h2 className="text-xl sm:text-2xl font-semibold text-slate-900">All Rates</h2>
+                  <div className="flex items-center gap-2">
+                    <span className="text-3xl">📈</span>
+                    <h2 className="text-xl sm:text-2xl font-semibold text-slate-900">Exchange Rates</h2>
                   </div>
                   <div className="flex items-center gap-4">
-                    <div className="text-sm text-slate-500">
-                      {filteredRates.length} currency pair{filteredRates.length !== 1 ? 's' : ''}
+                    <div className="text-sm font-medium text-slate-700">
+                      <span className="text-blue-600">{rates.filter(r => r.metadata?.type === 'currency').length}</span> Fiat •{' '}
+                      <span className="text-orange-600">{rates.filter(r => r.metadata?.type === 'cryptocurrency').length}</span> Crypto
                     </div>
-                    <button
-                      onClick={loadData}
-                      disabled={loading}
-                      className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition"
-                    >
-                      {loading ? 'Refreshing...' : 'Refresh'}
-                    </button>
                   </div>
                 </div>
 
