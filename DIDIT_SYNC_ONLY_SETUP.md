@@ -189,7 +189,7 @@ That's it! The session URL is hardcoded in the modal.
 **File**: `src/components/DiditVerificationModal.jsx` (Line 6)
 
 ```javascript
-const DEFAULT_DIDIT_SESSION_URL = 'https://verify.didit.me/session/0YcwjP8Jj41H'
+const DEFAULT_DIDIT_SESSION_URL = 'https://verify.didit.me/session/your-session-id'
 ```
 
 To change the session URL, edit this constant.
