@@ -710,7 +710,7 @@ export default function Rates() {
                   ) : (
                     <p className="text-sm text-slate-500 text-center py-8">
                       <span className="block mb-2">No favorites yet</span>
-                      Add currencies to favorites by clicking the ★ in the rates table
+                      Add currencies to favorites by clicking the Add button in the rates table
                     </p>
                   )}
                 </div>
