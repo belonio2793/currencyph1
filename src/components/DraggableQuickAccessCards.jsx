@@ -286,13 +286,13 @@ export default function DraggableQuickAccessCards({
                 }`}
               >
                 <div className="flex justify-center mb-4">
-                  <div className={`flex items-center justify-center w-12 h-12 rounded-lg transition-colors bg-white/50 ${config.colorClasses.split(' ').filter(c => c.includes('text-')).join(' ')}`}>
+                  <div className={`flex items-center justify-center w-12 h-12 rounded-lg transition-colors ${config.colorClasses}`}>
                     {config.icon}
                   </div>
                 </div>
-                <h3 className={`text-xl font-semibold mb-2 ${isLargeMode ? 'text-slate-900' : 'text-slate-900'}`}>{config.title}</h3>
-                <p className={`text-sm mb-4 ${isLargeMode ? 'text-slate-800' : 'text-slate-600'}`}>{config.description}</p>
-                <div className={`text-sm font-medium ${isLargeMode ? config.colorClasses.split(' ').filter(c => c.includes('text-')).join(' ') : config.colorClasses.split(' ').filter(c => c.includes('text-')).join(' ')}`}>
+                <h3 className="text-xl font-semibold text-slate-900 mb-2">{config.title}</h3>
+                <p className="text-sm text-slate-600 mb-4">{config.description}</p>
+                <div className={`text-sm font-medium ${config.colorClasses.split(' ').filter(c => c.includes('text-')).join(' ')}`}>
                   {isDragEnabled ? 'Drag to reorder • Click to open →' : 'Click to open →'}
                 </div>
               </button>
