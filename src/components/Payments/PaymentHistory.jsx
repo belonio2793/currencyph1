@@ -143,22 +143,22 @@ export default function PaymentHistory({ merchant, userId, globalCurrency = 'PHP
           </div>
         </div>
 
-        <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-4">
-          <p className="text-xs font-semibold text-emerald-700 uppercase mb-1">Gross Revenue</p>
-          <p className="text-2xl font-bold text-emerald-900">{globalCurrency} {summary.totalAmount.toFixed(2)}</p>
-          <p className="text-xs text-emerald-600 mt-2">Succeeded payments</p>
+        <div className="bg-white border border-slate-300 rounded-lg p-4">
+          <p className="text-xs font-semibold text-slate-600 uppercase mb-1">Gross Revenue</p>
+          <p className="text-sm font-mono font-semibold text-slate-900 truncate">{globalCurrency} {summary.totalAmount.toFixed(2)}</p>
+          <p className="text-xs text-slate-500 mt-2">Succeeded payments</p>
         </div>
 
-        <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
-          <p className="text-xs font-semibold text-amber-700 uppercase mb-1">Total Fees</p>
-          <p className="text-2xl font-bold text-amber-900">{globalCurrency} {summary.totalFees.toFixed(2)}</p>
-          <p className="text-xs text-amber-600 mt-2">From succeeded payments</p>
+        <div className="bg-white border border-slate-300 rounded-lg p-4">
+          <p className="text-xs font-semibold text-slate-600 uppercase mb-1">Total Fees</p>
+          <p className="text-sm font-mono font-semibold text-slate-900 truncate">{globalCurrency} {summary.totalFees.toFixed(2)}</p>
+          <p className="text-xs text-slate-500 mt-2">From succeeded payments</p>
         </div>
 
-        <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
-          <p className="text-xs font-semibold text-purple-700 uppercase mb-1">Net Revenue</p>
-          <p className="text-2xl font-bold text-purple-900">{globalCurrency} {summary.netRevenue.toFixed(2)}</p>
-          <p className="text-xs text-purple-600 mt-2">After fees</p>
+        <div className="bg-white border border-slate-300 rounded-lg p-4">
+          <p className="text-xs font-semibold text-slate-600 uppercase mb-1">Net Revenue</p>
+          <p className="text-sm font-mono font-semibold text-slate-900 truncate">{globalCurrency} {summary.netRevenue.toFixed(2)}</p>
+          <p className="text-xs text-slate-500 mt-2">After fees</p>
         </div>
       </div>
 
