@@ -284,12 +284,12 @@ export default function SearchableSelect({ value, onChange, options = [], label 
                 {/* CRYPTO Section */}
                 {filteredCrypto.length > 0 && (
                   <>
-                    <div className="px-4 py-3 text-xs font-bold text-orange-700 uppercase tracking-wider flex items-center gap-2 bg-orange-50">
-                      <span className="inline-flex items-center px-2 py-1 bg-orange-200 rounded-md text-orange-800">
+                    <div className="px-4 py-3 text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-2 bg-slate-100">
+                      <span className="inline-flex items-center px-2 py-1 bg-slate-300 rounded-md text-slate-900">
                         ₿ CRYPTO
                       </span>
-                      <span className="text-orange-600">Currencies</span>
-                      <div className="flex-1 h-px bg-orange-200 ml-auto"></div>
+                      <span className="text-slate-600">Currencies</span>
+                      <div className="flex-1 h-px bg-slate-300 ml-auto"></div>
                     </div>
                     {filteredCrypto.map((option) => (
                       <button
