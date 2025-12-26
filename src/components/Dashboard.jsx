@@ -120,24 +120,17 @@ export default function Dashboard({ userId, onNavigate, globalCurrency = 'PHP', 
       <div className="mb-6">
         <h3 className="text-lg font-light text-slate-900 mb-6 tracking-wide">Quick Actions</h3>
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          {actions.map(action => {
-            const colorMap = {
-              blue: 'bg-blue-50 text-blue-600 hover:bg-blue-100',
-              emerald: 'bg-emerald-50 text-emerald-600 hover:bg-emerald-100',
-              amber: 'bg-amber-50 text-amber-600 hover:bg-amber-100',
-              slate: 'bg-slate-50 text-slate-600 hover:bg-slate-100'
-            }
-            return (
+          {actions.map(action => (
               <button
                 key={action.id}
                 onClick={() => onNavigate(action.id)}
-                className={`${colorMap[action.color]} rounded-xl p-6 transition-colors text-center group`}
+                className={`${action.bgColor} text-${action.color}-600 rounded-xl p-6 transition-colors text-center group`}
               >
                 <div className="text-3xl mb-3 group-hover:scale-110 transition-transform">{action.icon}</div>
                 <p className="font-medium text-sm">{action.label}</p>
               </button>
             )
-          })}
+          )}
         </div>
       </div>
 
