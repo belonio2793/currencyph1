@@ -49,7 +49,7 @@ export default function Rates() {
       }
 
       pairsData = allPairsData || []
-      console.log(`📥 Fetched ${pairsData?.length || 0} pairs from public.pairs (including canonical & bidirectional)`)
+      console.log(`Fetched ${pairsData?.length || 0} pairs from public.pairs (including canonical and bidirectional)`)
       setAllPairs(pairsData || [])
 
       // Get unique currency codes from pairs
