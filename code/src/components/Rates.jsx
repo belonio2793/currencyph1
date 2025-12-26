@@ -195,12 +195,12 @@ export default function Rates() {
       if (fetchInfo && fetchInfo.fetchedAt) {
         // Use the actual fetch-rates edge function execution time (most accurate)
         mostRecentTimestamp = fetchInfo.fetchedAt
-        console.log(`🕐 Using fetch-rates execution time: ${fetchInfo.isoString}`)
+        console.log(`Clock Using fetch-rates execution time: ${fetchInfo.isoString}`)
       } else if (timestamps.length > 0) {
         // Fallback to most recent pair timestamp if fetch info not available
         timestamps.sort((a, b) => b - a)
         mostRecentTimestamp = timestamps[0]
-        console.log('🕐 Using most recent pair update timestamp (fallback)')
+        console.log('Clock Using most recent pair update timestamp (fallback)')
       }
 
       // Fallback: If we're missing rates, try inverted pairs (BASE→X)
