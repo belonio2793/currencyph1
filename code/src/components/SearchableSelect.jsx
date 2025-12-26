@@ -130,8 +130,8 @@ export default function SearchableSelect({ value, onChange, options = [], label 
 
   const getCurrencyTypeColor = (type) => {
     return type === 'cryptocurrency'
-      ? 'bg-orange-100 text-orange-700 border-orange-300'
-      : 'bg-blue-100 text-blue-700 border-blue-300'
+      ? 'bg-slate-200 text-slate-900 border-slate-400'
+      : 'bg-slate-200 text-slate-900 border-slate-400'
   }
 
   const getCurrencyTypeLabel = (type) => {
@@ -153,11 +153,7 @@ export default function SearchableSelect({ value, onChange, options = [], label 
       {/* Button / Input Display */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-left bg-white hover:border-slate-400 transition flex items-center justify-between ${
-          selectedOption?.metadata?.type === 'cryptocurrency'
-            ? 'border-orange-300 hover:border-orange-400 focus:ring-orange-500'
-            : 'border-slate-300'
-        }`}
+        className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-500 text-left bg-white hover:border-slate-400 transition flex items-center justify-between"
         type="button"
       >
         <div className="flex items-center gap-3 flex-1 min-w-0">
