@@ -12,7 +12,7 @@ export default function OnboardingChecklist({ userId, userEmail, onTaskComplete,
 
   const allCompleted = progress.completed === progress.total && progress.total === 4
 
-  // Load tasks - memoized to avoid recreating on each render
+  // Load tasks and preferences - memoized to avoid recreating on each render
   const loadTasks = useCallback(async () => {
     try {
       const [tasksData, progressData] = await Promise.all([
@@ -26,22 +26,47 @@ export default function OnboardingChecklist({ userId, userEmail, onTaskComplete,
     }
   }, [userId])
 
-  // Load tasks once on userId change
+  // Load user preference for showing/hiding checklist
+  const loadShowChecklistPreference = useCallback(async () => {
+    try {
+      const { data, error } = await supabase
+        .from('user_preferences')
+        .select('show_onboarding_checklist')
+        .eq('user_id', userId)
+        .single()
+
+      if (error && error.code !== 'PGRST116') {
+        console.warn('Error loading checklist preference:', error)
+        return
+      }
+
+      if (data) {
+        setShowChecklist(data.show_onboarding_checklist !== false)
+      }
+    } catch (err) {
+      console.error('Error loading checklist preference:', err)
+    }
+  }, [userId])
+
+  // Load tasks and preferences once on userId change
   useEffect(() => {
     if (!userId) {
       setLoading(false)
       return
     }
     setLoading(true)
-    loadTasks().finally(() => setLoading(false))
-  }, [userId, loadTasks])
+    Promise.all([
+      loadTasks(),
+      loadShowChecklistPreference()
+    ]).finally(() => setLoading(false))
+  }, [userId, loadTasks, loadShowChecklistPreference])
 
-  // Auto-collapse when all tasks are completed
+  // Auto-expand only when all tasks are completed
   useEffect(() => {
-    if (allCompleted) {
-      setIsExpanded(false)
+    if (allCompleted && showChecklist) {
+      setIsExpanded(true)
     }
-  }, [allCompleted])
+  }, [allCompleted, showChecklist])
 
   // Remove auto-detection to prevent unnecessary database queries
   // Tasks are now only validated when user explicitly clicks "Start"
