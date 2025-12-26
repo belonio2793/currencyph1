@@ -1878,7 +1878,7 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
                       {lastSuccessDeposit.converted_amount.toLocaleString(undefined, {
                         minimumFractionDigits: 2,
                         maximumFractionDigits: 8
-                      })} {lastSuccessDeposit.wallet_currency || 'PHP'}
+                      })} {lastSuccessDeposit.received_currency || lastSuccessDeposit.currency_symbol || 'BTC'}
                     </p>
                   </div>
                 )}
