@@ -156,10 +156,113 @@ export async function areRatesFresh() {
   return minutes < 60
 }
 
+/**
+ * Trigger the fetch-rates edge function manually
+ * Returns true if successful, false otherwise
+ */
+export async function triggerFetchRatesEdgeFunction() {
+  try {
+    const SUPABASE_URL = import.meta.env.VITE_PROJECT_URL || import.meta.env.VITE_SUPABASE_URL
+    const ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY
+
+    if (!SUPABASE_URL || !ANON_KEY) {
+      console.warn('[RatesFetch] Missing Supabase configuration for edge function')
+      return false
+    }
+
+    const edgeFunctionUrl = `${SUPABASE_URL}/functions/v1/fetch-rates`
+
+    console.log('[RatesFetch] Triggering fetch-rates edge function...')
+
+    const response = await fetch(edgeFunctionUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${ANON_KEY}`
+      },
+      body: JSON.stringify({
+        source: 'client-app-trigger',
+        timestamp: new Date().toISOString()
+      })
+    })
+
+    if (!response.ok) {
+      console.warn(`[RatesFetch] Edge function returned status ${response.status}`)
+      return false
+    }
+
+    const result = await response.json()
+    console.log('[RatesFetch] ✅ Edge function executed successfully:', result)
+    return true
+  } catch (err) {
+    console.warn('[RatesFetch] Failed to trigger edge function:', err.message)
+    return false
+  }
+}
+
+/**
+ * Check if we should refresh rates and trigger if needed
+ * Uses localStorage to track last manual fetch time (separate from edge function cron)
+ * Only triggers if more than 1 hour has passed since last client-side trigger
+ *
+ * This prevents excessive API calls while ensuring rates stay reasonably fresh
+ */
+export async function checkAndRefreshRatesIfNeeded() {
+  try {
+    const LAST_FETCH_KEY = 'rates_last_client_fetch'
+    const CACHE_DURATION_MS = 60 * 60 * 1000 // 1 hour in milliseconds
+
+    // Check localStorage for last manual fetch
+    const lastFetchStr = localStorage.getItem(LAST_FETCH_KEY)
+    const lastFetch = lastFetchStr ? new Date(lastFetchStr) : null
+    const now = new Date()
+
+    // Calculate time since last fetch
+    const timeSinceLastFetch = lastFetch ? now.getTime() - lastFetch.getTime() : CACHE_DURATION_MS
+
+    if (timeSinceLastFetch >= CACHE_DURATION_MS) {
+      console.log(`[RatesFetch] Refreshing rates (${lastFetch ? Math.round(timeSinceLastFetch / 1000 / 60) + ' minutes' : 'never'} since last fetch)`)
+
+      // Trigger the edge function
+      const success = await triggerFetchRatesEdgeFunction()
+
+      if (success) {
+        // Update localStorage with current time
+        localStorage.setItem(LAST_FETCH_KEY, now.toISOString())
+        return {
+          triggered: true,
+          message: 'Rates refreshed successfully'
+        }
+      } else {
+        return {
+          triggered: false,
+          message: 'Failed to trigger rates refresh'
+        }
+      }
+    } else {
+      const minutesUntilNextFetch = Math.ceil((CACHE_DURATION_MS - timeSinceLastFetch) / 1000 / 60)
+      console.log(`[RatesFetch] Rates were refreshed recently (${Math.round(timeSinceLastFetch / 1000 / 60)} minutes ago). Next refresh in ~${minutesUntilNextFetch} minutes.`)
+      return {
+        triggered: false,
+        message: `Rates refreshed ${Math.round(timeSinceLastFetch / 1000 / 60)} minutes ago. Next refresh in ~${minutesUntilNextFetch} minutes.`,
+        minutesUntilNextFetch: minutesUntilNextFetch
+      }
+    }
+  } catch (err) {
+    console.warn('[RatesFetch] Error in checkAndRefreshRatesIfNeeded:', err.message)
+    return {
+      triggered: false,
+      message: 'Error checking rates refresh'
+    }
+  }
+}
+
 export default {
   getLastRatesFetchTime,
   getLatestPairUpdateTime,
   getLastFetchInfo,
   getMinutesSinceLastFetch,
-  areRatesFresh
+  areRatesFresh,
+  triggerFetchRatesEdgeFunction,
+  checkAndRefreshRatesIfNeeded
 }
