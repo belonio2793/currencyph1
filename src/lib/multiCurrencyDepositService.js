@@ -212,12 +212,16 @@ export const multiCurrencyDepositService = {
         // Metadata with complete transaction context
         metadata: {
           ...metadata,
+          original_amount: conversion.fromAmount,
+          original_currency: depositCurrency.toUpperCase(),
+          received_amount: conversion.toAmount,
+          received_currency: walletCurrency.toUpperCase(),
           conversion_rate: conversion.rateRounded,
           from_currency: depositCurrency.toUpperCase(),
           to_currency: walletCurrency.toUpperCase(),
           created_via: 'multi_currency_deposit_service',
           rate_source: 'public.pairs',
-          deposit_type: 'cross_currency',
+          deposit_type: depositCurrency !== walletCurrency ? 'cross_currency' : 'same_currency',
           created_at: isoTimestamp,
           rate_fetched_at: isoTimestamp
         },
@@ -226,7 +230,7 @@ export const multiCurrencyDepositService = {
         notes: {
           original_amount: conversion.fromAmount,
           original_currency: depositCurrency.toUpperCase(),
-          converted_amount: conversion.toAmount,
+          received_amount: conversion.toAmount,
           received_currency: walletCurrency.toUpperCase(),
           exchange_rate: conversion.rateRounded,
           rate_source: 'public.pairs',
