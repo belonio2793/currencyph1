@@ -1224,7 +1224,7 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
             {selectedMethod === 'gcash' && (
               <div className="mb-8 p-6 bg-emerald-50 border border-emerald-200 rounded-lg">
                 <p className="text-sm text-slate-600 mb-4 font-medium">Complete your GCash payment using the merchant details:</p>
-                <div className="bg-white p-3 rounded border border-emerald-200 mb-4">
+                <div className="bg-white p-3 rounded border border-slate-300 mb-4">
                   <p className="text-xs text-slate-600"><span className="font-semibold">Mobile No.:</span> 09308510351</p>
                   <p className="text-xs text-slate-600 mt-2"><span className="font-semibold">User ID:</span> •••••••••••4ROQPN</p>
                 </div>
