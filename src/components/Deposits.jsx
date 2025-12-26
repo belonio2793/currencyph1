@@ -1291,8 +1291,8 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
             )}
 
             {/* Important Notes */}
-            <div className="mb-8 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-              <p className="font-semibold text-yellow-900 mb-2">Important:</p>
+            <div className="mb-8 p-4 bg-slate-50 border border-slate-300 rounded-lg">
+              <p className="font-semibold text-slate-900 mb-2">Important:</p>
               <ul className="text-sm text-yellow-800 space-y-1">
                 {activeMethodData?.type === 'crypto' && (
                   <>
