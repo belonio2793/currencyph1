@@ -378,7 +378,7 @@ export default function Rates() {
 
   if (error) {
     return (
-      <div className="bg-white rounded-2xl shadow-lg p-12 border border-red-200">
+      <div className="bg-slate-50 rounded-2xl shadow-lg p-12 border border-red-200">
         <p className="text-red-600 text-center text-lg font-medium">{error}</p>
         <button
           onClick={loadData}
