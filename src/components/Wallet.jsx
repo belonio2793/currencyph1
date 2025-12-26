@@ -401,7 +401,7 @@ export default function Wallet({ userId, globalCurrency = 'PHP' }) {
                               </p>
                             </div>
                             {wallet.is_active && (
-                              <span className="px-2 py-1 bg-green-100 text-green-700 text-xs font-medium rounded-full">
+                              <span className="px-2 py-1 bg-slate-200 text-slate-900 text-xs font-medium rounded-full">
                                 Active
                               </span>
                             )}
@@ -469,7 +469,7 @@ export default function Wallet({ userId, globalCurrency = 'PHP' }) {
                               </p>
                             </div>
                             {wallet.is_active && (
-                              <span className="px-2 py-1 bg-green-100 text-green-700 text-xs font-medium rounded-full">
+                              <span className="px-2 py-1 bg-slate-200 text-slate-900 text-xs font-medium rounded-full">
                                 Active
                               </span>
                             )}
