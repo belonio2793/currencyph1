@@ -69,7 +69,7 @@ CREATE OR REPLACE FUNCTION record_ledger_transaction(
 
 ### 4. Trigger Updates
 
-#### `trigger_auto_credit_on_deposit_approval` Function
+#### `trigger_auto_credit_on_deposit_approval` Function (Migration 0121)
 **Changes**:
 - Both approval and reversal paths now pass `p_deposit_id := NEW.id` to `record_ledger_transaction`
 - This ensures the wallet_transaction is properly linked to its source deposit
@@ -87,6 +87,22 @@ v_transaction_id := record_ledger_transaction(
   p_metadata := jsonb_build_object(...),
   p_description := 'Deposit approved: ...'
 );
+```
+
+#### `sync_wallet_balance_on_deposit_delete` Function (Migration 0122)
+**Changes**:
+- Updated to explicitly set `deposit_id = NULL` for sync transactions
+- This allows the audit trail to survive cascade delete
+- Balance sync records reference the deleted deposit via `reference_id` and `metadata.deleted_deposit_id`
+
+**Key Design**:
+```
+When a deposit is deleted:
+├── wallet_transactions with deposit_id = <id>
+│   └── Cascade-deleted (removal records)
+└── wallet_transactions with deposit_id = NULL (sync record)
+    └── Survives as permanent audit trail
+    └── Links to deleted deposit via reference_id and metadata
 ```
 
 ## Usage Examples
