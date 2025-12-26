@@ -465,28 +465,15 @@ export default function Wallet({ userId, globalCurrency = 'PHP' }) {
                           {/* Balance */}
                           <div className="bg-white/60 rounded-lg p-4 mb-4">
                             <p className="text-xs text-slate-600 mb-1">Current Balance</p>
-                            <p className="text-2xl font-light text-slate-900 font-mono">
-                              {formatNumber(wallet.balance || 0)}
+                            <p className="text-2xl font-light text-slate-900 font-mono break-all">
+                              {wallet.balance != null ? String(wallet.balance) : '0.00'}
                             </p>
                             <p className="text-xs text-slate-500 mt-2">
+                              {wallet.id}
+                            </p>
+                            <p className="text-xs text-slate-500 mt-1">
                               Received: {formatNumber(wallet.total_deposited || 0)}
                             </p>
-                          </div>
-
-                          {/* Wallet Address */}
-                          <div className="bg-slate-50 rounded-lg p-3 mb-4 border border-slate-300">
-                            <p className="text-xs text-slate-700 font-medium mb-2">Wallet Address</p>
-                            <div className="flex items-center gap-2">
-                              <p className="text-xs font-mono text-slate-900 break-all flex-1">
-                                {wallet.id}
-                              </p>
-                              <button
-                                onClick={() => copyToClipboard(wallet.id, wallet.id)}
-                                className="flex-shrink-0 px-2 py-1 bg-slate-700 text-white rounded hover:bg-slate-800 transition-colors text-xs font-medium"
-                              >
-                                {copied === wallet.id ? '✓' : 'Copy'}
-                              </button>
-                            </div>
                           </div>
 
                           {/* Meta Info */}
