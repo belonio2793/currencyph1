@@ -625,7 +625,7 @@ export default function Rates() {
                           }}
                           className="text-left py-3 px-4 font-semibold text-slate-700 text-sm cursor-pointer hover:bg-slate-100 transition select-none"
                         >
-                          Currency {sortBy === 'code' && (sortDirection === 'asc' ? '↑' : '↓')}
+                          Currency {sortBy === 'code' && (sortDirection === 'asc' ? ' UP' : ' DOWN')}
                         </th>
                         <th
                           onClick={() => {
