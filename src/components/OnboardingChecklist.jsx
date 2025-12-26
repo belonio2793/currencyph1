@@ -6,7 +6,6 @@ export default function OnboardingChecklist({ userId, userEmail, onTaskComplete,
   const [tasks, setTasks] = useState([])
   const [progress, setProgress] = useState({ percentage: 0, completed: 0, total: 0 })
   const [loading, setLoading] = useState(true)
-  const [isExpanded, setIsExpanded] = useState(false)
   const [completingTaskId, setCompletingTaskId] = useState(null)
   const [showChecklist, setShowChecklist] = useState(true)
 
