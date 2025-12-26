@@ -1177,7 +1177,7 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
                   <div className="space-y-3">
                     <div>
                       <p className="text-xs text-slate-500 mb-1">Wallet</p>
-                      <p className="text-2xl font-bold text-blue-600 break-words">{formatNumber(calculateConvertedAmount())} {selectedWalletData.currency_code}</p>
+                      <p className="text-2xl font-bold text-blue-600 break-words">{formatNumber(calculateConvertedAmount(), selectedWalletData.currency_code)} {selectedWalletData.currency_code}</p>
                     </div>
                     <div>
                       <p className="text-xs text-slate-500 mb-1">Destination Wallet</p>
