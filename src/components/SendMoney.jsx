@@ -710,7 +710,7 @@ export default function SendMoney({ userId }) {
                           )}
 
                           <div className="flex justify-between items-center p-3 bg-emerald-50 rounded-lg border border-emerald-200 gap-4 flex-wrap">
-                            <span className="text-emerald-700 font-medium">Recipient Receives</span>
+                            <span className="text-slate-700 font-medium">Recipient Receives</span>
                             <span className="font-semibold text-lg text-emerald-700 break-words">{getCurrencySymbol(recipientCurrency)}{formatNumber(parseFloat(receiverAmount) || 0)}</span>
                           </div>
                         </div>
