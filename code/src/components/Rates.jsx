@@ -497,18 +497,18 @@ export default function Rates() {
                   <div className="flex items-center justify-between flex-wrap gap-2">
                     <div>
                       <p className="text-sm text-slate-900">
-                        <span className="font-semibold">📊 Last Fetched:</span>{' '}
+                        <span className="font-semibold">Chart Last Fetched:</span>{' '}
                         <span className="text-slate-700">{formatFullDateTime(lastUpdated)}</span>
                       </p>
                       {lastUpdated && (
                         <p className="text-xs text-slate-600 mt-1">
                           {(() => {
                             const minutes = Math.floor((Date.now() - new Date(lastUpdated).getTime()) / 1000 / 60)
-                            if (minutes < 1) return '✓ Just now'
-                            if (minutes < 60) return `✓ ${minutes} minute${minutes !== 1 ? 's' : ''} ago`
+                            if (minutes < 1) return 'OK Just now'
+                            if (minutes < 60) return `OK ${minutes} minute${minutes !== 1 ? 's' : ''} ago`
                             const hours = Math.floor(minutes / 60)
-                            if (hours < 24) return `✓ ${hours} hour${hours !== 1 ? 's' : ''} ago`
-                            return `⚠ ${Math.floor(hours / 24)} day${Math.floor(hours / 24) !== 1 ? 's' : ''} ago`
+                            if (hours < 24) return `OK ${hours} hour${hours !== 1 ? 's' : ''} ago`
+                            return `WARNING ${Math.floor(hours / 24)} day${Math.floor(hours / 24) !== 1 ? 's' : ''} ago`
                           })()}
                         </p>
                       )}
