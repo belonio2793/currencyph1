@@ -201,6 +201,8 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
   const [showDepositDetailsModal, setShowDepositDetailsModal] = useState(false)
   const [selectedDepositForDetails, setSelectedDepositForDetails] = useState(null)
   const [initializingWallets, setInitializingWallets] = useState(new Set()) // Track wallets being initialized
+  const [showSuccessModal, setShowSuccessModal] = useState(false) // Show success confirmation modal
+  const [lastSuccessDeposit, setLastSuccessDeposit] = useState(null) // Store last successful deposit
 
   useEffect(() => {
     loadInitialData()
