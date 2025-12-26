@@ -157,32 +157,32 @@ export default function PaymentsLedger({ globalCurrency = 'PHP' }) {
 
         {/* Summary Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-            <p className="text-xs font-semibold text-blue-700 uppercase mb-1">Total Transactions</p>
-            <p className="text-2xl font-bold text-blue-900">{summary.total}</p>
-            <div className="text-xs text-blue-600 mt-2 space-y-1">
-              <div><span className="font-semibold text-emerald-600">Succeeded:</span> {summary.succeeded}</div>
-              <div><span className="font-semibold text-yellow-600">Pending:</span> {summary.pending}</div>
-              <div><span className="font-semibold text-red-600">Failed:</span> {summary.failed}</div>
+          <div className="bg-white border border-slate-300 rounded-lg p-4">
+            <p className="text-xs font-semibold text-slate-600 uppercase mb-1">Total Transactions</p>
+            <p className="text-sm font-mono font-semibold text-slate-900">{summary.total}</p>
+            <div className="text-xs text-slate-600 mt-2 space-y-1">
+              <div><span className="font-semibold">Succeeded:</span> {summary.succeeded}</div>
+              <div><span className="font-semibold">Pending:</span> {summary.pending}</div>
+              <div><span className="font-semibold">Failed:</span> {summary.failed}</div>
             </div>
           </div>
 
-          <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-4">
-            <p className="text-xs font-semibold text-emerald-700 uppercase mb-1">Gross Revenue</p>
-            <p className="text-2xl font-bold text-emerald-900">{globalCurrency} {formatNumber(summary.totalAmount)}</p>
-            <p className="text-xs text-emerald-600 mt-2">Succeeded payments only</p>
+          <div className="bg-white border border-slate-300 rounded-lg p-4">
+            <p className="text-xs font-semibold text-slate-600 uppercase mb-1">Gross Revenue</p>
+            <p className="text-sm font-mono font-semibold text-slate-900 truncate">{globalCurrency} {formatNumber(summary.totalAmount)}</p>
+            <p className="text-xs text-slate-500 mt-2">Succeeded payments only</p>
           </div>
 
-          <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
-            <p className="text-xs font-semibold text-purple-700 uppercase mb-1">Total Fees</p>
-            <p className="text-2xl font-bold text-purple-900">{globalCurrency} {formatNumber(summary.totalFees)}</p>
-            <p className="text-xs text-purple-600 mt-2">Fee collected</p>
+          <div className="bg-white border border-slate-300 rounded-lg p-4">
+            <p className="text-xs font-semibold text-slate-600 uppercase mb-1">Total Fees</p>
+            <p className="text-sm font-mono font-semibold text-slate-900 truncate">{globalCurrency} {formatNumber(summary.totalFees)}</p>
+            <p className="text-xs text-slate-500 mt-2">Fee collected</p>
           </div>
 
-          <div className="bg-indigo-50 border border-indigo-200 rounded-lg p-4">
-            <p className="text-xs font-semibold text-indigo-700 uppercase mb-1">Net Revenue</p>
-            <p className="text-2xl font-bold text-indigo-900">{globalCurrency} {formatNumber(summary.netRevenue)}</p>
-            <p className="text-xs text-indigo-600 mt-2">After fees</p>
+          <div className="bg-white border border-slate-300 rounded-lg p-4">
+            <p className="text-xs font-semibold text-slate-600 uppercase mb-1">Net Revenue</p>
+            <p className="text-sm font-mono font-semibold text-slate-900 truncate">{globalCurrency} {formatNumber(summary.netRevenue)}</p>
+            <p className="text-xs text-slate-500 mt-2">After fees</p>
           </div>
         </div>
 
