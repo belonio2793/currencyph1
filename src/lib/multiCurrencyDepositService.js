@@ -184,6 +184,7 @@ export const multiCurrencyDepositService = {
 
         // Conversion details
         received_amount: conversion.toAmount,
+        converted_amount: conversion.toAmount, // Also store as converted_amount for UI compatibility
         exchange_rate: conversion.rateRounded,
         exchange_rate_at_time: conversion.rateRounded,
         time_based_rate: conversion.rateRounded,
