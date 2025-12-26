@@ -158,11 +158,16 @@ export default function PartnershipNetworkSection({ isAuthenticated, userId }) {
     if (!userId) return
 
     try {
-      const { data: profileData } = await supabase
+      const { data: profileData, error } = await supabase
         .from('commitment_profiles')
         .select('*')
         .eq('user_id', userId)
-        .single()
+        .maybeSingle()
+
+      if (error) {
+        console.error('Error loading user profile:', error)
+        return
+      }
 
       if (profileData) {
         setUserProfile(profileData)
