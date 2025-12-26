@@ -3,6 +3,7 @@ import { supabase } from '../lib/supabaseClient'
 import { formatLastUpdated, formatFullDateTime } from '../lib/dateTimeUtils'
 import { getLastFetchInfo } from '../lib/ratesFetchService'
 import CurrencyCryptoToggle from './FiatCryptoToggle'
+import CurrencyConverter from './CurrencyConverter'
 
 export default function Rates() {
   const [currencies, setCurrencies] = useState({})
