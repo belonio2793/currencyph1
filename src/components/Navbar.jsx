@@ -119,7 +119,7 @@ function NavbarComponent({ activeTab, onTabChange, globalCurrency, setGlobalCurr
                 )}
               </p>
               <p className="text-sm text-slate-600">
-                {globalCryptocurrency} • All Assets Combined
+                All Assets Combined
               </p>
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-6">
