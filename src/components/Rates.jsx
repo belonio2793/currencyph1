@@ -410,7 +410,7 @@ export default function Rates() {
             {/* Left Column - Converter */}
             <div className="lg:col-span-2 space-y-6">
               {/* Converter Card */}
-              <div className="bg-white rounded-2xl shadow-lg p-6 sm:p-8 border border-slate-200">
+              <div className="bg-blue-50 rounded-2xl shadow-lg p-6 sm:p-8 border border-slate-200">
                 <h2 className="text-xl sm:text-2xl font-semibold text-slate-900 mb-6">Currency Converter</h2>
 
                 <div className="space-y-6">
