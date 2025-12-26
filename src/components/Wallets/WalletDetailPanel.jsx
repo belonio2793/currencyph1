@@ -92,33 +92,33 @@ export default function WalletDetailPanel({ wallet, userId, globalCurrency, onCl
         <div className="p-8">
           {/* Balance Display */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            <div className="bg-gradient-to-br from-slate-50 to-slate-100 p-6 rounded-lg border border-slate-200">
+            <div className="bg-white p-6 rounded-lg border border-slate-300">
               <p className="text-sm font-semibold text-slate-600 uppercase tracking-wide mb-2">Current Balance</p>
-              <p className="text-3xl font-light text-slate-900 mb-1">
+              <p className="text-sm font-mono font-semibold text-slate-900 truncate mb-1">
                 {formatNumber(convertedBalance)}
               </p>
               <p className="text-xs text-slate-500">{globalCurrency}</p>
               {!isSameCurrency && (
-                <p className="text-xs text-slate-400 mt-2">
+                <p className="text-xs text-slate-400 mt-2 truncate">
                   {formatNumber(Number(wallet.balance || 0))} {wallet.currency_code}
                 </p>
               )}
             </div>
 
-            <div className="bg-gradient-to-br from-emerald-50 to-emerald-100 p-6 rounded-lg border border-emerald-200">
-              <p className="text-sm font-semibold text-emerald-600 uppercase tracking-wide mb-2">Total Deposited</p>
-              <p className="text-3xl font-light text-emerald-900">
+            <div className="bg-white p-6 rounded-lg border border-slate-300">
+              <p className="text-sm font-semibold text-slate-600 uppercase tracking-wide mb-2">Total Deposited</p>
+              <p className="text-sm font-mono font-semibold text-slate-900 truncate">
                 {formatNumber(Number(wallet.total_deposited || 0))}
               </p>
-              <p className="text-xs text-emerald-600 mt-2">{wallet.currency_code}</p>
+              <p className="text-xs text-slate-500 mt-2">{wallet.currency_code}</p>
             </div>
 
-            <div className="bg-gradient-to-br from-red-50 to-red-100 p-6 rounded-lg border border-red-200">
-              <p className="text-sm font-semibold text-red-600 uppercase tracking-wide mb-2">Total Withdrawn</p>
-              <p className="text-3xl font-light text-red-900">
+            <div className="bg-white p-6 rounded-lg border border-slate-300">
+              <p className="text-sm font-semibold text-slate-600 uppercase tracking-wide mb-2">Total Withdrawn</p>
+              <p className="text-sm font-mono font-semibold text-slate-900 truncate">
                 {formatNumber(Number(wallet.total_withdrawn || 0))}
               </p>
-              <p className="text-xs text-red-600 mt-2">{wallet.currency_code}</p>
+              <p className="text-xs text-slate-500 mt-2">{wallet.currency_code}</p>
             </div>
           </div>
 
