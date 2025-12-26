@@ -187,7 +187,7 @@ export default function OnboardingChecklist({ userId, userEmail, onTaskComplete,
       </div>
 
       {/* Tasks List */}
-      {isExpanded && (
+      {shouldShowExpanded && (
         <div className="border-t border-slate-200">
           {incompleteTasks.length === 0 ? (
             <div className="p-4 text-center">
