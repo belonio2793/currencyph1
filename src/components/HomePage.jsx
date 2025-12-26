@@ -333,7 +333,7 @@ export default function HomePage({ userId, userEmail, globalCurrency = 'PHP', se
   }
 
   const getTotalDebt = () => {
-    return loans.reduce((sum, l) => sum + (l.remaining_balance || l.total_owed || 0), 0).toFixed(2)
+    return loans.reduce((sum, d) => sum + (d.outstanding_balance || d.total_owed || 0), 0).toFixed(2)
   }
 
   const personalLoans = useMemo(() =>
