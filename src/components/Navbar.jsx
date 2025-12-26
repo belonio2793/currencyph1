@@ -38,6 +38,8 @@ function NavbarComponent({ activeTab, onTabChange, globalCurrency, setGlobalCurr
   const [showCurrencyModal, setShowCurrencyModal] = useState(false)
   const [consolidatedHoldingsInCrypto, setConsolidatedHoldingsInCrypto] = useState(null)
   const [loadingConsolidated, setLoadingConsolidated] = useState(false)
+  const [totalCryptoInSelectedCrypto, setTotalCryptoInSelectedCrypto] = useState(0)
+  const [loadingCryptoConversion, setLoadingCryptoConversion] = useState(false)
 
   // Convert consolidated balance (fiat + crypto) to selected cryptocurrency
   useEffect(() => {
