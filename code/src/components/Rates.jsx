@@ -467,11 +467,11 @@ export default function Rates() {
 
                   {/* Result */}
                   {result && !result.error && (
-                    <div className="bg-gradient-to-br from-emerald-50 to-teal-50 rounded-xl p-6 border-2 border-emerald-200 mt-6">
-                      <p className="text-xs font-semibold text-emerald-700 mb-3 uppercase tracking-wider">Conversion Result</p>
+                    <div className="bg-white rounded-xl p-6 border-2 border-slate-300 mt-6">
+                      <p className="text-xs font-semibold text-slate-700 mb-3 uppercase tracking-wider">Conversion Result</p>
                       <div className="flex items-baseline justify-between mb-3">
                         <div>
-                          <p className="text-5xl font-bold text-emerald-600 mb-1">
+                          <p className="text-5xl font-bold text-slate-900 mb-1">
                             {result.amount}
                           </p>
                           <p className="text-lg font-semibold text-slate-700">
