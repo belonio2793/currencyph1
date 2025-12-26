@@ -675,37 +675,53 @@ export default function Rates() {
             <div className="lg:col-span-1 space-y-6">
               {/* Favorites Card */}
               <div className="bg-white rounded-2xl shadow-lg p-6 border border-slate-200">
-                <h3 className="text-lg font-semibold text-slate-900 mb-4">Favorite Rates</h3>
+                <div className="flex items-center gap-2 mb-4">
+                  <span className="text-2xl">⭐</span>
+                  <h3 className="text-lg font-semibold text-slate-900">Favorite Rates</h3>
+                </div>
                 <div className="space-y-3">
                   {favoriteRates.length > 0 ? (
                     favoriteRates.map(curr => (
                       <div
                         key={curr.code}
-                        className="p-4 border border-slate-200 rounded-lg hover:border-blue-300 hover:bg-blue-50 transition cursor-pointer"
+                        className={`p-4 border-2 rounded-lg transition cursor-pointer ${
+                          curr.metadata?.type === 'cryptocurrency'
+                            ? 'border-orange-200 hover:border-orange-400 hover:bg-orange-50'
+                            : 'border-blue-200 hover:border-blue-400 hover:bg-blue-50'
+                        }`}
                         onClick={() => setSelectedFrom(curr.code)}
                       >
                         <div className="flex items-center justify-between mb-2">
-                          <div>
-                            <div className="font-semibold text-slate-900">{curr.code}</div>
-                            <div className="text-xs text-slate-500">{curr.metadata?.name}</div>
+                          <div className="flex items-center gap-2 flex-1">
+                            <span className="text-xl">
+                              {curr.metadata?.type === 'cryptocurrency' ? '₿' : '💵'}
+                            </span>
+                            <div className="min-w-0">
+                              <div className="font-semibold text-slate-900">{curr.code}</div>
+                              <div className="text-xs text-slate-500 truncate">{curr.metadata?.name}</div>
+                            </div>
                           </div>
                           <button
                             onClick={(e) => {
                               e.stopPropagation()
                               toggleFavorite(curr.code)
                             }}
-                            className="text-yellow-400 hover:text-yellow-500 text-lg"
+                            className="text-yellow-400 hover:text-yellow-500 text-lg ml-2 flex-shrink-0"
+                            title="Remove from favorites"
                           >
                             ★
                           </button>
                         </div>
-                        <div className="text-sm font-mono text-slate-900">
+                        <div className="text-sm font-mono font-semibold text-slate-900 ml-7">
                           {formatNumber(curr.rate, curr.metadata?.decimals || 2)}
                         </div>
                       </div>
                     ))
                   ) : (
-                    <p className="text-sm text-slate-500 text-center py-6">Add currencies to favorites</p>
+                    <p className="text-sm text-slate-500 text-center py-8">
+                      <span className="block mb-2">No favorites yet</span>
+                      Add currencies to favorites by clicking the ★ in the rates table
+                    </p>
                   )}
                 </div>
               </div>
