@@ -163,7 +163,7 @@ VITE_DIDIT_WEBHOOK_SECRET=dZJcUZQm3y2kweH4S74KIr7MTfGu5yjmvJgp2qfhyq8
 
 **Optional Configuration**:
 ```
-VITE_DIDIT_DEFAULT_SESSION_URL=https://verify.didit.me/session/0YcwjP8Jj41H
+VITE_DIDIT_DEFAULT_SESSION_URL=https://verify.didit.me/session/your-session-id
 ```
 
 ### 🔐 Security Features
