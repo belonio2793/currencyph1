@@ -447,21 +447,21 @@ export default function Wallet({ userId, globalCurrency = 'PHP' }) {
 
                 {/* Crypto Currencies Section */}
                 {(activeType === 'all' || activeType === 'cryptocurrency') && cryptoWallets.length > 0 && (
-                  <div className="bg-gradient-to-br from-orange-50/40 to-slate-50 border border-orange-100 rounded-xl p-8">
-                    <div className="mb-8 pb-6 border-b-2 border-orange-200 flex items-center gap-3">
-                      <div className="w-2 h-8 bg-orange-600 rounded-full"></div>
+                  <div className="bg-white border border-slate-300 rounded-xl p-8">
+                    <div className="mb-8 pb-6 border-b-2 border-slate-300 flex items-center gap-3">
+                      <div className="w-2 h-8 bg-slate-700 rounded-full"></div>
                       <h2 className="text-2xl font-semibold text-slate-900">Cryptocurrencies</h2>
-                      <span className="px-3 py-1 bg-orange-100 text-orange-700 rounded-full text-sm font-medium">
+                      <span className="px-3 py-1 bg-slate-200 text-slate-900 rounded-full text-sm font-medium">
                         {cryptoWallets.length}
                       </span>
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                       {cryptoWallets.map(wallet => (
-                        <div key={wallet.id} className="bg-gradient-to-br from-orange-50 to-yellow-50 border border-orange-200 rounded-lg p-6 hover:shadow-lg transition-all">
+                        <div key={wallet.id} className="bg-white border border-slate-300 rounded-lg p-6 hover:shadow-lg transition-all">
                           {/* Header */}
                           <div className="mb-4 flex items-start justify-between">
                             <div>
-                              <p className="text-xs font-semibold text-orange-600 uppercase tracking-wider mb-2">
+                              <p className="text-xs font-semibold text-slate-700 uppercase tracking-wider mb-2">
                                 {wallet.currency_code}
                               </p>
                               <p className="text-2xl font-light text-slate-900">
@@ -487,15 +487,15 @@ export default function Wallet({ userId, globalCurrency = 'PHP' }) {
                           </div>
 
                           {/* Wallet Address */}
-                          <div className="bg-orange-100/40 rounded-lg p-3 mb-4 border border-orange-200">
-                            <p className="text-xs text-orange-700 font-medium mb-2">Wallet Address</p>
+                          <div className="bg-slate-50 rounded-lg p-3 mb-4 border border-slate-300">
+                            <p className="text-xs text-slate-700 font-medium mb-2">Wallet Address</p>
                             <div className="flex items-center gap-2">
                               <p className="text-xs font-mono text-slate-900 break-all flex-1">
                                 {wallet.id}
                               </p>
                               <button
                                 onClick={() => copyToClipboard(wallet.id, wallet.id)}
-                                className="flex-shrink-0 px-2 py-1 bg-orange-600 text-white rounded hover:bg-orange-700 transition-colors text-xs font-medium"
+                                className="flex-shrink-0 px-2 py-1 bg-slate-700 text-white rounded hover:bg-slate-800 transition-colors text-xs font-medium"
                               >
                                 {copied === wallet.id ? '✓' : 'Copy'}
                               </button>
