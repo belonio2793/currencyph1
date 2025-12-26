@@ -23,7 +23,7 @@ export default function Rates() {
   const [activeType, setActiveType] = useState('all')
   const [sortBy, setSortBy] = useState('code')
   const [sortDirection, setSortDirection] = useState('asc')
-  const [favorites, setFavorites] = useState(['PHP', 'USD', 'EUR', 'BTC', 'ETH'])
+  const [favorites, setFavorites] = useState([])
 
   // Load all pairs from public.pairs table
   useEffect(() => {
