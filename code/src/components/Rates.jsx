@@ -648,14 +648,14 @@ export default function Rates() {
                           <td className="py-3 px-4 text-center">
                             <button
                               onClick={() => toggleFavorite(currency.code)}
-                              className={`text-xl transition ${
+                              className={`text-xs font-semibold px-2 py-1 rounded transition ${
                                 favorites.includes(currency.code)
-                                  ? 'text-yellow-400 hover:text-yellow-500 animate-pulse'
-                                  : 'text-slate-300 hover:text-yellow-400'
+                                  ? 'bg-yellow-200 text-yellow-900 hover:bg-yellow-300 animate-pulse'
+                                  : 'bg-slate-200 text-slate-600 hover:bg-yellow-200'
                               }`}
                               title={favorites.includes(currency.code) ? 'Remove from favorites' : 'Add to favorites'}
                             >
-                              ★
+                              {favorites.includes(currency.code) ? 'FAV' : 'Add'}
                             </button>
                           </td>
                         </tr>
