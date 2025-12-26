@@ -423,22 +423,22 @@ export default function HomePage({ userId, userEmail, globalCurrency = 'PHP', se
         )}
 
         {/* Quick Stats */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6 sm:mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 mb-6 sm:mb-8">
           {/* Total Currency Balance */}
-          <div className="bg-white rounded-xl p-4 sm:p-6 border border-slate-300">
-            <p className="text-xs text-slate-600 font-medium uppercase tracking-wider mb-2">Currency Balance</p>
-            <p className="text-sm font-mono font-semibold text-slate-900 truncate">
+          <div className="border-b border-black pb-4">
+            <p className="text-xs text-black font-medium uppercase tracking-wider mb-3">Currency Balance</p>
+            <p className="text-lg font-semibold text-black truncate">
               {formatNumber(totalBalanceConverted != null ? totalBalanceConverted : getTotalBalance())} {globalCurrency}
             </p>
-            <p className="text-xs text-slate-500 mt-1">
+            <p className="text-xs text-slate-600 mt-2">
               Fiat wallets
             </p>
           </div>
 
           {/* Total Cryptocurrency Balance in Selected Cryptocurrency */}
-          <div className="bg-white rounded-xl p-4 sm:p-6 border border-slate-300">
-            <p className="text-xs text-slate-600 font-medium uppercase tracking-wider mb-2">Cryptocurrency Balance</p>
-            <p className="text-sm font-mono font-semibold text-slate-900 truncate">
+          <div className="border-b border-black pb-4">
+            <p className="text-xs text-black font-medium uppercase tracking-wider mb-3">Cryptocurrency Balance</p>
+            <p className="text-lg font-semibold text-black truncate">
               {loadingCryptoHoldingsConversion ? (
                 <span className="italic text-slate-400">loading...</span>
               ) : cryptoWallets.length > 0 ? (
@@ -447,27 +447,27 @@ export default function HomePage({ userId, userEmail, globalCurrency = 'PHP', se
                 '0 ' + globalCryptocurrency
               )}
             </p>
-            <p className="text-xs text-slate-500 mt-1">
+            <p className="text-xs text-slate-600 mt-2">
               {cryptoWallets.length > 0 ? `${cryptoWallets.length} holding${cryptoWallets.length !== 1 ? 's' : ''}` : 'No holdings'}
             </p>
           </div>
 
           {/* Net (Balance - Debt) */}
-          <div className="bg-white rounded-xl p-4 sm:p-6 border border-slate-300">
-            <p className="text-xs text-slate-600 font-medium uppercase tracking-wider mb-2">Net Worth</p>
-            <p className="text-sm font-mono font-semibold text-slate-900 truncate">
+          <div className="border-b border-black pb-4">
+            <p className="text-xs text-black font-medium uppercase tracking-wider mb-3">Net Worth</p>
+            <p className="text-lg font-semibold text-black truncate">
               {formatNumber(netDisplay)} {globalCurrency}
             </p>
-            <p className="text-xs text-slate-500 mt-1">
+            <p className="text-xs text-slate-600 mt-2">
               After debts
             </p>
           </div>
 
           {/* Total Debt */}
-          <div className="bg-white rounded-xl p-4 sm:p-6 border border-slate-300">
-            <p className="text-xs text-slate-600 font-medium uppercase tracking-wider mb-2">Total Debt</p>
-            <p className="text-sm font-mono font-semibold text-slate-900 truncate">{formatNumber(totalDebtConverted != null ? totalDebtConverted : getTotalDebt())} {globalCurrency}</p>
-            <p className="text-xs text-slate-500 mt-1">
+          <div className="border-b border-black pb-4">
+            <p className="text-xs text-black font-medium uppercase tracking-wider mb-3">Total Debt</p>
+            <p className="text-lg font-semibold text-black truncate">{formatNumber(totalDebtConverted != null ? totalDebtConverted : getTotalDebt())} {globalCurrency}</p>
+            <p className="text-xs text-slate-600 mt-2">
               Active loans
             </p>
           </div>
