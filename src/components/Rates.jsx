@@ -369,7 +369,7 @@ export default function Rates() {
 
   if (loading) {
     return (
-      <div className="bg-white rounded-2xl shadow-lg p-12 text-center">
+      <div className="bg-slate-50 rounded-2xl shadow-lg p-12 text-center">
         <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mb-4"></div>
         <p className="text-slate-500 text-lg">Loading exchange rates...</p>
       </div>
