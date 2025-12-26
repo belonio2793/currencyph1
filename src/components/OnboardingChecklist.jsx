@@ -120,19 +120,19 @@ export default function OnboardingChecklist({ userId, userEmail, onTaskComplete,
   return (
     <div className="bg-gradient-to-br from-slate-50 to-slate-100 rounded-xl shadow-lg border border-slate-200 overflow-hidden">
       {/* Header */}
-      <div className="bg-white px-6 py-5 border-b border-slate-200">
+      <div className="bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-5 border-b border-blue-800">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-3">
             <span className="text-3xl">🎯</span>
             <div>
-              <h3 className="text-lg font-bold text-slate-900">Welcome To Currency.ph</h3>
-              <p className="text-sm text-slate-600">{allCompleted ? '✓ All tasks completed!' : 'Get started with these setup tasks'}</p>
+              <h3 className="text-lg font-bold text-white">Welcome To Currency.ph</h3>
+              <p className="text-sm text-blue-100">{allCompleted ? '✓ All tasks completed!' : 'Get started with these setup tasks'}</p>
             </div>
           </div>
           {allCompleted && (
             <button
               onClick={handleRemoveChecklist}
-              className="text-slate-400 hover:text-slate-600 transition-colors p-2 hover:bg-slate-100 rounded-lg"
+              className="text-blue-200 hover:text-white transition-colors p-2 hover:bg-blue-600 rounded-lg"
               title="Remove checklist"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -145,14 +145,14 @@ export default function OnboardingChecklist({ userId, userEmail, onTaskComplete,
         {/* Progress Bar */}
         <div className="flex items-center gap-3">
           <div className="flex-1">
-            <div className="h-2.5 bg-slate-200 rounded-full overflow-hidden">
+            <div className="h-2.5 bg-blue-500 rounded-full overflow-hidden">
               <div
-                className="h-full bg-gradient-to-r from-blue-500 to-blue-600 transition-all duration-300"
+                className="h-full bg-gradient-to-r from-green-400 to-emerald-500 transition-all duration-300"
                 style={{ width: `${progress.percentage}%` }}
               />
             </div>
           </div>
-          <span className="text-sm font-semibold text-slate-900 w-12 text-right">
+          <span className="text-sm font-semibold text-white w-12 text-right">
             {progress.percentage}%
           </span>
         </div>
