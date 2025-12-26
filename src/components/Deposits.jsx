@@ -1827,7 +1827,7 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
                 </div>
 
                 {lastSuccessDeposit.converted_amount && (
-                  <div className="pt-4 border-t border-blue-200">
+                  <div className="pt-4 border-t border-slate-300">
                     <p className="text-xs text-slate-600 uppercase tracking-wide mb-1">You'll Receive</p>
                     <p className="text-2xl font-bold text-emerald-600">
                       {lastSuccessDeposit.converted_amount.toLocaleString(undefined, {
