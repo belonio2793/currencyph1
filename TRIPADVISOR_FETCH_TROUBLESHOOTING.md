@@ -84,18 +84,18 @@ If using the edge function, verify these are set:
 
 ```bash
 # Check your .env.local file contains:
-VITE_PROJECT_URL=https://corcofbmafdxehvlbesx.supabase.co
-VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
-VITE_TRIPADVISOR=451510296B594353B4EA0CD052DA6603
+VITE_PROJECT_URL=your-supabase-url
+VITE_SUPABASE_ANON_KEY=your-anon-key
+VITE_TRIPADVISOR=your-tripadvisor-api-key
 ```
 
 If using the local script, verify these are set:
 
 ```bash
 # For npm run sync-tripadvisor, check:
-SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
-VITE_TRIPADVISOR=451510296B594353B4EA0CD052DA6603
-VITE_PROJECT_URL=https://corcofbmafdxehvlbesx.supabase.co
+SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
+VITE_TRIPADVISOR=your-tripadvisor-api-key
+VITE_PROJECT_URL=your-supabase-url
 ```
 
 Create `.env.local` in your project root if it doesn't exist:
