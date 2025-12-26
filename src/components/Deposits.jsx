@@ -1142,7 +1142,7 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
         {/* Step 2: Payment Instructions */}
         {step === 'confirm' && (activeMethodData || selectedMethod) && selectedWalletData && (
           <div className="bg-white rounded-xl shadow-lg border border-slate-200 p-8 mb-6">
-            <h2 className="text-2xl font-semibold text-slate-900 mb-6">
+            <h2 className="text-2xl font-semibold text-slate-900 mb-6 break-words">
               {formatNumber(parseFloat(amount) || 0)} {selectedCurrency.toUpperCase()} via {activeMethodData?.name || DEPOSIT_METHODS[selectedMethod]?.name || 'Payment'}
             </h2>
 
@@ -1157,7 +1157,7 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
                   <div className="space-y-3">
                     <div>
                       <p className="text-xs text-slate-500 mb-1">Amount</p>
-                      <p className="text-2xl font-bold text-slate-900">{formatNumber(parseFloat(amount) || 0)} {selectedCurrency.toUpperCase()}</p>
+                      <p className="text-2xl font-bold text-slate-900 break-words">{formatNumber(parseFloat(amount) || 0)} {selectedCurrency.toUpperCase()}</p>
                     </div>
                     <div>
                       <p className="text-xs text-slate-500 mb-1">{activeType === 'cryptocurrency' ? 'Network' : 'Payment Method'}</p>
@@ -1177,7 +1177,7 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
                   <div className="space-y-3">
                     <div>
                       <p className="text-xs text-slate-500 mb-1">Wallet</p>
-                      <p className="text-2xl font-bold text-blue-600">{formatNumber(calculateConvertedAmount())} {selectedWalletData.currency_code}</p>
+                      <p className="text-2xl font-bold text-blue-600 break-words">{formatNumber(calculateConvertedAmount())} {selectedWalletData.currency_code}</p>
                     </div>
                     <div>
                       <p className="text-xs text-slate-500 mb-1">Destination Wallet</p>
@@ -1214,20 +1214,20 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
               <div className="mb-8 p-6 bg-blue-50 border border-blue-200 rounded-lg">
                 <h3 className="font-semibold text-slate-900 mb-4">Exchange Rate Summary</h3>
                 <div className="space-y-3">
-                  <div className="flex justify-between items-center">
+                  <div className="flex justify-between items-center gap-4 flex-wrap">
                     <span className="text-slate-700">You Send:</span>
-                    <span className="font-semibold text-slate-900">{formatNumber(parseFloat(amount) || 0)} {selectedCurrency}</span>
+                    <span className="font-semibold text-slate-900 break-words">{formatNumber(parseFloat(amount) || 0)} {selectedCurrency}</span>
                   </div>
                   {exchangeRates[selectedCurrency] && (
-                    <div className="flex justify-between items-center text-sm text-slate-600">
+                    <div className="flex justify-between items-center text-sm text-slate-600 gap-4 flex-wrap">
                       <span>Rate:</span>
-                      <span>1 {selectedCurrency} = {formatExchangeRate(exchangeRates[selectedCurrency]) || 'N/A'} {selectedWalletData.currency_code}</span>
+                      <span className="break-words">1 {selectedCurrency} = {formatExchangeRate(exchangeRates[selectedCurrency]) || 'N/A'} {selectedWalletData.currency_code}</span>
                     </div>
                   )}
                   {calculateConvertedAmount() && selectedCurrency !== selectedWalletData.currency_code && (
-                    <div className="flex justify-between items-center pt-3 border-t border-blue-200">
+                    <div className="flex justify-between items-center pt-3 border-t border-blue-200 gap-4 flex-wrap">
                       <span className="text-slate-900 font-medium">You Receive:</span>
-                      <span className="text-lg font-bold text-blue-600">{formatNumber(calculateConvertedAmount())} {selectedWalletData.currency_code}</span>
+                      <span className="text-lg font-bold text-blue-600 break-words">{formatNumber(calculateConvertedAmount())} {selectedWalletData.currency_code}</span>
                     </div>
                   )}
                 </div>
