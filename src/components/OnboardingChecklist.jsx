@@ -215,7 +215,7 @@ export default function OnboardingChecklist({ userId, userEmail, onTaskComplete,
                               ? 'bg-yellow-100 text-yellow-700'
                               : 'bg-slate-100 text-slate-600'
                           }`}>
-                            {task.category === 'important' ? '⭐ Important' : 'Optional'}
+                            {task.category === 'important' ? 'Important' : 'Optional'}
                           </span>
                         )}
                         {!task.completed && (
