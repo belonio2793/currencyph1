@@ -544,7 +544,7 @@ export default function HomePage({ userId, userEmail, globalCurrency = 'PHP', se
         </div>
 
         {/* Exchange Rates Preview */}
-        <div className="mt-8 bg-white rounded-xl shadow-lg p-6 border border-slate-200">
+        <div className="mt-8 bg-slate-50 rounded-xl shadow-lg p-6 border border-slate-200">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-lg font-semibold text-slate-900">Exchange Rates</h3>
             <button
