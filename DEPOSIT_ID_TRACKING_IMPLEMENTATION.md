@@ -162,10 +162,13 @@ WHERE deposit_id = '<deposit_id>';
 - Foreign key constraint prevents invalid `deposit_id` values
 - Cannot set `deposit_id` to a non-existent deposit ID
 
-### Cascade Delete Safety
-- When deposits.id is deleted, database automatically deletes related wallet_transactions
+### Cascade Delete Safety & Audit Trail
+- When deposits.id is deleted, database automatically deletes related wallet_transactions (those with `deposit_id = <id>`)
 - No orphaned transactions can exist with non-existent deposit IDs
-- Audit trail is maintained (deletion event is recorded)
+- Audit trail is **permanently maintained**:
+  - `balance_sync_on_delete` transactions have `deposit_id = NULL` so they survive the cascade
+  - These sync transactions reference the deleted deposit via `reference_id` and `metadata.deleted_deposit_id`
+  - Complete history of what happened when a deposit was removed is preserved
 
 ### No Data Loss
 - Existing wallet_transactions rows are not modified
