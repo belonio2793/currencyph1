@@ -34,13 +34,13 @@ The DIDIT integration enables secure, government-backed identity verification fo
 
 ### 1. Environment Variables
 
-These variables are already configured:
+These variables should be configured in your `.env.local`:
 
 ```
-DIDIT_APP_ID=e884d47b-33bb-412a-a571-c4ed2b716ace
-DIDIT_API_KEY=UjUxKvHnFXL1wBvZpL5XLlQhAe0GXqsheFU9k1Clrxo
-DIDIT_WORKFLOW_ID=839aad82-01d3-48e2-8f26-9677d3e0e255
-DIDIT_WEBHOOK_SECRET=dZJcUZQm3y2kweH4S74KIr7MTfGu5yjmvJgp2qfhyq8
+DIDIT_APP_ID=your-app-id
+DIDIT_API_KEY=your-api-key
+DIDIT_WORKFLOW_ID=your-workflow-id
+DIDIT_WEBHOOK_SECRET=your-webhook-secret
 ```
 
 The Vite-prefixed versions (`VITE_DIDIT_*`) are for client-side use in the browser.
@@ -50,7 +50,7 @@ The Vite-prefixed versions (`VITE_DIDIT_*`) are for client-side use in the brows
 To use a pre-configured default session URL instead of creating sessions dynamically:
 
 ```
-VITE_DIDIT_DEFAULT_SESSION_URL=https://verify.didit.me/session/0YcwjP8Jj41H
+VITE_DIDIT_DEFAULT_SESSION_URL=https://verify.didit.me/session/your-session-id
 ```
 
 ### 2. Webhook Configuration in DIDIT Dashboard
