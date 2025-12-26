@@ -527,7 +527,6 @@ export default function Rates() {
 
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
                   <div className="flex items-center gap-2">
-                    <span className="text-3xl">📈</span>
                     <h2 className="text-xl sm:text-2xl font-semibold text-slate-900">Exchange Rates</h2>
                   </div>
                   <div className="flex items-center gap-4">
