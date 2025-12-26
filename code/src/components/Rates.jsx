@@ -132,10 +132,34 @@ export default function Rates() {
         }
       })
 
-      // Collect all rates from public.pairs table with proper prioritization
-      // CRITICAL: ONLY use pairs where TO_CURRENCY is PHP (canonical direction)
-      // This prevents reversed rates like PHP→BTC (0.0000004) instead of BTC→PHP (2,500,000)
-      // Now with pair_direction metadata for clearer tracking
+      // Collect all rates from public.pairs table with flexible base currency approach
+      // Strategy: Find the best base currency (most pairs available) and use that
+      // This handles databases that may have BTC, USD, EUR, or other bases instead of just PHP
+
+      // First pass: count pairs by target currency to find best base
+      const targetCounts = {}
+      pairsData?.forEach(pair => {
+        if (pair.to_currency) {
+          targetCounts[pair.to_currency] = (targetCounts[pair.to_currency] || 0) + 1
+        }
+      })
+
+      // Select best base currency (most pairs target it)
+      let baseCurrency = 'PHP'
+      let maxCount = 0
+      Object.entries(targetCounts).forEach(([currency, count]) => {
+        // Prefer PHP, USD, BTC, EUR in that order if they have at least some pairs
+        if (count >= 2) {
+          if (currency === 'PHP' || (currency !== 'PHP' && count > maxCount)) {
+            baseCurrency = currency
+            maxCount = count
+          }
+        }
+      })
+
+      console.log(`📊 Selected base currency: ${baseCurrency} (${maxCount || targetCounts[baseCurrency] || 0} pairs)`)
+
+      // Second pass: collect rates using the best base currency
       pairsData?.forEach(pair => {
         if (pair.updated_at) {
           timestamps.push(new Date(pair.updated_at))
@@ -146,11 +170,9 @@ export default function Rates() {
           const fromCurrency = pair.from_currency
           const toCurrency = pair.to_currency
 
-          // CRITICAL FIX: Only use canonical pairs (X→PHP)
-          // Never invert or use PHP→X pairs, as they create small decimal rates that are backwards
-          // pair_direction will be 'canonical', 'inverse', or 'other' for clarity
-          if (toCurrency === 'PHP' && fromCurrency && ratesByCode[fromCurrency]) {
-            // Store the rate as-is (it's X→PHP, which is correct)
+          // Use pairs where TO_CURRENCY matches our selected base currency
+          if (toCurrency === baseCurrency && fromCurrency && ratesByCode[fromCurrency]) {
+            // Store the rate as-is (it's X→BASE, which is correct)
             const existingTime = new Date(ratesByCode[fromCurrency].updatedAt || 0)
             const pairTime = new Date(pair.updated_at || 0)
 
@@ -158,9 +180,9 @@ export default function Rates() {
             if (!ratesByCode[fromCurrency].rate || pairTime > existingTime) {
               ratesByCode[fromCurrency].rate = rate
               ratesByCode[fromCurrency].updatedAt = pair.updated_at || new Date().toISOString()
-              ratesByCode[fromCurrency].isPHPBased = true
+              ratesByCode[fromCurrency].isPHPBased = (baseCurrency === 'PHP')
               ratesByCode[fromCurrency].pairDirection = pair.pair_direction || 'canonical'
-              console.log(`📊 Storing ${pair.pair_direction || 'canonical'} rate: ${fromCurrency} = ${rate} PHP`)
+              console.log(`Chart Storing ${pair.pair_direction || 'canonical'} rate: ${fromCurrency} = ${rate} ${baseCurrency}`)
             }
           }
         }
