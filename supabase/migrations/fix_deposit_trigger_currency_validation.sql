@@ -141,12 +141,15 @@ GRANT EXECUTE ON FUNCTION credit_wallet_on_deposit_approved TO authenticated, se
 CREATE OR REPLACE FUNCTION validate_deposit_currency()
 RETURNS trigger AS $$
 BEGIN
-  -- If received_amount is set (crypto conversion happened), ensure currency_code is set correctly
+  -- If received_amount is set (conversion happened), ensure original_currency is set
   IF NEW.received_amount IS NOT NULL AND NEW.received_amount > 0 THEN
-    -- For crypto deposits, currency_code should NOT be PHP if there's a conversion
+    -- For conversions to PHP, original_currency MUST be set to track the source currency
     IF NEW.currency_code = 'PHP' AND NEW.exchange_rate IS NOT NULL AND NEW.exchange_rate <> 1 THEN
-      RAISE EXCEPTION 'Invalid deposit: currency_code is PHP but exchange_rate indicates a conversion. '
-        'Original currency should be stored in original_currency field.';
+      -- Only raise error if original_currency is NOT properly set
+      IF NEW.original_currency IS NULL OR NEW.original_currency = '' THEN
+        RAISE EXCEPTION 'Invalid deposit: currency_code is PHP but exchange_rate indicates a conversion. '
+          'Original currency should be stored in original_currency field.';
+      END IF;
     END IF;
   END IF;
 
