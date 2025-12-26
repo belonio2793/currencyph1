@@ -1399,10 +1399,10 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
                     return (
                       <tr key={deposit.id} className="border-b border-slate-100 hover:bg-slate-50 transition">
                         <td className="py-3 px-4 font-semibold text-slate-900">
-                          {formatAmount(deposit.amount)} {formatCurrency(originalCurrency)}
+                          {formatAmount(deposit.amount, originalCurrency)} {formatCurrency(originalCurrency)}
                         </td>
                         <td className="py-3 px-4 text-slate-700">
-                          {convertedAmount ? formatAmount(convertedAmount) : '—'}
+                          {convertedAmount ? formatAmount(convertedAmount, walletCurrency) : '—'}
                         </td>
                         <td className="py-3 px-4 text-slate-700">
                           {formatCurrency(walletCurrency)}
