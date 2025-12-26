@@ -1833,7 +1833,7 @@ export default function ReceiveMoney({ userId, globalCurrency = 'PHP' }) {
                     <div className="flex justify-between items-start">
                       <div>
                         <p className="text-sm font-medium text-slate-900">
-                          {getCurrencySymbol(deposit.currency_code)}{formatNumber(deposit.amount)}
+                          {formatNumber(deposit.amount)} {deposit.currency_code.toUpperCase()}
                         </p>
                         <p className="text-xs text-slate-500 mt-1">
                           {new Date(deposit.created_at).toLocaleDateString()}
