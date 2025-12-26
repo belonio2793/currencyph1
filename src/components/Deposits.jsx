@@ -1520,11 +1520,7 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
                           <p className="text-xs text-slate-600 uppercase tracking-wide mb-1">Status</p>
                           <p className="text-lg font-semibold text-slate-900">{deposit.status.toUpperCase()}</p>
                         </div>
-                        <span className={`px-4 py-2 rounded-full text-sm font-medium ${
-                          deposit.status === 'approved' || deposit.status === 'completed' ? 'bg-emerald-100 text-emerald-700' :
-                          deposit.status === 'rejected' ? 'bg-red-100 text-red-700' :
-                          'bg-yellow-100 text-yellow-700'
-                        }`}>
+                        <span className="px-4 py-2 rounded-full text-sm font-medium bg-slate-200 text-slate-900">
                           {deposit.status.charAt(0).toUpperCase() + deposit.status.slice(1)}
                         </span>
                       </div>
@@ -1540,7 +1536,7 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
                       </div>
                       <div>
                         <p className="text-xs text-slate-600 uppercase tracking-wide mb-2">Received Amount</p>
-                        <p className="text-2xl font-bold text-emerald-600">
+                        <p className="text-2xl font-bold text-slate-900">
                           {convertedAmount ? `${convertedAmount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: isCryptoCurrency(walletCurrency) ? 8 : 2 })} ${walletCurrency.toUpperCase()}` : '—'}
                         </p>
                       </div>
