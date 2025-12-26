@@ -250,7 +250,7 @@ export default function Rates() {
       setError(null)
     } catch (err) {
       const errorMsg = err?.message || String(err) || 'Unknown error'
-      console.error('❌ Error loading rates:', errorMsg)
+      console.error('ERROR Error loading rates:', errorMsg)
       console.error('Full error object:', err)
 
       let userFriendlyError = 'Failed to load exchange rates'
