@@ -25,7 +25,7 @@ This is the simplified integration that relies **exclusively on `didit-sync`** f
                               ↓
 ┌─────────────────────────────────────────────────────────────────┐
 │ User Completes Verification in DIDIT iframe                    │
-│ https://verify.didit.me/session/0YcwjP8Jj41H                  │
+│ https://verify.didit.me/session/your-session-id               │
 └─────────────────────────────────────────────────────────────────┘
                               ↓
 ┌─────────────────────────────────────────────────────────────────┐
