@@ -192,9 +192,9 @@ export default function SearchableSelect({ value, onChange, options = [], label 
                 {/* FIAT Section */}
                 {filteredFiat.length > 0 && (
                   <>
-                    <div className="px-4 py-2 mt-2 text-xs font-semibold text-slate-500 uppercase tracking-wider flex items-center gap-2">
-                      <span className="text-blue-600">💵</span>
-                      FIAT Currencies
+                    <div className="px-4 py-2 mt-2 text-xs font-semibold text-blue-700 uppercase tracking-wider flex items-center gap-2">
+                      <span className="px-2 py-1 bg-blue-100 rounded">FIAT</span>
+                      Currencies
                       <div className="flex-1 h-px bg-slate-200 ml-2"></div>
                     </div>
                     {filteredFiat.map((option, index) => (
