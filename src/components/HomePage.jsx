@@ -406,40 +406,6 @@ export default function HomePage({ userId, userEmail, globalCurrency = 'PHP', se
           <p className="text-slate-600">Quick access to your most used features</p>
         </div>
 
-        {/* Quick Stats */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
-          {/* Total Currency Balance */}
-          <div className="border-b border-black pb-4">
-            <p className="text-xs text-black font-medium uppercase tracking-wider mb-3">Currency Balance</p>
-            <p className="text-lg font-semibold text-black truncate">
-              {formatNumber(totalBalanceConverted != null ? totalBalanceConverted : getTotalBalance())} {globalCurrency}
-            </p>
-            <p className="text-xs text-slate-600 mt-2">
-              Fiat wallets
-            </p>
-          </div>
-
-          {/* Net (Balance - Debt) */}
-          <div className="border-b border-black pb-4">
-            <p className="text-xs text-black font-medium uppercase tracking-wider mb-3">Net Worth</p>
-            <p className="text-lg font-semibold text-black truncate">
-              {formatNumber(netDisplay)} {globalCurrency}
-            </p>
-            <p className="text-xs text-slate-600 mt-2">
-              After debts
-            </p>
-          </div>
-
-          {/* Total Debt */}
-          <div className="border-b border-black pb-4">
-            <p className="text-xs text-black font-medium uppercase tracking-wider mb-3">Total Debt</p>
-            <p className="text-lg font-semibold text-black truncate">{formatNumber(totalDebtConverted != null ? totalDebtConverted : getTotalDebt())} {globalCurrency}</p>
-            <p className="text-xs text-slate-600 mt-2">
-              Active loans
-            </p>
-          </div>
-        </div>
-
         {/* Onboarding Checklist */}
         {userId && (
           <div className="mb-8">
