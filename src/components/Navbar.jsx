@@ -137,7 +137,7 @@ function NavbarComponent({ activeTab, onTabChange, globalCurrency, setGlobalCurr
                   ) : totalCryptoBalancePHP > 0 ? (
                     <>{formatNumber(totalCryptoInSelectedCrypto.toFixed(8))} {globalCryptocurrency}</>
                   ) : (
-                    <span className="text-slate-400">0 {globalCryptocurrency}</span>
+                    <span className="text-black">0 {globalCryptocurrency}</span>
                   )}
                 </p>
               </div>
