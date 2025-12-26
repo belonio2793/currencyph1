@@ -407,7 +407,7 @@ export default function HomePage({ userId, userEmail, globalCurrency = 'PHP', se
         </div>
 
         {/* Quick Stats */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
           {/* Total Currency Balance */}
           <div className="border-b border-black pb-4">
             <p className="text-xs text-black font-medium uppercase tracking-wider mb-3">Currency Balance</p>
@@ -416,23 +416,6 @@ export default function HomePage({ userId, userEmail, globalCurrency = 'PHP', se
             </p>
             <p className="text-xs text-slate-600 mt-2">
               Fiat wallets
-            </p>
-          </div>
-
-          {/* Total Cryptocurrency Balance in Selected Cryptocurrency */}
-          <div className="border-b border-black pb-4">
-            <p className="text-xs text-black font-medium uppercase tracking-wider mb-3">Cryptocurrency Balance</p>
-            <p className="text-lg font-semibold text-black truncate">
-              {loadingCryptoHoldingsConversion ? (
-                <span className="italic text-slate-400">loading...</span>
-              ) : cryptoWallets.length > 0 ? (
-                formatNumber(totalCryptoInSelectedCrypto.toFixed(8)) + ' ' + globalCryptocurrency
-              ) : (
-                '0 ' + globalCryptocurrency
-              )}
-            </p>
-            <p className="text-xs text-slate-600 mt-2">
-              {cryptoWallets.length > 0 ? `${cryptoWallets.length} holding${cryptoWallets.length !== 1 ? 's' : ''}` : 'No holdings'}
             </p>
           </div>
 
