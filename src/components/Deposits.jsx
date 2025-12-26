@@ -1515,8 +1515,8 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
 
               const originalCurrency = notesMeta.original_currency || deposit.original_currency || deposit.currency_code
               const convertedAmount = notesMeta.converted_amount || deposit.converted_amount
-              const walletCurrency = notesMeta.wallet_currency || deposit.wallet_currency || deposit.currency_code
               const depositWallet = wallets.find(w => w.id === deposit.wallet_id)
+              const walletCurrency = notesMeta.wallet_currency || deposit.wallet_currency || depositWallet?.currency_code || deposit.currency_code
               const exchangeRate = convertedAmount && deposit.amount ? (convertedAmount / deposit.amount).toFixed(8) : null
               const methodName = DEPOSIT_METHODS[deposit.deposit_method]?.name || deposit.deposit_method.toUpperCase()
               const createdDate = new Date(deposit.created_at)
