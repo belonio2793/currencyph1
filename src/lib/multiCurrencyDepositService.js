@@ -166,25 +166,32 @@ export const multiCurrencyDepositService = {
       const isoTimestamp = now.toISOString()
 
       // Build comprehensive deposit record with all metadata
+      // SCHEMA SEMANTICS:
+      // - amount: source amount (what's being deposited)
+      // - currency_code: destination/wallet currency (what's received)
+      // - original_currency: source currency (what's being deposited)
+      // - received_amount: destination amount (what's received in wallet)
       const depositRecord = {
         user_id: userId,
         wallet_id: walletId,
 
-        // Original deposit amount and currency (what's being deposited FROM)
+        // Source amount and currency (what's being deposited FROM)
         amount: conversion.fromAmount,
-        currency_code: depositCurrency.toUpperCase(),
         original_currency: depositCurrency.toUpperCase(),
         original_currency_name: depositCurrencyInfo?.name || depositCurrency,
         original_currency_symbol: depositCurrencyInfo?.symbol || depositCurrency,
 
-        // Wallet/received currency info (what will be received INTO the wallet)
-        received_currency: walletCurrency.toUpperCase(),
+        // Destination/wallet currency (what will be received INTO the wallet)
+        currency_code: walletCurrency.toUpperCase(),
         currency_name: walletCurrencyInfo?.name || walletCurrency,
         currency_symbol: walletCurrencyInfo?.symbol || walletCurrency,
 
-        // Conversion details
+        // Received amount and currency
+        received_currency: walletCurrency.toUpperCase(),
         received_amount: conversion.toAmount,
         converted_amount: conversion.toAmount, // Also store as converted_amount for UI compatibility
+
+        // Exchange rate and rate tracking
         exchange_rate: conversion.rateRounded,
         exchange_rate_at_time: conversion.rateRounded,
         time_based_rate: conversion.rateRounded,
