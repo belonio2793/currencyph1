@@ -99,6 +99,25 @@ export default function OnboardingChecklist({ userId, userEmail, onTaskComplete,
     }
   }
 
+  // Save preference to hide checklist permanently
+  const handleRemoveChecklist = async () => {
+    try {
+      const { error } = await supabase
+        .from('user_preferences')
+        .update({ show_onboarding_checklist: false })
+        .eq('user_id', userId)
+
+      if (error) {
+        console.error('Error saving checklist preference:', error)
+        return
+      }
+
+      setShowChecklist(false)
+    } catch (err) {
+      console.error('Error removing checklist:', err)
+    }
+  }
+
   if (!userId || loading) {
     return null
   }
