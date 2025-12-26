@@ -344,25 +344,25 @@ export default function BorrowMoney({ userId, loanType }) {
               </div>
 
               {/* Total Debt */}
-              <div className="bg-white rounded-lg border border-slate-200 p-4">
+              <div className="bg-white rounded-lg border border-slate-300 p-4">
                 <div className="text-xs text-slate-600 mb-1">Total Debt</div>
-                <div className="text-2xl font-bold text-red-600">
+                <div className="text-sm font-mono font-semibold text-slate-900 truncate">
                   {Number(loans.reduce((sum, l) => sum + (l.remaining_balance || l.total_owed || 0), 0)).toFixed(2)} {loanType === 'personal' ? 'PHP' : 'PHP'}
                 </div>
               </div>
 
               {/* Total Paid */}
-              <div className="bg-white rounded-lg border border-slate-200 p-4">
+              <div className="bg-white rounded-lg border border-slate-300 p-4">
                 <div className="text-xs text-slate-600 mb-1">Total Paid</div>
-                <div className="text-2xl font-bold text-green-600">
+                <div className="text-sm font-mono font-semibold text-slate-900 truncate">
                   {Number(loans.reduce((sum, l) => sum + (l.amount_paid || 0), 0)).toFixed(2)} {loanType === 'personal' ? 'PHP' : 'PHP'}
                 </div>
               </div>
 
               {/* Active Loans */}
-              <div className="bg-white rounded-lg border border-slate-200 p-4">
+              <div className="bg-white rounded-lg border border-slate-300 p-4">
                 <div className="text-xs text-slate-600 mb-1">Active Loans</div>
-                <div className="text-2xl font-bold text-blue-600">
+                <div className="text-sm font-mono font-semibold text-slate-900 truncate">
                   {loans.filter(l => l.status === 'active').length}
                 </div>
               </div>
