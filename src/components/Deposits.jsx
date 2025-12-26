@@ -728,8 +728,10 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
       })
 
       setDeposits([result.deposit, ...deposits])
+      setLastSuccessDeposit(result.deposit)
       setSuccess(`Deposit initiated successfully! 1 ${selectedCurrency} = ${formattedRate} ${targetWalletData.currency_code}`)
       setError('')
+      setShowSuccessModal(true) // Show success modal with celebration
       setStep('confirm')
     } catch (err) {
       // Catch any unexpected errors
