@@ -82,7 +82,8 @@ export async function getPairRate(fromCurrency, toCurrency) {
 
 /**
  * Fetch exchange rate with metadata (includes updated_at, direction, source)
- * Prefers canonical pairs and includes direction metadata
+ * Uses proper mathematical inversion: 1/rate when needed
+ * Includes quality scoring and freshness information
  */
 export async function getPairRateWithMetadata(fromCurrency, toCurrency) {
   if (!fromCurrency || !toCurrency) return null
@@ -91,52 +92,80 @@ export async function getPairRateWithMetadata(fromCurrency, toCurrency) {
     updated_at: new Date().toISOString(),
     source: 'identity',
     pair_direction: 'canonical',
-    is_inverted: false
+    is_inverted: false,
+    quality_score: 1.0
   }
 
   const from = fromCurrency.toUpperCase()
   const to = toCurrency.toUpperCase()
 
   try {
-    // Strategy 1: Try direct canonical pair (preferred)
+    // Strategy 1: Try direct pair (any direction)
     const { data: directData, error: directError } = await supabase
       .from('pairs')
       .select('rate, updated_at, source_table, pair_direction, is_inverted')
       .eq('from_currency', from)
       .eq('to_currency', to)
-      .eq('pair_direction', 'canonical')
       .maybeSingle()
 
     if (!directError && directData && typeof directData.rate === 'number' && isFinite(directData.rate) && directData.rate > 0) {
       return {
         rate: directData.rate,
         updated_at: directData.updated_at,
-        source: directData.source_table || 'currency_rates',
-        pair_direction: 'canonical',
-        is_inverted: false
+        source: directData.source_table || 'cryptocurrency_rates',
+        pair_direction: directData.pair_direction || 'canonical',
+        is_inverted: directData.is_inverted === true,
+        quality_score: 1.0
       }
     }
 
-    // Strategy 2: Try inverse pair (PHP→X)
-    const { data: inverseData, error: inverseError } = await supabase
+    // Strategy 2: Try reverse pair and calculate inverse using 1/rate
+    const { data: reverseData, error: reverseError } = await supabase
       .from('pairs')
       .select('rate, updated_at, source_table, pair_direction, is_inverted')
       .eq('from_currency', to)
       .eq('to_currency', from)
-      .eq('pair_direction', 'inverse')
       .maybeSingle()
 
-    if (!inverseError && inverseData && typeof inverseData.rate === 'number' && isFinite(inverseData.rate) && inverseData.rate > 0) {
-      const calculatedRate = 1 / inverseData.rate
-      if (isFinite(calculatedRate) && calculatedRate > 0) {
+    if (!reverseError && reverseData && typeof reverseData.rate === 'number' && isFinite(reverseData.rate) && reverseData.rate > 0) {
+      // CRITICAL: Mathematical inversion: if from=Y, to=X, rate=r, then from=X, to=Y, rate=1/r
+      const invertedRate = 1 / reverseData.rate
+      if (isFinite(invertedRate) && invertedRate > 0) {
         return {
-          rate: calculatedRate,
-          updated_at: inverseData.updated_at,
-          source: inverseData.source_table || 'currency_rates',
-          pair_direction: 'calculated_inverse',
-          is_inverted: true
+          rate: invertedRate,
+          updated_at: reverseData.updated_at,
+          source: reverseData.source_table || 'cryptocurrency_rates',
+          pair_direction: 'calculated_inverse',  // Explicitly mark as calculated
+          is_inverted: true,
+          quality_score: 0.95  // Slightly lower confidence for calculated inverses
         }
       }
+    }
+
+    // Strategy 3: Use RPC function
+    try {
+      const { data: rpcData, error: rpcError } = await supabase
+        .rpc('get_exchange_rate_safe', {
+          p_from_currency: from,
+          p_to_currency: to
+        })
+
+      if (!rpcError && rpcData && rpcData.length > 0) {
+        const rate = parseFloat(rpcData[0].rate)
+        const isInverted = rpcData[0].is_inverted
+        if (isFinite(rate) && rate > 0) {
+          return {
+            rate,
+            updated_at: rpcData[0].updated_at,
+            source: rpcData[0].source_table || 'cryptocurrency_rates',
+            pair_direction: isInverted ? 'calculated_inverse' : 'canonical',
+            is_inverted: isInverted,
+            quality_score: parseFloat(rpcData[0].quality_score || 0.8)
+          }
+        }
+      }
+    } catch (rpcErr) {
+      console.debug(`[PairsRate] RPC function not available:`, rpcErr?.message)
     }
 
     console.warn(`[PairsRate] Rate metadata not found for ${from}/${to}`)
