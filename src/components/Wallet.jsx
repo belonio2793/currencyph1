@@ -379,11 +379,11 @@ export default function Wallet({ userId, globalCurrency = 'PHP' }) {
               <div className="space-y-16">
                 {/* Fiat Currencies Section */}
                 {(activeType === 'all' || activeType === 'currency') && fiatWallets.length > 0 && (
-                  <div className="bg-gradient-to-br from-blue-50/40 to-slate-50 border border-blue-100 rounded-xl p-8">
-                    <div className="mb-8 pb-6 border-b-2 border-blue-200 flex items-center gap-3">
-                      <div className="w-2 h-8 bg-blue-600 rounded-full"></div>
+                  <div className="bg-white border border-slate-300 rounded-xl p-8">
+                    <div className="mb-8 pb-6 border-b-2 border-slate-300 flex items-center gap-3">
+                      <div className="w-2 h-8 bg-slate-700 rounded-full"></div>
                       <h2 className="text-2xl font-semibold text-slate-900">Fiat Currencies</h2>
-                      <span className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm font-medium">
+                      <span className="px-3 py-1 bg-slate-200 text-slate-900 rounded-full text-sm font-medium">
                         {fiatWallets.length}
                       </span>
                     </div>
