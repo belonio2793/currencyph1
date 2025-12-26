@@ -1656,9 +1656,9 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
                 <div className="p-6 bg-gradient-to-r from-blue-50 to-indigo-50 border-2 border-blue-200 rounded-lg">
                   <h4 className="font-semibold text-slate-900 mb-4">💰 Amount to Send</h4>
                   <div className="space-y-3">
-                    <div className="flex items-baseline justify-between">
+                    <div className="flex items-baseline justify-between gap-4 flex-wrap">
                       <span className="text-slate-700">You need to send:</span>
-                      <span className="text-3xl font-bold text-blue-600">
+                      <span className="text-3xl font-bold text-blue-600 break-words">
                         {getDepositMethodAmount()?.toLocaleString(undefined, {
                           minimumFractionDigits: isCryptoCurrency(selectedAddressMethod.cryptoSymbol) ? 2 : 2,
                           maximumFractionDigits: isCryptoCurrency(selectedAddressMethod.cryptoSymbol) ? 8 : 2
@@ -1666,9 +1666,9 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
                       </span>
                     </div>
                     {selectedCurrency.toUpperCase() !== selectedAddressMethod.cryptoSymbol?.toUpperCase() && (
-                      <div className="flex items-baseline justify-between pt-3 border-t border-blue-200">
+                      <div className="flex items-baseline justify-between pt-3 border-t border-blue-200 gap-4 flex-wrap">
                         <span className="text-slate-600 text-sm">Original amount:</span>
-                        <span className="text-lg font-semibold text-slate-900">
+                        <span className="text-lg font-semibold text-slate-900 break-words">
                           {parseFloat(amount).toLocaleString(undefined, {
                             minimumFractionDigits: 2,
                             maximumFractionDigits: 8
@@ -1721,9 +1721,9 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
               {selectedWallet && calculateConvertedAmount() && selectedCurrency !== selectedWallet.currency_code && (
                 <div className="p-6 bg-emerald-50 border border-emerald-200 rounded-lg">
                   <h4 className="font-semibold text-slate-900 mb-4">✓ What You Will Receive</h4>
-                  <div className="flex items-baseline justify-between">
+                  <div className="flex items-baseline justify-between gap-4 flex-wrap">
                     <span className="text-slate-700">Deposited to your {selectedWallet.currency_code} wallet:</span>
-                    <span className="text-3xl font-bold text-emerald-600">
+                    <span className="text-3xl font-bold text-emerald-600 break-words">
                       {calculateConvertedAmount()?.toLocaleString(undefined, {
                         minimumFractionDigits: 2,
                         maximumFractionDigits: 8
