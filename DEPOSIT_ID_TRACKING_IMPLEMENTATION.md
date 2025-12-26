@@ -187,14 +187,65 @@ WHERE deposit_id = '<deposit_id>';
 
 ## Testing Checklist
 
-- [ ] Migration runs without errors
+### Schema Validation
+- [ ] Migration 0121 runs without errors
+- [ ] Migration 0122 runs without errors
 - [ ] `deposit_id` column exists in wallet_transactions
-- [ ] Foreign key constraint is active
-- [ ] Indexes are created and usable
-- [ ] New deposits create wallet_transactions with deposit_id populated
+- [ ] Foreign key constraint `fk_wallet_transactions_deposit_id` is active
+- [ ] Indexes `idx_wallet_tx_deposit_id` and `idx_wallet_tx_deposit_type` are created
+
+### Functional Tests
+- [ ] New deposits create wallet_transactions with `deposit_id` populated
+- [ ] Deposit approval triggers create `deposit_approved` transaction with correct `deposit_id`
+- [ ] Deposit reversal triggers create `deposit_reversed` transaction with correct `deposit_id`
 - [ ] Deleting a deposit cascades to delete related transactions
+- [ ] Balance sync transactions are created with `deposit_id = NULL` when deposit is deleted
+- [ ] Sync transactions have correct `reference_id` and `metadata.deleted_deposit_id`
 - [ ] Query performance is acceptable with new indexes
 - [ ] Existing reports/dashboards continue working
+
+### Cascade Delete Test (Step-by-Step)
+```sql
+-- 1. Get a deposit ID and wallet ID
+SELECT id, wallet_id FROM deposits WHERE status = 'approved' LIMIT 1;
+-- Result: deposit_id = '...', wallet_id = '...'
+
+-- 2. Count transactions BEFORE deletion
+SELECT COUNT(*) as tx_before FROM wallet_transactions
+WHERE deposit_id = '<deposit_id>';
+
+-- 3. Delete the deposit
+DELETE FROM deposits WHERE id = '<deposit_id>';
+
+-- 4. Count transactions AFTER deletion (should be 0)
+SELECT COUNT(*) as tx_after FROM wallet_transactions
+WHERE deposit_id = '<deposit_id>';
+
+-- 5. Check for audit trail (balance sync record)
+SELECT * FROM wallet_transactions
+WHERE wallet_id = '<wallet_id>'
+  AND type = 'balance_sync_on_delete'
+  AND reference_id = '<deposit_id>'
+ORDER BY created_at DESC
+LIMIT 1;
+-- Should show: deposit_id = NULL, metadata.deleted_deposit_id = '<deposit_id>'
+```
+
+### Performance Tests
+```sql
+-- Test index usage for deposit_id lookups
+EXPLAIN ANALYZE
+SELECT * FROM wallet_transactions
+WHERE deposit_id = '<deposit_id>'
+ORDER BY created_at DESC;
+
+-- Test composite index for deposit type filtering
+EXPLAIN ANALYZE
+SELECT * FROM wallet_transactions
+WHERE deposit_id = '<deposit_id>'
+  AND type = 'deposit_approved'
+ORDER BY created_at DESC;
+```
 
 ## Related Tables
 
