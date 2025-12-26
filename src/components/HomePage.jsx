@@ -329,7 +329,7 @@ export default function HomePage({ userId, userEmail, globalCurrency = 'PHP', se
   }
 
   const getActiveLoanCount = () => {
-    return loans.filter(d => d.status === 'active' || d.status === 'pending').length
+    return loans.filter(d => d.status === 'active' || d.status === 'pending' || d.status === 'delinquent').length
   }
 
   const getTotalDebt = () => {
