@@ -1867,7 +1867,7 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
                     {lastSuccessDeposit.amount.toLocaleString(undefined, {
                       minimumFractionDigits: 2,
                       maximumFractionDigits: 8
-                    })} {lastSuccessDeposit.currency_code.toUpperCase()}
+                    })} {(lastSuccessDeposit.original_currency || lastSuccessDeposit.currency_code).toUpperCase()}
                   </p>
                 </div>
 
