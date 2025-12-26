@@ -639,11 +639,7 @@ export default function Rates() {
                           </td>
                           <td className="py-3 px-4 text-slate-600">{currency.metadata?.name || currency.code}</td>
                           <td className="py-3 px-4">
-                            <span className={`inline-block px-3 py-1 rounded-full text-xs font-medium ${
-                              currency.metadata?.type === 'cryptocurrency'
-                                ? 'bg-orange-100 text-orange-700'
-                                : 'bg-blue-100 text-blue-700'
-                            }`}>
+                            <span className="inline-block px-3 py-1 rounded-full text-xs font-medium bg-slate-200 text-slate-900">
                               {currency.metadata?.type === 'cryptocurrency' ? 'Cryptocurrency' : 'FIAT'}
                             </span>
                           </td>
