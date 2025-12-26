@@ -2,6 +2,7 @@ import { supabase } from './supabaseClient'
 
 /**
  * Fetch cryptocurrency exchange rate from public.pairs table
+ * SECURITY FIX: Uses safe inversion (1/rate) if direct pair not found
  * Returns the rate of fromCurrency -> toCurrency
  */
 export async function getCryptoRateFromDb(fromCurrency, toCurrency = 'USD') {
@@ -9,19 +10,16 @@ export async function getCryptoRateFromDb(fromCurrency, toCurrency = 'USD') {
     const fromCode = fromCurrency.toUpperCase()
     const toCode = toCurrency.toUpperCase()
 
-    const { data, error } = await supabase
-      .from('pairs')
-      .select('rate, updated_at')
-      .eq('from_currency', fromCode)
-      .eq('to_currency', toCode)
-      .single()
+    // Use safe rate lookup with proper inversion
+    const { getPairRate } = await import('./pairsRateService.js')
+    const rate = await getPairRate(fromCode, toCode)
 
-    if (error || !data || !(typeof data.rate === 'number' && isFinite(data.rate) && data.rate > 0)) {
+    if (!rate || !(typeof rate === 'number' && isFinite(rate) && rate > 0)) {
       console.warn(`No exchange rate found for ${fromCurrency}/${toCurrency}`)
       return null
     }
 
-    return parseFloat(data.rate)
+    return parseFloat(rate)
   } catch (error) {
     console.warn(`Error fetching crypto rate for ${fromCurrency}/${toCurrency}:`, error.message)
     return null
