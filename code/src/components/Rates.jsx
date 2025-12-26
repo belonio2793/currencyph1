@@ -719,7 +719,6 @@ export default function Rates() {
               {/* Info Card */}
               <div className="bg-gradient-to-br from-slate-50 to-slate-100 rounded-2xl shadow-lg p-6 border border-slate-200 space-y-4">
                 <div className="flex items-center gap-2 mb-2">
-                  <span className="text-2xl">ℹ️</span>
                   <h3 className="text-lg font-semibold text-slate-900">Information</h3>
                 </div>
 
