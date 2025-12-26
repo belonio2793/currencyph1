@@ -259,7 +259,14 @@ wallets (id, currency_code, balance, ...)
 
 ## Migration Order
 
-This migration should run **after** migration `0118_remove_wallet_transactions_user_fk.sql` and **before** any code that explicitly passes `deposit_id` to wallet transaction creation.
+**Execution Order** (must be sequential):
+1. Migration `0121_add_deposit_id_to_wallet_transactions.sql` - Main schema changes
+2. Migration `0122_update_delete_trigger_with_deposit_id.sql` - Delete trigger optimization
+
+**Dependencies**:
+- Must run **after** migration `0118_remove_wallet_transactions_user_fk.sql`
+- Must run **before** code that explicitly passes `deposit_id` to wallet transaction creation
+- Both migrations should be applied together as a unit
 
 ---
 
