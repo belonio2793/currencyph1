@@ -191,40 +191,56 @@ export default function SearchableSelect({ value, onChange, options = [], label 
       {isOpen && (
         <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-slate-300 rounded-lg shadow-xl z-50">
           {/* Search Input */}
-          <div className="p-3 border-b border-slate-200 sticky top-0 bg-white">
-            <input
-              ref={searchInputRef}
-              type="text"
-              placeholder="Search by code or name..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              onKeyDown={handleKeyDown}
-              className="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
-              autoComplete="off"
-            />
+          <div className="p-3 border-b border-slate-200 sticky top-0 bg-white rounded-t-lg">
+            <div className="relative">
+              <input
+                ref={searchInputRef}
+                type="text"
+                placeholder="Search currencies... (type to filter)"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                onKeyDown={handleKeyDown}
+                className="w-full px-3 py-2 pl-9 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                autoComplete="off"
+              />
+              <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+            </div>
+            {searchTerm && (
+              <p className="text-xs text-slate-500 mt-2">
+                Found {flatOptions.length} match{flatOptions.length !== 1 ? 'es' : ''}
+              </p>
+            )}
           </div>
 
           {/* Options List */}
           <div
             ref={optionsListRef}
-            className="max-h-64 overflow-y-auto"
+            className="max-h-72 overflow-y-auto"
             onKeyDown={handleKeyDown}
           >
             {flatOptions.length === 0 ? (
-              <div className="px-4 py-8 text-center text-slate-500 text-sm">
-                No currencies found matching "{searchTerm}"
+              <div className="px-4 py-12 text-center">
+                <svg className="mx-auto h-12 w-12 text-slate-300 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <p className="text-slate-500 text-sm font-medium">No currencies found</p>
+                <p className="text-slate-400 text-xs mt-1">Try different search terms</p>
               </div>
             ) : (
               <>
                 {/* FIAT Section */}
                 {filteredFiat.length > 0 && (
                   <>
-                    <div className="px-4 py-2 mt-2 text-xs font-semibold text-blue-700 uppercase tracking-wider flex items-center gap-2">
-                      <span className="px-2 py-1 bg-blue-100 rounded">FIAT</span>
-                      Currencies
-                      <div className="flex-1 h-px bg-slate-200 ml-2"></div>
+                    <div className="px-4 py-3 text-xs font-bold text-blue-700 uppercase tracking-wider flex items-center gap-2 bg-blue-50">
+                      <span className="inline-flex items-center px-2 py-1 bg-blue-200 rounded-md text-blue-800">
+                        💵 FIAT
+                      </span>
+                      <span className="text-blue-600">Currencies</span>
+                      <div className="flex-1 h-px bg-blue-200 ml-auto"></div>
                     </div>
-                    {filteredFiat.map((option, index) => (
+                    {filteredFiat.map((option) => (
                       <button
                         key={option.code}
                         onClick={() => {
@@ -237,16 +253,18 @@ export default function SearchableSelect({ value, onChange, options = [], label 
                           const idx = flatOptions.findIndex(o => o.code === option.code)
                           setHighlightedIndex(idx)
                         }}
-                        className={`w-full text-left px-4 py-3 transition ${
+                        className={`w-full text-left px-4 py-3 transition border-l-4 ${
                           flatOptions[highlightedIndex]?.code === option.code
-                            ? 'bg-blue-50'
-                            : 'hover:bg-slate-50'
-                        } ${value === option.code ? 'bg-blue-100 border-l-4 border-l-blue-600' : ''}`}
+                            ? 'bg-blue-100 border-l-blue-500'
+                            : value === option.code
+                            ? 'bg-blue-50 border-l-blue-400'
+                            : 'border-l-transparent hover:bg-slate-50'
+                        }`}
                         type="button"
                       >
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-3 flex-1 min-w-0">
-                            <span className="font-semibold text-slate-900">{option.code}</span>
+                            <span className="font-semibold text-slate-900 w-12">{option.code}</span>
                             <span className="text-slate-600 text-sm truncate">
                               {option.metadata?.name}
                             </span>
@@ -262,18 +280,22 @@ export default function SearchableSelect({ value, onChange, options = [], label 
                   </>
                 )}
 
+                {/* Divider */}
+                {filteredFiat.length > 0 && filteredCrypto.length > 0 && (
+                  <div className="h-px bg-slate-200 my-2"></div>
+                )}
+
                 {/* CRYPTO Section */}
                 {filteredCrypto.length > 0 && (
                   <>
-                    {filteredFiat.length > 0 && (
-                      <div className="h-px bg-slate-200 my-1"></div>
-                    )}
-                    <div className="px-4 py-2 mt-2 text-xs font-semibold text-orange-700 uppercase tracking-wider flex items-center gap-2">
-                      <span className="px-2 py-1 bg-orange-100 rounded">CRYPTO</span>
-                      Currencies
-                      <div className="flex-1 h-px bg-slate-200 ml-2"></div>
+                    <div className="px-4 py-3 text-xs font-bold text-orange-700 uppercase tracking-wider flex items-center gap-2 bg-orange-50">
+                      <span className="inline-flex items-center px-2 py-1 bg-orange-200 rounded-md text-orange-800">
+                        ₿ CRYPTO
+                      </span>
+                      <span className="text-orange-600">Currencies</span>
+                      <div className="flex-1 h-px bg-orange-200 ml-auto"></div>
                     </div>
-                    {filteredCrypto.map((option, index) => (
+                    {filteredCrypto.map((option) => (
                       <button
                         key={option.code}
                         onClick={() => {
@@ -286,16 +308,18 @@ export default function SearchableSelect({ value, onChange, options = [], label 
                           const idx = flatOptions.findIndex(o => o.code === option.code)
                           setHighlightedIndex(idx)
                         }}
-                        className={`w-full text-left px-4 py-3 transition ${
+                        className={`w-full text-left px-4 py-3 transition border-l-4 ${
                           flatOptions[highlightedIndex]?.code === option.code
-                            ? 'bg-orange-50'
-                            : 'hover:bg-slate-50'
-                        } ${value === option.code ? 'bg-orange-100 border-l-4 border-l-orange-600' : ''}`}
+                            ? 'bg-orange-100 border-l-orange-500'
+                            : value === option.code
+                            ? 'bg-orange-50 border-l-orange-400'
+                            : 'border-l-transparent hover:bg-slate-50'
+                        }`}
                         type="button"
                       >
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-3 flex-1 min-w-0">
-                            <span className="font-semibold text-slate-900">{option.code}</span>
+                            <span className="font-semibold text-slate-900 w-12">{option.code}</span>
                             <span className="text-slate-600 text-sm truncate">
                               {option.metadata?.name}
                             </span>
