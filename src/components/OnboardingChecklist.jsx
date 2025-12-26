@@ -123,10 +123,9 @@ export default function OnboardingChecklist({ userId, userEmail, onTaskComplete,
       <div className="bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-5 border-b border-blue-800">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-3">
-            <span className="text-3xl">🎯</span>
             <div>
-              <h3 className="text-lg font-bold text-white">Welcome To Currency.ph</h3>
-              <p className="text-sm text-blue-100">{allCompleted ? '✓ All tasks completed!' : 'Get started with these setup tasks'}</p>
+              <h3 className="text-lg font-bold text-white">Get started with these setup tasks</h3>
+              <p className="text-sm text-blue-100">{allCompleted ? 'All tasks completed!' : ''}</p>
             </div>
           </div>
           {allCompleted && (
