@@ -71,10 +71,10 @@ You should see these key columns:
 Ensure these are in your `.env.local` (in project root):
 
 ```bash
-VITE_PROJECT_URL=https://corcofbmafdxehvlbesx.supabase.co
-VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
-SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
-VITE_TRIPADVISOR=451510296B594353B4EA0CD052DA6603
+VITE_PROJECT_URL=your-supabase-url
+VITE_SUPABASE_ANON_KEY=your-anon-key
+SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
+VITE_TRIPADVISOR=your-tripadvisor-api-key
 ```
 
 **Note:** If you're using the CLI, these should already be set. Check:
