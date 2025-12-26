@@ -337,11 +337,11 @@ export default function HomePage({ userId, userEmail, globalCurrency = 'PHP', se
   }
 
   const personalLoans = useMemo(() =>
-    loans.filter(l => l.loan_type === 'personal'),
+    loans.filter(d => d.debt_type === 'personal_loan'),
     [loans]
   )
   const businessLoans = useMemo(() =>
-    loans.filter(l => l.loan_type === 'business'),
+    loans.filter(d => d.debt_type === 'business_loan'),
     [loans]
   )
 
