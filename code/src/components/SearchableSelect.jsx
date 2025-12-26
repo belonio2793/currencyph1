@@ -241,9 +241,9 @@ export default function SearchableSelect({ value, onChange, options = [], label 
                     {filteredFiat.length > 0 && (
                       <div className="h-px bg-slate-200 my-1"></div>
                     )}
-                    <div className="px-4 py-2 mt-2 text-xs font-semibold text-slate-500 uppercase tracking-wider flex items-center gap-2">
-                      <span className="text-orange-600">₿</span>
-                      Cryptocurrencies
+                    <div className="px-4 py-2 mt-2 text-xs font-semibold text-orange-700 uppercase tracking-wider flex items-center gap-2">
+                      <span className="px-2 py-1 bg-orange-100 rounded">CRYPTO</span>
+                      Currencies
                       <div className="flex-1 h-px bg-slate-200 ml-2"></div>
                     </div>
                     {filteredCrypto.map((option, index) => (
