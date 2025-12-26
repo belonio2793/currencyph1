@@ -5,8 +5,10 @@ Added a `deposit_id` foreign key column to the `wallet_transactions` table to en
 
 ## Changes Made
 
-### 1. Migration File
-**File**: `supabase/migrations/0121_add_deposit_id_to_wallet_transactions.sql`
+### 1. Migration Files
+**Files**:
+1. `supabase/migrations/0121_add_deposit_id_to_wallet_transactions.sql` (Main schema changes)
+2. `supabase/migrations/0122_update_delete_trigger_with_deposit_id.sql` (Delete trigger optimization)
 
 ### 2. Schema Changes
 
