@@ -151,6 +151,108 @@ async function convertToPhp(amount: number, fromCurrency: string): Promise<{
   }
 }
 
+// Helper: Enrich deposit data with all necessary metadata fields
+async function enrichDepositDataWithMetadata(
+  depositData: Record<string, any>,
+  request: DepositRequest,
+  conversionResult?: { exchangeRate: number; convertedAmount: number; source: string }
+): Promise<Record<string, any>> {
+  const now = new Date().toISOString()
+  const depositCurrency = depositData.currency_code || request.currency
+  const walletCurrency = depositData.received_currency || 'PHP' // Default to PHP if not specified
+
+  // Fetch wallet info to get destination currency
+  let walletCurrencyCode = walletCurrency
+  try {
+    const { data: wallet } = await supabase
+      .from('wallets')
+      .select('currency_code')
+      .eq('id', request.walletId)
+      .single()
+
+    if (wallet) {
+      walletCurrencyCode = wallet.currency_code
+    }
+  } catch (error) {
+    console.warn('Failed to fetch wallet info:', error)
+  }
+
+  // Fetch currency information for both currencies
+  let currencyMap: Record<string, any> = {}
+  try {
+    const { data: currencies } = await supabase
+      .from('currencies')
+      .select('code, name, symbol')
+      .in('code', [depositCurrency.toUpperCase(), walletCurrencyCode.toUpperCase()])
+
+    if (currencies) {
+      currencies.forEach((curr: any) => {
+        currencyMap[curr.code] = curr
+      })
+    }
+  } catch (error) {
+    console.warn('Failed to fetch currency info:', error)
+  }
+
+  // Enrich with all metadata
+  const enriched = {
+    ...depositData,
+
+    // Ensure original currency tracking
+    original_currency: depositCurrency.toUpperCase(),
+    original_currency_name: currencyMap[depositCurrency.toUpperCase()]?.name || depositCurrency,
+    original_currency_symbol: currencyMap[depositCurrency.toUpperCase()]?.symbol || depositCurrency,
+
+    // Ensure wallet/received currency tracking
+    received_currency: walletCurrencyCode.toUpperCase(),
+    currency_name: currencyMap[walletCurrencyCode.toUpperCase()]?.name || walletCurrencyCode,
+    currency_symbol: currencyMap[walletCurrencyCode.toUpperCase()]?.symbol || walletCurrencyCode,
+
+    // Add conversion details if available
+    ...(conversionResult && {
+      exchange_rate: conversionResult.exchangeRate,
+      exchange_rate_at_time: conversionResult.exchangeRate,
+      time_based_rate: conversionResult.exchangeRate,
+      rate_source: conversionResult.source,
+      rate_fetched_at: now,
+      received_amount: conversionResult.convertedAmount
+    }),
+
+    // Ensure rate_fetched_at is set even without conversion
+    ...(!(depositData.rate_fetched_at) && {
+      rate_fetched_at: now
+    }),
+
+    // Add metadata object if not present
+    metadata: {
+      ...depositData.metadata,
+      original_currency: depositCurrency.toUpperCase(),
+      received_currency: walletCurrencyCode.toUpperCase(),
+      exchange_rate: conversionResult?.exchangeRate || 1,
+      rate_source: conversionResult?.source || 'none',
+      created_via: 'process_deposit_edge_function',
+      created_at: now,
+      rate_fetched_at: now
+    },
+
+    // Add notes for audit trail
+    notes: {
+      ...depositData.notes,
+      original_amount: request.amount,
+      original_currency: depositCurrency.toUpperCase(),
+      received_currency: walletCurrencyCode.toUpperCase(),
+      exchange_rate: conversionResult?.exchangeRate || 1,
+      rate_source: conversionResult?.source || 'none',
+      deposit_method: depositData.deposit_method,
+      user_id: request.userId,
+      wallet_id: request.walletId,
+      timestamp: now
+    }
+  }
+
+  return enriched
+}
+
 // Process Stripe deposit
 async function processStripeDeposit(
   request: DepositRequest
