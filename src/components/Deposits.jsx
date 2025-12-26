@@ -1157,7 +1157,7 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
                   <div className="space-y-3">
                     <div>
                       <p className="text-xs text-slate-500 mb-1">Amount</p>
-                      <p className="text-2xl font-bold text-slate-900 break-words">{formatNumber(parseFloat(amount) || 0)} {selectedCurrency.toUpperCase()}</p>
+                      <p className="text-2xl font-bold text-slate-900 break-words">{formatNumber(parseFloat(amount) || 0, selectedCurrency)} {selectedCurrency.toUpperCase()}</p>
                     </div>
                     <div>
                       <p className="text-xs text-slate-500 mb-1">{activeType === 'cryptocurrency' ? 'Network' : 'Payment Method'}</p>
