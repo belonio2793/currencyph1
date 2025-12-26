@@ -13,11 +13,6 @@ export default function Rates() {
   const [error, setError] = useState(null)
   const [lastUpdated, setLastUpdated] = useState(new Date())
 
-  const [selectedFrom, setSelectedFrom] = useState('PHP')
-  const [selectedTo, setSelectedTo] = useState('USD')
-  const [amount, setAmount] = useState('1')
-  const [result, setResult] = useState(null)
-
   const [searchTerm, setSearchTerm] = useState('')
   const [typeFilter, setTypeFilter] = useState('all')
   const [activeType, setActiveType] = useState('all')
