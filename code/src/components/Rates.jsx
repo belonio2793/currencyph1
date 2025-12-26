@@ -164,35 +164,9 @@ export default function Rates() {
         }
       })
 
-      // Collect all rates from public.pairs table with flexible base currency approach
-      // Strategy: Find the best base currency (most pairs available) and use that
-      // This handles databases that may have BTC, USD, EUR, or other bases instead of just PHP
-
-      // First pass: count pairs by target currency to find best base
-      const targetCounts = {}
-      pairsData?.forEach(pair => {
-        if (pair.to_currency) {
-          targetCounts[pair.to_currency] = (targetCounts[pair.to_currency] || 0) + 1
-        }
-      })
-
-      // Select best base currency (most pairs target it)
-      let baseCurrency = 'PHP'
-      let maxCount = 0
-      Object.entries(targetCounts).forEach(([currency, count]) => {
-        // Prefer PHP, USD, BTC, EUR in that order if they have at least some pairs
-        if (count >= 2) {
-          if (currency === 'PHP' || (currency !== 'PHP' && count > maxCount)) {
-            baseCurrency = currency
-            maxCount = count
-          }
-        }
-      })
-
-      console.log(`Chart Selected base currency: ${baseCurrency} (${maxCount || targetCounts[baseCurrency] || 0} pairs)`)
-
-      // Second pass: collect rates using the best base currency
-      pairsData?.forEach(pair => {
+      // Collect all rates from combined currency_rates and cryptocurrency_rates tables
+      // Each pair represents a from_currency → to_currency rate
+      allRatePairs?.forEach(pair => {
         if (pair.updated_at) {
           timestamps.push(new Date(pair.updated_at))
         }
