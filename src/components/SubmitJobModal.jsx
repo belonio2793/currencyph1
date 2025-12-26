@@ -1065,9 +1065,11 @@ export default function SubmitJobModal({
             borderRadius: '12px',
             maxWidth: '500px',
             width: '100%',
-            maxHeight: '90vh',
+            maxHeight: 'calc(100dvh - 32px)',
             overflow: 'auto',
-            boxShadow: '0 20px 60px rgba(0, 0, 0, 0.3)'
+            boxShadow: '0 20px 60px rgba(0, 0, 0, 0.3)',
+            display: 'flex',
+            flexDirection: 'column'
           }}
           onClick={(e) => e.stopPropagation()}
           >
