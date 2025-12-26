@@ -1760,8 +1760,8 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
               )}
 
               {/* Important Notes */}
-              <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-                <p className="font-semibold text-yellow-900 mb-2">Important:</p>
+              <div className="p-4 bg-slate-50 border border-slate-300 rounded-lg">
+                <p className="font-semibold text-slate-900 mb-2">Important:</p>
                 <ul className="text-sm text-yellow-800 space-y-1">
                   <li>• Only send {selectedAddressMethod.cryptoName} ({selectedAddressMethod.cryptoSymbol}) to this address</li>
                   {selectedAddressMethod.network && <li>• Network: {selectedAddressMethod.network}</li>}
