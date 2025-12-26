@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabaseClient'
 import { formatNumber } from '../lib/currency'
 import WalletDisplayCustomizer from './WalletDisplayCustomizer'
