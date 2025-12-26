@@ -543,7 +543,7 @@ export default function ReceiveMoney({ userId, globalCurrency = 'PHP' }) {
         // Create conversation with recipient
         const conversation = await createConversation(
           userId,
-          `Payment Request: ${getCurrencySymbol(currency)}${formatNumber(amount)}`,
+          `Payment Request: ${formatNumber(amount)} ${currency.toUpperCase()}`,
           [recipient.id]
         )
 
