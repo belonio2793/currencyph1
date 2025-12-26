@@ -269,7 +269,7 @@ export default function Wallet({ userId, globalCurrency = 'PHP' }) {
                     onClick={() => setViewMode('grid')}
                     className={`px-4 py-2 rounded text-sm font-medium transition-colors ${
                       viewMode === 'grid'
-                        ? 'bg-blue-600 text-white'
+                        ? 'bg-slate-700 text-white'
                         : 'text-slate-700 hover:bg-slate-100'
                     }`}
                   >
@@ -279,7 +279,7 @@ export default function Wallet({ userId, globalCurrency = 'PHP' }) {
                     onClick={() => setViewMode('list')}
                     className={`px-4 py-2 rounded text-sm font-medium transition-colors ${
                       viewMode === 'list'
-                        ? 'bg-blue-600 text-white'
+                        ? 'bg-slate-700 text-white'
                         : 'text-slate-700 hover:bg-slate-100'
                     }`}
                   >
@@ -356,8 +356,8 @@ export default function Wallet({ userId, globalCurrency = 'PHP' }) {
             ) : activeType === 'cryptocurrency' && cryptoWallets.length === 0 ? (
               // Empty crypto section - show helpful message
               <div className="bg-gradient-to-br from-orange-50/40 to-slate-50 border border-orange-100 rounded-xl p-8 text-center">
-                <div className="mb-6 pb-6 border-b-2 border-orange-200 flex items-center gap-3">
-                  <div className="w-2 h-8 bg-orange-600 rounded-full"></div>
+                <div className="mb-6 pb-6 border-b-2 border-slate-300 flex items-center gap-3">
+                  <div className="w-2 h-8 bg-slate-700 rounded-full"></div>
                   <h2 className="text-2xl font-semibold text-slate-900">Cryptocurrencies</h2>
                   <span className="px-3 py-1 bg-orange-100 text-orange-700 rounded-full text-sm font-medium">
                     0
@@ -519,8 +519,8 @@ export default function Wallet({ userId, globalCurrency = 'PHP' }) {
                 {/* Fiat Currencies Section */}
                 {(activeType === 'all' || activeType === 'currency') && fiatWallets.length > 0 && (
                   <div className="bg-gradient-to-br from-blue-50/40 to-slate-50 border border-blue-100 rounded-xl p-6">
-                    <div className="mb-6 pb-4 border-b-2 border-blue-200 flex items-center gap-3">
-                      <div className="w-2 h-6 bg-blue-600 rounded-full"></div>
+                    <div className="mb-6 pb-4 border-b-2 border-slate-300 flex items-center gap-3">
+                      <div className="w-2 h-6 bg-slate-700 rounded-full"></div>
                       <h2 className="text-xl font-semibold text-slate-900">Fiat Currencies</h2>
                       <span className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-medium">
                         {fiatWallets.length}
@@ -570,8 +570,8 @@ export default function Wallet({ userId, globalCurrency = 'PHP' }) {
                 {/* Crypto Currencies Section */}
                 {(activeType === 'all' || activeType === 'cryptocurrency') && cryptoWallets.length > 0 && (
                   <div className="bg-gradient-to-br from-orange-50/40 to-slate-50 border border-orange-100 rounded-xl p-6">
-                    <div className="mb-6 pb-4 border-b-2 border-orange-200 flex items-center gap-3">
-                      <div className="w-2 h-6 bg-orange-600 rounded-full"></div>
+                    <div className="mb-6 pb-4 border-b-2 border-slate-300 flex items-center gap-3">
+                      <div className="w-2 h-6 bg-slate-700 rounded-full"></div>
                       <h2 className="text-xl font-semibold text-slate-900">Cryptocurrencies</h2>
                       <span className="px-3 py-1 bg-orange-100 text-orange-700 rounded-full text-xs font-medium">
                         {cryptoWallets.length}
