@@ -32,52 +32,65 @@ export default function Rates() {
       setLoading(true)
       setError(null)
 
-      // Strategy 1: Try pairs view first (includes canonical and bidirectional pairs)
-      let pairsData = []
-      const { data: allPairsData, error: pairsError } = await supabase
-        .from('pairs')
-        .select('from_currency, to_currency, rate, updated_at, pair_direction')
+      // Fetch rates directly from source tables: currency_rates (fiat) and cryptocurrency_rates (crypto)
+      // This is more efficient than using the unified pairs table
+      const [currencyRatesRes, cryptoRatesRes] = await Promise.all([
+        supabase
+          .from('currency_rates')
+          .select('from_currency, to_currency, rate, updated_at'),
+        supabase
+          .from('cryptocurrency_rates')
+          .select('from_currency, to_currency, rate, updated_at')
+      ])
 
-      if (pairsError) {
-        console.error('Error fetching pairs:', pairsError)
-        throw pairsError
+      if (currencyRatesRes.error) {
+        console.error('Error fetching currency_rates:', currencyRatesRes.error)
+        throw currencyRatesRes.error
       }
 
-      pairsData = allPairsData || []
-      console.log(`📥 Fetched ${pairsData?.length || 0} pairs from public.pairs (including canonical & bidirectional)`)
-      setAllPairs(pairsData || [])
+      if (cryptoRatesRes.error) {
+        console.error('Error fetching cryptocurrency_rates:', cryptoRatesRes.error)
+        throw cryptoRatesRes.error
+      }
 
-      // Get unique currency codes from pairs
+      // Combine both rate sources
+      const allRatePairs = [
+        ...(currencyRatesRes.data || []),
+        ...(cryptoRatesRes.data || [])
+      ]
+
+      console.log(`📥 Fetched ${currencyRatesRes.data?.length || 0} fiat currency rates`)
+      console.log(`📥 Fetched ${cryptoRatesRes.data?.length || 0} cryptocurrency rates`)
+      console.log(`📥 Total: ${allRatePairs.length} rate pairs`)
+      setAllPairs(allRatePairs || [])
+
+      // Get unique currency codes from all rates
       const codes = new Set()
-      if (pairsData) {
-        pairsData.forEach(pair => {
-          if (pair.from_currency) codes.add(pair.from_currency)
-          if (pair.to_currency) codes.add(pair.to_currency)
-        })
-      }
+      allRatePairs.forEach(pair => {
+        if (pair.from_currency) codes.add(pair.from_currency)
+        if (pair.to_currency) codes.add(pair.to_currency)
+      })
 
       const codeArray = Array.from(codes)
       console.log(`📊 Found ${codeArray.length} unique currencies/cryptos`)
 
       if (codeArray.length === 0) {
         setRates([])
-        setError('No currency pairs available in database.')
+        setError('No currency rates available in database.')
         setLoading(false)
         return
       }
 
-      // Fetch metadata for all codes
+      // Fetch metadata for all codes from currencies and cryptocurrencies tables
       let allMetadata = {}
 
       const [currenciesRes, cryptosRes] = await Promise.all([
         supabase
           .from('currencies')
-          .select('code,name,type,symbol,decimals,is_default,active')
-          .in('code', codeArray),
+          .select('code,name,type,symbol,decimals,is_default,active'),
         supabase
           .from('cryptocurrencies')
           .select('code,name,coingecko_id')
-          .in('code', codeArray)
       ])
 
       if (currenciesRes.data) {
