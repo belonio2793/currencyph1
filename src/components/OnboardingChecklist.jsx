@@ -117,9 +117,6 @@ export default function OnboardingChecklist({ userId, userEmail, onTaskComplete,
 
   const incompleteTasks = tasks.filter(t => !t.completed)
 
-  // Auto-collapse after showing completion
-  const shouldShowExpanded = isExpanded || (allCompleted && progress.total > 0)
-
   return (
     <div className="bg-gradient-to-br from-slate-50 to-slate-100 rounded-xl shadow-lg border border-slate-200 overflow-hidden">
       {/* Header */}
