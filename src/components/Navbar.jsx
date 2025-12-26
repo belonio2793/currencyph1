@@ -73,27 +73,46 @@ function NavbarComponent({ activeTab, onTabChange, globalCurrency, setGlobalCurr
           <div className="flex items-center gap-3">
             <h1 className="text-2xl sm:text-2xl md:text-2xl font-light text-slate-900 tracking-wide">currency.ph</h1>
             {userEmail && (
-              <div className="ml-2 flex items-center gap-2 hidden sm:inline-flex">
-                {/* FIAT Section */}
-                <div className="flex items-center gap-2 px-3 py-2 rounded-lg">
-                  <span className="text-xs text-slate-500 font-medium uppercase tracking-wider">Fiat</span>
-                  <span className="font-semibold text-black text-xs sm:text-sm">
-                    {formatNumber(totalBalanceConverted || 0)} {globalCurrency}
-                  </span>
-                </div>
-
-                {/* CRYPTO Section */}
-                <div className="flex items-center gap-2 px-3 py-2 rounded-lg">
-                  <span className="text-xs text-slate-500 font-medium uppercase tracking-wider">Crypto</span>
-                  <span className="font-semibold text-black text-xs sm:text-sm">
+              <div className="ml-2 hidden sm:inline-block">
+                <div className="flex flex-col gap-1">
+                  <p className="text-xs text-slate-500 font-medium uppercase tracking-wider">Total User Holdings Value</p>
+                  <p className="text-3xl font-light text-black">
                     {loadingConsolidated ? (
-                      <span className="text-slate-400 italic">loading...</span>
+                      <span className="text-slate-400">loading...</span>
                     ) : consolidatedHoldingsInCrypto !== null && consolidatedHoldingsInCrypto !== undefined ? (
-                      <>{formatNumber(consolidatedHoldingsInCrypto.toFixed(8))} {globalCryptocurrency}</>
+                      formatNumber(consolidatedHoldingsInCrypto.toFixed(8))
                     ) : (
-                      <span className="text-slate-400 italic">0.00 {globalCryptocurrency}</span>
+                      formatNumber(0)
                     )}
-                  </span>
+                  </p>
+                  <p className="text-sm text-slate-600">
+                    {globalCryptocurrency} • All Assets Combined
+                  </p>
+                  <div className="flex gap-6 mt-2">
+                    <div>
+                      <p className="text-xs text-slate-500 font-medium uppercase tracking-wider mb-1">Fiat Holdings</p>
+                      <p className="text-lg font-semibold text-black">
+                        {formatNumber(totalBalanceConverted || 0)} {globalCurrency}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-slate-500 font-medium uppercase tracking-wider mb-1">Crypto Holdings</p>
+                      <p className="text-lg font-semibold text-black">
+                        {loadingConsolidated ? (
+                          <span className="text-slate-400 italic">loading...</span>
+                        ) : totalCryptoBalancePHP !== null && totalCryptoBalancePHP !== undefined && totalCryptoBalancePHP > 0 ? (
+                          <>
+                            {(() => {
+                              const result = (totalCryptoBalancePHP / (consolidatedHoldingsInCrypto && consolidatedHoldingsInCrypto > 0 ? (Number(totalBalanceConverted || 0) + totalCryptoBalancePHP) / consolidatedHoldingsInCrypto : 1)).toFixed(8)
+                              return isNaN(result) ? '0' : formatNumber(result)
+                            })()} {globalCryptocurrency}
+                          </>
+                        ) : (
+                          <span className="text-slate-400">0 {globalCryptocurrency}</span>
+                        )}
+                      </p>
+                    </div>
+                  </div>
                 </div>
               </div>
             )}
