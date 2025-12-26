@@ -412,9 +412,12 @@ export default function Rates() {
             <div className="lg:col-span-2 space-y-6">
               {/* Converter Card */}
               <div className="bg-white rounded-2xl shadow-lg p-6 sm:p-8 border border-slate-200">
-                <h2 className="text-xl sm:text-2xl font-semibold text-slate-900 mb-6">Currency Converter</h2>
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="text-3xl">💱</div>
+                  <h2 className="text-xl sm:text-2xl font-semibold text-slate-900">Currency Converter</h2>
+                </div>
 
-                <div className="space-y-6">
+                <div className="space-y-4">
                   {/* From Currency */}
                   <SearchableSelect
                     value={selectedFrom}
@@ -432,9 +435,26 @@ export default function Rates() {
                       min="0"
                       value={amount}
                       onChange={(e) => setAmount(e.target.value)}
-                      className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-lg"
+                      className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-lg font-medium"
                       placeholder="0.00"
                     />
+                  </div>
+
+                  {/* Swap Button */}
+                  <div className="flex justify-center">
+                    <button
+                      onClick={() => {
+                        const temp = selectedFrom
+                        setSelectedFrom(selectedTo)
+                        setSelectedTo(temp)
+                      }}
+                      className="p-2 bg-slate-100 hover:bg-slate-200 rounded-full transition text-slate-700 font-semibold"
+                      title="Swap currencies"
+                    >
+                      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16V4m0 0L3 8m0 0l4 4m10-4v12m0 0l4-4m0 0l-4-4" />
+                      </svg>
+                    </button>
                   </div>
 
                   {/* To Currency */}
@@ -447,14 +467,24 @@ export default function Rates() {
 
                   {/* Result */}
                   {result && !result.error && (
-                    <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg p-6 border border-blue-200">
-                      <p className="text-sm text-slate-600 mb-2">Result</p>
-                      <div className="text-4xl font-bold text-blue-600 mb-2">
-                        {result.amount} {selectedTo}
+                    <div className="bg-gradient-to-br from-emerald-50 to-teal-50 rounded-xl p-6 border-2 border-emerald-200 mt-6">
+                      <p className="text-xs font-semibold text-emerald-700 mb-3 uppercase tracking-wider">Conversion Result</p>
+                      <div className="flex items-baseline justify-between mb-3">
+                        <div>
+                          <p className="text-5xl font-bold text-emerald-600 mb-1">
+                            {result.amount}
+                          </p>
+                          <p className="text-lg font-semibold text-slate-700">
+                            {selectedTo}
+                          </p>
+                        </div>
+                        <div className="text-center">
+                          <p className="text-sm text-slate-600 mb-1">Exchange Rate</p>
+                          <p className="text-lg font-mono font-semibold text-slate-900">
+                            1 {selectedFrom} = {formatNumber(result.rate, toCurrency?.metadata?.decimals || 2)}
+                          </p>
+                        </div>
                       </div>
-                      <p className="text-sm text-slate-600">
-                        1 {selectedFrom} = {formatNumber(result.rate, toCurrency?.metadata?.decimals || 2)} {selectedTo}
-                      </p>
                     </div>
                   )}
                 </div>
