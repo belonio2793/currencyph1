@@ -774,17 +774,17 @@ export default function Rates() {
                     <span className="text-sm font-medium text-slate-700">All Currencies</span>
                     <span className="text-lg font-bold text-slate-900">{rates.length}</span>
                   </div>
-                  <div className="flex justify-between items-center p-3 bg-blue-50 rounded-lg">
-                    <span className="text-sm font-medium text-blue-700 flex items-center gap-1">
+                  <div className="flex justify-between items-center p-3 bg-slate-100 rounded-lg">
+                    <span className="text-sm font-medium text-slate-700 flex items-center gap-1">
                       <span>💵</span> FIAT
                     </span>
-                    <span className="text-lg font-bold text-blue-900">{rates.filter(r => r.metadata?.type === 'currency').length}</span>
+                    <span className="text-lg font-bold text-slate-900">{rates.filter(r => r.metadata?.type === 'currency').length}</span>
                   </div>
-                  <div className="flex justify-between items-center p-3 bg-orange-50 rounded-lg">
-                    <span className="text-sm font-medium text-orange-700 flex items-center gap-1">
+                  <div className="flex justify-between items-center p-3 bg-slate-100 rounded-lg">
+                    <span className="text-sm font-medium text-slate-700 flex items-center gap-1">
                       <span>₿</span> Crypto
                     </span>
-                    <span className="text-lg font-bold text-orange-900">{rates.filter(r => r.metadata?.type === 'cryptocurrency').length}</span>
+                    <span className="text-lg font-bold text-slate-900">{rates.filter(r => r.metadata?.type === 'cryptocurrency').length}</span>
                   </div>
                 </div>
               </div>
