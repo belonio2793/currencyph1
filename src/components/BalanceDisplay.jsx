@@ -53,12 +53,12 @@ export default function BalanceDisplay({ userId }) {
   }
 
   return (
-    <div className="bg-white border border-gray-200 p-6 mb-6">
-      <p className="text-gray-600 text-xs mb-1">Balance</p>
-      <p className="text-3xl font-bold text-black">
+    <div className="bg-white border border-slate-300 p-6 mb-6">
+      <p className="text-slate-600 text-xs mb-1">Balance</p>
+      <p className="text-sm font-mono font-semibold text-slate-900 truncate">
         {balance !== null ? balance.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '0'}
       </p>
-      <p className="text-gray-500 text-xs mt-2">Real-time via Supabase</p>
+      <p className="text-slate-500 text-xs mt-2">Real-time via Supabase</p>
     </div>
   )
 }
