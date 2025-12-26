@@ -111,7 +111,7 @@ export default function Rates() {
       })
 
       setCurrencies(allMetadata)
-      console.log(`📋 Loaded metadata for ${Object.keys(allMetadata).length} currencies/cryptos`)
+      console.log(`List Loaded metadata for ${Object.keys(allMetadata).length} currencies and cryptos`)
 
       // Build rates list - one entry per unique currency/crypto code
       const ratesByCode = {}
