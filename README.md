@@ -468,20 +468,11 @@ Currency.ph includes a real-world map of the Philippines using:
 
 ### Set Up Maps
 
-Add these keys to `.env.local`:
-
-```bash
-VITE_MAPTILER_API_KEY=your-key-here
-VITE_GOOGLE_API_KEY=your-key-here
-VITE_SUPABASE_URL=your-project.supabase.co
-VITE_SUPABASE_ANON_KEY=your-anon-key
-```
-
-Then:
-
-1. Start dev server: `yarn dev`
-2. Click the "Nearby" button
-3. Use "Street View" (top-right) to see panoramas when available
+1. Get API keys from [MapTiler](https://www.maptiler.com/) and [Google Cloud](https://console.cloud.google.com/)
+2. Add your keys to `.env.local` (see `.env.example` for required variables)
+3. Start dev server: `yarn dev`
+4. Click the "Nearby" button
+5. Use "Street View" (top-right) to see panoramas when available
 
 See **[Maps & APIs Documentation](./docs/PLAY_CURRENCY_GOOGLE_APIS.md)** for details.
 
