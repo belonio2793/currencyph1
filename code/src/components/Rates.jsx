@@ -683,8 +683,8 @@ export default function Rates() {
                       >
                         <div className="flex items-center justify-between mb-2">
                           <div className="flex items-center gap-2 flex-1">
-                            <span className="text-xl">
-                              {curr.metadata?.type === 'cryptocurrency' ? '₿' : '💵'}
+                            <span className="text-xs font-semibold text-slate-600">
+                              {curr.metadata?.type === 'cryptocurrency' ? 'CRY' : 'FIA'}
                             </span>
                             <div className="min-w-0">
                               <div className="font-semibold text-slate-900">{curr.code}</div>
@@ -696,10 +696,10 @@ export default function Rates() {
                               e.stopPropagation()
                               toggleFavorite(curr.code)
                             }}
-                            className="text-yellow-400 hover:text-yellow-500 text-lg ml-2 flex-shrink-0"
+                            className="text-xs font-semibold px-2 py-1 rounded bg-yellow-200 text-yellow-900 hover:bg-yellow-300 ml-2 flex-shrink-0"
                             title="Remove from favorites"
                           >
-                            ★
+                            DEL
                           </button>
                         </div>
                         <div className="text-sm font-mono font-semibold text-slate-900 ml-7">
