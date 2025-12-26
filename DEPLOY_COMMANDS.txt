@@ -1,0 +1,69 @@
+================================================================================
+DEPOSIT ID TRACKING - DEPLOYMENT COMMANDS
+================================================================================
+
+Step 1: Apply migration 0121
+================================================================================
+psql < supabase/migrations/0121_add_deposit_id_to_wallet_transactions.sql
+
+
+Step 2: Apply migration 0122
+================================================================================
+psql < supabase/migrations/0122_update_delete_trigger_with_deposit_id.sql
+
+
+================================================================================
+VERIFICATION COMMANDS
+================================================================================
+
+Verify column exists:
+SELECT column_name, data_type 
+FROM information_schema.columns 
+WHERE table_name = 'wallet_transactions' AND column_name = 'deposit_id';
+
+Verify foreign key constraint:
+SELECT constraint_name 
+FROM information_schema.table_constraints 
+WHERE table_name = 'wallet_transactions' 
+  AND constraint_name = 'fk_wallet_transactions_deposit_id';
+
+Verify indexes exist:
+SELECT indexname 
+FROM pg_indexes 
+WHERE tablename = 'wallet_transactions' 
+  AND indexname LIKE 'idx_wallet_tx_deposit%';
+
+Check function updated:
+SELECT routine_name 
+FROM information_schema.routines 
+WHERE routine_name = 'record_ledger_transaction';
+
+
+================================================================================
+QUICK TEST
+================================================================================
+
+Count deposit-linked transactions:
+SELECT COUNT(*) as transaction_count 
+FROM wallet_transactions 
+WHERE deposit_id IS NOT NULL;
+
+Find deposit_approved transactions:
+SELECT id, wallet_id, type, deposit_id 
+FROM wallet_transactions 
+WHERE type = 'deposit_approved' AND deposit_id IS NOT NULL
+LIMIT 5;
+
+
+================================================================================
+ROLLBACK (if needed - NOT RECOMMENDED)
+================================================================================
+
+Only if migrations fail and you need to rollback:
+
+DROP INDEX IF EXISTS idx_wallet_tx_deposit_type;
+DROP INDEX IF EXISTS idx_wallet_tx_deposit_id;
+ALTER TABLE wallet_transactions DROP CONSTRAINT IF EXISTS fk_wallet_transactions_deposit_id;
+ALTER TABLE wallet_transactions DROP COLUMN IF EXISTS deposit_id;
+
+================================================================================
