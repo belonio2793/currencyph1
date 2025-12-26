@@ -691,9 +691,9 @@ export default function SendMoney({ userId }) {
                       <div className="mb-6 pb-6 border-b border-slate-200">
                         <p className="text-xs font-medium text-slate-600 uppercase tracking-wider mb-3">Amount & Conversion</p>
                         <div className="space-y-3">
-                          <div className="flex justify-between items-center p-3 bg-slate-50 rounded-lg">
+                          <div className="flex justify-between items-center p-3 bg-slate-50 rounded-lg gap-4 flex-wrap">
                             <span className="text-slate-600">Amount Sending</span>
-                            <span className="font-medium text-lg text-slate-900">{getCurrencySymbol(selectedSender)}{formatNumber(parseFloat(amount) || 0)}</span>
+                            <span className="font-medium text-lg text-slate-900 break-words">{getCurrencySymbol(selectedSender)}{formatNumber(parseFloat(amount) || 0)}</span>
                           </div>
 
                           {selectedSender !== recipientCurrency && (
@@ -702,16 +702,16 @@ export default function SendMoney({ userId }) {
                                 <div className="text-xs text-slate-500 font-medium">Exchange Rate</div>
                               </div>
                               <div className="text-center py-2 px-3 bg-amber-50 border border-amber-200 rounded-lg">
-                                <p className="text-xs text-amber-700 font-medium">
+                                <p className="text-xs text-amber-700 font-medium break-words">
                                   {getCurrencySymbol(selectedSender)}1 = {getCurrencySymbol(recipientCurrency)}{exchangeRate.toFixed(4)}
                                 </p>
                               </div>
                             </>
                           )}
 
-                          <div className="flex justify-between items-center p-3 bg-emerald-50 rounded-lg border border-emerald-200">
+                          <div className="flex justify-between items-center p-3 bg-emerald-50 rounded-lg border border-emerald-200 gap-4 flex-wrap">
                             <span className="text-emerald-700 font-medium">Recipient Receives</span>
-                            <span className="font-semibold text-lg text-emerald-700">{getCurrencySymbol(recipientCurrency)}{formatNumber(parseFloat(receiverAmount) || 0)}</span>
+                            <span className="font-semibold text-lg text-emerald-700 break-words">{getCurrencySymbol(recipientCurrency)}{formatNumber(parseFloat(receiverAmount) || 0)}</span>
                           </div>
                         </div>
                       </div>
@@ -721,13 +721,13 @@ export default function SendMoney({ userId }) {
                     <div className="mb-6 pb-6 border-b border-slate-200">
                       <p className="text-xs font-medium text-slate-600 uppercase tracking-wider mb-3">Fees & Charges</p>
                       <div className="space-y-2 text-sm">
-                        <div className="flex justify-between items-center p-2">
+                        <div className="flex justify-between items-center p-2 gap-4 flex-wrap">
                           <span className="text-slate-600">Transfer Fee (1%)</span>
-                          <span className="font-medium text-slate-900">{getCurrencySymbol(selectedSender)}{formatNumber((parseFloat(amount) * 0.01) || 0)}</span>
+                          <span className="font-medium text-slate-900 break-words">{getCurrencySymbol(selectedSender)}{formatNumber((parseFloat(amount) * 0.01) || 0)}</span>
                         </div>
-                        <div className="flex justify-between items-center p-3 bg-amber-50 rounded-lg border border-amber-200 mt-2">
+                        <div className="flex justify-between items-center p-3 bg-amber-50 rounded-lg border border-amber-200 mt-2 gap-4 flex-wrap">
                           <span className="font-medium text-amber-700">Total Debit</span>
-                          <span className="font-semibold text-amber-700">{getCurrencySymbol(selectedSender)}{formatNumber((parseFloat(amount) * 1.01) || 0)}</span>
+                          <span className="font-semibold text-amber-700 break-words">{getCurrencySymbol(selectedSender)}{formatNumber((parseFloat(amount) * 1.01) || 0)}</span>
                         </div>
                       </div>
                     </div>
