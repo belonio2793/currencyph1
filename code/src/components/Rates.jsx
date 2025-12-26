@@ -493,12 +493,12 @@ export default function Rates() {
               {/* Rates Table */}
               <div className="bg-white rounded-2xl shadow-lg p-6 sm:p-8 border border-slate-200">
                 {/* Last Updated Info Banner */}
-                <div className="mb-6 p-4 bg-gradient-to-r from-blue-50 to-cyan-50 border border-blue-200 rounded-lg">
+                <div className="mb-6 p-4 bg-slate-50 border border-slate-300 rounded-lg">
                   <div className="flex items-center justify-between flex-wrap gap-2">
                     <div>
                       <p className="text-sm text-slate-900">
                         <span className="font-semibold">📊 Last Fetched:</span>{' '}
-                        <span className="text-blue-700">{formatFullDateTime(lastUpdated)}</span>
+                        <span className="text-slate-700">{formatFullDateTime(lastUpdated)}</span>
                       </p>
                       {lastUpdated && (
                         <p className="text-xs text-slate-600 mt-1">
