@@ -577,26 +577,10 @@ export default function Rates() {
               <div className="bg-slate-50 rounded-2xl shadow-lg p-6 border border-slate-200 space-y-4">
                 <h3 className="text-lg font-semibold text-slate-900">Information</h3>
 
-                {fromCurrency && (
-                  <div className="pb-4 border-b border-slate-200">
-                    <p className="text-xs text-slate-600 font-medium mb-1">Base Currency</p>
-                    <p className="text-sm font-semibold text-slate-900">{fromCurrency.metadata?.name}</p>
-                    <p className="text-xs text-slate-500 mt-1">{fromCurrency.code}</p>
-                  </div>
-                )}
-
-                {toCurrency && (
-                  <div className="pb-4 border-b border-slate-200">
-                    <p className="text-xs text-slate-600 font-medium mb-1">Target Currency</p>
-                    <p className="text-sm font-semibold text-slate-900">{toCurrency.metadata?.name}</p>
-                    <p className="text-xs text-slate-500 mt-1">{toCurrency.code}</p>
-                  </div>
-                )}
-
                 <div>
                   <p className="text-xs text-slate-600 font-medium mb-1">Data Source</p>
                   <p className="text-xs text-slate-500">
-                    Real-time rates from fiat and cryptocurrency markets
+                    Real-time rates from public.pairs database (fiat and cryptocurrency markets)
                   </p>
                 </div>
 
