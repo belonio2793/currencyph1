@@ -681,7 +681,7 @@ export default function ReceiveMoney({ userId, globalCurrency = 'PHP' }) {
                   <div className="flex justify-between items-start">
                     <span className="text-sm font-medium text-slate-700">Amount:</span>
                     <span className="font-semibold text-slate-900">
-                      {getCurrencySymbol(selectedCurrency)}{formatNumber(amount)}
+                      {formatNumber(amount)} {selectedCurrency.toUpperCase()}
                     </span>
                   </div>
                   <div className="flex justify-between items-start">
