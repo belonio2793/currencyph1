@@ -1379,7 +1379,8 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
                     // Get original currency and converted amount from notes or columns
                     const originalCurrency = notesMeta.original_currency || deposit.original_currency || deposit.currency_code
                     const convertedAmount = notesMeta.converted_amount || deposit.converted_amount
-                    const walletCurrency = notesMeta.wallet_currency || deposit.wallet_currency || deposit.currency_code
+                    const depositWallet = wallets.find(w => w.id === deposit.wallet_id)
+                    const walletCurrency = notesMeta.wallet_currency || deposit.wallet_currency || depositWallet?.currency_code || deposit.currency_code
 
                     // Helper function to format numbers with proper decimal/thousand separators
                     const formatAmount = (num, currency = null) => {
