@@ -413,7 +413,7 @@ export default function Rates() {
               {/* Converter Card */}
               <div className="bg-white rounded-2xl shadow-lg p-6 sm:p-8 border border-slate-200">
                 <div className="flex items-center gap-3 mb-6">
-                  <div className="text-3xl">💱</div>
+                  <div className="px-3 py-2 bg-blue-100 rounded-lg text-blue-700 font-bold">FX</div>
                   <h2 className="text-xl sm:text-2xl font-semibold text-slate-900">Currency Converter</h2>
                 </div>
 
