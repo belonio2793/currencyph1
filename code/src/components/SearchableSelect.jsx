@@ -306,9 +306,9 @@ export default function SearchableSelect({ value, onChange, options = [], label 
                         }}
                         className={`w-full text-left px-4 py-3 transition border-l-4 ${
                           flatOptions[highlightedIndex]?.code === option.code
-                            ? 'bg-orange-100 border-l-orange-500'
+                            ? 'bg-slate-200 border-l-slate-600'
                             : value === option.code
-                            ? 'bg-orange-50 border-l-orange-400'
+                            ? 'bg-slate-100 border-l-slate-500'
                             : 'border-l-transparent hover:bg-slate-50'
                         }`}
                         type="button"
@@ -321,7 +321,7 @@ export default function SearchableSelect({ value, onChange, options = [], label 
                             </span>
                           </div>
                           {value === option.code && (
-                            <svg className="w-5 h-5 text-orange-600 flex-shrink-0 ml-2" fill="currentColor" viewBox="0 0 20 20">
+                            <svg className="w-5 h-5 text-slate-900 flex-shrink-0 ml-2" fill="currentColor" viewBox="0 0 20 20">
                               <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                             </svg>
                           )}
