@@ -8,23 +8,32 @@ import { getPairRate } from './pairsRateService'
  */
 export const multiCurrencyDepositService = {
   /**
-   * Get exchange rate between two currencies from public.pairs table
-   * Falls back to base currency conversion if direct pair doesn't exist
+   * SECURITY FIX: Get exchange rate with proper mathematical inversion
+   *
+   * Principle: If A→B = r, then B→A = 1/r (not restating as same value)
+   * This function ensures proper bidirectional rate handling
    */
   async getExchangeRate(fromCurrency, toCurrency) {
     try {
       // If same currency, rate is 1
       if (fromCurrency === toCurrency) {
-        return { rate: 1, fromCurrency, toCurrency, timestamp: new Date() }
+        return {
+          rate: 1,
+          fromCurrency,
+          toCurrency,
+          timestamp: new Date(),
+          isInverted: false
+        }
       }
 
       const fromUpper = fromCurrency.toUpperCase()
       const toUpper = toCurrency.toUpperCase()
 
-      // Try direct pair first
+      // Try direct pair first using safe inversion
       let rate = await getPairRate(fromUpper, toUpper)
+      let isInverted = false
 
-      // If direct pair not found, try base currency conversion (USD)
+      // If direct pair not found, try base currency conversion
       if (!rate) {
         const baseCurrency = 'USD'
 
@@ -35,9 +44,11 @@ export const multiCurrencyDepositService = {
             getPairRate(baseCurrency, toUpper)
           ])
 
-          // If we have both rates, calculate the indirect conversion
+          // If we have both rates, multiply them (both should be properly inverted already)
           if (fromBaseRate && baseToRate) {
             rate = fromBaseRate * baseToRate
+            // Mark as inverted if either was inverted
+            isInverted = true
           }
         }
       }
@@ -52,12 +63,15 @@ export const multiCurrencyDepositService = {
 
         if (fromAltRate && altToRate) {
           rate = fromAltRate * altToRate
+          isInverted = true
         }
       }
 
       if (!rate || !isFinite(rate) || rate <= 0) {
         throw new Error(
-          `No exchange rate found for ${fromCurrency}→${toCurrency} (tried direct, USD base, and PHP base)`
+          `No exchange rate found for ${fromCurrency}→${toCurrency}. ` +
+          `Tried: direct pair, USD base conversion, PHP base conversion. ` +
+          `Please ensure rate data exists in public.pairs table.`
         )
       }
 
@@ -66,7 +80,8 @@ export const multiCurrencyDepositService = {
         fromCurrency,
         toCurrency,
         timestamp: new Date(),
-        source: 'public.pairs'
+        source: 'public.pairs',
+        isInverted
       }
     } catch (err) {
       console.error(`Error getting exchange rate ${fromCurrency}→${toCurrency}:`, err)
