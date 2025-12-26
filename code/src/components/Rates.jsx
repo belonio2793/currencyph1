@@ -13,8 +13,8 @@ export default function Rates() {
   const [error, setError] = useState(null)
   const [lastUpdated, setLastUpdated] = useState(new Date())
 
-  const [selectedFrom, setSelectedFrom] = useState('PHP')
-  const [selectedTo, setSelectedTo] = useState('USD')
+  const [selectedFrom, setSelectedFrom] = useState(null)
+  const [selectedTo, setSelectedTo] = useState(null)
   const [amount, setAmount] = useState('1')
   const [result, setResult] = useState(null)
 
