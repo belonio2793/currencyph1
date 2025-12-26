@@ -708,6 +708,24 @@ export const currencyAPI = {
     }
   },
 
+  // ============ Debts (from unified debts table) =========
+  async getDebts(userId) {
+    if (!userId) return []
+    try {
+      // Fetch debts directly from the debts table
+      const { data, error } = await supabase
+        .from('debts')
+        .select('id,user_id,debt_type,status,outstanding_balance,total_owed,currency_code,created_at,updated_at')
+        .eq('user_id', userId)
+        .order('created_at', { ascending: false })
+      if (error) throw error
+      return data || []
+    } catch (err) {
+      console.warn('getDebts failed:', err)
+      return []
+    }
+  },
+
   // ============ Beneficiaries =========
   async getBeneficiaries(userId) {
     if (!userId) return []
