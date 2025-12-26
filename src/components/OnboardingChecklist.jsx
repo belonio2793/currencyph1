@@ -60,12 +60,6 @@ export default function OnboardingChecklist({ userId, userEmail, onTaskComplete,
     ]).finally(() => setLoading(false))
   }, [userId, loadTasks, loadShowChecklistPreference])
 
-  // Auto-expand only when all tasks are completed
-  useEffect(() => {
-    if (allCompleted && showChecklist) {
-      setIsExpanded(true)
-    }
-  }, [allCompleted, showChecklist])
 
   // Remove auto-detection to prevent unnecessary database queries
   // Tasks are now only validated when user explicitly clicks "Start"
