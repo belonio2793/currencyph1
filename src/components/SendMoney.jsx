@@ -333,8 +333,8 @@ export default function SendMoney({ userId }) {
                                 <span className="text-slate-600">Current Balance</span>
                                 <span className="font-medium font-mono text-slate-900">{formatNumber(wallet.balance || 0)}</span>
                               </div>
-                              <div className="pt-2 border-t border-blue-200">
-                                <p className="text-xs text-blue-700 font-medium mb-1">Wallet ID</p>
+                              <div className="pt-2 border-t border-slate-300">
+                                <p className="text-xs text-slate-700 font-medium mb-1">Wallet ID</p>
                                 <p className="text-xs font-mono text-slate-900 break-all bg-white p-2 rounded border border-blue-200">{wallet.id}</p>
                               </div>
                               <div className="text-xs text-slate-500 space-y-1 pt-2">
