@@ -1408,12 +1408,7 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
                           {deposit.reference_number || deposit.phone_number || '—'}
                         </td>
                         <td className="py-3 px-4">
-                          <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-                            deposit.status === 'approved' ? 'bg-emerald-100 text-emerald-700' :
-                            deposit.status === 'completed' ? 'bg-emerald-100 text-emerald-700' :
-                            deposit.status === 'rejected' ? 'bg-red-100 text-red-700' :
-                            'bg-yellow-100 text-yellow-700'
-                          }`}>
+                          <span className="px-3 py-1 rounded-full text-xs font-medium bg-slate-200 text-slate-900">
                             {deposit.status.charAt(0).toUpperCase() + deposit.status.slice(1)}
                           </span>
                         </td>
