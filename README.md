@@ -172,35 +172,16 @@ currency-ph/
 
 ### Required Environment Variables
 
-```bash
-# Supabase (your backend)
-VITE_SUPABASE_URL=https://your-project.supabase.co
-VITE_SUPABASE_ANON_KEY=your-anon-key
-VITE_SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
+See `.env.example` for a complete template.
 
-# Payments (Coins.ph)
-# Frontend
-VITE_COINS_PH_API_KEY=your-coins-ph-key
-VITE_COINS_PH_API_SECRET=your-coins-ph-secret
-# Server-side
-COINS_PH_API_KEY=your-coins-ph-key
-COINS_PH_API_SECRET=your-coins-ph-secret
+**Important:** Never commit `.env.local` or real API keys to git. Keep all keys private and secure.
 
-# Maps & Location
-VITE_MAPTILER_API_KEY=your-maptiler-key
-VITE_GOOGLE_API_KEY=your-google-api-key
+To set up your environment:
+1. Copy `.env.example` to `.env.local`
+2. Fill in your API keys (request from service providers as needed)
+3. Keep `.env.local` in your `.gitignore`
 
-# Crypto & Exchange Rates
-VITE_OPEN_EXCHANGE_RATES_API=your-exchange-rates-key
-VITE_X_API_KEY=your-grok-api-key
-
-# DIDIT Verification
-VITE_DIDIT_APP_ID=your-didit-app-id
-VITE_DIDIT_API_KEY=your-didit-api-key
-VITE_DIDIT_WORKFLOW_ID=your-didit-workflow-id
-```
-
-All keys should be kept **private** and never committed to git. Use `.env.local` for local development.
+For a complete list of all available environment variables and what each one does, refer to the `.env.example` file in the project root.
 
 ---
 
