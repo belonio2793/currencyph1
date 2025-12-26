@@ -283,14 +283,14 @@ export default function HomePage({ userId, userEmail, globalCurrency = 'PHP', se
 
       // Calculate debt sum
       let debtSum = 0
-      for (const loan of (l || [])) {
-        const amt = Number(loan.remaining_balance || loan.total_owed || 0)
+      for (const debt of (l || [])) {
+        const amt = Number(debt.outstanding_balance || debt.total_owed || 0)
         if (amt === 0) continue
-        const loanCurrency = loan.currency || loan.currency_code || globalCurrency
-        if (loanCurrency === globalCurrency) {
+        const debtCurrency = debt.currency_code || globalCurrency
+        if (debtCurrency === globalCurrency) {
           debtSum += amt
         } else {
-          const rate = rates[loanCurrency]
+          const rate = rates[debtCurrency]
           debtSum += rate ? amt * Number(rate) : 0
         }
       }
