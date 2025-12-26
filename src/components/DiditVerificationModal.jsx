@@ -3,7 +3,10 @@ import { supabase } from '../lib/supabaseClient'
 import ExpandableModal from './ExpandableModal'
 import { useDevice } from '../context/DeviceContext'
 
-const DEFAULT_DIDIT_SESSION_URL = 'https://verify.didit.me/session/0YcwjP8Jj41H'
+// Use environment variable if available, with fallback
+const DEFAULT_DIDIT_SESSION_URL =
+  import.meta.env.VITE_DIDIT_DEFAULT_SESSION_URL ||
+  'https://verify.didit.me/session/default'
 
 export default function DiditVerificationModal({ userId, onClose, onSuccess }) {
   const { isMobile } = useDevice()
