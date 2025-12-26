@@ -113,14 +113,11 @@ export async function populateTripadvisorListings(onProgress = null) {
         }
 
         try {
-          // Try API first
+          // Fetch from TripAdvisor API only
           const searchQuery = `${category} in ${city} Philippines`
-          let listings = await fetchTripAdvisorListings(searchQuery, 10)
+          const listings = await fetchTripAdvisorListings(searchQuery, 10)
 
-          // Fallback to enhanced mock data if API returns nothing
-          if (listings.length === 0) {
-            listings = generateEnhancedMockAttractionsForCity(city, category)
-          }
+          // Skip if API returns no results (no mock data fallback)
 
           // Add to map (key is tripadvisor_id to avoid duplicates)
           for (const listing of listings) {
