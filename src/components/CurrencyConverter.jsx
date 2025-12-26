@@ -281,11 +281,11 @@ export default function CurrencyConverter({ rates = [] }) {
         <div className="grid grid-cols-2 gap-4 pt-4 border-t border-slate-200">
           <div className="flex items-center gap-2">
             <div className="w-3 h-3 bg-blue-100 rounded-full border border-blue-300"></div>
-            <span className="text-xs text-slate-600">Fiat Currencies ({fiatCurrencies.length})</span>
+            <span className="text-xs text-slate-600">Fiat ({fiatCurrencies.length})</span>
           </div>
           <div className="flex items-center gap-2">
             <div className="w-3 h-3 bg-orange-100 rounded-full border border-orange-300"></div>
-            <span className="text-xs text-slate-600">Cryptocurrencies ({cryptoCurrencies.length})</span>
+            <span className="text-xs text-slate-600">Crypto ({cryptoCurrencies.length})</span>
           </div>
         </div>
       </div>
