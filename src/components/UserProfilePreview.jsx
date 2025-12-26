@@ -34,9 +34,9 @@ export default function UserProfilePreview({ userId }) {
           .from('users')
           .select('id, full_name, username, email, display_name_type, profile_picture_url, created_at')
           .eq('id', user.id)
-          .single()
+          .maybeSingle()
 
-        if (userError && userError.code !== 'PGRST116') throw userError
+        if (userError) throw userError
 
         setUserProfile({
           id: user.id,
