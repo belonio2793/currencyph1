@@ -33,36 +33,66 @@ export default function Rates() {
       setLoading(true)
       setError(null)
 
-      // Fetch rates directly from source tables: currency_rates (fiat) and cryptocurrency_rates (crypto)
-      // This is more efficient than using the unified pairs table
-      const [currencyRatesRes, cryptoRatesRes] = await Promise.all([
+      // Hybrid approach: Use specialized tables + public.pairs as fallback
+      // This ensures we get all rates: fiat, crypto, and anything else
+      const [currencyRatesRes, cryptoRatesRes, pairsRes] = await Promise.all([
         supabase
           .from('currency_rates')
           .select('from_currency, to_currency, rate, updated_at'),
         supabase
           .from('cryptocurrency_rates')
+          .select('from_currency, to_currency, rate, updated_at'),
+        supabase
+          .from('pairs')
           .select('from_currency, to_currency, rate, updated_at')
       ])
 
       if (currencyRatesRes.error) {
-        console.error('Error fetching currency_rates:', currencyRatesRes.error)
-        throw currencyRatesRes.error
+        console.warn('⚠️ Error fetching currency_rates:', currencyRatesRes.error.message)
       }
 
       if (cryptoRatesRes.error) {
-        console.error('Error fetching cryptocurrency_rates:', cryptoRatesRes.error)
-        throw cryptoRatesRes.error
+        console.warn('⚠️ Error fetching cryptocurrency_rates:', cryptoRatesRes.error.message)
       }
 
-      // Combine both rate sources
-      const allRatePairs = [
-        ...(currencyRatesRes.data || []),
-        ...(cryptoRatesRes.data || [])
-      ]
+      if (pairsRes.error) {
+        console.warn('⚠️ Error fetching public.pairs:', pairsRes.error.message)
+      }
+
+      // Combine all rate sources (with deduplication)
+      // Priority: currency_rates → cryptocurrency_rates → public.pairs
+      const seenPairs = new Set()
+      const allRatePairs = []
+
+      // Add fiat currency rates (priority 1)
+      (currencyRatesRes.data || []).forEach(pair => {
+        const key = `${pair.from_currency}-${pair.to_currency}`
+        seenPairs.add(key)
+        allRatePairs.push(pair)
+      })
+
+      // Add crypto rates (priority 2, skip if already in currency_rates)
+      (cryptoRatesRes.data || []).forEach(pair => {
+        const key = `${pair.from_currency}-${pair.to_currency}`
+        if (!seenPairs.has(key)) {
+          seenPairs.add(key)
+          allRatePairs.push(pair)
+        }
+      })
+
+      // Add public.pairs as fallback (priority 3, skip if already added)
+      (pairsRes.data || []).forEach(pair => {
+        const key = `${pair.from_currency}-${pair.to_currency}`
+        if (!seenPairs.has(key)) {
+          seenPairs.add(key)
+          allRatePairs.push(pair)
+        }
+      })
 
       console.log(`📥 Fetched ${currencyRatesRes.data?.length || 0} fiat currency rates`)
       console.log(`📥 Fetched ${cryptoRatesRes.data?.length || 0} cryptocurrency rates`)
-      console.log(`📥 Total: ${allRatePairs.length} rate pairs`)
+      console.log(`📥 Fetched ${pairsRes.data?.length || 0} pairs (fallback)`)
+      console.log(`📥 Total combined (deduplicated): ${allRatePairs.length} rate pairs`)
       setAllPairs(allRatePairs || [])
 
       // Get unique currency codes from all rates
