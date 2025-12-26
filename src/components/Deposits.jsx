@@ -1381,13 +1381,15 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
                     const walletCurrency = notesMeta.wallet_currency || deposit.wallet_currency || deposit.currency_code
 
                     // Helper function to format numbers with proper decimal/thousand separators
-                    const formatAmount = (num) => {
+                    const formatAmount = (num, currency = null) => {
                       if (!num && num !== 0) return '—'
                       const numValue = typeof num === 'string' ? parseFloat(num) : num
                       if (isNaN(numValue)) return '—'
+                      // Use 8 decimals for crypto, 2 for fiat
+                      const maxDecimals = currency && isCryptoCurrency(currency) ? 8 : 2
                       return numValue.toLocaleString('en-US', {
                         minimumFractionDigits: 2,
-                        maximumFractionDigits: 2
+                        maximumFractionDigits: maxDecimals
                       })
                     }
 
