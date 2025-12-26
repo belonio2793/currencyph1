@@ -565,23 +565,15 @@ export const currencyAPI = {
     const toCode = to.toUpperCase()
 
     try {
-      // Fetch from public.pairs (unified rate table for all currencies and cryptos)
-      const { data, error } = await supabase
-        .from('pairs')
-        .select('rate')
-        .eq('from_currency', fromCode)
-        .eq('to_currency', toCode)
-        .maybeSingle()
+      // SECURITY FIX: Use safe rate lookup with proper inversion (1/rate)
+      const { getPairRate } = await import('./pairsRateService.js')
+      const rate = await getPairRate(fromCode, toCode)
 
-      if (!error && data && typeof data.rate !== 'undefined') {
-        const rate = Number(data.rate)
-        // Validate rate is not 0.00 or NaN
-        if (isFinite(rate) && rate > 0) {
-          console.debug(`Rate from public.pairs: ${fromCode}/${toCode} = ${rate}`)
-          return rate
-        } else {
-          console.warn(`Invalid rate from public.pairs for ${fromCode}/${toCode}: ${rate}`)
-        }
+      if (rate && typeof rate === 'number' && isFinite(rate) && rate > 0) {
+        console.debug(`Rate from public.pairs (safe inversion): ${fromCode}/${toCode} = ${rate}`)
+        return rate
+      } else {
+        console.debug(`No rate found in public.pairs for ${fromCode}/${toCode}`)
       }
     } catch (e) {
       console.warn('Error fetching from public.pairs:', e.message)
