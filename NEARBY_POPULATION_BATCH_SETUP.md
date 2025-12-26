@@ -129,8 +129,8 @@ CX=37b25d5fc2be342d7
 
 ✅ **Supabase Credentials**: Configured
 ```
-VITE_PROJECT_URL=https://corcofbmafdxehvlbesx.supabase.co
-SUPABASE_SERVICE_ROLE_KEY=[configured]
+VITE_PROJECT_URL=your-supabase-url
+SUPABASE_SERVICE_ROLE_KEY=[your-service-role-key]
 ```
 
 ✅ **Dependencies**: All available
