@@ -727,41 +727,44 @@ export default function Rates() {
               </div>
 
               {/* Info Card */}
-              <div className="bg-slate-50 rounded-2xl shadow-lg p-6 border border-slate-200 space-y-4">
-                <h3 className="text-lg font-semibold text-slate-900">Information</h3>
+              <div className="bg-gradient-to-br from-slate-50 to-slate-100 rounded-2xl shadow-lg p-6 border border-slate-200 space-y-4">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="text-2xl">ℹ️</span>
+                  <h3 className="text-lg font-semibold text-slate-900">Information</h3>
+                </div>
 
                 {fromCurrency && (
-                  <div className="pb-4 border-b border-slate-200">
-                    <p className="text-xs text-slate-600 font-medium mb-1">Base Currency</p>
+                  <div className="pb-4 border-b border-slate-300">
+                    <p className="text-xs text-slate-600 font-medium mb-1 uppercase tracking-wider">From Currency</p>
                     <p className="text-sm font-semibold text-slate-900">{fromCurrency.metadata?.name}</p>
                     <p className="text-xs text-slate-500 mt-1">{fromCurrency.code}</p>
                   </div>
                 )}
 
                 {toCurrency && (
-                  <div className="pb-4 border-b border-slate-200">
-                    <p className="text-xs text-slate-600 font-medium mb-1">Target Currency</p>
+                  <div className="pb-4 border-b border-slate-300">
+                    <p className="text-xs text-slate-600 font-medium mb-1 uppercase tracking-wider">To Currency</p>
                     <p className="text-sm font-semibold text-slate-900">{toCurrency.metadata?.name}</p>
                     <p className="text-xs text-slate-500 mt-1">{toCurrency.code}</p>
                   </div>
                 )}
 
-                <div>
-                  <p className="text-xs text-slate-600 font-medium mb-1">Data Source</p>
+                <div className="pb-4 border-b border-slate-300">
+                  <p className="text-xs text-slate-600 font-medium mb-1 uppercase tracking-wider">Data Source</p>
                   <p className="text-xs text-slate-500">
-                    Real-time rates from fiat and cryptocurrency markets
+                    ✓ Real-time rates from fiat & crypto markets
                   </p>
                 </div>
 
-                <div>
-                  <p className="text-xs text-slate-600 font-medium mb-1">Coverage</p>
+                <div className="pb-4 border-b border-slate-300">
+                  <p className="text-xs text-slate-600 font-medium mb-1 uppercase tracking-wider">Coverage</p>
                   <p className="text-xs text-slate-500">
-                    {rates.length} currencies tracked
+                    {rates.length} currencies tracked globally
                   </p>
                 </div>
 
-                <div className="pt-2 border-t border-slate-200">
-                  <p className="text-xs text-slate-600 font-medium mb-1">Last Updated</p>
+                <div className="pt-2">
+                  <p className="text-xs text-slate-600 font-medium mb-1 uppercase tracking-wider">Last Updated</p>
                   <p className="text-xs text-slate-500">
                     {formatLastUpdated(lastUpdated)}
                   </p>
@@ -770,19 +773,26 @@ export default function Rates() {
 
               {/* Quick Stats */}
               <div className="bg-white rounded-2xl shadow-lg p-6 border border-slate-200">
-                <h3 className="text-lg font-semibold text-slate-900 mb-4">Quick Stats</h3>
-                <div className="space-y-3">
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-slate-600">Total Currencies</span>
-                    <span className="text-lg font-semibold text-slate-900">{rates.length}</span>
+                <div className="flex items-center gap-2 mb-4">
+                  <span className="text-2xl">📊</span>
+                  <h3 className="text-lg font-semibold text-slate-900">Overview</h3>
+                </div>
+                <div className="space-y-4">
+                  <div className="flex justify-between items-center p-3 bg-slate-50 rounded-lg">
+                    <span className="text-sm font-medium text-slate-700">All Currencies</span>
+                    <span className="text-lg font-bold text-slate-900">{rates.length}</span>
                   </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-slate-600">Currencies</span>
-                    <span className="text-lg font-semibold text-slate-900">{rates.filter(r => r.metadata?.type === 'currency').length}</span>
+                  <div className="flex justify-between items-center p-3 bg-blue-50 rounded-lg">
+                    <span className="text-sm font-medium text-blue-700 flex items-center gap-1">
+                      <span>💵</span> FIAT
+                    </span>
+                    <span className="text-lg font-bold text-blue-900">{rates.filter(r => r.metadata?.type === 'currency').length}</span>
                   </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-slate-600">Cryptocurrencies</span>
-                    <span className="text-lg font-semibold text-slate-900">{rates.filter(r => r.metadata?.type === 'cryptocurrency').length}</span>
+                  <div className="flex justify-between items-center p-3 bg-orange-50 rounded-lg">
+                    <span className="text-sm font-medium text-orange-700 flex items-center gap-1">
+                      <span>₿</span> Crypto
+                    </span>
+                    <span className="text-lg font-bold text-orange-900">{rates.filter(r => r.metadata?.type === 'cryptocurrency').length}</span>
                   </div>
                 </div>
               </div>
