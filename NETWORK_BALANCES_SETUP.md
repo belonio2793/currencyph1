@@ -185,7 +185,7 @@ To run reconciliation automatically every 24 hours, use Supabase's edge function
 **Option 2: Via External Cron Service (Zapier, etc.)**
 ```bash
 curl -X GET \
-  "https://corcofbmafdxehvlbesx.supabase.co/functions/v1/reconcile-balances?type=all" \
+  "https://YOUR_SUPABASE_URL/functions/v1/reconcile-balances?type=all" \
   -H "Authorization: Bearer <SUPABASE_SERVICE_ROLE_KEY>" \
   -H "Content-Type: application/json"
 ```
