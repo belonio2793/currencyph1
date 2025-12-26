@@ -410,71 +410,8 @@ export default function Rates() {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
             {/* Left Column - Converter */}
             <div className="lg:col-span-2 space-y-6">
-              {/* Converter Card */}
-              <div className="bg-white rounded-2xl shadow-lg p-6 sm:p-8 border border-slate-200">
-                <h2 className="text-xl sm:text-2xl font-semibold text-slate-900 mb-6">Currency Converter</h2>
-
-                <div className="space-y-6">
-                  {/* From Currency */}
-                  <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-2">From</label>
-                    <select
-                      value={selectedFrom}
-                      onChange={(e) => setSelectedFrom(e.target.value)}
-                      className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    >
-                      {rates.map(r => (
-                        <option key={r.code} value={r.code}>
-                          {r.code} - {r.metadata?.name || r.code}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-
-                  {/* Amount Input */}
-                  <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-2">Amount</label>
-                    <input
-                      type="number"
-                      step="any"
-                      min="0"
-                      value={amount}
-                      onChange={(e) => setAmount(e.target.value)}
-                      className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-lg"
-                      placeholder="0.00"
-                    />
-                  </div>
-
-                  {/* To Currency */}
-                  <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-2">To</label>
-                    <select
-                      value={selectedTo}
-                      onChange={(e) => setSelectedTo(e.target.value)}
-                      className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    >
-                      {rates.map(r => (
-                        <option key={r.code} value={r.code}>
-                          {r.code} - {r.metadata?.name || r.code}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-
-                  {/* Result */}
-                  {result && !result.error && (
-                    <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg p-6 border border-blue-200">
-                      <p className="text-sm text-slate-600 mb-2">Result</p>
-                      <div className="text-4xl font-bold text-blue-600 mb-2">
-                        {result.amount} {selectedTo}
-                      </div>
-                      <p className="text-sm text-slate-600">
-                        1 {selectedFrom} = {formatNumber(result.rate, toCurrency?.metadata?.decimals || 2)} {selectedTo}
-                      </p>
-                    </div>
-                  )}
-                </div>
-              </div>
+              {/* Enhanced Currency Converter */}
+              <CurrencyConverter rates={rates} />
 
               {/* Rates Table */}
               <div className="bg-white rounded-2xl shadow-lg p-6 sm:p-8 border border-slate-200">
