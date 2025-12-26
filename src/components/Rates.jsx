@@ -127,10 +127,8 @@ export default function Rates() {
         }
       })
 
-      // Collect all rates from public.pairs table with proper prioritization
-      // CRITICAL: ONLY use pairs where TO_CURRENCY is PHP (canonical direction)
-      // This prevents reversed rates like PHP→BTC (0.0000004) instead of BTC→PHP (2,500,000)
-      // Now with pair_direction metadata for clearer tracking
+      // Collect all rates from public.pairs table
+      // Accept all valid currency pairs (not just PHP-based)
       pairsData?.forEach(pair => {
         if (pair.updated_at) {
           timestamps.push(new Date(pair.updated_at))
@@ -141,21 +139,37 @@ export default function Rates() {
           const fromCurrency = pair.from_currency
           const toCurrency = pair.to_currency
 
-          // CRITICAL FIX: Only use canonical pairs (X→PHP)
-          // Never invert or use PHP→X pairs, as they create small decimal rates that are backwards
-          // pair_direction will be 'canonical', 'inverse', or 'other' for clarity
-          if (toCurrency === 'PHP' && fromCurrency && ratesByCode[fromCurrency]) {
-            // Store the rate as-is (it's X→PHP, which is correct)
+          // Store from_currency rate if it exists in our codes
+          if (fromCurrency && ratesByCode[fromCurrency]) {
             const existingTime = new Date(ratesByCode[fromCurrency].updatedAt || 0)
             const pairTime = new Date(pair.updated_at || 0)
+
+            // Update type info from pairs table
+            if (pair.from_type) {
+              if (!allMetadata[fromCurrency]) {
+                allMetadata[fromCurrency] = { code: fromCurrency, name: fromCurrency, type: pair.from_type, decimals: 2 }
+              } else {
+                allMetadata[fromCurrency].type = pair.from_type
+              }
+            }
 
             // Use if we don't have a rate yet, or this is more recent
             if (!ratesByCode[fromCurrency].rate || pairTime > existingTime) {
               ratesByCode[fromCurrency].rate = rate
               ratesByCode[fromCurrency].updatedAt = pair.updated_at || new Date().toISOString()
-              ratesByCode[fromCurrency].isPHPBased = true
-              ratesByCode[fromCurrency].pairDirection = pair.pair_direction || 'canonical'
-              console.log(`📊 Storing ${pair.pair_direction || 'canonical'} rate: ${fromCurrency} = ${rate} PHP`)
+              ratesByCode[fromCurrency].pairDirection = pair.pair_direction || 'unknown'
+            }
+          }
+
+          // Also store to_currency if it exists in our codes
+          if (toCurrency && ratesByCode[toCurrency]) {
+            // Update type info from pairs table
+            if (pair.to_type) {
+              if (!allMetadata[toCurrency]) {
+                allMetadata[toCurrency] = { code: toCurrency, name: toCurrency, type: pair.to_type, decimals: 2 }
+              } else {
+                allMetadata[toCurrency].type = pair.to_type
+              }
             }
           }
         }
