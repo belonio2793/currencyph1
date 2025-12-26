@@ -401,29 +401,13 @@ export default function HomePage({ userId, userEmail, globalCurrency = 'PHP', se
     <div className="min-h-screen bg-slate-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Welcome Header */}
-        <div className="mb-12">
+        <div className="mb-8">
           <h1 className="text-4xl font-light text-slate-900 mb-2">Welcome back, {userEmail?.split('@')[0] || 'User'}</h1>
           <p className="text-slate-600">Quick access to your most used features</p>
         </div>
 
-        {/* Onboarding Checklist */}
-        {userId && (
-          <div className="mb-8">
-            <OnboardingChecklist
-              userId={userId}
-              userEmail={userEmail}
-              onTaskComplete={() => {}}
-              onOpenAddressModal={() => setShowAddressOnboardingModal(true)}
-              onOpenProfileModal={() => setShowProfileModal(true)}
-              onOpenVerificationModal={() => setShowVerificationModal(true)}
-              onOpenCurrencyModal={() => setShowCurrencyModal(true)}
-              onNavigate={onTabChange}
-            />
-          </div>
-        )}
-
         {/* Quick Stats */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 mb-6 sm:mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
           {/* Total Currency Balance */}
           <div className="border-b border-black pb-4">
             <p className="text-xs text-black font-medium uppercase tracking-wider mb-3">Currency Balance</p>
@@ -472,6 +456,22 @@ export default function HomePage({ userId, userEmail, globalCurrency = 'PHP', se
             </p>
           </div>
         </div>
+
+        {/* Onboarding Checklist */}
+        {userId && (
+          <div className="mb-8">
+            <OnboardingChecklist
+              userId={userId}
+              userEmail={userEmail}
+              onTaskComplete={() => {}}
+              onOpenAddressModal={() => setShowAddressOnboardingModal(true)}
+              onOpenProfileModal={() => setShowProfileModal(true)}
+              onOpenVerificationModal={() => setShowVerificationModal(true)}
+              onOpenCurrencyModal={() => setShowCurrencyModal(true)}
+              onNavigate={onTabChange}
+            />
+          </div>
+        )}
 
         {/* Quick Access Cards Section */}
         <div className="relative mb-8">
