@@ -1002,7 +1002,7 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
                       </div>
                       <div className="text-right">
                         <p className="text-sm text-slate-600">You will receive</p>
-                        <p className="text-2xl font-bold text-emerald-600">
+                        <p className="text-2xl font-bold text-emerald-600 break-words">
                           {parseFloat(amount).toLocaleString(undefined, { maximumFractionDigits: 8 })} {selectedWalletData?.currency_code}
                         </p>
                       </div>
