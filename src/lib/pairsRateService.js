@@ -1,9 +1,18 @@
 import { supabase } from './supabaseClient'
 
 /**
+ * SECURITY FIX: Proper rate inversion using mathematical principle: 1/rate
+ *
+ * If you have: 1 BTC = 0.000004173217677177161 ADA
+ * Then: 1 ADA = 1 / 0.000004173217677177161 = 239,634.19 BTC (NOT 0.000004...)
+ *
+ * PRINCIPLE: A→B = r, then B→A = 1/r (this is the ONLY correct mathematical inversion)
+ */
+
+/**
  * Fetch exchange rate directly from public.pairs table
- * Prefers canonical pairs (X→PHP) and falls back to calculated inverses
- * Uses the new pairs_canonical view for optimal query performance
+ * Uses safe inversion: if direct pair not found, calculates 1/rate from opposite direction
+ * All pairs are normalized in database (canonical direction), inverses are calculated at runtime
  */
 export async function getPairRate(fromCurrency, toCurrency) {
   if (!fromCurrency || !toCurrency) return null
@@ -13,55 +22,53 @@ export async function getPairRate(fromCurrency, toCurrency) {
   const to = toCurrency.toUpperCase()
 
   try {
-    // Strategy 1: Try direct canonical pair (preferred)
+    // Strategy 1: Try direct pair in any direction
     const { data: directData, error: directError } = await supabase
       .from('pairs')
-      .select('rate, updated_at, pair_direction')
+      .select('rate, updated_at, pair_direction, from_currency, to_currency')
       .eq('from_currency', from)
       .eq('to_currency', to)
-      .eq('pair_direction', 'canonical')
       .maybeSingle()
 
     if (!directError && directData && typeof directData.rate === 'number' && isFinite(directData.rate) && directData.rate > 0) {
-      console.debug(`[PairsRate] Found canonical pair: ${from}→${to} = ${directData.rate}`)
+      console.debug(`[PairsRate] Found direct pair: ${from}→${to} = ${directData.rate}`)
       return directData.rate
     }
 
-    // Strategy 2: Try inverse pair (PHP→X)
-    const { data: inverseData, error: inverseError } = await supabase
+    // Strategy 2: Try reverse pair and invert using proper mathematical formula: 1/rate
+    const { data: reverseData, error: reverseError } = await supabase
       .from('pairs')
-      .select('rate, updated_at, pair_direction')
+      .select('rate, updated_at, pair_direction, from_currency, to_currency')
       .eq('from_currency', to)
       .eq('to_currency', from)
-      .eq('pair_direction', 'inverse')
       .maybeSingle()
 
-    if (!inverseError && inverseData && typeof inverseData.rate === 'number' && isFinite(inverseData.rate) && inverseData.rate > 0) {
-      const calculatedRate = 1 / inverseData.rate
-      if (isFinite(calculatedRate) && calculatedRate > 0) {
-        console.debug(`[PairsRate] Using inverse pair calculation: ${from}→${to} = ${calculatedRate} (from ${to}→${from} = ${inverseData.rate})`)
-        return calculatedRate
+    if (!reverseError && reverseData && typeof reverseData.rate === 'number' && isFinite(reverseData.rate) && reverseData.rate > 0) {
+      // CRITICAL: Use mathematical inversion formula: 1/rate
+      const invertedRate = 1 / reverseData.rate
+      if (isFinite(invertedRate) && invertedRate > 0) {
+        console.debug(`[PairsRate] Found reverse pair (${to}→${from} = ${reverseData.rate}). Calculating inverse: 1/${reverseData.rate} = ${invertedRate}`)
+        return invertedRate
       }
     }
 
-    // Strategy 3: Use RPC function for safe fallback (handles both directions automatically)
+    // Strategy 3: Use RPC function for safe fallback (database-level inversion)
     try {
       const { data: rpcData, error: rpcError } = await supabase
-        .rpc('get_exchange_rate', {
+        .rpc('get_exchange_rate_safe', {
           p_from_currency: from,
-          p_to_currency: to,
-          p_use_canonical_only: false
+          p_to_currency: to
         })
 
       if (!rpcError && rpcData && rpcData.length > 0) {
         const rate = parseFloat(rpcData[0].rate)
+        const isInverted = rpcData[0].is_inverted
         if (isFinite(rate) && rate > 0) {
-          console.debug(`[PairsRate] Using RPC function: ${from}→${to} = ${rate}`)
+          console.debug(`[PairsRate] Using RPC safe function: ${from}→${to} = ${rate} (inverted: ${isInverted})`)
           return rate
         }
       }
     } catch (rpcErr) {
-      // RPC may not be available, continue with other strategies
       console.debug(`[PairsRate] RPC function not available:`, rpcErr?.message)
     }
 
