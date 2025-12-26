@@ -95,48 +95,7 @@ function NavbarComponent({ activeTab, onTabChange, globalCurrency, setGlobalCurr
       <div className="max-w-7xl mx-auto px-4">
         {/* Row 1: Logo and HeaderMap */}
         <div className="py-4 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <h1 className="text-2xl sm:text-2xl md:text-2xl font-light text-slate-900 tracking-wide">currency.ph</h1>
-            {userEmail && (
-              <div className="ml-2 hidden sm:inline-block">
-                <div className="flex flex-col gap-1">
-                  <p className="text-xs text-slate-500 font-medium uppercase tracking-wider">Total User Holdings Value</p>
-                  <p className="text-3xl font-light text-black">
-                    {loadingConsolidated ? (
-                      <span className="text-slate-400">loading...</span>
-                    ) : consolidatedHoldingsInCrypto !== null && consolidatedHoldingsInCrypto !== undefined ? (
-                      formatNumber(consolidatedHoldingsInCrypto.toFixed(8))
-                    ) : (
-                      formatNumber(0)
-                    )}
-                  </p>
-                  <p className="text-sm text-slate-600">
-                    {globalCryptocurrency} • All Assets Combined
-                  </p>
-                  <div className="flex gap-6 mt-2">
-                    <div>
-                      <p className="text-xs text-slate-500 font-medium uppercase tracking-wider mb-1">Fiat Holdings</p>
-                      <p className="text-lg font-semibold text-black">
-                        {formatNumber(totalBalanceConverted || 0)} {globalCurrency}
-                      </p>
-                    </div>
-                    <div>
-                      <p className="text-xs text-slate-500 font-medium uppercase tracking-wider mb-1">Crypto Holdings</p>
-                      <p className="text-lg font-semibold text-black">
-                        {loadingCryptoConversion ? (
-                          <span className="text-slate-400 italic">loading...</span>
-                        ) : totalCryptoBalancePHP > 0 ? (
-                          <>{formatNumber(totalCryptoInSelectedCrypto.toFixed(8))} {globalCryptocurrency}</>
-                        ) : (
-                          <span className="text-slate-400">0 {globalCryptocurrency}</span>
-                        )}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
+          <h1 className="text-2xl sm:text-2xl md:text-2xl font-light text-slate-900 tracking-wide">currency.ph</h1>
           <div className="hidden md:flex items-center gap-3">
             <HeaderMap userId={userId} />
           </div>
@@ -144,6 +103,47 @@ function NavbarComponent({ activeTab, onTabChange, globalCurrency, setGlobalCurr
         <div className="md:hidden w-full pb-4">
           <HeaderMap />
         </div>
+
+        {/* Row 2: Holdings Info */}
+        {userEmail && (
+          <div className="pb-4 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
+            <div className="flex flex-col gap-1">
+              <p className="text-xs text-slate-500 font-medium uppercase tracking-wider">Total User Holdings Value</p>
+              <p className="text-3xl font-light text-black">
+                {loadingConsolidated ? (
+                  <span className="text-slate-400">loading...</span>
+                ) : consolidatedHoldingsInCrypto !== null && consolidatedHoldingsInCrypto !== undefined ? (
+                  formatNumber(consolidatedHoldingsInCrypto.toFixed(8))
+                ) : (
+                  formatNumber(0)
+                )}
+              </p>
+              <p className="text-sm text-slate-600">
+                {globalCryptocurrency} • All Assets Combined
+              </p>
+            </div>
+            <div className="flex gap-8">
+              <div>
+                <p className="text-xs text-slate-500 font-medium uppercase tracking-wider mb-2">Fiat Holdings</p>
+                <p className="text-xl font-semibold text-black">
+                  {formatNumber(totalBalanceConverted || 0)} {globalCurrency}
+                </p>
+              </div>
+              <div>
+                <p className="text-xs text-slate-500 font-medium uppercase tracking-wider mb-2">Crypto Holdings</p>
+                <p className="text-xl font-semibold text-black">
+                  {loadingCryptoConversion ? (
+                    <span className="text-slate-400 italic">loading...</span>
+                  ) : totalCryptoBalancePHP > 0 ? (
+                    <>{formatNumber(totalCryptoInSelectedCrypto.toFixed(8))} {globalCryptocurrency}</>
+                  ) : (
+                    <span className="text-slate-400">0 {globalCryptocurrency}</span>
+                  )}
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Row 2: Currency selector and Navigation */}
         <div className="border-t border-slate-100 py-2 flex flex-wrap items-center gap-2">
