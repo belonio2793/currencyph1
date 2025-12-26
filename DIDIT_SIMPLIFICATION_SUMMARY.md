@@ -43,14 +43,14 @@ These non-working edge functions were removed entirely:
 - Complex fallback logic
 
 **After**:
-- Uses hardcoded session URL: `https://verify.didit.me/session/0YcwjP8Jj41H`
+- Uses hardcoded session URL: `https://verify.didit.me/session/your-session-id`
 - Polls database every 2 seconds instead
 - Simpler initialization (just database insert)
 - ~80% less code
 
 ```javascript
 // Hardcoded at the top
-const DEFAULT_DIDIT_SESSION_URL = 'https://verify.didit.me/session/0YcwjP8Jj41H'
+const DEFAULT_DIDIT_SESSION_URL = 'https://verify.didit.me/session/your-session-id'
 
 // Usage
 const { error: insertErr } = await supabase
