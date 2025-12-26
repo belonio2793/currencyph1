@@ -170,14 +170,14 @@ export const multiCurrencyDepositService = {
         user_id: userId,
         wallet_id: walletId,
 
-        // Original deposit amount and currency
+        // Original deposit amount and currency (what's being deposited FROM)
         amount: conversion.fromAmount,
+        currency_code: depositCurrency.toUpperCase(),
         original_currency: depositCurrency.toUpperCase(),
         original_currency_name: depositCurrencyInfo?.name || depositCurrency,
         original_currency_symbol: depositCurrencyInfo?.symbol || depositCurrency,
 
-        // Wallet/received currency info
-        currency_code: walletCurrency.toUpperCase(),
+        // Wallet/received currency info (what will be received INTO the wallet)
         received_currency: walletCurrency.toUpperCase(),
         currency_name: walletCurrencyInfo?.name || walletCurrency,
         currency_symbol: walletCurrencyInfo?.symbol || walletCurrency,
