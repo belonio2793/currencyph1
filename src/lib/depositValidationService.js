@@ -234,7 +234,7 @@ export function buildDepositRecord(params) {
     deposit_method: depositMethod,
     status: 'pending',
     received_amount: convertedAmount ? parseFloat(convertedAmount) : parseFloat(amount),
-    conversion_rate: conversionRate ? parseFloat(conversionRate) : 1,
+    exchange_rate: conversionRate ? parseFloat(conversionRate) : 1,
     created_at: new Date().toISOString(),
     description: `${activeType} deposit of ${amount} ${selectedCurrency}${convertedAmount ? ` (converted to ${convertedAmount} ${walletCurrency})` : ''}`
   }
