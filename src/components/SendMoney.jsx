@@ -581,7 +581,7 @@ export default function SendMoney({ userId }) {
                       {(() => {
                         const senderWallet = getWalletByCurrency(selectedSender)
                         return senderWallet ? (
-                          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                          <div className="bg-slate-50 border border-slate-300 rounded-lg p-4">
                             <div className="space-y-2 text-sm">
                               <div className="flex justify-between items-center">
                                 <span className="text-slate-600">Wallet</span>
