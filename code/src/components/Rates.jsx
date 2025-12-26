@@ -174,11 +174,9 @@ export default function Rates() {
         if (pair.rate && isFinite(Number(pair.rate)) && Number(pair.rate) > 0) {
           const rate = Number(pair.rate)
           const fromCurrency = pair.from_currency
-          const toCurrency = pair.to_currency
 
-          // Use pairs where TO_CURRENCY matches our selected base currency
-          if (toCurrency === baseCurrency && fromCurrency && ratesByCode[fromCurrency]) {
-            // Store the rate as-is (it's X→BASE, which is correct)
+          // Store from_currency rate if it exists in our codes
+          if (fromCurrency && ratesByCode[fromCurrency]) {
             const existingTime = new Date(ratesByCode[fromCurrency].updatedAt || 0)
             const pairTime = new Date(pair.updated_at || 0)
 
@@ -186,9 +184,6 @@ export default function Rates() {
             if (!ratesByCode[fromCurrency].rate || pairTime > existingTime) {
               ratesByCode[fromCurrency].rate = rate
               ratesByCode[fromCurrency].updatedAt = pair.updated_at || new Date().toISOString()
-              ratesByCode[fromCurrency].isPHPBased = (baseCurrency === 'PHP')
-              ratesByCode[fromCurrency].pairDirection = pair.pair_direction || 'canonical'
-              console.log(`Chart Storing ${pair.pair_direction || 'canonical'} rate: ${fromCurrency} = ${rate} ${baseCurrency}`)
             }
           }
         }
@@ -201,41 +196,12 @@ export default function Rates() {
       if (fetchInfo && fetchInfo.fetchedAt) {
         // Use the actual fetch-rates edge function execution time (most accurate)
         mostRecentTimestamp = fetchInfo.fetchedAt
-        console.log(`Clock Using fetch-rates execution time: ${fetchInfo.isoString}`)
+        console.log(`Using fetch-rates execution time: ${fetchInfo.isoString}`)
       } else if (timestamps.length > 0) {
         // Fallback to most recent pair timestamp if fetch info not available
         timestamps.sort((a, b) => b - a)
         mostRecentTimestamp = timestamps[0]
-        console.log('Clock Using most recent pair update timestamp (fallback)')
-      }
-
-      // Fallback: If we're missing rates, try inverted pairs (BASE→X)
-      // This is a safety net if the database has pairs in reverse direction
-      const codesWithRates = new Set(Object.entries(ratesByCode)
-        .filter(([_, item]) => item.rate !== null && isFinite(item.rate) && item.rate > 0)
-        .map(([code]) => code))
-
-      const stillMissing = codeArray.filter(code => !codesWithRates.has(code))
-      if (stillMissing.length > 0) {
-        console.warn(`[Rates] Missing canonical rates for: ${stillMissing.join(', ')}, trying inverse pairs...`)
-
-        pairsData?.forEach(pair => {
-          const fromCode = pair.from_currency
-          const toCode = pair.to_currency
-          const rate = Number(pair.rate)
-          const pairDir = pair.pair_direction || 'unknown'
-
-          // Try inverted pairs (BASE→X) but only if we don't have the canonical (X→BASE)
-          if (fromCode === baseCurrency && toCode && ratesByCode[toCode] && !codesWithRates.has(toCode) && isFinite(rate) && rate > 0) {
-            const invertedRate = 1 / rate
-            if (isFinite(invertedRate) && invertedRate > 0) {
-              ratesByCode[toCode].rate = invertedRate
-              ratesByCode[toCode].isPHPBased = (baseCurrency === 'PHP')
-              ratesByCode[toCode].pairDirection = pairDir
-              console.log(`[Rates] WARNING: Using ${pairDir} pair for ${toCode} = ${invertedRate} ${baseCurrency} (from ${baseCurrency}→${toCode})`)
-            }
-          }
-        })
+        console.log('Using most recent pair update timestamp (fallback)')
       }
 
       // Sort: rates with values first, then without
