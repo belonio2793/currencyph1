@@ -98,27 +98,26 @@ export async function getAllCryptoRates() {
 
 /**
  * Get specific crypto rate with timestamp
+ * SECURITY FIX: Uses safe rate lookup with proper inversion
  */
 export async function getCryptoRateWithTimestamp(fromCurrency, toCurrency = 'USD') {
   try {
     const fromCode = fromCurrency.toUpperCase()
     const toCode = toCurrency.toUpperCase()
 
-    const { data, error } = await supabase
-      .from('pairs')
-      .select('rate, updated_at')
-      .eq('from_currency', fromCode)
-      .eq('to_currency', toCode)
-      .single()
+    // Use safe rate lookup with metadata (includes timestamp and inversion info)
+    const { getPairRateWithMetadata } = await import('./pairsRateService.js')
+    const rateData = await getPairRateWithMetadata(fromCode, toCode)
 
-    if (error || !data || !(typeof data.rate === 'number' && isFinite(data.rate) && data.rate > 0)) {
+    if (!rateData || !rateData.rate || !(typeof rateData.rate === 'number' && isFinite(rateData.rate) && rateData.rate > 0)) {
       console.warn(`Could not get ${fromCurrency}/${toCurrency} rate`)
       return null
     }
 
     return {
-      rate: parseFloat(data.rate),
-      updated_at: data.updated_at
+      rate: parseFloat(rateData.rate),
+      updated_at: rateData.updated_at,
+      is_inverted: rateData.is_inverted  // Track if calculated via inversion
     }
   } catch (error) {
     console.warn(`Error fetching crypto rate for ${fromCurrency}/${toCurrency}:`, error.message)
