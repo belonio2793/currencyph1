@@ -36,7 +36,7 @@ export default function Rates() {
       let pairsData = []
       const { data: allPairsData, error: pairsError } = await supabase
         .from('pairs')
-        .select('from_currency, to_currency, rate, updated_at, pair_direction, from_type, to_type')
+        .select('from_currency, to_currency, rate, updated_at, pair_direction')
 
       if (pairsError) {
         console.error('Error fetching pairs:', pairsError)
@@ -144,32 +144,11 @@ export default function Rates() {
             const existingTime = new Date(ratesByCode[fromCurrency].updatedAt || 0)
             const pairTime = new Date(pair.updated_at || 0)
 
-            // Update type info from pairs table
-            if (pair.from_type) {
-              if (!allMetadata[fromCurrency]) {
-                allMetadata[fromCurrency] = { code: fromCurrency, name: fromCurrency, type: pair.from_type, decimals: 2 }
-              } else {
-                allMetadata[fromCurrency].type = pair.from_type
-              }
-            }
-
             // Use if we don't have a rate yet, or this is more recent
             if (!ratesByCode[fromCurrency].rate || pairTime > existingTime) {
               ratesByCode[fromCurrency].rate = rate
               ratesByCode[fromCurrency].updatedAt = pair.updated_at || new Date().toISOString()
               ratesByCode[fromCurrency].pairDirection = pair.pair_direction || 'unknown'
-            }
-          }
-
-          // Also store to_currency if it exists in our codes
-          if (toCurrency && ratesByCode[toCurrency]) {
-            // Update type info from pairs table
-            if (pair.to_type) {
-              if (!allMetadata[toCurrency]) {
-                allMetadata[toCurrency] = { code: toCurrency, name: toCurrency, type: pair.to_type, decimals: 2 }
-              } else {
-                allMetadata[toCurrency].type = pair.to_type
-              }
             }
           }
         }
