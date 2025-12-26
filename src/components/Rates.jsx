@@ -497,7 +497,7 @@ export default function Rates() {
                                 ? 'bg-orange-100 text-orange-700'
                                 : 'bg-blue-100 text-blue-700'
                             }`}>
-                              {currency.metadata?.type === 'cryptocurrency' ? 'Cryptocurrency' : 'Currency'}
+                              {currency.metadata?.type === 'cryptocurrency' ? 'Crypto' : 'Fiat'}
                             </span>
                           </td>
                           <td className="py-3 px-4 text-right font-mono text-slate-900">
