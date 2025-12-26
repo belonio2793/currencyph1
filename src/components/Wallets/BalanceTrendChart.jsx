@@ -88,23 +88,23 @@ export default function BalanceTrendChart({ data, wallet, formatNumber: fmt }) {
 
       {/* Summary Statistics */}
       <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-        <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
-          <p className="text-xs font-semibold text-blue-600 uppercase tracking-wider mb-2">Current Balance</p>
-          <p className="text-2xl font-light text-blue-900">
+        <div className="bg-white p-4 rounded-lg border border-slate-300">
+          <p className="text-xs font-semibold text-slate-600 uppercase tracking-wider mb-2">Current Balance</p>
+          <p className="text-sm font-mono font-semibold text-slate-900 truncate">
             {data.length > 0 ? fmt(data[data.length - 1].balance || 0) : 'N/A'}
           </p>
         </div>
 
-        <div className="bg-emerald-50 p-4 rounded-lg border border-emerald-200">
-          <p className="text-xs font-semibold text-emerald-600 uppercase tracking-wider mb-2">Highest Balance</p>
-          <p className="text-2xl font-light text-emerald-900">
+        <div className="bg-white p-4 rounded-lg border border-slate-300">
+          <p className="text-xs font-semibold text-slate-600 uppercase tracking-wider mb-2">Highest Balance</p>
+          <p className="text-sm font-mono font-semibold text-slate-900 truncate">
             {fmt(maxBalance)}
           </p>
         </div>
 
-        <div className="bg-red-50 p-4 rounded-lg border border-red-200">
-          <p className="text-xs font-semibold text-red-600 uppercase tracking-wider mb-2">Lowest Balance</p>
-          <p className="text-2xl font-light text-red-900">
+        <div className="bg-white p-4 rounded-lg border border-slate-300">
+          <p className="text-xs font-semibold text-slate-600 uppercase tracking-wider mb-2">Lowest Balance</p>
+          <p className="text-sm font-mono font-semibold text-slate-900 truncate">
             {fmt(Math.max(minBalance, 0))}
           </p>
         </div>
