@@ -425,49 +425,49 @@ export default function HomePage({ userId, userEmail, globalCurrency = 'PHP', se
         {/* Quick Stats */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6 sm:mb-8">
           {/* Total Currency Balance */}
-          <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-4 sm:p-6 border border-blue-200">
-            <p className="text-xs sm:text-sm text-blue-600 font-medium uppercase tracking-wider mb-2">Currency Balance</p>
-            <p className="text-lg sm:text-2xl font-light text-blue-900">
+          <div className="bg-white rounded-xl p-4 sm:p-6 border border-slate-300">
+            <p className="text-xs text-slate-600 font-medium uppercase tracking-wider mb-2">Currency Balance</p>
+            <p className="text-sm font-mono font-semibold text-slate-900 truncate">
               {formatNumber(totalBalanceConverted != null ? totalBalanceConverted : getTotalBalance())} {globalCurrency}
             </p>
-            <p className="text-xs sm:text-sm font-light text-blue-700 mt-1">
+            <p className="text-xs text-slate-500 mt-1">
               Fiat wallets
             </p>
           </div>
 
           {/* Total Cryptocurrency Balance in Selected Cryptocurrency */}
-          <div className="bg-gradient-to-br from-orange-50 to-orange-100 rounded-xl p-4 sm:p-6 border border-orange-200">
-            <p className="text-xs sm:text-sm text-orange-600 font-medium uppercase tracking-wider mb-2">Cryptocurrency Balance</p>
-            <p className="text-lg sm:text-2xl font-light text-orange-900">
+          <div className="bg-white rounded-xl p-4 sm:p-6 border border-slate-300">
+            <p className="text-xs text-slate-600 font-medium uppercase tracking-wider mb-2">Cryptocurrency Balance</p>
+            <p className="text-sm font-mono font-semibold text-slate-900 truncate">
               {loadingCryptoHoldingsConversion ? (
-                <span className="italic text-orange-500">loading...</span>
+                <span className="italic text-slate-400">loading...</span>
               ) : cryptoWallets.length > 0 ? (
                 formatNumber(totalCryptoInSelectedCrypto.toFixed(8)) + ' ' + globalCryptocurrency
               ) : (
                 '0 ' + globalCryptocurrency
               )}
             </p>
-            <p className="text-xs sm:text-sm font-light text-orange-700 mt-1">
+            <p className="text-xs text-slate-500 mt-1">
               {cryptoWallets.length > 0 ? `${cryptoWallets.length} holding${cryptoWallets.length !== 1 ? 's' : ''}` : 'No holdings'}
             </p>
           </div>
 
           {/* Net (Balance - Debt) */}
-          <div className={`rounded-xl p-4 sm:p-6 border ${isNegativeNet ? 'bg-gradient-to-br from-rose-50 to-rose-100 border-rose-200' : 'bg-gradient-to-br from-emerald-50 to-emerald-100 border-emerald-200'}`}>
-            <p className={`text-xs sm:text-sm font-medium uppercase tracking-wider mb-2 ${isNegativeNet ? 'text-rose-600' : 'text-emerald-600'}`}>Net Worth</p>
-            <p className={`text-lg sm:text-2xl font-light ${isNegativeNet ? 'text-rose-900' : 'text-emerald-900'}`}>
+          <div className="bg-white rounded-xl p-4 sm:p-6 border border-slate-300">
+            <p className="text-xs text-slate-600 font-medium uppercase tracking-wider mb-2">Net Worth</p>
+            <p className="text-sm font-mono font-semibold text-slate-900 truncate">
               {formatNumber(netDisplay)} {globalCurrency}
             </p>
-            <p className={`text-xs sm:text-sm font-light mt-1 ${isNegativeNet ? 'text-rose-700' : 'text-emerald-700'}`}>
+            <p className="text-xs text-slate-500 mt-1">
               After debts
             </p>
           </div>
 
           {/* Total Debt */}
-          <div className="bg-gradient-to-br from-red-50 to-red-100 rounded-xl p-4 sm:p-6 border border-red-200">
-            <p className="text-xs sm:text-sm text-red-600 font-medium uppercase tracking-wider mb-2">Total Debt</p>
-            <p className="text-lg sm:text-2xl font-light text-red-900">{formatNumber(totalDebtConverted != null ? totalDebtConverted : getTotalDebt())} {globalCurrency}</p>
-            <p className="text-xs sm:text-sm font-light text-red-700 mt-1">
+          <div className="bg-white rounded-xl p-4 sm:p-6 border border-slate-300">
+            <p className="text-xs text-slate-600 font-medium uppercase tracking-wider mb-2">Total Debt</p>
+            <p className="text-sm font-mono font-semibold text-slate-900 truncate">{formatNumber(totalDebtConverted != null ? totalDebtConverted : getTotalDebt())} {globalCurrency}</p>
+            <p className="text-xs text-slate-500 mt-1">
               Active loans
             </p>
           </div>
