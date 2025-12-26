@@ -130,12 +130,16 @@ export default function SearchableSelect({ value, onChange, options = [], label 
 
   const getCurrencyTypeColor = (type) => {
     return type === 'cryptocurrency'
-      ? 'bg-orange-50 text-orange-700'
-      : 'bg-blue-50 text-blue-700'
+      ? 'bg-orange-100 text-orange-700 border-orange-300'
+      : 'bg-blue-100 text-blue-700 border-blue-300'
   }
 
   const getCurrencyTypeLabel = (type) => {
-    return type === 'cryptocurrency' ? 'CRYPTO' : 'FIAT'
+    return type === 'cryptocurrency' ? '₿ CRYPTO' : '💵 FIAT'
+  }
+
+  const getCurrencyTypeEmoji = (type) => {
+    return type === 'cryptocurrency' ? '₿' : '💵'
   }
 
   return (
@@ -149,13 +153,17 @@ export default function SearchableSelect({ value, onChange, options = [], label 
       {/* Button / Input Display */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-left bg-white hover:border-slate-400 transition flex items-center justify-between"
+        className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-left bg-white hover:border-slate-400 transition flex items-center justify-between ${
+          selectedOption?.metadata?.type === 'cryptocurrency'
+            ? 'border-orange-300 hover:border-orange-400 focus:ring-orange-500'
+            : 'border-slate-300'
+        }`}
         type="button"
       >
         <div className="flex items-center gap-3 flex-1 min-w-0">
           {selectedOption && (
             <>
-              <span className="text-lg">
+              <span className={`inline-flex items-center px-2 py-1 rounded text-sm font-semibold ${getCurrencyTypeColor(selectedOption.metadata?.type)}`}>
                 {getCurrencyTypeLabel(selectedOption.metadata?.type)}
               </span>
               <div className="min-w-0">
@@ -170,7 +178,7 @@ export default function SearchableSelect({ value, onChange, options = [], label 
           )}
         </div>
         <svg
-          className={`w-5 h-5 text-slate-400 transition-transform ${isOpen ? 'rotate-180' : ''}`}
+          className={`w-5 h-5 text-slate-400 transition-transform flex-shrink-0 ${isOpen ? 'rotate-180' : ''}`}
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
