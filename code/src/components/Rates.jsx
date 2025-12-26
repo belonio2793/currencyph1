@@ -203,8 +203,8 @@ export default function Rates() {
         console.log('🕐 Using most recent pair update timestamp (fallback)')
       }
 
-      // Fallback: If we're missing rates, try inverted pairs (PHP→X)
-      // This is a safety net if the database only has inverted pairs
+      // Fallback: If we're missing rates, try inverted pairs (BASE→X)
+      // This is a safety net if the database has pairs in reverse direction
       const codesWithRates = new Set(Object.entries(ratesByCode)
         .filter(([_, item]) => item.rate !== null && isFinite(item.rate) && item.rate > 0)
         .map(([code]) => code))
@@ -219,15 +219,14 @@ export default function Rates() {
           const rate = Number(pair.rate)
           const pairDir = pair.pair_direction || 'unknown'
 
-          // Try inverted pairs (PHP→X) but only if we don't have the canonical (X→PHP)
-          // Now using pair_direction metadata for clarity
-          if (fromCode === 'PHP' && toCode && ratesByCode[toCode] && !codesWithRates.has(toCode) && isFinite(rate) && rate > 0) {
+          // Try inverted pairs (BASE→X) but only if we don't have the canonical (X→BASE)
+          if (fromCode === baseCurrency && toCode && ratesByCode[toCode] && !codesWithRates.has(toCode) && isFinite(rate) && rate > 0) {
             const invertedRate = 1 / rate
             if (isFinite(invertedRate) && invertedRate > 0) {
               ratesByCode[toCode].rate = invertedRate
-              ratesByCode[toCode].isPHPBased = true
+              ratesByCode[toCode].isPHPBased = (baseCurrency === 'PHP')
               ratesByCode[toCode].pairDirection = pairDir
-              console.log(`[Rates] WARNING: Using ${pairDir} pair for ${toCode} = ${invertedRate} PHP (from PHP→${toCode})`)
+              console.log(`[Rates] WARNING: Using ${pairDir} pair for ${toCode} = ${invertedRate} ${baseCurrency} (from ${baseCurrency}→${toCode})`)
             }
           }
         })
