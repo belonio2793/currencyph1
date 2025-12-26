@@ -123,15 +123,10 @@ function NavbarComponent({ activeTab, onTabChange, globalCurrency, setGlobalCurr
                     <div>
                       <p className="text-xs text-slate-500 font-medium uppercase tracking-wider mb-1">Crypto Holdings</p>
                       <p className="text-lg font-semibold text-black">
-                        {loadingConsolidated ? (
+                        {loadingCryptoConversion ? (
                           <span className="text-slate-400 italic">loading...</span>
-                        ) : totalCryptoBalancePHP !== null && totalCryptoBalancePHP !== undefined && totalCryptoBalancePHP > 0 ? (
-                          <>
-                            {(() => {
-                              const result = (totalCryptoBalancePHP / (consolidatedHoldingsInCrypto && consolidatedHoldingsInCrypto > 0 ? (Number(totalBalanceConverted || 0) + totalCryptoBalancePHP) / consolidatedHoldingsInCrypto : 1)).toFixed(8)
-                              return isNaN(result) ? '0' : formatNumber(result)
-                            })()} {globalCryptocurrency}
-                          </>
+                        ) : totalCryptoBalancePHP > 0 ? (
+                          <>{formatNumber(totalCryptoInSelectedCrypto.toFixed(8))} {globalCryptocurrency}</>
                         ) : (
                           <span className="text-slate-400">0 {globalCryptocurrency}</span>
                         )}
