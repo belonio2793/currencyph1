@@ -38,6 +38,7 @@ export async function getAllPairsOptimized() {
 
 /**
  * Get specific rate from public.pairs (fastest single lookup)
+ * SECURITY FIX: Falls back to safe inversion if direct pair not found
  * @param {string} fromCurrency - Source currency code (e.g., 'BTC')
  * @param {string} toCurrency - Target currency code (e.g., 'PHP')
  * @returns {Promise<number|null>} Exchange rate or null
@@ -60,14 +61,20 @@ export async function getDirectRate(fromCurrency, toCurrency) {
 
     const queryTime = performance.now() - startTime
 
-    if (error) {
-      console.debug(`[DirectPairs] ${from}/${to} not found (${queryTime.toFixed(2)}ms)`)
-      return null
-    }
-
-    if (data && typeof data.rate === 'number' && isFinite(data.rate) && data.rate > 0) {
+    if (!error && data && typeof data.rate === 'number' && isFinite(data.rate) && data.rate > 0) {
       console.debug(`[DirectPairs] ${from}/${to} = ${data.rate} (${queryTime.toFixed(2)}ms)`)
       return data.rate
+    }
+
+    // If not found, try safe rate lookup with proper inversion (1/rate)
+    if (error) {
+      console.debug(`[DirectPairs] ${from}/${to} not found, trying safe inversion...`)
+      const { getPairRate } = await import('./pairsRateService.js')
+      const rate = await getPairRate(from, to)
+      if (rate) {
+        console.debug(`[DirectPairs] ${from}/${to} = ${rate} (via safe inversion)`)
+        return rate
+      }
     }
 
     return null
