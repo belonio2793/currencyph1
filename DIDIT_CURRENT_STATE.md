@@ -136,8 +136,8 @@ When user completes verification, database stores:
 ```javascript
 {
   user_id: "550e8400-e29b-41d4-a716-446655440000",
-  didit_session_id: "0YcwjP8Jj41H",
-  didit_session_url: "https://verify.didit.me/session/0YcwjP8Jj41H",
+  didit_session_id: "your-session-id",
+  didit_session_url: "https://verify.didit.me/session/your-session-id",
   status: "pending|approved|rejected",
   verification_method: "didit",
   document_type: "passport|national_id|drivers_license|...",
