@@ -143,9 +143,9 @@ export default function Rates() {
         }
       })
 
-      // Collect all rates from public.pairs table
-      // Accept all valid currency pairs (not just PHP-based)
-      pairsData?.forEach(pair => {
+      // Collect all rates from combined currency_rates and cryptocurrency_rates tables
+      // Each pair represents a from_currency → to_currency rate
+      allRatePairs?.forEach(pair => {
         if (pair.updated_at) {
           timestamps.push(new Date(pair.updated_at))
         }
@@ -164,7 +164,6 @@ export default function Rates() {
             if (!ratesByCode[fromCurrency].rate || pairTime > existingTime) {
               ratesByCode[fromCurrency].rate = rate
               ratesByCode[fromCurrency].updatedAt = pair.updated_at || new Date().toISOString()
-              ratesByCode[fromCurrency].pairDirection = pair.pair_direction || 'unknown'
             }
           }
         }
