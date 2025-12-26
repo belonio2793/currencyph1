@@ -243,10 +243,10 @@ export default function HomePage({ userId, userEmail, globalCurrency = 'PHP', se
         }
       }
 
-      for (const loan of (l || [])) {
-        const loanCurrency = loan.currency || loan.currency_code || globalCurrency
-        if (loanCurrency !== globalCurrency) {
-          uniqueCurrencies.add(loanCurrency)
+      for (const debt of (l || [])) {
+        const debtCurrency = debt.currency_code || globalCurrency
+        if (debtCurrency !== globalCurrency) {
+          uniqueCurrencies.add(debtCurrency)
         }
       }
 
