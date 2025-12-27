@@ -1168,7 +1168,7 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
 
             {/* THREE-CURRENCY MODEL DISPLAY: Show all three currencies clearly */}
             {selectedAddressMethod && selectedCurrency !== selectedAddressMethod?.cryptoSymbol?.toUpperCase() && (
-              <div className="mb-8 p-6 bg-gradient-to-r from-indigo-50 via-blue-50 to-cyan-50 border-2 border-indigo-300 rounded-lg">
+              <div className="mb-8 p-6 bg-slate-50 border border-slate-300 rounded-lg">
                 <h3 className="font-bold text-slate-900 mb-4 flex items-center gap-2">
                   <span className="text-lg">🔄</span> Three-Currency Deposit Model
                 </h3>
