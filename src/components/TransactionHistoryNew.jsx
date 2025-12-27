@@ -67,6 +67,21 @@ export default function TransactionHistory({ userId }) {
     return `${symbol}${formatted} ${code}`
   }
 
+  const getAmountDisplay = (amount, currencyCode, isOutgoing = false) => {
+    if (amount == null || isNaN(amount)) return { text: '0', symbol: '', code: currencyCode?.toUpperCase() || 'USD' }
+    const code = currencyCode?.toUpperCase() || 'USD'
+    const symbol = getCurrencySymbol(code)
+    const formatted = formatFullPrecision(amount)
+    const prefix = isOutgoing ? '-' : '+'
+    return {
+      text: `${prefix}${symbol}${formatted}`,
+      symbol,
+      code,
+      formatted,
+      fullText: `${prefix}${symbol}${formatted} ${code}`
+    }
+  }
+
   const fetchCryptoRates = async () => {
     try {
       const ids = Object.values(CRYPTO_IDS).join(',')
