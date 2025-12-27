@@ -18,16 +18,17 @@ export default function CurrencyConverter({ rates = [] }) {
   const [result, setResult] = useState(null)
   const [error, setError] = useState(null)
 
-  // Transform rates into currency list with type info
+  // Transform rates into currency list with type info (using database type values)
   const currencies = useMemo(() => {
     if (!rates || rates.length === 0) return []
 
     return rates.map(rate => ({
       code: rate.code,
-      name: rate.metadata?.name || rate.code,
-      type: rate.metadata?.type === 'cryptocurrency' ? 'crypto' : 'fiat',
+      name: rate.name || rate.code,
+      type: rate.type || 'fiat', // Use actual database type: 'fiat' or 'crypto'
+      symbol: rate.symbol || '',
       rate: rate.rate,
-      decimals: rate.metadata?.decimals || 2,
+      decimals: rate.decimals || 2,
       metadata: rate.metadata
     })).sort((a, b) => {
       // Sort: fiat first, then crypto, alphabetically within each group
