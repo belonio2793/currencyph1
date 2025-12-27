@@ -840,7 +840,7 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
 
   if (!userId || userId.includes('guest')) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 flex items-center justify-center px-4">
+      <div className="min-h-screen bg-white flex items-center justify-center px-4">
         <div className="text-center">
           <p className="text-slate-600 mb-4">Please sign in to make a deposit</p>
         </div>
