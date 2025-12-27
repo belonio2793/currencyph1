@@ -976,7 +976,7 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
                     <div className="flex items-center justify-between">
                       <div>
                         <p className="text-sm text-slate-600">Deposit Amount</p>
-                        <p className="text-xs text-emerald-600 font-medium mt-1">✓ No conversion needed - same currency</p>
+                        <p className="text-xs text-slate-600 font-medium mt-1">✓ No conversion needed - same currency</p>
                       </div>
                       <div className="text-right">
                         <p className="text-sm text-slate-600">You will receive</p>
