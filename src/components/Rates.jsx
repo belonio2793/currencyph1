@@ -138,10 +138,22 @@ export default function Rates() {
       const ratesWithValues = Object.values(ratesByCode)
         .filter(r => r.rate !== null && isFinite(r.rate) && r.rate > 0)
         .sort((a, b) => a.code.localeCompare(b.code))
+        .map(r => ({
+          ...r,
+          value: r.code,
+          label: r.code,
+          id: r.code
+        }))
 
       const ratesWithoutValues = Object.values(ratesByCode)
         .filter(r => r.rate === null || !isFinite(r.rate) || r.rate <= 0)
         .sort((a, b) => a.code.localeCompare(b.code))
+        .map(r => ({
+          ...r,
+          value: r.code,
+          label: r.code,
+          id: r.code
+        }))
 
       const validRates = [...ratesWithValues, ...ratesWithoutValues]
 
