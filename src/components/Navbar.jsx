@@ -65,30 +65,46 @@ function NavbarComponent({ activeTab, onTabChange, globalCurrency, setGlobalCurr
     convertCryptoHoldings()
   }, [totalCryptoBalancePHP, globalCryptocurrency, globalCurrency, userEmail])
 
-  // Convert consolidated balance (fiat + crypto) to selected cryptocurrency
+  // Calculate total fiat wallet valuation from all user wallets
   useEffect(() => {
-    if (userEmail && globalCryptocurrency && globalCurrency) {
-      setLoadingConsolidated(true)
-      // Total assets = fiat (already in display currency) + crypto (in PHP, need to convert to display currency first)
-      const totalAssets = Number(totalBalanceConverted || 0) + Number(totalCryptoBalancePHP || 0)
-      if (totalAssets === 0) {
+    const calculateTotalWalletValuation = async () => {
+      if (!userId || !globalCurrency) {
         setConsolidatedHoldingsInCrypto(0)
         setLoadingConsolidated(false)
         return
       }
 
-      convertFiatToCryptoDb(totalAssets, globalCurrency, globalCryptocurrency)
-        .then(balance => {
-          setConsolidatedHoldingsInCrypto(balance)
-          setLoadingConsolidated(false)
+      setLoadingConsolidated(true)
+      try {
+        // Call RPC function to get total fiat valuation of all wallets
+        const { data, error } = await supabase.rpc('get_total_wallet_valuation_in_fiat', {
+          p_user_id: userId,
+          p_target_currency: globalCurrency
         })
-        .catch(error => {
-          console.error('Failed to convert consolidated holdings:', error)
+
+        if (error) {
+          console.error('Error calculating wallet valuation:', error)
           setConsolidatedHoldingsInCrypto(null)
           setLoadingConsolidated(false)
-        })
+          return
+        }
+
+        if (data && data[0]) {
+          // Display the total fiat value
+          setConsolidatedHoldingsInCrypto(data[0].total_balance_in_target_currency || 0)
+        } else {
+          setConsolidatedHoldingsInCrypto(0)
+        }
+      } catch (error) {
+        console.error('Failed to calculate wallet valuation:', error)
+        setConsolidatedHoldingsInCrypto(null)
+      } finally {
+        setLoadingConsolidated(false)
+      }
     }
-  }, [totalBalanceConverted, totalCryptoBalancePHP, globalCurrency, globalCryptocurrency, userEmail])
+
+    calculateTotalWalletValuation()
+  }, [userId, globalCurrency])
 
 
   return (
