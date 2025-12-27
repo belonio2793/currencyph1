@@ -1552,8 +1552,21 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
                             <span>—</span>
                           )}
                         </td>
-                        <td className="hidden xl:table-cell py-2 sm:py-3 px-2 sm:px-3 text-slate-700 text-xs whitespace-nowrap">
-                          {exchangeRate ? `1 ${originalCurrency.toUpperCase()} = ${formatExchangeRate(exchangeRate)} ${walletCurrency.toUpperCase()}` : '—'}
+                        <td className="hidden xl:table-cell py-2 sm:py-3 px-2 sm:px-3 text-slate-700 text-xs">
+                          <div className="space-y-1">
+                            {/* Primary exchange rate */}
+                            {exchangeRate ? (
+                              <p className="whitespace-nowrap">1 {originalCurrency.toUpperCase()} = {formatExchangeRate(exchangeRate)} {walletCurrency.toUpperCase()}</p>
+                            ) : (
+                              <p>—</p>
+                            )}
+                            {/* Payment currency rate for triple-currency deposits */}
+                            {notesMeta.payment_method_currency && notesMeta.payment_method_currency !== originalCurrency && (
+                              <p className="whitespace-nowrap text-slate-600 border-t border-slate-200 pt-1">
+                                <span className="font-semibold">{notesMeta.payment_method_currency}:</span> {notesMeta.payment_amount ? formatAmount(notesMeta.payment_amount, notesMeta.payment_method_currency) : '—'}
+                              </p>
+                            )}
+                          </div>
                         </td>
                         <td className="py-2 sm:py-3 px-2 sm:px-3 font-semibold text-emerald-600 text-xs whitespace-nowrap">
                           <div className="font-bold">{convertedAmount ? formatAmount(convertedAmount, walletCurrency) : '—'}</div>
