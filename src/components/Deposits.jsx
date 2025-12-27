@@ -1270,7 +1270,7 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
                     value={gcashReferenceNumber}
                     onChange={(e) => setGcashReferenceNumber(e.target.value)}
                     placeholder="Enter your GCash transaction reference (e.g., GCR123456789)"
-                    className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 text-sm"
+                    className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-400 text-sm"
                   />
                   <p className="text-xs text-slate-500 mt-1">You'll find this in your GCash app after sending the payment</p>
                 </div>
