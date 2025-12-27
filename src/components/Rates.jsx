@@ -148,13 +148,18 @@ export default function Rates() {
   const filteredRates = useMemo(() => {
     let filtered = rates
 
+    // Filter by type (using actual database values: 'fiat' or 'crypto')
     if (typeFilter !== 'all') {
-      filtered = filtered.filter(r => r.type === typeFilter)
+      const typeValue = typeFilter === 'currency' ? 'fiat' : (typeFilter === 'cryptocurrency' ? 'crypto' : typeFilter)
+      filtered = filtered.filter(r => r.type === typeValue)
     }
 
     if (searchTerm) {
       const search = searchTerm.toLowerCase()
-      filtered = filtered.filter(r => r.code.toLowerCase().includes(search))
+      filtered = filtered.filter(r =>
+        r.code.toLowerCase().includes(search) ||
+        r.name.toLowerCase().includes(search)
+      )
     }
 
     // Separate rates with values from those without
