@@ -1098,7 +1098,7 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
                           setExchangeRates({})
                           fetchExchangeRates()
                         }}
-                        className="ml-4 px-4 py-2 bg-amber-600 text-white text-sm font-medium rounded hover:bg-amber-700 transition"
+                        className="ml-4 px-4 py-2 bg-slate-100 text-slate-700 text-sm font-medium rounded hover:bg-slate-200 transition border border-slate-200"
                       >
                         Retry
                       </button>
