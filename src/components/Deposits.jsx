@@ -1552,14 +1552,14 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
             <div className="flex gap-2 mt-6">
               <button
                 onClick={() => setShowWalletModal(false)}
-                className="flex-1 px-3 py-2 border border-slate-300 rounded text-slate-900 text-sm font-medium hover:bg-slate-50 transition"
+                className="flex-1 px-3 py-2 border-2 border-slate-900 rounded text-slate-900 text-sm font-medium hover:bg-slate-900 hover:text-white transition"
               >
                 Cancel
               </button>
               <button
                 onClick={handleCreateWallet}
                 disabled={submitting}
-                className="flex-1 px-3 py-2 bg-slate-800 text-white rounded text-sm font-medium hover:bg-slate-900 transition disabled:opacity-50"
+                className="flex-1 px-3 py-2 bg-blue-600 text-white rounded text-sm font-medium hover:bg-blue-700 transition disabled:opacity-50"
               >
                 {submitting ? 'Creating...' : 'Create Wallet'}
               </button>
