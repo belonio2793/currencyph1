@@ -619,16 +619,22 @@ export default function Rates() {
                 {fromCurrency && (
                   <div className="pb-4 border-b border-slate-300">
                     <p className="text-xs text-slate-600 font-medium mb-1 uppercase tracking-wider">From Currency</p>
-                    <p className="text-sm font-semibold text-slate-900">{fromCurrency.code}</p>
-                    <p className="text-xs text-slate-500 mt-1">{fromCurrency.type}</p>
+                    <p className="text-sm font-semibold text-slate-900">
+                      {fromCurrency.name}
+                      {fromCurrency.symbol && <span className="text-xs text-slate-500 font-normal ml-1">({fromCurrency.symbol})</span>}
+                    </p>
+                    <p className="text-xs text-slate-500 mt-1">{fromCurrency.code} • {fromCurrency.type === 'crypto' ? 'Cryptocurrency' : 'Fiat'}</p>
                   </div>
                 )}
 
                 {toCurrency && (
                   <div className="pb-4 border-b border-slate-300">
                     <p className="text-xs text-slate-600 font-medium mb-1 uppercase tracking-wider">To Currency</p>
-                    <p className="text-sm font-semibold text-slate-900">{toCurrency.code}</p>
-                    <p className="text-xs text-slate-500 mt-1">{toCurrency.type}</p>
+                    <p className="text-sm font-semibold text-slate-900">
+                      {toCurrency.name}
+                      {toCurrency.symbol && <span className="text-xs text-slate-500 font-normal ml-1">({toCurrency.symbol})</span>}
+                    </p>
+                    <p className="text-xs text-slate-500 mt-1">{toCurrency.code} • {toCurrency.type === 'crypto' ? 'Cryptocurrency' : 'Fiat'}</p>
                   </div>
                 )}
 
