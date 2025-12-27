@@ -360,10 +360,44 @@ export const multiCurrencyDepositService = {
         conversion
       }
     } catch (err) {
-      console.error('Error creating multi-currency deposit:', err)
+      // Enhanced error logging for debugging
+      console.error('Error creating multi-currency deposit:', {
+        errorMessage: err?.message || String(err),
+        errorCode: err?.code,
+        errorStatus: err?.status,
+        fullError: err,
+        details: {
+          userId,
+          walletId,
+          amount,
+          depositCurrency,
+          walletCurrency,
+          paymentMethodCurrency,
+          depositMethod
+        }
+      })
+
+      // Return more helpful error message
+      let errorMessage = 'Failed to create deposit'
+
+      if (err?.message) {
+        errorMessage = err.message
+      } else if (err?.error_description) {
+        errorMessage = err.error_description
+      } else if (err?.code) {
+        errorMessage = `Error (${err.code}): ${err.message || 'Unknown error'}`
+      } else if (typeof err === 'string') {
+        errorMessage = err
+      }
+
       return {
         success: false,
-        error: err.message || 'Failed to create deposit'
+        error: errorMessage,
+        errorDetails: {
+          code: err?.code,
+          message: err?.message,
+          status: err?.status
+        }
       }
     }
   },
