@@ -363,40 +363,26 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
       console.log(`[Deposits] ✅ Loaded ${Object.keys(rates).length} rates from combined sources (${allRatePairs.length} rows)`)
       setExchangeRates(rates)
 
-      // Fetch and display last fetch info - MATCHING /rates PAGE LOGIC
-      // Prefer cached_rates (edge function execution time), fallback to most recent pair update
-      try {
-        let mostRecentTimestamp = new Date()
-        const fetchInfo = await getLastFetchInfo()
+      // Get the most recent timestamp - EXACTLY MATCHING /rates PAGE LOGIC
+      // Prefer actual fetch-rates execution time from cached_rates, fallback to pair timestamps
+      let mostRecentTimestamp = new Date()
+      const fetchInfo = await getLastFetchInfo()
 
-        if (fetchInfo && fetchInfo.fetchedAt) {
-          mostRecentTimestamp = fetchInfo.fetchedAt
-          console.log(`[Deposits] ✓ Using edge-function execution time: ${fetchInfo.isoString}`)
-        } else if (allRatePairs && allRatePairs.length > 0 && allRatePairs[0].updated_at) {
-          // Fallback: Use most recent pair's timestamp (already ordered DESC)
-          mostRecentTimestamp = new Date(allRatePairs[0].updated_at)
-          console.log(`[Deposits] ✓ Using most recent pair update timestamp: ${mostRecentTimestamp.toISOString()} (fallback)`)
-        } else if (timestamps.length > 0) {
-          // Last resort: Find most recent from collected timestamps
-          timestamps.sort((a, b) => b - a)
-          mostRecentTimestamp = timestamps[0]
-          console.log('[Deposits] ✓ Using most recent timestamp from rates collection (final fallback)')
-        }
-
-        const minutesSinceFetch = Math.floor((Date.now() - mostRecentTimestamp.getTime()) / 1000 / 60)
-
-        setLastFetchedRates({
-          fetchedAt: mostRecentTimestamp,
-          isoString: mostRecentTimestamp.toISOString(),
-          source: fetchInfo?.source || 'pairs-table',
-          isFresh: minutesSinceFetch < 60,
-          minutesSinceFetch: minutesSinceFetch
-        })
-
-        console.log(`[Deposits] ✓ Timestamp set: ${mostRecentTimestamp.toISOString()} (${minutesSinceFetch} minutes ago)`)
-      } catch (e) {
-        console.warn('[Deposits] Could not fetch last fetch info:', e.message)
+      if (fetchInfo && fetchInfo.fetchedAt) {
+        mostRecentTimestamp = fetchInfo.fetchedAt
+        console.log(`[Deposits] ✓ Using fetch-rates execution time: ${fetchInfo.isoString}`)
+      } else if (timestamps.length > 0) {
+        timestamps.sort((a, b) => b - a)
+        mostRecentTimestamp = timestamps[0]
+        console.log('[Deposits] ✓ Using most recent pair update timestamp (fallback)')
       }
+
+      setLastFetchedRates({
+        fetchedAt: mostRecentTimestamp,
+        isoString: mostRecentTimestamp.toISOString()
+      })
+
+      console.log(`[Deposits] ✓ Last fetch timestamp set: ${mostRecentTimestamp.toISOString()}`)
 
       setRatesLoading(false)
     } catch (err) {
