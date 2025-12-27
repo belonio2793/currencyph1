@@ -1596,7 +1596,7 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
                                 setSelectedDepositForDetails(deposit)
                                 setShowDepositDetailsModal(true)
                               }}
-                              className="px-2 py-1 bg-blue-600 text-white text-xs font-medium rounded hover:bg-blue-700 transition"
+                              className="px-2 py-1 bg-slate-900 text-white text-xs font-medium rounded hover:bg-slate-800 transition"
                             >
                               Details
                             </button>
