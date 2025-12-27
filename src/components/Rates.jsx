@@ -588,22 +588,82 @@ export default function Rates() {
                   </div>
                 </div>
 
-                {/* Target Currency Selector */}
+                {/* Target Currency Selector with Search */}
                 <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-                  <label className="block text-sm font-semibold text-slate-900 mb-2">
+                  <label className="block text-sm font-semibold text-slate-900 mb-3">
                     Convert All Rates To:
                   </label>
-                  <select
-                    value={targetCurrency}
-                    onChange={(e) => setTargetCurrency(e.target.value)}
-                    className="w-full sm:w-48 px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white font-medium text-slate-900"
-                  >
-                    {currencies.map(curr => (
-                      <option key={curr.code} value={curr.code}>
-                        {curr.code} - {curr.name}
-                      </option>
-                    ))}
-                  </select>
+                  <div className="relative">
+                    {/* Dropdown Trigger Button */}
+                    <button
+                      onClick={() => setTargetCurrencySearchOpen(!targetCurrencySearchOpen)}
+                      className="w-full sm:w-64 px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white font-medium text-slate-900 text-left flex items-center justify-between hover:border-slate-400 transition"
+                    >
+                      <span>
+                        {targetCurrency} - {currencies.find(c => c.code === targetCurrency)?.name || 'Select Currency'}
+                      </span>
+                      <svg className={`w-5 h-5 transition-transform ${targetCurrencySearchOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+                      </svg>
+                    </button>
+
+                    {/* Dropdown Menu */}
+                    {targetCurrencySearchOpen && (
+                      <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-slate-300 rounded-lg shadow-lg z-50">
+                        {/* Search Input */}
+                        <div className="p-3 border-b border-slate-200">
+                          <input
+                            type="text"
+                            placeholder="Search currencies..."
+                            value={targetCurrencySearchTerm}
+                            onChange={(e) => setTargetCurrencySearchTerm(e.target.value)}
+                            className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                            autoFocus
+                          />
+                        </div>
+
+                        {/* Currency List */}
+                        <div className="max-h-64 overflow-y-auto">
+                          {currencies
+                            .filter(curr =>
+                              curr.code.toLowerCase().includes(targetCurrencySearchTerm.toLowerCase()) ||
+                              curr.name.toLowerCase().includes(targetCurrencySearchTerm.toLowerCase())
+                            )
+                            .map(curr => (
+                              <button
+                                key={curr.code}
+                                onClick={() => {
+                                  setTargetCurrency(curr.code)
+                                  setTargetCurrencySearchOpen(false)
+                                  setTargetCurrencySearchTerm('')
+                                }}
+                                className={`w-full text-left px-4 py-3 border-b border-slate-100 hover:bg-blue-50 transition flex items-center justify-between ${
+                                  targetCurrency === curr.code ? 'bg-blue-100 font-semibold' : ''
+                                }`}
+                              >
+                                <div>
+                                  <div className="font-semibold text-slate-900">{curr.code}</div>
+                                  <div className="text-xs text-slate-500">{curr.name}</div>
+                                </div>
+                                {targetCurrency === curr.code && (
+                                  <svg className="w-5 h-5 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                                  </svg>
+                                )}
+                              </button>
+                            ))}
+                          {currencies.filter(curr =>
+                            curr.code.toLowerCase().includes(targetCurrencySearchTerm.toLowerCase()) ||
+                            curr.name.toLowerCase().includes(targetCurrencySearchTerm.toLowerCase())
+                          ).length === 0 && (
+                            <div className="px-4 py-6 text-center text-slate-500 text-sm">
+                              No currencies found
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    )}
+                  </div>
                 </div>
 
                 {/* Sticky Search and Filters */}
