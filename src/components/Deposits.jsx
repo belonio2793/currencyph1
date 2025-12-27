@@ -1454,20 +1454,20 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
 
         {/* Recent Deposits */}
         {deposits.length > 0 && (
-          <div className="bg-white rounded-lg shadow border border-slate-200 p-4 sm:p-8">
+          <div className="bg-white rounded-lg shadow border border-slate-200 p-4 sm:p-8 w-full">
             <h3 className="text-xl font-semibold text-slate-900 mb-4">Recent Deposits</h3>
-            <div className="w-full">
-              <table className="w-full text-xs sm:text-sm">
+            <div className="w-full overflow-x-auto -mx-4 sm:-mx-8 px-4 sm:px-8">
+              <table className="w-full text-xs sm:text-sm border-collapse">
                 <thead>
                   <tr className="border-b border-slate-200">
-                    <th className="text-left py-2 sm:py-3 px-2 sm:px-3 text-slate-600 font-medium min-w-max">Date & Time</th>
-                    <th className="text-left py-2 sm:py-3 px-2 sm:px-3 text-slate-600 font-medium min-w-max">You Sent</th>
-                    <th className="text-left py-2 sm:py-3 px-2 sm:px-3 text-slate-600 font-medium min-w-max">Payment</th>
-                    <th className="hidden lg:table-cell text-left py-2 sm:py-3 px-2 sm:px-3 text-slate-600 font-medium min-w-max">Rate</th>
-                    <th className="text-left py-2 sm:py-3 px-2 sm:px-3 text-slate-600 font-medium min-w-max">Received</th>
-                    <th className="text-left py-2 sm:py-3 px-2 sm:px-3 text-slate-600 font-medium min-w-max">Status</th>
-                    <th className="text-left py-2 sm:py-3 px-2 sm:px-3 text-slate-600 font-medium min-w-max">Reconciliation</th>
-                    <th className="text-left py-2 sm:py-3 px-2 sm:px-3 text-slate-600 font-medium min-w-max">Action</th>
+                    <th className="text-left py-2 sm:py-3 px-2 sm:px-3 text-slate-600 font-medium text-xs">Date & Time</th>
+                    <th className="text-left py-2 sm:py-3 px-2 sm:px-3 text-slate-600 font-medium text-xs">You Sent</th>
+                    <th className="text-left py-2 sm:py-3 px-2 sm:px-3 text-slate-600 font-medium text-xs">Payment</th>
+                    <th className="hidden xl:table-cell text-left py-2 sm:py-3 px-2 sm:px-3 text-slate-600 font-medium text-xs">Rate</th>
+                    <th className="text-left py-2 sm:py-3 px-2 sm:px-3 text-slate-600 font-medium text-xs">Received</th>
+                    <th className="text-left py-2 sm:py-3 px-2 sm:px-3 text-slate-600 font-medium text-xs">Status</th>
+                    <th className="text-left py-2 sm:py-3 px-2 sm:px-3 text-slate-600 font-medium text-xs">Reconciliation</th>
+                    <th className="text-left py-2 sm:py-3 px-2 sm:px-3 text-slate-600 font-medium text-xs">Action</th>
                   </tr>
                 </thead>
                 <tbody>
