@@ -703,23 +703,37 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
         return
       }
 
-      // Success - Display rate with full precision in explicit format
+      // Success - Display THREE-CURRENCY model in success message
       const rate = result.conversion.rate
       const formattedRate = formatExchangeRate(rate)
 
+      // Build comprehensive success message with all three currencies
+      let successMessage = ''
+      if (paymentMethodCurrency && paymentMethodCurrency !== depositCurrency) {
+        // Three currencies: input, payment, wallet
+        const paymentAmount = result.deposit.payment_amount || result.conversion.toAmount
+        successMessage = `✓ Deposit initiated! ${amount} ${depositCurrency} → ${paymentAmount?.toLocaleString(undefined, { maximumFractionDigits: 8 })} ${paymentMethodCurrency} → ${result.conversion.toAmount?.toLocaleString(undefined, { maximumFractionDigits: 8 })} ${targetWalletData.currency_code}`
+      } else {
+        // Two currencies: input, wallet
+        successMessage = `✓ Deposit initiated! ${amount} ${selectedCurrency} → ${result.conversion.toAmount?.toLocaleString(undefined, { maximumFractionDigits: 8 })} ${targetWalletData.currency_code}`
+      }
+
       // Log the actual rate for debugging
-      console.debug('[Deposits] Deposit success - Rate details:', {
+      console.debug('[Deposits] Deposit success - Three-Currency Details:', {
         rate: rate,
-        fromAmount: result.conversion.fromAmount,
-        toAmount: result.conversion.toAmount,
-        fromCurrency: result.conversion.fromCurrency,
-        toCurrency: result.conversion.toCurrency,
-        formattedRate: formattedRate
+        inputAmount: result.conversion.fromAmount,
+        inputCurrency: result.conversion.fromCurrency,
+        paymentMethodCurrency: paymentMethodCurrency,
+        paymentAmount: result.deposit.payment_amount,
+        receivedAmount: result.conversion.toAmount,
+        receivedCurrency: result.conversion.toCurrency,
+        formattedRate: formattedRate,
+        deposit: result.deposit
       })
 
       setDeposits([result.deposit, ...deposits])
       setLastSuccessDeposit(result.deposit)
-      setSuccess(`Deposit initiated successfully! 1 ${selectedCurrency} = ${formattedRate} ${targetWalletData.currency_code}`)
+      setSuccess(successMessage)
       setError('')
       setShowSuccessModal(true) // Show success modal with celebration
       setStep('confirm')
