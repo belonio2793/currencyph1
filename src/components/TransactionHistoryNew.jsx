@@ -163,7 +163,7 @@ export default function TransactionHistory({ userId }) {
                   </div>
                   <div>
                     <p className="font-medium text-slate-900 text-sm">{getTransactionLabel(transaction.transaction_type)}</p>
-                    <p className="text-xs text-slate-500 mt-1">{transaction.description}</p>
+                    <p className="text-xs text-slate-500 mt-1">{transaction.description?.toUpperCase()}</p>
                     <p className="text-xs text-slate-400 mt-1">
                       {new Date(transaction.created_at).toLocaleDateString()} {new Date(transaction.created_at).toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'})}
                     </p>
