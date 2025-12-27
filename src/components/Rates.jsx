@@ -626,7 +626,7 @@ export default function Rates() {
                     {targetCurrencySearchOpen && (
                       <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-slate-300 rounded-lg shadow-lg z-50">
                         {/* Search Input */}
-                        <div className="p-3 border-b border-slate-200">
+                        <div className="p-3 border-b border-slate-200 sticky top-0 bg-white">
                           <input
                             type="text"
                             placeholder="Search currencies..."
@@ -638,43 +638,92 @@ export default function Rates() {
                         </div>
 
                         {/* Currency List */}
-                        <div className="max-h-64 overflow-y-auto">
-                          {currencies
-                            .filter(curr =>
+                        <div className="max-h-80 overflow-y-auto">
+                          {(() => {
+                            const filtered = currencies.filter(curr =>
                               curr.code.toLowerCase().includes(targetCurrencySearchTerm.toLowerCase()) ||
                               curr.name.toLowerCase().includes(targetCurrencySearchTerm.toLowerCase())
                             )
-                            .map(curr => (
-                              <button
-                                key={curr.code}
-                                onClick={() => {
-                                  setTargetCurrency(curr.code)
-                                  setTargetCurrencySearchOpen(false)
-                                  setTargetCurrencySearchTerm('')
-                                }}
-                                className={`w-full text-left px-4 py-3 border-b border-slate-100 hover:bg-blue-50 transition flex items-center justify-between ${
-                                  targetCurrency === curr.code ? 'bg-blue-100 font-semibold' : ''
-                                }`}
-                              >
-                                <div>
-                                  <div className="font-semibold text-slate-900">{curr.code}</div>
-                                  <div className="text-xs text-slate-500">{curr.name}</div>
-                                </div>
-                                {targetCurrency === curr.code && (
-                                  <svg className="w-5 h-5 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                                  </svg>
+                            const fiat = filtered.filter(c => c.type === 'fiat')
+                            const crypto = filtered.filter(c => c.type === 'crypto')
+
+                            return (
+                              <>
+                                {/* Fiat Currencies Section */}
+                                {fiat.length > 0 && (
+                                  <div>
+                                    <div className="sticky top-12 px-4 py-2 bg-blue-50 border-b border-blue-200 font-semibold text-sm text-blue-900 flex items-center gap-2">
+                                      <div className="w-5 h-5 flex items-center justify-center font-bold text-white text-xs bg-blue-500 rounded">F</div>
+                                      Fiat Currencies
+                                    </div>
+                                    {fiat.map(curr => (
+                                      <button
+                                        key={curr.code}
+                                        onClick={() => {
+                                          setTargetCurrency(curr.code)
+                                          setTargetCurrencySearchOpen(false)
+                                          setTargetCurrencySearchTerm('')
+                                        }}
+                                        className={`w-full text-left px-4 py-3 border-b border-slate-100 hover:bg-blue-50 transition flex items-center justify-between ${
+                                          targetCurrency === curr.code ? 'bg-blue-100 font-semibold' : ''
+                                        }`}
+                                      >
+                                        <div>
+                                          <div className="font-semibold text-slate-900">{curr.code}</div>
+                                          <div className="text-xs text-slate-500">{curr.name}</div>
+                                        </div>
+                                        {targetCurrency === curr.code && (
+                                          <svg className="w-5 h-5 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                                          </svg>
+                                        )}
+                                      </button>
+                                    ))}
+                                  </div>
                                 )}
-                              </button>
-                            ))}
-                          {currencies.filter(curr =>
-                            curr.code.toLowerCase().includes(targetCurrencySearchTerm.toLowerCase()) ||
-                            curr.name.toLowerCase().includes(targetCurrencySearchTerm.toLowerCase())
-                          ).length === 0 && (
-                            <div className="px-4 py-6 text-center text-slate-500 text-sm">
-                              No currencies found
-                            </div>
-                          )}
+
+                                {/* Crypto Currencies Section */}
+                                {crypto.length > 0 && (
+                                  <div>
+                                    <div className="sticky px-4 py-2 bg-orange-50 border-b border-orange-200 font-semibold text-sm text-orange-900 flex items-center gap-2">
+                                      <div className="w-5 h-5 flex items-center justify-center font-bold text-white text-xs bg-orange-500 rounded">C</div>
+                                      Cryptocurrencies
+                                    </div>
+                                    {crypto.map(curr => (
+                                      <button
+                                        key={curr.code}
+                                        onClick={() => {
+                                          setTargetCurrency(curr.code)
+                                          setTargetCurrencySearchOpen(false)
+                                          setTargetCurrencySearchTerm('')
+                                        }}
+                                        className={`w-full text-left px-4 py-3 border-b border-slate-100 hover:bg-orange-50 transition flex items-center justify-between ${
+                                          targetCurrency === curr.code ? 'bg-orange-100 font-semibold' : ''
+                                        }`}
+                                      >
+                                        <div>
+                                          <div className="font-semibold text-slate-900">{curr.code}</div>
+                                          <div className="text-xs text-slate-500">{curr.name}</div>
+                                        </div>
+                                        {targetCurrency === curr.code && (
+                                          <svg className="w-5 h-5 text-orange-600" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                                          </svg>
+                                        )}
+                                      </button>
+                                    ))}
+                                  </div>
+                                )}
+
+                                {/* No results message */}
+                                {fiat.length === 0 && crypto.length === 0 && (
+                                  <div className="px-4 py-6 text-center text-slate-500 text-sm">
+                                    No currencies found
+                                  </div>
+                                )}
+                              </>
+                            )
+                          })()}
                         </div>
                       </div>
                     )}
