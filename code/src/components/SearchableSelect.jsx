@@ -278,7 +278,7 @@ export default function SearchableSelect({ value, onChange, options = [], label 
 
                 {/* Divider */}
                 {filteredFiat.length > 0 && filteredCrypto.length > 0 && (
-                  <div className="h-px bg-slate-200 my-2"></div>
+                  <div className="h-px bg-slate-200"></div>
                 )}
 
                 {/* CRYPTO Section */}
