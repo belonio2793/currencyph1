@@ -1325,6 +1325,47 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
               </div>
             )}
 
+            {/* CRITICAL WARNING: Multi-Currency Deposit Confirmation */}
+            {selectedAddressMethod && selectedCurrency !== selectedAddressMethod?.cryptoSymbol?.toUpperCase() && (
+              <div className="mb-8 p-6 bg-red-50 border-2 border-red-400 rounded-lg">
+                <h4 className="font-bold text-red-900 mb-3 flex items-center gap-2">
+                  <span className="text-xl">⚠️</span> CRITICAL: Verify Before Sending
+                </h4>
+                <div className="space-y-3 text-sm text-red-800">
+                  <p className="font-semibold">You are making a multi-currency deposit. Understand all three steps:</p>
+                  <div className="bg-white p-3 rounded border border-red-200 space-y-2">
+                    <div className="flex gap-2">
+                      <span className="font-bold text-blue-600 flex-shrink-0">1️⃣</span>
+                      <div>
+                        <p className="font-semibold">You Specify: {formatNumber(parseFloat(amount) || 0, selectedCurrency)} {selectedCurrency}</p>
+                        <p className="text-xs opacity-75">This is the amount you're depositing in your chosen currency</p>
+                      </div>
+                    </div>
+                    <div className="flex gap-2">
+                      <span className="font-bold text-purple-600 flex-shrink-0">2️⃣</span>
+                      <div>
+                        <p className="font-semibold">You Send: {getDepositMethodAmount()?.toLocaleString(undefined, {
+                          minimumFractionDigits: isCryptoCurrency(selectedAddressMethod?.cryptoSymbol) ? 2 : 2,
+                          maximumFractionDigits: isCryptoCurrency(selectedAddressMethod?.cryptoSymbol) ? 8 : 2
+                        })} {selectedAddressMethod?.cryptoSymbol?.toUpperCase()}</p>
+                        <p className="text-xs opacity-75">This is the ACTUAL amount you need to send (different from step 1!)</p>
+                      </div>
+                    </div>
+                    <div className="flex gap-2">
+                      <span className="font-bold text-emerald-600 flex-shrink-0">3️⃣</span>
+                      <div>
+                        <p className="font-semibold">You Receive: {formatNumber(calculateConvertedAmount(), selectedWalletData?.currency_code)} {selectedWalletData?.currency_code}</p>
+                        <p className="text-xs opacity-75">This is what gets credited to your wallet</p>
+                      </div>
+                    </div>
+                  </div>
+                  <p className="font-bold bg-red-100 p-2 rounded text-red-900 mt-3">
+                    🔴 DO NOT send {selectedCurrency} to a {selectedAddressMethod?.cryptoSymbol?.toUpperCase()} address. You will lose your funds!
+                  </p>
+                </div>
+              </div>
+            )}
+
             {/* Important Notes */}
             <div className="mb-8 p-4 bg-slate-50 border border-slate-300 rounded-lg">
               <p className="font-semibold text-slate-900 mb-2">Important:</p>
