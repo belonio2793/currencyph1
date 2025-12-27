@@ -2,11 +2,36 @@ import { useState, useEffect } from 'react'
 import { currencyAPI } from '../lib/payments'
 import { formatNumber } from '../lib/currency'
 
+const CRYPTO_CURRENCIES = ['USDC', 'USDT', 'BTC', 'ETH', 'MATIC', 'SOL', 'XRP', 'DOGE', 'ADA', 'AVAX', 'LTC', 'BCH', 'LINK', 'DOT', 'UNI', 'AAVE', 'CRV', 'WETH', 'DAI', 'BUSD', 'SHIB']
+
 export default function TransactionHistory({ userId }) {
   const [transactions, setTransactions] = useState([])
   const [loading, setLoading] = useState(true)
   const [filter, setFilter] = useState('all')
   const [selectedCurrency, setSelectedCurrency] = useState('all')
+
+  const getCurrencySymbol = (currencyCode) => {
+    const code = currencyCode?.toUpperCase() || 'USD'
+    if (CRYPTO_CURRENCIES.includes(code)) {
+      return '' // No symbol for crypto, just show the code
+    }
+    switch (code) {
+      case 'PHP':
+        return '₱'
+      case 'EUR':
+        return '€'
+      case 'GBP':
+        return '£'
+      case 'JPY':
+        return '¥'
+      default:
+        return '$'
+    }
+  }
+
+  const isCryptoCurrency = (currencyCode) => {
+    return CRYPTO_CURRENCIES.includes(currencyCode?.toUpperCase())
+  }
 
   useEffect(() => {
     loadTransactions()
