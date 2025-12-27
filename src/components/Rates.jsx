@@ -604,15 +604,15 @@ export default function Rates() {
                   </select>
                 </div>
 
-                {/* Controls */}
-                <div className="mb-6 space-y-4">
+                {/* Sticky Search and Filters */}
+                <div className="sticky top-0 z-10 -mx-6 -mt-6 px-6 pt-6 pb-4 bg-white border-b border-slate-200 space-y-4 mb-6">
                   {/* Search */}
                   <input
                     type="text"
                     placeholder="Search by currency code or name..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                    className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm font-medium"
                   />
 
                   {/* Filters and Sort */}
@@ -622,7 +622,7 @@ export default function Rates() {
                     <select
                       value={sortBy}
                       onChange={(e) => setSortBy(e.target.value)}
-                      className="px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+                      className="px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white font-medium"
                     >
                       <option value="code">Sort by Code</option>
                       <option value="rate">Sort by Rate</option>
@@ -638,100 +638,190 @@ export default function Rates() {
                   </div>
                 </div>
 
-                {/* Rates Table */}
-                <div className="overflow-x-auto">
-                  <table className="w-full">
-                    <thead>
-                      <tr className="border-b border-slate-200">
-                        <th
-                          onClick={() => {
-                            if (sortBy === 'code') {
-                              setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc')
-                            } else {
-                              setSortBy('code')
-                              setSortDirection('asc')
-                            }
-                          }}
-                          className="text-left py-3 px-4 font-semibold text-slate-700 text-sm cursor-pointer hover:bg-slate-100 transition select-none"
-                        >
-                          Currency {sortBy === 'code' && (sortDirection === 'asc' ? '↑' : '↓')}
-                        </th>
-                        <th className="text-left py-3 px-4 font-semibold text-slate-700 text-sm">Type</th>
-                        <th
-                          onClick={() => {
-                            if (sortBy === 'rate') {
-                              setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc')
-                            } else {
-                              setSortBy('rate')
-                              setSortDirection('desc')
-                            }
-                          }}
-                          className="text-right py-3 px-4 font-semibold text-slate-700 text-sm cursor-pointer hover:bg-slate-100 transition select-none"
-                        >
-                          Rate ({targetCurrencyData?.symbol || targetCurrency}) {sortBy === 'rate' && (sortDirection === 'asc' ? '↑' : '↓')}
-                        </th>
-                        <th className="text-center py-3 px-4 font-semibold text-slate-700 text-sm">Action</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {filteredRates.map(currency => (
-                        <tr
-                          key={currency.code}
-                          className={`border-b border-slate-100 hover:bg-slate-50 transition ${
-                            currency.type === 'crypto' ? 'hover:bg-orange-50' : 'hover:bg-blue-50'
-                          }`}
-                        >
-                          <td className="py-3 px-4">
-                            <div className="flex items-center gap-2">
-                              <div
-                                className={`w-8 h-8 flex items-center justify-center font-bold text-white text-sm border border-slate-300 ${
-                                  currency.type === 'crypto'
-                                    ? 'bg-orange-500'
-                                    : 'bg-blue-500'
-                                }`}
-                                title={currency.type === 'crypto' ? 'Cryptocurrency' : 'Fiat Currency'}
-                              >
-                                {currency.type === 'crypto' ? 'C' : 'F'}
-                              </div>
-                              <div className="min-w-0">
-                                <div className="font-semibold text-slate-900">{currency.code}</div>
-                                <div className="text-xs text-slate-500">{currency.name}</div>
-                              </div>
-                            </div>
-                          </td>
-                          <td className="py-3 px-4">
-                            <span className={`inline-block px-3 py-1 rounded-full text-xs font-medium ${
-                              currency.type === 'crypto'
-                                ? 'bg-orange-100 text-orange-700'
-                                : 'bg-blue-100 text-blue-700'
-                            }`}>
-                              {currency.type === 'crypto' ? 'Cryptocurrency' : 'Fiat'}
-                            </span>
-                          </td>
-                          <td className="py-3 px-4 text-right font-mono text-slate-900 font-medium">
-                            <span className="flex items-center justify-end gap-2">
-                              <span>{formatNumber(currency.rate, currency.decimals)}</span>
-                              {currency.symbol && <span className="text-xs text-slate-500">{currency.symbol}</span>}
-                            </span>
-                          </td>
-                          <td className="py-3 px-4 text-center">
-                            <button
-                              onClick={() => toggleFavorite(currency.code)}
-                              className={`text-xs font-semibold px-2 py-1 rounded transition ${
-                                favorites.includes(currency.code)
-                                  ? 'bg-yellow-200 text-yellow-900 hover:bg-yellow-300 animate-pulse'
-                                  : 'bg-slate-200 text-slate-600 hover:bg-yellow-200'
-                              }`}
-                              title={favorites.includes(currency.code) ? 'Remove from favorites' : 'Add to favorites'}
-                            >
-                              {favorites.includes(currency.code) ? 'FAV' : 'Add'}
-                            </button>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
+                {/* Separate Fiat and Crypto Sections */}
+                {(() => {
+                  const fiatRates = filteredRates.filter(c => c.type === 'fiat')
+                  const cryptoRates = filteredRates.filter(c => c.type === 'crypto')
+
+                  return (
+                    <div className="space-y-8">
+                      {/* Fiat Currencies Section */}
+                      {fiatRates.length > 0 && (
+                        <div>
+                          <div className="flex items-center gap-2 mb-4 pb-3 border-b-2 border-blue-300">
+                            <div className="w-6 h-6 flex items-center justify-center font-bold text-white text-sm bg-blue-500 rounded">F</div>
+                            <h3 className="text-lg font-semibold text-slate-900">Fiat Currencies ({fiatRates.length})</h3>
+                          </div>
+                          <div className="overflow-x-auto">
+                            <table className="w-full">
+                              <thead>
+                                <tr className="border-b border-slate-200">
+                                  <th
+                                    onClick={() => {
+                                      if (sortBy === 'code') {
+                                        setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc')
+                                      } else {
+                                        setSortBy('code')
+                                        setSortDirection('asc')
+                                      }
+                                    }}
+                                    className="text-left py-3 px-4 font-semibold text-slate-700 text-sm cursor-pointer hover:bg-slate-100 transition select-none"
+                                  >
+                                    Currency {sortBy === 'code' && (sortDirection === 'asc' ? '↑' : '↓')}
+                                  </th>
+                                  <th
+                                    onClick={() => {
+                                      if (sortBy === 'rate') {
+                                        setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc')
+                                      } else {
+                                        setSortBy('rate')
+                                        setSortDirection('desc')
+                                      }
+                                    }}
+                                    className="text-right py-3 px-4 font-semibold text-slate-700 text-sm cursor-pointer hover:bg-slate-100 transition select-none"
+                                  >
+                                    Rate ({targetCurrencyData?.symbol || targetCurrency}) {sortBy === 'rate' && (sortDirection === 'asc' ? '↑' : '↓')}
+                                  </th>
+                                  <th className="text-center py-3 px-4 font-semibold text-slate-700 text-sm">Action</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                {fiatRates.map(currency => (
+                                  <tr
+                                    key={currency.code}
+                                    className="border-b border-slate-100 hover:bg-blue-50 transition"
+                                  >
+                                    <td className="py-3 px-4">
+                                      <div className="flex items-center gap-2">
+                                        <div className="w-8 h-8 flex items-center justify-center font-bold text-white text-sm bg-blue-500 rounded border border-slate-300">
+                                          F
+                                        </div>
+                                        <div className="min-w-0">
+                                          <div className="font-semibold text-slate-900">{currency.code}</div>
+                                          <div className="text-xs text-slate-500">{currency.name}</div>
+                                        </div>
+                                      </div>
+                                    </td>
+                                    <td className="py-3 px-4 text-right font-mono text-slate-900 font-medium">
+                                      <span className="flex items-center justify-end gap-2">
+                                        <span>{formatNumber(currency.rate, currency.decimals)}</span>
+                                        {currency.symbol && <span className="text-xs text-slate-500">{currency.symbol}</span>}
+                                      </span>
+                                    </td>
+                                    <td className="py-3 px-4 text-center">
+                                      <button
+                                        onClick={() => toggleFavorite(currency.code)}
+                                        className={`text-xs font-semibold px-2 py-1 rounded transition ${
+                                          favorites.includes(currency.code)
+                                            ? 'bg-yellow-200 text-yellow-900 hover:bg-yellow-300 animate-pulse'
+                                            : 'bg-slate-200 text-slate-600 hover:bg-yellow-200'
+                                        }`}
+                                        title={favorites.includes(currency.code) ? 'Remove from favorites' : 'Add to favorites'}
+                                      >
+                                        {favorites.includes(currency.code) ? 'FAV' : 'Add'}
+                                      </button>
+                                    </td>
+                                  </tr>
+                                ))}
+                              </tbody>
+                            </table>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Crypto Currencies Section */}
+                      {cryptoRates.length > 0 && (
+                        <div>
+                          <div className="flex items-center gap-2 mb-4 pb-3 border-b-2 border-orange-300">
+                            <div className="w-6 h-6 flex items-center justify-center font-bold text-white text-sm bg-orange-500 rounded">C</div>
+                            <h3 className="text-lg font-semibold text-slate-900">Cryptocurrencies ({cryptoRates.length})</h3>
+                          </div>
+                          <div className="overflow-x-auto">
+                            <table className="w-full">
+                              <thead>
+                                <tr className="border-b border-slate-200">
+                                  <th
+                                    onClick={() => {
+                                      if (sortBy === 'code') {
+                                        setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc')
+                                      } else {
+                                        setSortBy('code')
+                                        setSortDirection('asc')
+                                      }
+                                    }}
+                                    className="text-left py-3 px-4 font-semibold text-slate-700 text-sm cursor-pointer hover:bg-slate-100 transition select-none"
+                                  >
+                                    Currency {sortBy === 'code' && (sortDirection === 'asc' ? '↑' : '↓')}
+                                  </th>
+                                  <th
+                                    onClick={() => {
+                                      if (sortBy === 'rate') {
+                                        setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc')
+                                      } else {
+                                        setSortBy('rate')
+                                        setSortDirection('desc')
+                                      }
+                                    }}
+                                    className="text-right py-3 px-4 font-semibold text-slate-700 text-sm cursor-pointer hover:bg-slate-100 transition select-none"
+                                  >
+                                    Rate ({targetCurrencyData?.symbol || targetCurrency}) {sortBy === 'rate' && (sortDirection === 'asc' ? '↑' : '↓')}
+                                  </th>
+                                  <th className="text-center py-3 px-4 font-semibold text-slate-700 text-sm">Action</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                {cryptoRates.map(currency => (
+                                  <tr
+                                    key={currency.code}
+                                    className="border-b border-slate-100 hover:bg-orange-50 transition"
+                                  >
+                                    <td className="py-3 px-4">
+                                      <div className="flex items-center gap-2">
+                                        <div className="w-8 h-8 flex items-center justify-center font-bold text-white text-sm bg-orange-500 rounded border border-slate-300">
+                                          C
+                                        </div>
+                                        <div className="min-w-0">
+                                          <div className="font-semibold text-slate-900">{currency.code}</div>
+                                          <div className="text-xs text-slate-500">{currency.name}</div>
+                                        </div>
+                                      </div>
+                                    </td>
+                                    <td className="py-3 px-4 text-right font-mono text-slate-900 font-medium">
+                                      <span className="flex items-center justify-end gap-2">
+                                        <span>{formatNumber(currency.rate, currency.decimals)}</span>
+                                        {currency.symbol && <span className="text-xs text-slate-500">{currency.symbol}</span>}
+                                      </span>
+                                    </td>
+                                    <td className="py-3 px-4 text-center">
+                                      <button
+                                        onClick={() => toggleFavorite(currency.code)}
+                                        className={`text-xs font-semibold px-2 py-1 rounded transition ${
+                                          favorites.includes(currency.code)
+                                            ? 'bg-yellow-200 text-yellow-900 hover:bg-yellow-300 animate-pulse'
+                                            : 'bg-slate-200 text-slate-600 hover:bg-yellow-200'
+                                        }`}
+                                        title={favorites.includes(currency.code) ? 'Remove from favorites' : 'Add to favorites'}
+                                      >
+                                        {favorites.includes(currency.code) ? 'FAV' : 'Add'}
+                                      </button>
+                                    </td>
+                                  </tr>
+                                ))}
+                              </tbody>
+                            </table>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* No results message */}
+                      {fiatRates.length === 0 && cryptoRates.length === 0 && (
+                        <div className="text-center py-12">
+                          <p className="text-slate-500 text-lg">No currencies match your search</p>
+                        </div>
+                      )}
+                    </div>
+                  )
+                })()}
               </div>
             </div>
 
