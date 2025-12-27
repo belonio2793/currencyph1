@@ -253,7 +253,7 @@ export const multiCurrencyDepositService = {
 
         // PAYMENT LAYER: How user pays (if different from input currency)
         payment_method_currency: paymentMethodCurrency ? paymentMethodCurrency.toUpperCase() : null,
-        payment_amount: null, // Will be calculated if paymentMethodCurrency differs from depositCurrency
+        payment_amount: paymentConversion ? paymentConversion.toAmount : null, // Amount of payment currency needed
 
         // WALLET LAYER: What's credited to wallet
         currency_code: walletCurrency.toUpperCase(),
