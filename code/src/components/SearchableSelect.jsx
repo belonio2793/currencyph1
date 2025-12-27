@@ -149,9 +149,16 @@ export default function SearchableSelect({ value, onChange, options = [], label 
         <div className="flex items-center gap-3 flex-1 min-w-0">
           {selectedOption && (
             <>
-              <span className={`inline-flex items-center px-2 py-1 rounded text-sm font-semibold ${getCurrencyTypeColor(selectedOption.metadata?.type)}`}>
-                {getCurrencyTypeLabel(selectedOption.metadata?.type)}
-              </span>
+              <div
+                className={`w-8 h-8 flex items-center justify-center font-bold text-white text-sm border border-slate-300 ${
+                  selectedOption.metadata?.type === 'cryptocurrency'
+                    ? 'bg-orange-500'
+                    : 'bg-blue-500'
+                }`}
+                title={getCurrencyTypeLabel(selectedOption.metadata?.type)}
+              >
+                {selectedOption.metadata?.type === 'cryptocurrency' ? 'C' : 'F'}
+              </div>
               <div className="min-w-0">
                 <div className="font-semibold text-slate-900 truncate">
                   {selectedOption.code}
