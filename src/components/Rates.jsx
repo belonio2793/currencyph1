@@ -33,19 +33,26 @@ export default function Rates() {
     return () => clearInterval(interval)
   }, [])
 
-  // Set default currencies when rates load
+  // Load exchange rates when target currency changes
   useEffect(() => {
-    if (rates.length > 0 && !selectedFrom) {
-      const phpRate = rates.find(r => r.code === 'PHP')
-      setSelectedFrom(phpRate?.code || rates[0].code)
+    if (currencies.length > 0 && targetCurrency) {
+      loadExchangeRates(targetCurrency)
+    }
+  }, [targetCurrency, currencies])
+
+  // Set default currencies when currencies load
+  useEffect(() => {
+    if (currencies.length > 0 && !selectedFrom) {
+      const phpCurrency = currencies.find(c => c.code === 'PHP')
+      setSelectedFrom(phpCurrency?.code || currencies[0].code)
     }
 
-    if (rates.length > 0 && !selectedTo) {
-      const usdRate = rates.find(r => r.code === 'USD')
-      const firstNonSelected = rates.find(r => r.code !== selectedFrom)
-      setSelectedTo(usdRate?.code || firstNonSelected?.code)
+    if (currencies.length > 0 && !selectedTo) {
+      const usdCurrency = currencies.find(c => c.code === 'USD')
+      const firstNonSelected = currencies.find(c => c.code !== selectedFrom)
+      setSelectedTo(usdCurrency?.code || firstNonSelected?.code)
     }
-  }, [rates, selectedFrom, selectedTo])
+  }, [currencies, selectedFrom, selectedTo])
 
   const loadData = async () => {
     try {
