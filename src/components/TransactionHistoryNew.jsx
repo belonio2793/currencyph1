@@ -580,14 +580,14 @@ export default function TransactionHistory({ userId }) {
                 {selectedTransaction.description && (
                   <div>
                     <p className="text-xs font-medium text-slate-600 uppercase tracking-wide mb-1">What This Transaction Was For</p>
-                    <p className="text-sm text-slate-700">{selectedTransaction.description}</p>
+                    <p className="text-sm text-slate-700">{capitalizeCurrencyCodes(selectedTransaction.description)}</p>
                   </div>
                 )}
 
                 {selectedTransaction.note && (
                   <div>
                     <p className="text-xs font-medium text-slate-600 uppercase tracking-wide mb-1">Additional Notes</p>
-                    <p className="text-sm text-slate-700">{selectedTransaction.note}</p>
+                    <p className="text-sm text-slate-700">{capitalizeCurrencyCodes(selectedTransaction.note)}</p>
                   </div>
                 )}
 
