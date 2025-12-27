@@ -535,9 +535,16 @@ export default function Rates() {
                         >
                           <td className="py-3 px-4">
                             <div className="flex items-center gap-2">
-                              <span className="text-sm font-semibold text-slate-600">
-                                {currency.type === 'crypto' ? '₿' : '$'}
-                              </span>
+                              <div
+                                className={`w-8 h-8 flex items-center justify-center font-bold text-white text-sm border border-slate-300 ${
+                                  currency.type === 'crypto'
+                                    ? 'bg-orange-500'
+                                    : 'bg-blue-500'
+                                }`}
+                                title={currency.type === 'crypto' ? 'Cryptocurrency' : 'Fiat Currency'}
+                              >
+                                {currency.type === 'crypto' ? 'C' : 'F'}
+                              </div>
                               <div className="min-w-0">
                                 <div className="font-semibold text-slate-900">{currency.code}</div>
                                 <div className="text-xs text-slate-500">{currency.name}</div>
