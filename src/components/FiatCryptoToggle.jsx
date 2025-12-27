@@ -7,7 +7,7 @@ export default function CurrencyCryptoToggle({ active, onChange }) {
         onClick={() => onChange('all')}
         className={`px-6 py-2 rounded text-sm font-medium transition-colors ${
           active === 'all'
-            ? 'bg-slate-600 text-white'
+            ? 'bg-slate-900 text-white'
             : 'text-slate-700 hover:bg-slate-100'
         }`}
       >
