@@ -210,48 +210,74 @@ export default function TransactionHistory({ userId }) {
           <p className="text-slate-500 text-sm">No transactions found</p>
         </div>
       ) : (
-        <div className="space-y-2">
-          {filteredTransactions.map(transaction => (
-            <div key={transaction.id} className="bg-white border border-slate-200 rounded-lg p-4 hover:shadow-md transition-shadow">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-4">
-                  <div className={`w-10 h-10 rounded-full flex items-center justify-center font-light text-lg ${
-                    transaction.transaction_type?.includes('sent') || transaction.transaction_type === 'bill_payment'
+        <div className="space-y-3">
+          {filteredTransactions.map(transaction => {
+            const usdValue = getCryptoInUSD(transaction.amount, transaction.currency_code)
+            const isOutgoing = transaction.transaction_type?.includes('sent') || transaction.transaction_type === 'bill_payment'
+
+            return (
+              <div key={transaction.id} className="bg-white border border-slate-200 rounded-lg p-4 sm:p-5 hover:shadow-md transition-shadow">
+                {/* Header: Icon and Title */}
+                <div className="flex items-start gap-3 sm:gap-4 mb-3">
+                  <div className={`flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center font-light text-lg ${
+                    isOutgoing
                       ? 'bg-red-100 text-red-600'
                       : 'bg-emerald-100 text-emerald-600'
                   }`}>
                     {getTransactionIcon(transaction.transaction_type)}
                   </div>
-                  <div>
-                    <p className="font-medium text-slate-900 text-sm">{getTransactionLabel(transaction.transaction_type)}</p>
-                    <p className="text-xs text-slate-500 mt-1">{transaction.description?.toUpperCase()}</p>
+
+                  <div className="flex-grow min-w-0">
+                    <p className="font-medium text-slate-900 text-sm sm:text-base">{getTransactionLabel(transaction.transaction_type)}</p>
+                    <p className="text-xs sm:text-sm text-slate-500 mt-1 break-words">{transaction.description?.toUpperCase()}</p>
                     <p className="text-xs text-slate-400 mt-1">
                       {new Date(transaction.created_at).toLocaleDateString()} {new Date(transaction.created_at).toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'})}
                     </p>
                   </div>
                 </div>
 
-                <div className="text-right">
-                  <p className={`text-lg font-light ${
-                    transaction.transaction_type?.includes('sent') || transaction.transaction_type === 'bill_payment'
-                      ? 'text-red-600'
-                      : 'text-emerald-600'
-                  }`}>
-                    {transaction.transaction_type?.includes('sent') || transaction.transaction_type === 'bill_payment' ? '-' : '+'}
-                    {getCurrencySymbol(transaction.currency_code)}
-                    {formatNumber(transaction.amount)}
-                  </p>
-                  <p className="text-xs text-slate-500">{transaction.currency_code?.toUpperCase()}</p>
-                </div>
-              </div>
+                {/* Amount Section */}
+                <div className="bg-slate-50 rounded-lg p-3 sm:p-4 space-y-2">
+                  {/* Primary Amount */}
+                  <div className="flex items-baseline justify-between gap-3">
+                    <span className="text-xs sm:text-sm font-medium text-slate-600 uppercase tracking-wide">{transaction.currency_code?.toUpperCase()}</span>
+                    <p className={`text-base sm:text-lg font-light flex-shrink-0 ${
+                      isOutgoing
+                        ? 'text-red-600'
+                        : 'text-emerald-600'
+                    }`}>
+                      {isOutgoing ? '-' : '+'}
+                      {getCurrencySymbol(transaction.currency_code)}
+                      {formatFullPrecision(transaction.amount)}
+                    </p>
+                  </div>
 
-              {transaction.reference_number && (
-                <div className="mt-3 pt-3 border-t border-slate-100">
-                  <p className="text-xs text-slate-500">Ref: {transaction.reference_number}</p>
+                  {/* Fiat Equivalent for Crypto */}
+                  {isCryptoCurrency(transaction.currency_code) && usdValue !== null && (
+                    <div className="flex items-baseline justify-between gap-3 pt-2 border-t border-slate-200">
+                      <span className="text-xs font-medium text-slate-500 uppercase tracking-wide">USD EQUIVALENT</span>
+                      <p className={`text-sm font-light flex-shrink-0 ${
+                        isOutgoing
+                          ? 'text-red-600'
+                          : 'text-emerald-600'
+                      }`}>
+                        {isOutgoing ? '-' : '+'}
+                        $
+                        {usdValue.toFixed(2)}
+                      </p>
+                    </div>
+                  )}
                 </div>
-              )}
-            </div>
-          ))}
+
+                {/* Reference Number */}
+                {transaction.reference_number && (
+                  <div className="mt-3 pt-3 border-t border-slate-100">
+                    <p className="text-xs text-slate-500">Ref: {transaction.reference_number}</p>
+                  </div>
+                )}
+              </div>
+            )
+          })}
         </div>
       )}
     </div>
