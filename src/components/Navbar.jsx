@@ -84,24 +84,14 @@ function NavbarComponent({ activeTab, onTabChange, globalCurrency, setGlobalCurr
             <div className="flex flex-col gap-1">
               <p className="text-xs text-slate-500 font-medium uppercase tracking-wider">Total Wallet Holdings Value</p>
               <p className="text-3xl font-light text-black">
-                {loadingConsolidated ? (
-                  <span className="text-slate-400">loading...</span>
-                ) : consolidatedHoldingsInCrypto !== null && consolidatedHoldingsInCrypto !== undefined ? (
-                  <>
-                    {formatNumber(consolidatedHoldingsInCrypto.toFixed(2))} {globalCurrency}
-                  </>
-                ) : (
-                  <>
-                    {formatNumber(0)} {globalCurrency}
-                  </>
-                )}
+                {formatNumber((totalBalanceConverted || 0).toFixed(2))} {globalCurrency}
               </p>
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-6">
               <div>
                 <p className="text-xs text-slate-500 font-medium uppercase tracking-wider mb-2">Fiat Holdings</p>
                 <p className="text-lg font-semibold text-black">
-                  {formatNumber(totalBalanceConverted || 0)} {globalCurrency}
+                  {formatNumber((fiatHoldingsConverted || 0).toFixed(2))} {globalCurrency}
                 </p>
               </div>
               <div>
@@ -109,7 +99,7 @@ function NavbarComponent({ activeTab, onTabChange, globalCurrency, setGlobalCurr
                 <p className="text-lg font-semibold text-black">
                   {loadingCryptoConversion ? (
                     <span className="text-slate-400 italic">loading...</span>
-                  ) : totalCryptoBalancePHP > 0 ? (
+                  ) : cryptoHoldingsConverted > 0 ? (
                     <>{formatNumber(totalCryptoInSelectedCrypto.toFixed(8))} {globalCryptocurrency}</>
                   ) : (
                     <span className="text-black">0 {globalCryptocurrency}</span>
@@ -119,13 +109,13 @@ function NavbarComponent({ activeTab, onTabChange, globalCurrency, setGlobalCurr
               <div>
                 <p className="text-xs text-slate-500 font-medium uppercase tracking-wider mb-2">Net Worth</p>
                 <p className="text-lg font-semibold text-black">
-                  {formatNumber(totalNet || 0)} {globalCurrency}
+                  {formatNumber((totalNet || 0).toFixed(2))} {globalCurrency}
                 </p>
               </div>
               <div>
                 <p className="text-xs text-slate-500 font-medium uppercase tracking-wider mb-2">Total Debt</p>
                 <p className="text-lg font-semibold text-black">
-                  {formatNumber(totalDebtConverted || 0)} {globalCurrency}
+                  {formatNumber((totalDebtConverted || 0).toFixed(2))} {globalCurrency}
                 </p>
               </div>
             </div>
