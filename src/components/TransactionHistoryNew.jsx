@@ -192,7 +192,7 @@ export default function TransactionHistory({ userId }) {
       case 'deposit_reversed':
         return 'Deposit Reversed'
       case 'fee':
-        return 'Fee'
+        return 'Service Fee'
       case 'refund':
         return 'Refund'
       case 'adjustment':
@@ -200,6 +200,17 @@ export default function TransactionHistory({ userId }) {
       default:
         return type?.replace(/_/g, ' ').charAt(0).toUpperCase() + type?.slice(1).replace(/_/g, ' ').toLowerCase()
     }
+  }
+
+  const getStatusDisplay = (status) => {
+    const statusMap = {
+      'pending': 'Pending',
+      'approved': 'Approved',
+      'completed': 'Completed',
+      'reversed': 'Reversed',
+      'rejected': 'Rejected'
+    }
+    return statusMap[status] || (status ? status.charAt(0).toUpperCase() + status.slice(1) : 'Completed')
   }
 
   const filteredTransactions = transactions.filter(t => {
