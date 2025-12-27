@@ -1481,7 +1481,7 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
                               <div className="font-medium text-slate-900">
                                 {notesMeta.payment_method_currency || deposit.payment_method_currency}
                               </div>
-                              {notesMeta.payment_amount || deposit.payment_amount && (
+                              {(notesMeta.payment_amount || deposit.payment_amount) && (
                                 <div className="text-slate-600">
                                   {formatAmount(notesMeta.payment_amount || deposit.payment_amount, notesMeta.payment_method_currency || deposit.payment_method_currency)}
                                 </div>
