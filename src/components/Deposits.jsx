@@ -295,29 +295,35 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
         .select('from_currency, to_currency, rate, updated_at')
         .limit(10000)
 
-      if (canonicalError) {
-        console.warn('[Deposits] Warning fetching canonical pairs:', canonicalError.message)
+      if (pairsError) {
+        console.warn('[Deposits] Warning fetching pairs:', pairsError.message)
       }
 
       if (cryptoError) {
         console.warn('[Deposits] Warning fetching crypto_rates:', cryptoError.message)
       }
 
-      // Combine data sources - prioritize pairs, fallback to crypto_rates
-      let allRatePairs = (canonicalPairs || [])
+      // Combine data sources - prioritize pairs, fallback to crypto_rates (matching /rates page)
+      const seenPairs = new Set()
+      let allRatePairs = []
 
-      if (cryptoRatesData && cryptoRatesData.length > 0) {
-        const seenPairs = new Set()
-        allRatePairs.forEach(p => {
-          seenPairs.add(`${p.from_currency}-${p.to_currency}`)
-        })
+      // Add pairs from main pairs table (priority 1)
+      (pairsData || []).forEach(pair => {
+        const key = `${pair.from_currency}-${pair.to_currency}`
+        if (!seenPairs.has(key)) {
+          seenPairs.add(key)
+          allRatePairs.push(pair)
+        }
+      })
 
-        cryptoRatesData.forEach(p => {
-          if (!seenPairs.has(`${p.from_currency}-${p.to_currency}`)) {
-            allRatePairs.push(p)
-          }
-        })
-      }
+      // Add crypto rates as fallback (priority 2)
+      (cryptoRatesData || []).forEach(pair => {
+        const key = `${pair.from_currency}-${pair.to_currency}`
+        if (!seenPairs.has(key)) {
+          seenPairs.add(key)
+          allRatePairs.push(pair)
+        }
+      })
 
       if (!allRatePairs || allRatePairs.length === 0) {
         console.warn('[Deposits] No rates available from pairs or crypto_rates')
@@ -326,26 +332,27 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
         return
       }
 
-      console.log(`[Deposits] Fetched ${canonicalPairs?.length || 0} pairs + ${cryptoRatesData?.length || 0} crypto_rates (deduplicated: ${allRatePairs.length})`)
+      console.log(`[Deposits] Fetched ${pairsData?.length || 0} pairs + ${cryptoRatesData?.length || 0} crypto_rates (total: ${allRatePairs.length})`)
 
-      // 🎯 CRITICAL: Store canonical rates (X→PHP) directly
+      // 🎯 Extract and store canonical rates (X→PHP)
       // This ensures crypto rates are large numbers (BTC→PHP: 2,500,000)
       // NOT small decimals (PHP→BTC: 0.0000004)
       allRatePairs.forEach(pair => {
         const fromCode = pair.from_currency.toUpperCase()
+        const toCode = pair.to_currency.toUpperCase()
         const rate = Number(pair.rate)
 
-        // Collect timestamps from all rate sources for timestamp logic
+        // Collect timestamps from all pairs for timestamp logic (matching /rates page)
         if (pair.updated_at) {
           timestamps.push(new Date(pair.updated_at))
         }
 
-        // Validate rate before storing
-        if (isFinite(rate) && rate > 0) {
+        // Only store rates where target currency is PHP
+        if (toCode === 'PHP' && isFinite(rate) && rate > 0) {
           // If we don't have this rate yet, store it (prefer most recent)
           if (!rates[fromCode]) {
             rates[fromCode] = rate
-            console.log(`[Deposits] ✓ ${fromCode} = ${rate.toLocaleString(undefined, { maximumFractionDigits: 8 })} PHP`)
+            console.log(`[Deposits] ✓ ${fromCode} → PHP = ${rate.toLocaleString(undefined, { maximumFractionDigits: 8 })}`)
           }
         }
       })
