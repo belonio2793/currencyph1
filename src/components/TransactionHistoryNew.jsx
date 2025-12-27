@@ -4,11 +4,36 @@ import { formatNumber } from '../lib/currency'
 
 const CRYPTO_CURRENCIES = ['USDC', 'USDT', 'BTC', 'ETH', 'MATIC', 'SOL', 'XRP', 'DOGE', 'ADA', 'AVAX', 'LTC', 'BCH', 'LINK', 'DOT', 'UNI', 'AAVE', 'CRV', 'WETH', 'DAI', 'BUSD', 'SHIB']
 
+const CRYPTO_IDS = {
+  'BTC': 'bitcoin',
+  'ETH': 'ethereum',
+  'USDC': 'usd-coin',
+  'USDT': 'tether',
+  'XRP': 'ripple',
+  'ADA': 'cardano',
+  'SOL': 'solana',
+  'MATIC': 'matic-network',
+  'DOGE': 'dogecoin',
+  'LTC': 'litecoin',
+  'AVAX': 'avalanche-2',
+  'BCH': 'bitcoin-cash',
+  'LINK': 'chainlink',
+  'DOT': 'polkadot',
+  'UNI': 'uniswap',
+  'AAVE': 'aave',
+  'CRV': 'curve-dao-token',
+  'WETH': 'ethereum',
+  'DAI': 'dai',
+  'BUSD': 'binance-usd',
+  'SHIB': 'shiba-inu'
+}
+
 export default function TransactionHistory({ userId }) {
   const [transactions, setTransactions] = useState([])
   const [loading, setLoading] = useState(true)
   const [filter, setFilter] = useState('all')
   const [selectedCurrency, setSelectedCurrency] = useState('all')
+  const [cryptoRates, setCryptoRates] = useState({})
 
   const getCurrencySymbol = (currencyCode) => {
     const code = currencyCode?.toUpperCase() || 'USD'
@@ -31,6 +56,38 @@ export default function TransactionHistory({ userId }) {
 
   const isCryptoCurrency = (currencyCode) => {
     return CRYPTO_CURRENCIES.includes(currencyCode?.toUpperCase())
+  }
+
+  const fetchCryptoRates = async () => {
+    try {
+      const ids = Object.values(CRYPTO_IDS).join(',')
+      const response = await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${ids}&vs_currencies=usd&include_market_cap=false&include_24hr_vol=false`)
+      const data = await response.json()
+
+      const rates = {}
+      for (const [symbol, id] of Object.entries(CRYPTO_IDS)) {
+        if (data[id]) {
+          rates[symbol] = data[id].usd
+        }
+      }
+      setCryptoRates(rates)
+    } catch (err) {
+      console.error('Failed to fetch crypto rates:', err)
+    }
+  }
+
+  const formatFullPrecision = (amount) => {
+    if (amount == null || isNaN(amount)) return '0'
+    return String(amount)
+  }
+
+  const getCryptoInUSD = (amount, currency) => {
+    if (!isCryptoCurrency(currency) || !cryptoRates[currency?.toUpperCase()]) {
+      return null
+    }
+    const rate = cryptoRates[currency?.toUpperCase()]
+    const usdValue = amount * rate
+    return usdValue
   }
 
   useEffect(() => {
