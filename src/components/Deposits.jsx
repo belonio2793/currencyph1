@@ -1464,7 +1464,7 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
                     <th className="text-left py-3 px-4 text-slate-600 font-medium">Payment Currency</th>
                     <th className="text-left py-3 px-4 text-slate-600 font-medium">Exchange Rate</th>
                     <th className="text-left py-3 px-4 text-slate-600 font-medium">You Received</th>
-                    <th className="text-left py-3 px-4 text-slate-600 font-medium">Reference</th>
+                    <th className="text-left py-3 px-4 text-slate-600 font-medium">Date & Time</th>
                     <th className="text-left py-3 px-4 text-slate-600 font-medium">Status</th>
                     <th className="text-left py-3 px-4 text-slate-600 font-medium">Action</th>
                   </tr>
