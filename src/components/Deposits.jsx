@@ -757,7 +757,7 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
       availableMethods.push({
         id: addresses.length > 1 ? `${cryptoCode.toLowerCase()}-${idx}` : cryptoCode.toLowerCase(),
         name: addresses.length > 1 ? `${cryptoCode} (${addressData.network})` : cryptoCode,
-        icon: cryptoCode,
+        icon: 'C',
         type: 'crypto',
         description: `Send ${cryptoName} directly to our wallet${addresses.length > 1 ? ` via ${addressData.network}` : ''}`,
         address: addressData.address,
