@@ -214,23 +214,33 @@ export const multiCurrencyDepositService = {
       const now = new Date()
       const isoTimestamp = now.toISOString()
 
-      // Build comprehensive deposit record with all metadata
-      // SCHEMA SEMANTICS:
-      // - amount: source amount (what's being deposited)
-      // - currency_code: destination/wallet currency (what's received)
-      // - original_currency: source currency (what's being deposited)
-      // - received_amount: destination amount (what's received in wallet)
+      // Build comprehensive deposit record with THREE-CURRENCY model
+      // SCHEMA SEMANTICS (THREE-CURRENCY MODEL):
+      // 1. Input Layer: amount, input_currency - what user specifies
+      // 2. Payment Layer: payment_amount, payment_method_currency - how they pay
+      // 3. Wallet Layer: received_amount, currency_code - what's credited to wallet
+      //
+      // CRITICAL FIX: These are three separate currencies!
+      // Example: 90,000 USD (input) → 0.03 ETH (payment) → 4,500,000 PHP (wallet)
       const depositRecord = {
         user_id: userId,
         wallet_id: walletId,
 
-        // Source amount and currency (what's being deposited FROM)
+        // INPUT LAYER: What user specifies
+        input_amount: conversion.fromAmount,
+        input_currency: depositCurrency.toUpperCase(),
+
+        // LEGACY FIELDS (for backward compatibility with old schema)
         amount: conversion.fromAmount,
         original_currency: depositCurrency.toUpperCase(),
         original_currency_name: depositCurrencyInfo?.name || depositCurrency,
         original_currency_symbol: depositCurrencyInfo?.symbol || depositCurrency,
 
-        // Destination/wallet currency (what will be received INTO the wallet)
+        // PAYMENT LAYER: How user pays (if different from input currency)
+        payment_method_currency: paymentMethodCurrency ? paymentMethodCurrency.toUpperCase() : null,
+        payment_amount: null, // Will be calculated if paymentMethodCurrency differs from depositCurrency
+
+        // WALLET LAYER: What's credited to wallet
         currency_code: walletCurrency.toUpperCase(),
         currency_name: walletCurrencyInfo?.name || walletCurrency,
         currency_symbol: walletCurrencyInfo?.symbol || walletCurrency,
