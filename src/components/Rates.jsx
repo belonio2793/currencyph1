@@ -68,28 +68,31 @@ export default function Rates() {
 
       console.log(`Fetched ${currenciesData.length} currencies from database`)
 
-      // Fetch all exchange rates from pairs table
-      const { data: pairsData, error: pairsError } = await supabase
-        .from('pairs')
-        .select('from_currency, rate, updated_at')
+      // Fetch all exchange rates from both currency_rates and cryptocurrency_rates tables
+      const [{ data: fiatRatesData, error: fiatError }, { data: cryptoRatesData, error: cryptoError }] = await Promise.all([
+        supabase
+          .from('currency_rates')
+          .select('from_currency, to_currency, rate, updated_at'),
+        supabase
+          .from('cryptocurrency_rates')
+          .select('from_currency, to_currency, rate, updated_at')
+      ])
 
-      if (pairsError) {
-        console.warn('Warning fetching pairs:', pairsError)
-        // Don't throw - we can still display currencies without rates
-      }
-
-      // Build rates map from pairs data
+      // Build rates map from both sources
       const ratesByCode = {}
       let mostRecentTime = new Date()
 
-      if (pairsData && pairsData.length > 0) {
-        pairsData.forEach(pair => {
+      const processRatesData = (ratesData, source) => {
+        if (!ratesData) return
+        ratesData.forEach(pair => {
           if (pair.rate && isFinite(Number(pair.rate)) && Number(pair.rate) > 0) {
-            const fromCode = pair.from_currency
-            if (!ratesByCode[fromCode] || !ratesByCode[fromCode].rate) {
+            const fromCode = pair.from_currency.toUpperCase()
+            // Store rate if we don't have it yet
+            if (!ratesByCode[fromCode]) {
               ratesByCode[fromCode] = {
                 rate: Number(pair.rate),
-                updatedAt: pair.updated_at || new Date().toISOString()
+                updatedAt: pair.updated_at || new Date().toISOString(),
+                source
               }
 
               // Track most recent timestamp
@@ -100,6 +103,20 @@ export default function Rates() {
             }
           }
         })
+      }
+
+      if (!fiatError) {
+        console.log(`Fetched ${fiatRatesData?.length || 0} fiat rates from currency_rates`)
+        processRatesData(fiatRatesData, 'currency_rates')
+      } else {
+        console.warn('Warning fetching currency_rates:', fiatError.message)
+      }
+
+      if (!cryptoError) {
+        console.log(`Fetched ${cryptoRatesData?.length || 0} crypto rates from cryptocurrency_rates`)
+        processRatesData(cryptoRatesData, 'cryptocurrency_rates')
+      } else {
+        console.warn('Warning fetching cryptocurrency_rates:', cryptoError.message)
       }
 
       // Build final rates array from currencies table, enriched with rate data
