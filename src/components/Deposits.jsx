@@ -7,7 +7,6 @@ import PaymentMethodsGrid from './PaymentMethodsGrid'
 import { currencyAPI } from '../lib/currencyAPI'
 import { coinsPhApi } from '../lib/coinsPhApi'
 import { formatNumber, formatExchangeRate, convertCurrency, isCryptoCurrency } from '../lib/currency'
-import { formatFullDateTime } from '../lib/dateTimeUtils'
 import { walletService } from '../lib/walletService'
 import { multiCurrencyDepositService } from '../lib/multiCurrencyDepositService'
 import {
