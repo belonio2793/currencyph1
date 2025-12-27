@@ -130,7 +130,7 @@ export default function TransactionHistory({ userId }) {
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-4">
                   <div className={`w-10 h-10 rounded-full flex items-center justify-center font-light text-lg ${
-                    transaction.transaction_type.includes('sent') || transaction.transaction_type === 'bill_payment'
+                    transaction.transaction_type?.includes('sent') || transaction.transaction_type === 'bill_payment'
                       ? 'bg-red-100 text-red-600'
                       : 'bg-emerald-100 text-emerald-600'
                   }`}>
