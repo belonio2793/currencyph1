@@ -60,6 +60,24 @@ export default function TransactionHistory({ userId }) {
     return CRYPTO_CURRENCIES.includes(currencyCode?.toUpperCase())
   }
 
+  const capitalizeCurrencyCodes = (text) => {
+    if (!text) return text
+    // List of all currency codes to capitalize
+    const allCurrencies = [
+      'PHP', 'USD', 'EUR', 'GBP', 'JPY', 'CNY', 'INR', 'AUD', 'CAD',
+      'BTC', 'ETH', 'USDC', 'USDT', 'XRP', 'ADA', 'SOL', 'MATIC', 'DOGE',
+      'LTC', 'BCH', 'LINK', 'DOT', 'UNI', 'AAVE', 'CRV', 'WETH', 'DAI', 'BUSD', 'SHIB'
+    ]
+
+    let result = text
+    allCurrencies.forEach(currency => {
+      // Replace lowercase versions with uppercase (case-insensitive)
+      const regex = new RegExp(`\\b${currency.toLowerCase()}\\b`, 'gi')
+      result = result.replace(regex, currency)
+    })
+    return result
+  }
+
   const formatCurrencyAmount = (amount, currencyCode) => {
     if (amount == null || isNaN(amount)) return '0'
     const code = currencyCode?.toUpperCase() || 'USD'
