@@ -943,40 +943,6 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
                 )}
               </div>
 
-              {/* Last Fetched Rates Info - Matching /rates page format */}
-              {lastFetchedRates && (
-                <div className="mb-6 p-4 bg-slate-50 border border-slate-300 rounded-lg">
-                  <div className="flex items-center justify-between flex-wrap gap-2">
-                    <div>
-                      <p className="text-sm text-slate-900">
-                        <span className="font-semibold">Last Fetched Rates:</span>{' '}
-                        <span className="text-slate-700">{formatFullDateTime(lastFetchedRates.fetchedAt)}</span>
-                      </p>
-                      {lastFetchedRates && (
-                        <p className="text-xs text-slate-600 mt-1">
-                          {(() => {
-                            const minutes = Math.floor((Date.now() - new Date(lastFetchedRates.fetchedAt).getTime()) / 1000 / 60)
-                            if (minutes < 1) return 'Just now'
-                            if (minutes < 60) return `${minutes} minute${minutes !== 1 ? 's' : ''} ago`
-                            const hours = Math.floor(minutes / 60)
-                            if (hours < 24) return `${hours} hour${hours !== 1 ? 's' : ''} ago`
-                            return '⚠ Data may be stale'
-                          })()}
-                        </p>
-                      )}
-                    </div>
-                    {!ratesLoading && (
-                      <button
-                        onClick={() => fetchExchangeRates()}
-                        disabled={ratesLoading}
-                        className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition whitespace-nowrap"
-                      >
-                        {ratesLoading ? 'Refreshing...' : 'Refresh Rates'}
-                      </button>
-                    )}
-                  </div>
-                </div>
-              )}
 
               {/* Conversion Display */}
               {amount && selectedWallet && (
