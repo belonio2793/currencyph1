@@ -18,6 +18,8 @@ export default function Rates() {
   // Rates table view - default conversion target is USD
   const [targetCurrency, setTargetCurrency] = useState('USD')
   const [exchangeRates, setExchangeRates] = useState({})
+  const [targetCurrencySearchOpen, setTargetCurrencySearchOpen] = useState(false)
+  const [targetCurrencySearchTerm, setTargetCurrencySearchTerm] = useState('')
 
   const [searchTerm, setSearchTerm] = useState('')
   const [typeFilter, setTypeFilter] = useState('all')
