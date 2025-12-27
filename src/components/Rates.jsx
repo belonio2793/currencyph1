@@ -604,7 +604,7 @@ export default function Rates() {
                 </div>
 
                 {/* Target Currency Selector with Search */}
-                <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg" data-target-currency-dropdown>
                   <label className="block text-sm font-semibold text-slate-900 mb-3">
                     Convert All Rates To:
                   </label>
