@@ -1005,7 +1005,7 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
                         <div className="text-slate-400 text-xl flex-shrink-0">↔</div>
                         <div className="text-right flex-1 min-w-0">
                           <p className="text-xs text-slate-600 mb-1">You receive in {selectedWalletData?.currency_code}</p>
-                          <p className={`text-3xl font-bold break-words ${calculateConvertedAmount() ? 'text-indigo-600' : 'text-amber-600'}`}>
+                          <p className={`text-3xl font-bold break-words ${calculateConvertedAmount() ? 'text-slate-900' : 'text-amber-600'}`}>
                             {calculateConvertedAmount() ? calculateConvertedAmount().toLocaleString(undefined, { maximumFractionDigits: 8 }) : (
                               exchangeRates[selectedCurrency] ? (parseFloat(amount) * exchangeRates[selectedCurrency]).toLocaleString(undefined, { maximumFractionDigits: 8 }) : '⏳'
                             )}
