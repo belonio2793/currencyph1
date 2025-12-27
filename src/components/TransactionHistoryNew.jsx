@@ -92,6 +92,10 @@ export default function TransactionHistory({ userId }) {
 
   useEffect(() => {
     loadTransactions()
+    fetchCryptoRates()
+    // Refresh crypto rates every 60 seconds
+    const interval = setInterval(fetchCryptoRates, 60000)
+    return () => clearInterval(interval)
   }, [userId])
 
   const loadTransactions = async () => {
