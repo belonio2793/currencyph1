@@ -31,12 +31,15 @@ BEGIN
         RAISE EXCEPTION 'Wallet not found for user % and wallet %', NEW.user_id, NEW.wallet_id;
       END IF;
 
-      -- Calculate new balance
-      v_new_balance := COALESCE(v_wallet_balance, 0) + NEW.amount;
+      -- Calculate new balance using received_amount (converted to wallet currency)
+      -- CRITICAL FIX: Use received_amount instead of amount
+      -- Example: 95,588 PHP deposited → converted to 1.73745506 BTC
+      -- Wallet should receive 1.73745506 BTC, not 95,588!
+      v_new_balance := COALESCE(v_wallet_balance, 0) + COALESCE(NEW.received_amount, NEW.amount);
 
       -- Update wallet balance atomically
       UPDATE wallets
-      SET 
+      SET
         balance = v_new_balance,
         updated_at = NOW()
       WHERE id = NEW.wallet_id
@@ -58,7 +61,7 @@ BEGIN
           NEW.user_id,
           NEW.wallet_id,
           'deposit',
-          NEW.amount,
+          COALESCE(NEW.received_amount, NEW.amount),
           NEW.currency_code,
           NEW.id,
           COALESCE(NEW.description, 'Deposit from ' || NEW.deposit_method),
