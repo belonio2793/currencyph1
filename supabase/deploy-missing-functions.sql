@@ -41,9 +41,9 @@ BEGIN
       v_wallet_rate := 1.0;
     ELSE
       -- Get rate from pairs table using safe function
-      SELECT (result).rate INTO v_wallet_rate
-      FROM (SELECT public.get_exchange_rate_safe(v_wallet_record.currency_code, v_target_upper) AS result) t
-      WHERE (result).rate IS NOT NULL
+      SELECT er.rate INTO v_wallet_rate
+      FROM public.get_exchange_rate_safe(v_wallet_record.currency_code, v_target_upper) as er
+      WHERE er.rate IS NOT NULL
       LIMIT 1;
     END IF;
 
