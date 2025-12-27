@@ -78,7 +78,18 @@ export default function TransactionHistory({ userId }) {
 
   const formatFullPrecision = (amount) => {
     if (amount == null || isNaN(amount)) return '0'
-    return String(amount)
+
+    // Convert to string and split into integer and decimal parts
+    const str = String(amount)
+    const parts = str.split('.')
+    const integerPart = parts[0]
+    const decimalPart = parts[1] || ''
+
+    // Add comma formatting to integer part
+    const formattedInteger = parseInt(integerPart).toLocaleString('en-US')
+
+    // Combine back together
+    return decimalPart ? `${formattedInteger}.${decimalPart}` : formattedInteger
   }
 
   const getCryptoInUSD = (amount, currency) => {
