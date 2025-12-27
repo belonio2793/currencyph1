@@ -1279,7 +1279,7 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
 
             {/* Cryptocurrency Address QR */}
             {activeMethodData?.type === 'crypto' && (
-              <div className="mb-8 p-6 bg-purple-50 border border-purple-200 rounded-lg">
+              <div className="mb-8 p-6 bg-slate-50 border border-slate-300 rounded-lg">
                 {activeMethodData?.address ? (
                   <>
                     <div className="mb-4">
