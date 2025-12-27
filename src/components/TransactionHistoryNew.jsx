@@ -544,7 +544,7 @@ export default function TransactionHistory({ userId }) {
                   {selectedTransaction.deposit_method && (
                     <div className="pt-2 border-t border-slate-200">
                       <p className="text-xs font-medium text-slate-600 uppercase tracking-wide mb-1">Payment Method Used</p>
-                      <p className="text-sm font-semibold text-slate-900 capitalize">{selectedTransaction.deposit_method.replace(/_/g, ' ')}</p>
+                      <p className="text-sm font-semibold text-slate-900 capitalize">{capitalizeCurrencyCodes(selectedTransaction.deposit_method.replace(/_/g, ' '))}</p>
                     </div>
                   )}
                 </div>
