@@ -3,7 +3,7 @@ import { supabase } from '../lib/supabaseClient'
 import { formatLastUpdated, formatFullDateTime } from '../lib/dateTimeUtils'
 import { getLastFetchInfo } from '../lib/ratesFetchService'
 import CurrencyCryptoToggle from './FiatCryptoToggle'
-import CurrencyConverter from './CurrencyConverter'
+import SearchableSelect from './SearchableSelect'
 
 export default function Rates() {
   const [currencies, setCurrencies] = useState({})
@@ -13,66 +13,77 @@ export default function Rates() {
   const [error, setError] = useState(null)
   const [lastUpdated, setLastUpdated] = useState(new Date())
 
+  const [selectedFrom, setSelectedFrom] = useState(null)
+  const [selectedTo, setSelectedTo] = useState(null)
+  const [amount, setAmount] = useState('1')
+  const [result, setResult] = useState(null)
+
   const [searchTerm, setSearchTerm] = useState('')
   const [typeFilter, setTypeFilter] = useState('all')
   const [activeType, setActiveType] = useState('all')
   const [sortBy, setSortBy] = useState('code')
   const [sortDirection, setSortDirection] = useState('asc')
-  const [favorites, setFavorites] = useState(['PHP', 'USD', 'EUR', 'BTC', 'ETH'])
+  const [favorites, setFavorites] = useState([])
 
-  // Load all rates from currency_rates and cryptocurrency_rates tables
-  // Refreshes every 5 minutes
+  // Load all pairs from public.pairs table (primary source of truth)
   useEffect(() => {
     loadData()
     const interval = setInterval(loadData, 5 * 60 * 1000)
     return () => clearInterval(interval)
   }, [])
 
+  // Set default currencies when rates load
+  useEffect(() => {
+    if (rates.length > 0 && !selectedFrom) {
+      const phpRate = rates.find(r => r.code === 'PHP')
+      setSelectedFrom(phpRate?.code || rates[0].code)
+    }
+
+    if (rates.length > 0 && !selectedTo) {
+      const usdRate = rates.find(r => r.code === 'USD')
+      const firstNonSelected = rates.find(r => r.code !== selectedFrom)
+      setSelectedTo(usdRate?.code || firstNonSelected?.code)
+    }
+  }, [rates, selectedFrom, selectedTo])
+
   const loadData = async () => {
     try {
       setLoading(true)
       setError(null)
 
-      // Hybrid approach: Use specialized tables + public.pairs as fallback
-      // This ensures we get all rates: fiat, crypto, and anything else
-      const [currencyRatesRes, cryptoRatesRes, pairsRes] = await Promise.all([
-        supabase
-          .from('currency_rates')
-          .select('from_currency, to_currency, rate, updated_at'),
-        supabase
-          .from('cryptocurrency_rates')
-          .select('from_currency, to_currency, rate, updated_at'),
-        supabase
-          .from('pairs')
-          .select('from_currency, to_currency, rate, updated_at')
-      ])
-
-      if (currencyRatesRes.error) {
-        console.warn('⚠️ Error fetching currency_rates:', currencyRatesRes.error.message)
+      // Verify Supabase client is properly initialized
+      if (!supabase || typeof supabase.from !== 'function') {
+        throw new Error('Supabase client not properly initialized')
       }
 
-      if (cryptoRatesRes.error) {
-        console.warn('⚠️ Error fetching cryptocurrency_rates:', cryptoRatesRes.error.message)
+      // Primary source: pairs table (contains all currency and crypto rates)
+      // The pairs table is populated by the fetch-rates edge function and contains:
+      // from_currency, to_currency, rate, source_table, updated_at
+      const { data: pairsData, error: pairsError } = await supabase
+        .from('pairs')
+        .select('from_currency, to_currency, rate, source_table, updated_at')
+        .limit(10000)
+
+      if (pairsError) {
+        console.warn('Error fetching pairs table:', pairsError.message)
       }
 
-      if (pairsRes.error) {
-        console.warn('⚠️ Error fetching public.pairs:', pairsRes.error.message)
+      // Fallback: crypto_rates table (fallback if pairs is empty)
+      const { data: cryptoRatesData, error: cryptoError } = await supabase
+        .from('crypto_rates')
+        .select('from_currency, to_currency, rate, updated_at')
+        .limit(10000)
+
+      if (cryptoError) {
+        console.warn('Error fetching crypto_rates table:', cryptoError.message)
       }
 
-      // Combine all rate sources (with deduplication)
-      // Priority: currency_rates → cryptocurrency_rates → public.pairs
+      // Combine data sources (deduplication)
       const seenPairs = new Set()
       const allRatePairs = []
 
-      // Add fiat currency rates (priority 1)
-      (currencyRatesRes.data || []).forEach(pair => {
-        const key = `${pair.from_currency}-${pair.to_currency}`
-        seenPairs.add(key)
-        allRatePairs.push(pair)
-      })
-
-      // Add crypto rates (priority 2, skip if already in currency_rates)
-      (cryptoRatesRes.data || []).forEach(pair => {
+      // Add pairs from main pairs table (priority 1)
+      (pairsData || []).forEach(pair => {
         const key = `${pair.from_currency}-${pair.to_currency}`
         if (!seenPairs.has(key)) {
           seenPairs.add(key)
@@ -80,8 +91,8 @@ export default function Rates() {
         }
       })
 
-      // Add public.pairs as fallback (priority 3, skip if already added)
-      (pairsRes.data || []).forEach(pair => {
+      // Add crypto rates as fallback (priority 2)
+      (cryptoRatesData || []).forEach(pair => {
         const key = `${pair.from_currency}-${pair.to_currency}`
         if (!seenPairs.has(key)) {
           seenPairs.add(key)
@@ -89,10 +100,10 @@ export default function Rates() {
         }
       })
 
-      console.log(`📥 Fetched ${currencyRatesRes.data?.length || 0} fiat currency rates`)
-      console.log(`📥 Fetched ${cryptoRatesRes.data?.length || 0} cryptocurrency rates`)
-      console.log(`📥 Fetched ${pairsRes.data?.length || 0} pairs (fallback)`)
-      console.log(`📥 Total combined (deduplicated): ${allRatePairs.length} rate pairs`)
+      console.log(`Fetched ${pairsData?.length || 0} pairs from pairs table`)
+      console.log(`Fetched ${cryptoRatesData?.length || 0} crypto rates (fallback)`)
+      console.log(`Total combined (deduplicated): ${allRatePairs.length} rate pairs`)
+
       setAllPairs(allRatePairs || [])
 
       // Get unique currency codes from all rates
@@ -103,7 +114,7 @@ export default function Rates() {
       })
 
       const codeArray = Array.from(codes)
-      console.log(`📊 Found ${codeArray.length} unique currencies/cryptos`)
+      console.log(`Found ${codeArray.length} unique currencies and cryptos`)
 
       if (codeArray.length === 0) {
         setRates([])
@@ -129,17 +140,17 @@ export default function Rates() {
         currenciesRes.data.forEach(c => {
           allMetadata[c.code] = { ...c, type: 'currency' }
         })
-        console.log(`📋 Loaded metadata for ${currenciesRes.data.length} fiat currencies`)
+        console.log(`Loaded metadata for ${currenciesRes.data.length} fiat currencies`)
       }
 
       if (cryptosRes.data) {
         cryptosRes.data.forEach(c => {
           allMetadata[c.code] = { ...c, type: 'cryptocurrency' }
         })
-        console.log(`📋 Loaded metadata for ${cryptosRes.data.length} cryptocurrencies`)
+        console.log(`Loaded metadata for ${cryptosRes.data.length} cryptocurrencies`)
       }
 
-      // Add fallback entries for codes without metadata (rates that don't have metadata yet)
+      // Add fallback entries for codes without metadata
       codeArray.forEach(code => {
         if (!allMetadata[code]) {
           allMetadata[code] = {
@@ -153,7 +164,7 @@ export default function Rates() {
       })
 
       setCurrencies(allMetadata)
-      console.log(`📋 Total metadata loaded: ${Object.keys(allMetadata).length} items`)
+      console.log(`Total metadata loaded: ${Object.keys(allMetadata).length} items`)
 
       // Build rates list - one entry per unique currency/crypto code
       const ratesByCode = {}
@@ -174,8 +185,7 @@ export default function Rates() {
         }
       })
 
-      // Collect all rates from combined currency_rates and cryptocurrency_rates tables
-      // Each pair represents a from_currency → to_currency rate
+      // Collect all rates from combined pairs and crypto_rates tables
       allRatePairs?.forEach(pair => {
         if (pair.updated_at) {
           timestamps.push(new Date(pair.updated_at))
@@ -184,7 +194,6 @@ export default function Rates() {
         if (pair.rate && isFinite(Number(pair.rate)) && Number(pair.rate) > 0) {
           const rate = Number(pair.rate)
           const fromCurrency = pair.from_currency
-          const toCurrency = pair.to_currency
 
           // Store from_currency rate if it exists in our codes
           if (fromCurrency && ratesByCode[fromCurrency]) {
@@ -205,16 +214,13 @@ export default function Rates() {
       const fetchInfo = await getLastFetchInfo()
 
       if (fetchInfo && fetchInfo.fetchedAt) {
-        // Use the actual fetch-rates edge function execution time (most accurate)
         mostRecentTimestamp = fetchInfo.fetchedAt
-        console.log(`🕐 Using fetch-rates execution time: ${fetchInfo.isoString}`)
+        console.log(`Using fetch-rates execution time: ${fetchInfo.isoString}`)
       } else if (timestamps.length > 0) {
-        // Fallback to most recent pair timestamp if fetch info not available
         timestamps.sort((a, b) => b - a)
         mostRecentTimestamp = timestamps[0]
-        console.log('🕐 Using most recent pair update timestamp (fallback)')
+        console.log('Using most recent pair update timestamp (fallback)')
       }
-
 
       // Sort: rates with values first, then without
       const ratesWithValues = Object.values(ratesByCode)
@@ -229,12 +235,12 @@ export default function Rates() {
 
       setRates(validRates)
       setLastUpdated(mostRecentTimestamp)
-      console.log(`✅ Final rates list: ${validRates.length} items (${ratesWithValues.length} with rates)`)
-      console.log(`🕐 Last fetch date set to: ${formatFullDateTime(mostRecentTimestamp)}`)
+      console.log(`Final rates list: ${validRates.length} items (${ratesWithValues.length} with rates)`)
+      console.log(`Last fetch date set to: ${formatFullDateTime(mostRecentTimestamp)}`)
       setError(null)
     } catch (err) {
       const errorMsg = err?.message || String(err) || 'Unknown error'
-      console.error('❌ Error loading rates:', errorMsg)
+      console.error('Error loading rates:', errorMsg)
       console.error('Full error object:', err)
 
       let userFriendlyError = 'Failed to load exchange rates'
@@ -309,6 +315,48 @@ export default function Rates() {
     return rates.filter(r => favorites.includes(r.code))
   }, [rates, favorites])
 
+  const calculateConversion = () => {
+    const numAmount = parseFloat(amount)
+    if (!isNaN(numAmount) && numAmount > 0) {
+      const fromRate = rates.find(r => r.code === selectedFrom)
+      const toRate = rates.find(r => r.code === selectedTo)
+
+      // Check if rates exist
+      if (!fromRate || !toRate) {
+        setResult({
+          error: 'Rate not available',
+          message: `Exchange rate for ${!fromRate ? selectedFrom : selectedTo} is not available.`
+        })
+        return
+      }
+
+      // Check if rates are valid (not 0.00 or invalid)
+      const fromRateValid = isFinite(fromRate.rate) && fromRate.rate > 0
+      const toRateValid = isFinite(toRate.rate) && toRate.rate > 0
+
+      if (!fromRateValid || !toRateValid) {
+        setResult({
+          error: 'Rate not available',
+          message: 'Exchange rate data is not available for the selected currencies.'
+        })
+        return
+      }
+
+      const convertedAmount = (numAmount * toRate.rate) / fromRate.rate
+      const toDecimals = toRate.metadata?.decimals || 2
+      setResult({
+        amount: convertedAmount.toFixed(toDecimals),
+        decimals: toDecimals,
+        rate: toRate.rate / fromRate.rate
+      })
+    } else {
+      setResult(null)
+    }
+  }
+
+  useEffect(() => {
+    calculateConversion()
+  }, [amount, selectedFrom, selectedTo, rates])
 
   const toggleFavorite = (code) => {
     setFavorites(prev =>
@@ -333,7 +381,7 @@ export default function Rates() {
 
   if (loading) {
     return (
-      <div className="bg-slate-50 rounded-2xl shadow-lg p-12 text-center">
+      <div className="bg-white rounded-2xl shadow-lg p-12 text-center">
         <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mb-4"></div>
         <p className="text-slate-500 text-lg">Loading exchange rates...</p>
       </div>
@@ -342,7 +390,7 @@ export default function Rates() {
 
   if (error) {
     return (
-      <div className="bg-slate-50 rounded-2xl shadow-lg p-12 border border-red-200">
+      <div className="bg-white rounded-2xl shadow-lg p-12 border border-red-200">
         <p className="text-red-600 text-center text-lg font-medium">{error}</p>
         <button
           onClick={loadData}
@@ -356,42 +404,122 @@ export default function Rates() {
 
   if (rates.length === 0) {
     return (
-      <div className="bg-slate-50 rounded-2xl shadow-lg p-12 text-center">
+      <div className="bg-white rounded-2xl shadow-lg p-12 text-center">
         <p className="text-slate-500 text-lg">No exchange rates available</p>
       </div>
     )
   }
 
+  const fromCurrency = rates.find(r => r.code === selectedFrom)
+  const toCurrency = rates.find(r => r.code === selectedTo)
+
   return (
-    <div className="w-full min-h-screen bg-slate-50">
+    <div className="w-full min-h-screen bg-gradient-to-b from-slate-50 to-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10 lg:py-12">
         <div className="space-y-6 sm:space-y-8">
           {/* Main Grid */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
             {/* Left Column - Converter */}
             <div className="lg:col-span-2 space-y-6">
-              {/* Enhanced Currency Converter */}
-              <CurrencyConverter rates={rates} />
+              {/* Converter Card */}
+              <div className="bg-white rounded-2xl shadow-lg p-6 sm:p-8 border border-slate-200">
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="px-3 py-2 bg-blue-100 rounded-lg text-blue-700 font-bold">FX</div>
+                  <h2 className="text-xl sm:text-2xl font-semibold text-slate-900">Currency Converter</h2>
+                </div>
+
+                <div className="space-y-4">
+                  {/* From Currency */}
+                  <SearchableSelect
+                    value={selectedFrom}
+                    onChange={setSelectedFrom}
+                    options={rates}
+                    label="From"
+                  />
+
+                  {/* Amount Input */}
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-2">Amount</label>
+                    <input
+                      type="number"
+                      step="any"
+                      min="0"
+                      value={amount}
+                      onChange={(e) => setAmount(e.target.value)}
+                      className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-lg font-medium"
+                      placeholder="0.00"
+                    />
+                  </div>
+
+                  {/* Swap Button */}
+                  <div className="flex justify-center">
+                    <button
+                      onClick={() => {
+                        const temp = selectedFrom
+                        setSelectedFrom(selectedTo)
+                        setSelectedTo(temp)
+                      }}
+                      className="p-2 bg-slate-100 hover:bg-slate-200 rounded-full transition text-slate-700 font-semibold"
+                      title="Swap currencies"
+                    >
+                      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16V4m0 0L3 8m0 0l4 4m10-4v12m0 0l4-4m0 0l-4-4" />
+                      </svg>
+                    </button>
+                  </div>
+
+                  {/* To Currency */}
+                  <SearchableSelect
+                    value={selectedTo}
+                    onChange={setSelectedTo}
+                    options={rates}
+                    label="To"
+                  />
+
+                  {/* Result */}
+                  {result && !result.error && (
+                    <div className="bg-white rounded-xl p-6 border-2 border-slate-300 mt-6">
+                      <p className="text-xs font-semibold text-slate-700 mb-3 uppercase tracking-wider">Conversion Result</p>
+                      <div className="flex items-baseline justify-between mb-3">
+                        <div>
+                          <p className="text-5xl font-bold text-slate-900 mb-1">
+                            {result.amount}
+                          </p>
+                          <p className="text-lg font-semibold text-slate-700">
+                            {selectedTo}
+                          </p>
+                        </div>
+                        <div className="text-center">
+                          <p className="text-sm text-slate-600 mb-1">Exchange Rate</p>
+                          <p className="text-lg font-mono font-semibold text-slate-900">
+                            1 {selectedFrom} = {formatNumber(result.rate, toCurrency?.metadata?.decimals || 2)}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
 
               {/* Rates Table */}
               <div className="bg-white rounded-2xl shadow-lg p-6 sm:p-8 border border-slate-200">
                 {/* Last Updated Info Banner */}
-                <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                <div className="mb-6 p-4 bg-slate-50 border border-slate-300 rounded-lg">
                   <div className="flex items-center justify-between flex-wrap gap-2">
                     <div>
-                      <p className="text-sm text-blue-900">
-                        <span className="font-semibold">Last Fetched Rates:</span>{' '}
-                        {formatFullDateTime(lastUpdated)}
+                      <p className="text-sm text-slate-900">
+                        <span className="font-semibold">Chart Last Fetched:</span>{' '}
+                        <span className="text-slate-700">{formatFullDateTime(lastUpdated)}</span>
                       </p>
                       {lastUpdated && (
-                        <p className="text-xs text-blue-700 mt-1">
+                        <p className="text-xs text-slate-600 mt-1">
                           {(() => {
                             const minutes = Math.floor((Date.now() - new Date(lastUpdated).getTime()) / 1000 / 60)
-                            if (minutes < 1) return '✓ Just now'
-                            if (minutes < 60) return `✓ ${minutes} minute${minutes !== 1 ? 's' : ''} ago`
+                            if (minutes < 1) return 'Just now'
+                            if (minutes < 60) return `${minutes} minute${minutes !== 1 ? 's' : ''} ago`
                             const hours = Math.floor(minutes / 60)
-                            if (hours < 24) return `✓ ${hours} hour${hours !== 1 ? 's' : ''} ago`
-                            return `⚠ ${Math.floor(hours / 24)} day${Math.floor(hours / 24) !== 1 ? 's' : ''} ago`
+                            if (hours < 24) return `${hours} hour${hours !== 1 ? 's' : ''} ago`
+                            return `${Math.floor(hours / 24)} day${Math.floor(hours / 24) !== 1 ? 's' : ''} ago`
                           })()}
                         </p>
                       )}
@@ -400,29 +528,23 @@ export default function Rates() {
                       <button
                         onClick={loadData}
                         disabled={loading}
-                        className="px-3 py-1 bg-blue-600 text-white text-xs font-medium rounded hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition whitespace-nowrap"
+                        className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition whitespace-nowrap"
                       >
-                        {loading ? 'Refreshing...' : 'Refresh Rates'}
+                        {loading ? 'Refreshing...' : 'Refresh'}
                       </button>
                     )}
                   </div>
                 </div>
 
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
-                  <div>
-                    <h2 className="text-xl sm:text-2xl font-semibold text-slate-900">All Rates</h2>
+                  <div className="flex items-center gap-2">
+                    <h2 className="text-xl sm:text-2xl font-semibold text-slate-900">Exchange Rates</h2>
                   </div>
                   <div className="flex items-center gap-4">
-                    <div className="text-sm text-slate-500">
-                      {filteredRates.length} currency pair{filteredRates.length !== 1 ? 's' : ''}
+                    <div className="text-sm font-medium text-slate-700">
+                      <span className="text-blue-600">{rates.filter(r => r.metadata?.type === 'currency').length}</span> Fiat •{' '}
+                      <span className="text-orange-600">{rates.filter(r => r.metadata?.type === 'cryptocurrency').length}</span> Crypto
                     </div>
-                    <button
-                      onClick={loadData}
-                      disabled={loading}
-                      className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition"
-                    >
-                      {loading ? 'Refreshing...' : 'Refresh'}
-                    </button>
                   </div>
                 </div>
 
@@ -511,33 +633,40 @@ export default function Rates() {
                     </thead>
                     <tbody>
                       {filteredRates.map(currency => (
-                        <tr key={currency.code} className="border-b border-slate-100 hover:bg-slate-50 transition">
+                        <tr
+                          key={currency.code}
+                          className={`border-b border-slate-100 hover:bg-slate-50 transition ${
+                            currency.metadata?.type === 'cryptocurrency' ? 'hover:bg-orange-50' : 'hover:bg-blue-50'
+                          }`}
+                        >
                           <td className="py-3 px-4">
-                            <span className="font-semibold text-slate-900">{currency.code}</span>
+                            <div className="flex items-center gap-2">
+                              <span className="text-sm font-semibold text-slate-600">
+                                {currency.metadata?.type === 'cryptocurrency' ? 'CRY' : 'FIA'}
+                              </span>
+                              <span className="font-semibold text-slate-900">{currency.code}</span>
+                            </div>
                           </td>
                           <td className="py-3 px-4 text-slate-600">{currency.metadata?.name || currency.code}</td>
                           <td className="py-3 px-4">
-                            <span className={`inline-block px-3 py-1 rounded-full text-xs font-medium ${
-                              currency.metadata?.type === 'cryptocurrency'
-                                ? 'bg-orange-100 text-orange-700'
-                                : 'bg-blue-100 text-blue-700'
-                            }`}>
-                              {currency.metadata?.type === 'cryptocurrency' ? 'Crypto' : 'Fiat'}
+                            <span className="inline-block px-3 py-1 rounded-full text-xs font-medium bg-slate-200 text-slate-900">
+                              {currency.metadata?.type === 'cryptocurrency' ? 'Cryptocurrency' : 'Fiat'}
                             </span>
                           </td>
-                          <td className="py-3 px-4 text-right font-mono text-slate-900">
+                          <td className="py-3 px-4 text-right font-mono text-slate-900 font-medium">
                             {formatNumber(currency.rate, currency.metadata?.decimals || 2)}
                           </td>
                           <td className="py-3 px-4 text-center">
                             <button
                               onClick={() => toggleFavorite(currency.code)}
-                              className={`text-xl transition ${
+                              className={`text-xs font-semibold px-2 py-1 rounded transition ${
                                 favorites.includes(currency.code)
-                                  ? 'text-yellow-400 hover:text-yellow-500'
-                                  : 'text-slate-300 hover:text-yellow-400'
+                                  ? 'bg-yellow-200 text-yellow-900 hover:bg-yellow-300 animate-pulse'
+                                  : 'bg-slate-200 text-slate-600 hover:bg-yellow-200'
                               }`}
+                              title={favorites.includes(currency.code) ? 'Remove from favorites' : 'Add to favorites'}
                             >
-                              ★
+                              {favorites.includes(currency.code) ? 'FAV' : 'Add'}
                             </button>
                           </td>
                         </tr>
@@ -552,57 +681,90 @@ export default function Rates() {
             <div className="lg:col-span-1 space-y-6">
               {/* Favorites Card */}
               <div className="bg-white rounded-2xl shadow-lg p-6 border border-slate-200">
-                <h3 className="text-lg font-semibold text-slate-900 mb-4">Favorite Rates</h3>
+                <div className="flex items-center gap-2 mb-4">
+                  <h3 className="text-lg font-semibold text-slate-900">Favorite Rates</h3>
+                </div>
                 <div className="space-y-3">
                   {favoriteRates.length > 0 ? (
                     favoriteRates.map(curr => (
                       <div
                         key={curr.code}
-                        className="p-4 border border-slate-200 rounded-lg hover:border-blue-300 hover:bg-blue-50 transition"
+                        className="p-4 border-2 border-slate-300 hover:border-slate-400 hover:bg-slate-50 rounded-lg transition cursor-pointer"
+                        onClick={() => setSelectedFrom(curr.code)}
                       >
                         <div className="flex items-center justify-between mb-2">
-                          <div>
-                            <div className="font-semibold text-slate-900">{curr.code}</div>
-                            <div className="text-xs text-slate-500">{curr.metadata?.name}</div>
+                          <div className="flex items-center gap-2 flex-1">
+                            <span className="text-xs font-semibold text-slate-600">
+                              {curr.metadata?.type === 'cryptocurrency' ? 'CRY' : 'FIA'}
+                            </span>
+                            <div className="min-w-0">
+                              <div className="font-semibold text-slate-900">{curr.code}</div>
+                              <div className="text-xs text-slate-500 truncate">{curr.metadata?.name}</div>
+                            </div>
                           </div>
                           <button
-                            onClick={() => toggleFavorite(curr.code)}
-                            className="text-yellow-400 hover:text-yellow-500 text-lg transition"
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              toggleFavorite(curr.code)
+                            }}
+                            className="text-xs font-semibold px-2 py-1 rounded bg-yellow-200 text-yellow-900 hover:bg-yellow-300 ml-2 flex-shrink-0"
+                            title="Remove from favorites"
                           >
-                            ★
+                            DEL
                           </button>
                         </div>
-                        <div className="text-sm font-mono text-slate-900">
+                        <div className="text-sm font-mono font-semibold text-slate-900 ml-7">
                           {formatNumber(curr.rate, curr.metadata?.decimals || 2)}
                         </div>
                       </div>
                     ))
                   ) : (
-                    <p className="text-sm text-slate-500 text-center py-6">Add currencies to favorites</p>
+                    <p className="text-sm text-slate-500 text-center py-8">
+                      <span className="block mb-2">No favorites yet</span>
+                      Add currencies to favorites by clicking the Add button in the rates table
+                    </p>
                   )}
                 </div>
               </div>
 
               {/* Info Card */}
-              <div className="bg-slate-50 rounded-2xl shadow-lg p-6 border border-slate-200 space-y-4">
-                <h3 className="text-lg font-semibold text-slate-900">Information</h3>
+              <div className="bg-gradient-to-br from-slate-50 to-slate-100 rounded-2xl shadow-lg p-6 border border-slate-200 space-y-4">
+                <div className="flex items-center gap-2 mb-2">
+                  <h3 className="text-lg font-semibold text-slate-900">Information</h3>
+                </div>
 
-                <div>
-                  <p className="text-xs text-slate-600 font-medium mb-1">Data Source</p>
+                {fromCurrency && (
+                  <div className="pb-4 border-b border-slate-300">
+                    <p className="text-xs text-slate-600 font-medium mb-1 uppercase tracking-wider">From Currency</p>
+                    <p className="text-sm font-semibold text-slate-900">{fromCurrency.metadata?.name}</p>
+                    <p className="text-xs text-slate-500 mt-1">{fromCurrency.code}</p>
+                  </div>
+                )}
+
+                {toCurrency && (
+                  <div className="pb-4 border-b border-slate-300">
+                    <p className="text-xs text-slate-600 font-medium mb-1 uppercase tracking-wider">To Currency</p>
+                    <p className="text-sm font-semibold text-slate-900">{toCurrency.metadata?.name}</p>
+                    <p className="text-xs text-slate-500 mt-1">{toCurrency.code}</p>
+                  </div>
+                )}
+
+                <div className="pb-4 border-b border-slate-300">
+                  <p className="text-xs text-slate-600 font-medium mb-1 uppercase tracking-wider">Data Source</p>
                   <p className="text-xs text-slate-500">
-                    Real-time rates from public.pairs database (fiat and cryptocurrency markets)
+                    Real-time rates from fiat and crypto markets
                   </p>
                 </div>
 
-                <div>
-                  <p className="text-xs text-slate-600 font-medium mb-1">Coverage</p>
+                <div className="pb-4 border-b border-slate-300">
+                  <p className="text-xs text-slate-600 font-medium mb-1 uppercase tracking-wider">Coverage</p>
                   <p className="text-xs text-slate-500">
-                    {rates.length} currencies tracked
+                    {rates.length} currencies tracked globally
                   </p>
                 </div>
 
-                <div className="pt-2 border-t border-slate-200">
-                  <p className="text-xs text-slate-600 font-medium mb-1">Last Updated</p>
+                <div className="pt-2">
+                  <p className="text-xs text-slate-600 font-medium mb-1 uppercase tracking-wider">Last Updated</p>
                   <p className="text-xs text-slate-500">
                     {formatLastUpdated(lastUpdated)}
                   </p>
@@ -611,19 +773,25 @@ export default function Rates() {
 
               {/* Quick Stats */}
               <div className="bg-white rounded-2xl shadow-lg p-6 border border-slate-200">
-                <h3 className="text-lg font-semibold text-slate-900 mb-4">Quick Stats</h3>
-                <div className="space-y-3">
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-slate-600">Total Currencies</span>
-                    <span className="text-lg font-semibold text-slate-900">{rates.length}</span>
+                <div className="flex items-center gap-2 mb-4">
+                  <h3 className="text-lg font-semibold text-slate-900">Overview</h3>
+                </div>
+                <div className="space-y-4">
+                  <div className="flex justify-between items-center p-3 bg-slate-50 rounded-lg">
+                    <span className="text-sm font-medium text-slate-700">All Currencies</span>
+                    <span className="text-lg font-bold text-slate-900">{rates.length}</span>
                   </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-slate-600">Currencies</span>
-                    <span className="text-lg font-semibold text-slate-900">{rates.filter(r => r.metadata?.type === 'currency').length}</span>
+                  <div className="flex justify-between items-center p-3 bg-slate-100 rounded-lg">
+                    <span className="text-sm font-medium text-slate-700 flex items-center gap-1">
+                      <span className="font-bold">Fiat</span>
+                    </span>
+                    <span className="text-lg font-bold text-slate-900">{rates.filter(r => r.metadata?.type === 'currency').length}</span>
                   </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-slate-600">Cryptocurrencies</span>
-                    <span className="text-lg font-semibold text-slate-900">{rates.filter(r => r.metadata?.type === 'cryptocurrency').length}</span>
+                  <div className="flex justify-between items-center p-3 bg-slate-100 rounded-lg">
+                    <span className="text-sm font-medium text-slate-700 flex items-center gap-1">
+                      <span className="font-bold">Crypto</span>
+                    </span>
+                    <span className="text-lg font-bold text-slate-900">{rates.filter(r => r.metadata?.type === 'cryptocurrency').length}</span>
                   </div>
                 </div>
               </div>
