@@ -594,9 +594,16 @@ export default function Rates() {
                       >
                         <div className="flex items-center justify-between mb-2">
                           <div className="flex items-center gap-2 flex-1">
-                            <span className="text-xs font-semibold text-slate-600">
-                              {curr.type === 'crypto' ? '₿' : '$'}
-                            </span>
+                            <div
+                              className={`w-6 h-6 flex items-center justify-center font-bold text-white text-xs border border-slate-300 ${
+                                curr.type === 'crypto'
+                                  ? 'bg-orange-500'
+                                  : 'bg-blue-500'
+                              }`}
+                              title={curr.type === 'crypto' ? 'Cryptocurrency' : 'Fiat Currency'}
+                            >
+                              {curr.type === 'crypto' ? 'C' : 'F'}
+                            </div>
                             <div className="min-w-0">
                               <div className="font-semibold text-slate-900">{curr.code}</div>
                               <div className="text-xs text-slate-500">{curr.name}</div>
