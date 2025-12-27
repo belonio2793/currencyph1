@@ -177,10 +177,10 @@ export default function TransactionHistory({ userId }) {
                       : 'text-emerald-600'
                   }`}>
                     {transaction.transaction_type?.includes('sent') || transaction.transaction_type === 'bill_payment' ? '-' : '+'}
-                    {transaction.currency_code === 'PHP' ? '₱' : transaction.currency_code === 'EUR' ? '€' : transaction.currency_code === 'GBP' ? '£' : '$'}
+                    {getCurrencySymbol(transaction.currency_code)}
                     {formatNumber(transaction.amount)}
                   </p>
-                  <p className="text-xs text-slate-500">{transaction.currency_code}</p>
+                  <p className="text-xs text-slate-500">{transaction.currency_code?.toUpperCase()}</p>
                 </div>
               </div>
 
