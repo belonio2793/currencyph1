@@ -82,7 +82,7 @@ SELECT
   d.input_currency,
   
   -- Payment method (how user pays)
-  d.payment_method,
+  d.deposit_method,
   d.payment_method_currency,
   d.payment_amount,
   d.payment_address,
