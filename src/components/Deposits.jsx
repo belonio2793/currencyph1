@@ -1457,16 +1457,16 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
           <div className="bg-white rounded-lg shadow border border-slate-200 p-4 sm:p-8">
             <h3 className="text-xl font-semibold text-slate-900 mb-4">Recent Deposits</h3>
             <div className="w-full">
-              <table className="w-full text-sm">
+              <table className="w-full text-xs sm:text-sm">
                 <thead>
                   <tr className="border-b border-slate-200">
-                    <th className="text-left py-3 px-4 text-slate-600 font-medium">You Sent</th>
-                    <th className="text-left py-3 px-4 text-slate-600 font-medium">Payment Currency</th>
-                    <th className="text-left py-3 px-4 text-slate-600 font-medium">Exchange Rate</th>
-                    <th className="text-left py-3 px-4 text-slate-600 font-medium">You Received</th>
-                    <th className="text-left py-3 px-4 text-slate-600 font-medium">Date & Time</th>
-                    <th className="text-left py-3 px-4 text-slate-600 font-medium">Status</th>
-                    <th className="text-left py-3 px-4 text-slate-600 font-medium">Action</th>
+                    <th className="text-left py-2 sm:py-3 px-2 sm:px-3 text-slate-600 font-medium">You Sent</th>
+                    <th className="text-left py-2 sm:py-3 px-2 sm:px-3 text-slate-600 font-medium">Payment</th>
+                    <th className="hidden md:table-cell text-left py-2 sm:py-3 px-2 sm:px-3 text-slate-600 font-medium">Rate</th>
+                    <th className="text-left py-2 sm:py-3 px-2 sm:px-3 text-slate-600 font-medium">Received</th>
+                    <th className="text-left py-2 sm:py-3 px-2 sm:px-3 text-slate-600 font-medium">Date</th>
+                    <th className="text-left py-2 sm:py-3 px-2 sm:px-3 text-slate-600 font-medium">Status</th>
+                    <th className="text-left py-2 sm:py-3 px-2 sm:px-3 text-slate-600 font-medium">Action</th>
                   </tr>
                 </thead>
                 <tbody>
