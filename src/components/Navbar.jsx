@@ -125,18 +125,22 @@ function NavbarComponent({ activeTab, onTabChange, globalCurrency, setGlobalCurr
         {userEmail && (
           <div className="pb-4 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
             <div className="flex flex-col gap-1">
-              <p className="text-xs text-slate-500 font-medium uppercase tracking-wider">Total User Holdings Value</p>
+              <p className="text-xs text-slate-500 font-medium uppercase tracking-wider">Total Wallet Holdings Value</p>
               <p className="text-3xl font-light text-black">
                 {loadingConsolidated ? (
                   <span className="text-slate-400">loading...</span>
                 ) : consolidatedHoldingsInCrypto !== null && consolidatedHoldingsInCrypto !== undefined ? (
-                  formatNumber(consolidatedHoldingsInCrypto.toFixed(8))
+                  <>
+                    {formatNumber(consolidatedHoldingsInCrypto.toFixed(2))} {globalCurrency}
+                  </>
                 ) : (
-                  formatNumber(0)
+                  <>
+                    {formatNumber(0)} {globalCurrency}
+                  </>
                 )}
               </p>
               <p className="text-sm text-slate-600">
-                All Assets Combined
+                All Wallets Combined (Excluding Debt)
               </p>
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-6">
