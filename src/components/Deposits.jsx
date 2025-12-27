@@ -658,14 +658,19 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
       // ===== USE MULTI-CURRENCY DEPOSIT SERVICE =====
       // This handles all conversion and validation automatically
 
-      // Determine the deposit currency and method
-      // If a crypto method is selected, use its currency code; otherwise use selectedCurrency
-      let depositCurrency = selectedCurrency
+      // CRITICAL FIX: Properly handle three-currency model
+      // - depositCurrency: Input currency (what user specifies - e.g., USD)
+      // - paymentMethodCurrency: Payment method currency (how they pay - e.g., ETH)
+      // - walletCurrency: Wallet currency (what they receive in - e.g., PHP)
+      // DO NOT confuse these three!
+
+      const depositCurrency = selectedCurrency // INPUT CURRENCY (what user specifies)
       let depositMethodId = selectedMethod
+      let paymentMethodCurrency = null // PAYMENT METHOD CURRENCY
 
       if (selectedAddressMethod) {
-        // For crypto method selections, use the method's currency code
-        depositCurrency = selectedAddressMethod.depositCurrencyCode || selectedAddressMethod.cryptoSymbol || selectedCurrency
+        // For crypto method selections, the payment method currency is the crypto symbol
+        paymentMethodCurrency = selectedAddressMethod.cryptoSymbol?.toUpperCase() || null
         depositMethodId = selectedAddressMethod.cryptoSymbol?.toLowerCase() || selectedCurrency.toLowerCase()
       }
 
@@ -673,15 +678,22 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
         userId,
         walletId: selectedWallet,
         amount,
-        depositCurrency: depositCurrency,
-        walletCurrency: targetWalletData.currency_code,
+        depositCurrency: depositCurrency, // Input currency (what user specifies)
+        walletCurrency: targetWalletData.currency_code, // Wallet currency (what they receive)
         depositMethod: depositMethodId,
+        paymentMethodCurrency: paymentMethodCurrency, // Payment method currency (NEW - how they pay)
         paymentReference: selectedMethod === 'gcash' ? gcashReferenceNumber : null,
         paymentAddress: activeMethodData?.address || null,
         metadata: {
           activeType,
           methodName: activeMethodData?.name || depositCurrency,
-          networkInfo: activeMethodData?.network ? { network: activeMethodData.network, provider: activeMethodData.provider } : null
+          networkInfo: activeMethodData?.network ? { network: activeMethodData.network, provider: activeMethodData.provider } : null,
+          // AUDIT: Document the three-currency model
+          depositCurrencyModel: {
+            input: depositCurrency,
+            payment: paymentMethodCurrency,
+            wallet: targetWalletData.currency_code
+          }
         }
       })
 
