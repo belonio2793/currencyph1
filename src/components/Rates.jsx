@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo } from 'react'
 import { supabase } from '../lib/supabaseClient'
 import { formatLastUpdated, formatFullDateTime } from '../lib/dateTimeUtils'
 import CurrencyCryptoToggle from './FiatCryptoToggle'
-import SearchableSelect from './SearchableSelect'
+import CurrencySelect from './CurrencySelect'
 
 export default function Rates() {
   const [rates, setRates] = useState([])
