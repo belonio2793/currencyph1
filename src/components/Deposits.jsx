@@ -1454,9 +1454,9 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
 
         {/* Recent Deposits */}
         {deposits.length > 0 && (
-          <div className="bg-white rounded-lg shadow border border-slate-200 p-8">
+          <div className="bg-white rounded-lg shadow border border-slate-200 p-4 sm:p-8">
             <h3 className="text-xl font-semibold text-slate-900 mb-4">Recent Deposits</h3>
-            <div className="overflow-x-auto">
+            <div className="w-full">
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b border-slate-200">
