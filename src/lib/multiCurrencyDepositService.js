@@ -138,17 +138,24 @@ export const multiCurrencyDepositService = {
   },
 
   /**
-   * Create a multi-currency deposit record
-   * Handles all validation and conversion
-   * Populates all metadata fields for complete audit trail
+   * Create a three-currency deposit record
+   * FIXED: Properly handles input currency, payment method currency, and wallet currency
+   *
+   * Conversion flow:
+   * 1. User specifies amount in input_currency (e.g., 90,000 USD)
+   * 2. System shows how much payment_method_currency is needed (e.g., 0.03 ETH)
+   * 3. When received, converted to wallet_currency (e.g., credited as PHP in wallet)
+   *
+   * This fixes the bug where input amount was confused with payment method currency.
    */
   async createMultiCurrencyDeposit({
     userId,
     walletId,
     amount,
-    depositCurrency, // Currency being deposited (source)
-    walletCurrency, // Target wallet currency (destination)
+    depositCurrency, // Currency user specifies for the amount (input currency)
+    walletCurrency, // Target wallet currency (what they receive in wallet)
     depositMethod, // 'gcash', 'solana', etc.
+    paymentMethodCurrency = null, // Currency of the payment method (e.g., ETH if paying via Ethereum)
     paymentReference = null,
     paymentAddress = null,
     externalTxId = null,
