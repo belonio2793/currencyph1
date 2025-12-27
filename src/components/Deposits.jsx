@@ -10,8 +10,6 @@ import { formatNumber, formatExchangeRate, convertCurrency, isCryptoCurrency } f
 import { formatFullDateTime } from '../lib/dateTimeUtils'
 import { walletService } from '../lib/walletService'
 import { multiCurrencyDepositService } from '../lib/multiCurrencyDepositService'
-import { getLastFetchInfo } from '../lib/ratesFetchService'
-import { startRatesPolling, startRealtimeRatesSubscription, stopAllRatesUpdates } from '../lib/ratesPollingService'
 import {
   validateDepositInput,
   validateWalletCurrency,
