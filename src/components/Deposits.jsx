@@ -1534,7 +1534,7 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
                           {new Date(deposit.created_at).toLocaleDateString()}
                         </td>
                         <td className="py-2 sm:py-3 px-2 sm:px-3">
-                          <span className={`px-3 py-1 rounded-full text-xs font-medium ${
+                          <span className={`px-2 sm:px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap ${
                             deposit.status === 'completed' ? 'bg-emerald-100 text-emerald-700' :
                             deposit.status === 'pending' ? 'bg-amber-100 text-amber-700' :
                             deposit.status === 'approved' ? 'bg-blue-100 text-blue-700' :
