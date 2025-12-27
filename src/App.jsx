@@ -545,28 +545,63 @@ export default function App() {
     }
   }, [userId])
 
-  // Compute converted totals (balance and debt) in the selected display currency so the Navbar can show a synced NET
+  // Load fiat and crypto holdings separately
   useEffect(() => {
     let cancelled = false
-    const computeConvertedTotals = async () => {
+    const loadWalletHoldings = async () => {
       if (!userId || userId.includes('guest-local')) {
+        setFiatHoldingsConverted(0)
+        setCryptoHoldingsConverted(0)
         setTotalBalanceConverted(0)
         setTotalDebtConverted(0)
         return
       }
-      try {
-        const wallets = await currencyAPI.getWallets(userId).catch(() => [])
-        const balancePromises = (wallets || []).map(async (w) => {
-          const bal = Number(w.balance || 0)
-          if (!bal) return 0
-          const from = w.currency_code || globalCurrency
-          if (from === globalCurrency) return bal
-          const rate = await currencyAPI.getExchangeRate(from, globalCurrency)
-          return rate ? bal * Number(rate) : 0
-        })
-        const balanceValues = await Promise.all(balancePromises)
-        const balanceTotal = balanceValues.reduce((s, v) => s + v, 0)
 
+      try {
+        // Fetch wallets directly from supabase with type information
+        const { data: wallets } = await supabase
+          .from('wallets')
+          .select('id, currency_code, balance, type')
+          .eq('user_id', userId)
+          .eq('is_active', true)
+
+        if (!cancelled && wallets) {
+          // Separate fiat and crypto wallets
+          const fiatWallets = wallets.filter(w => w.type === 'fiat')
+          const cryptoWallets = wallets.filter(w => w.type === 'crypto')
+
+          // Calculate fiat holdings
+          const fiatPromises = fiatWallets.map(async (w) => {
+            const bal = Number(w.balance || 0)
+            if (!bal) return 0
+            const from = w.currency_code || globalCurrency
+            if (from === globalCurrency) return bal
+            const rate = await currencyAPI.getExchangeRate(from, globalCurrency)
+            return rate ? bal * Number(rate) : 0
+          })
+          const fiatValues = await Promise.all(fiatPromises)
+          const fiatTotal = fiatValues.reduce((s, v) => s + v, 0)
+
+          // Calculate crypto holdings
+          const cryptoPromises = cryptoWallets.map(async (w) => {
+            const bal = Number(w.balance || 0)
+            if (!bal) return 0
+            const from = w.currency_code || globalCurrency
+            if (from === globalCurrency) return bal
+            const rate = await currencyAPI.getExchangeRate(from, globalCurrency)
+            return rate ? bal * Number(rate) : 0
+          })
+          const cryptoValues = await Promise.all(cryptoPromises)
+          const cryptoTotal = cryptoValues.reduce((s, v) => s + v, 0)
+
+          if (!cancelled) {
+            setFiatHoldingsConverted(fiatTotal)
+            setCryptoHoldingsConverted(cryptoTotal)
+            setTotalBalanceConverted(fiatTotal + cryptoTotal)
+          }
+        }
+
+        // Load debts
         const debts = await currencyAPI.getDebts(userId).catch(() => [])
         const debtPromises = (debts || []).map(async (d) => {
           const debtAmount = Number(d.outstanding_balance || d.total_owed || 0)
@@ -580,18 +615,20 @@ export default function App() {
         const debtTotal = debtValues.reduce((s, v) => s + v, 0)
 
         if (!cancelled) {
-          setTotalBalanceConverted(balanceTotal)
           setTotalDebtConverted(debtTotal)
         }
       } catch (err) {
-        console.warn('Failed to compute converted totals for navbar:', err)
+        console.warn('Failed to load wallet holdings:', err)
         if (!cancelled) {
+          setFiatHoldingsConverted(0)
+          setCryptoHoldingsConverted(0)
           setTotalBalanceConverted(0)
           setTotalDebtConverted(0)
         }
       }
     }
-    computeConvertedTotals()
+
+    loadWalletHoldings()
     return () => { cancelled = true }
   }, [userId, globalCurrency])
 
