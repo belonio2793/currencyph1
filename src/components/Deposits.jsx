@@ -1524,6 +1524,10 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
 
                     return (
                       <tr key={deposit.id} className="border-b border-slate-100 hover:bg-slate-50 transition">
+                        <td className="py-2 sm:py-3 px-2 sm:px-3 text-xs text-slate-600 font-mono whitespace-nowrap">
+                          <span className="text-slate-700 font-semibold">{deposit.id.substring(0, 8)}</span>
+                          <span className="text-slate-400">...</span>
+                        </td>
                         <td className="py-2 sm:py-3 px-2 sm:px-3 text-xs text-slate-600 whitespace-nowrap">
                           <div className="font-medium">{dateTimeStr}</div>
                           <div className="text-slate-500 text-xs">{timeStr}</div>
