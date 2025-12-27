@@ -389,7 +389,7 @@ export default function Rates() {
                   <CurrencySelect
                     value={selectedFrom}
                     onChange={setSelectedFrom}
-                    options={rates}
+                    options={currencies}
                     label="From"
                   />
 
@@ -427,7 +427,7 @@ export default function Rates() {
                   <CurrencySelect
                     value={selectedTo}
                     onChange={setSelectedTo}
-                    options={rates}
+                    options={currencies}
                     label="To"
                   />
 
