@@ -388,17 +388,11 @@ export default function Rates() {
                   </button>
 
                   {/* To Currency */}
-                  <SearchableSelect
+                  <CurrencySelect
                     value={selectedTo}
                     onChange={setSelectedTo}
                     options={rates}
                     label="To"
-                    placeholder="Search currency code or name..."
-                    searchKeys={['code', 'value', 'label']}
-                    autofillThreshold={1}
-                    maxResults={50}
-                    debounceMs={100}
-                    highlightMatches={true}
                   />
 
                   {/* Result */}
