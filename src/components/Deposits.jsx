@@ -1393,7 +1393,7 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
               <button
                 onClick={() => setStep('amount')}
                 disabled={submitting}
-                className="flex-1 px-6 py-3 border border-slate-300 rounded-lg text-slate-900 font-medium hover:bg-slate-50 transition disabled:opacity-50"
+                className="flex-1 px-6 py-3 border-2 border-slate-900 rounded-lg text-slate-900 font-medium hover:bg-slate-900 hover:text-white transition disabled:opacity-50"
               >
                 Back
               </button>
@@ -1403,7 +1403,7 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
                 className={`flex-1 px-6 py-3 bg-blue-600 text-white rounded-lg font-medium transition flex items-center justify-center gap-2 ${
                   submitting
                     ? 'opacity-75 cursor-wait'
-                    : 'hover:bg-slate-800 active:scale-95'
+                    : 'hover:bg-blue-700 active:scale-95'
                 } ${submitting || !selectedWalletData || (selectedMethod === 'gcash' && !gcashReferenceNumber.trim()) ? 'opacity-50 cursor-not-allowed' : ''}`}
               >
                 {submitting && (
