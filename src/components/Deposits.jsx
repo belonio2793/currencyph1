@@ -895,8 +895,8 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
   }
 
   return (
-    <div className="min-h-screen bg-white py-4 px-4">
-      <div className="max-w-3xl mx-auto">
+    <div className="min-h-screen bg-white py-4 px-4 w-full">
+      <div className="w-full mx-auto">
         {/* Header with Toggle */}
         <div className="mb-8 flex items-center justify-between flex-wrap gap-4">
           <div>
