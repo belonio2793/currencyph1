@@ -216,7 +216,7 @@ function SearchableCurrencyDropdown({
 
                 {/* Show Crypto Currencies Header at top (only when showing crypto) */}
                 {(activeTab === 'all' || activeTab === 'crypto') && filterCurrencies(cryptoCurrencies).length > 0 && (
-                  <div className="sticky top-0 z-20 px-4 py-1 bg-slate-100 border-b border-slate-200">
+                  <div className="sticky top-0 z-30 px-4 py-1 bg-slate-100 border-b border-t border-slate-200">
                     <p className="text-xs font-semibold text-slate-600 uppercase tracking-wide">Cryptocurrencies</p>
                   </div>
                 )}
