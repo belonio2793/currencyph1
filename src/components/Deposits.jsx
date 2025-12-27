@@ -971,7 +971,7 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
 
               {/* Conversion Display */}
               {amount && selectedWallet && (
-                <div className={`border rounded-lg p-6 ${!calculateConvertedAmount() ? 'bg-amber-50 border-amber-200' : 'bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200'}`}>
+                <div className={`border rounded-lg p-6 ${!calculateConvertedAmount() ? 'bg-amber-50 border-amber-200' : 'bg-slate-50 border-slate-300'}`}>
                   {selectedCurrency === selectedWalletData?.currency_code ? (
                     <div className="flex items-center justify-between">
                       <div>
