@@ -188,114 +188,102 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
     }
   }, [activeType, cryptoAddresses, selectedWallet, wallets])
 
-  const fetchExchangeRates = async () => {
+  const fetchExchangeRates = async (targetCurr = 'PHP') => {
     try {
       setRatesLoading(true)
+      const target = targetCurr.toUpperCase()
       const rates = {}
-      const timestamps = []
 
-      // Primary source: pairs table (contains all currency and crypto rates)
-      // Query ALL pairs like /rates page does (not filtered) to ensure we get the freshest data
-      const { data: pairsData, error: pairsError } = await supabase
+      // PHASE 1: Try public.pairs as primary source (mirrors /rates.jsx)
+      const { data: pairsData } = await supabase
         .from('pairs')
-        .select('from_currency, to_currency, rate, source_table, updated_at')
-        .limit(10000)
+        .select('from_currency, to_currency, rate')
+        .eq('to_currency', target)
+        .gt('rate', 0)
 
-      // Fallback: crypto_rates table (like /rates page does)
-      const { data: cryptoRatesData, error: cryptoError } = await supabase
-        .from('crypto_rates')
-        .select('from_currency, to_currency, rate, updated_at')
-        .limit(10000)
-
-      if (pairsError) {
-        console.warn('[Deposits] Warning fetching pairs:', pairsError.message)
-      }
-
-      if (cryptoError) {
-        console.warn('[Deposits] Warning fetching crypto_rates:', cryptoError.message)
-      }
-
-      // Combine data sources - prioritize pairs, fallback to crypto_rates (matching /rates page)
-      const seenPairs = new Set()
-      let allRatePairs = []
-
-      // Add pairs from main pairs table (priority 1)
-      (pairsData || []).forEach(pair => {
-        const key = `${pair.from_currency}-${pair.to_currency}`
-        if (!seenPairs.has(key)) {
-          seenPairs.add(key)
-          allRatePairs.push(pair)
-        }
-      })
-
-      // Add crypto rates as fallback (priority 2)
-      (cryptoRatesData || []).forEach(pair => {
-        const key = `${pair.from_currency}-${pair.to_currency}`
-        if (!seenPairs.has(key)) {
-          seenPairs.add(key)
-          allRatePairs.push(pair)
-        }
-      })
-
-      if (!allRatePairs || allRatePairs.length === 0) {
-        console.warn('[Deposits] No rates available from pairs or crypto_rates')
-        setExchangeRates({})
-        setRatesLoading(false)
-        return
-      }
-
-      console.log(`[Deposits] Fetched ${pairsData?.length || 0} pairs + ${cryptoRatesData?.length || 0} crypto_rates (total: ${allRatePairs.length})`)
-
-      // 🎯 Extract and store canonical rates (X→PHP)
-      // This ensures crypto rates are large numbers (BTC→PHP: 2,500,000)
-      // NOT small decimals (PHP→BTC: 0.0000004)
-      allRatePairs.forEach(pair => {
-        const fromCode = pair.from_currency.toUpperCase()
-        const toCode = pair.to_currency.toUpperCase()
-        const rate = Number(pair.rate)
-
-        // Collect timestamps from all pairs for timestamp logic (matching /rates page)
-        if (pair.updated_at) {
-          timestamps.push(new Date(pair.updated_at))
-        }
-
-        // Only store rates where target currency is PHP
-        if (toCode === 'PHP' && isFinite(rate) && rate > 0) {
-          // If we don't have this rate yet, store it (prefer most recent)
-          if (!rates[fromCode]) {
-            rates[fromCode] = rate
-            console.log(`[Deposits] ✓ ${fromCode} → PHP = ${rate.toLocaleString(undefined, { maximumFractionDigits: 8 })}`)
+      if (pairsData) {
+        pairsData.forEach(pair => {
+          const fromCode = pair.from_currency.toUpperCase()
+          if (isFinite(Number(pair.rate)) && Number(pair.rate) > 0) {
+            rates[fromCode] = Number(pair.rate)
           }
-        }
-      })
-
-      // Ensure PHP base rate exists (always 1 PHP = 1 PHP)
-      if (!rates['PHP']) rates['PHP'] = 1
-
-      console.log(`[Deposits] ✅ Loaded ${Object.keys(rates).length} rates from combined sources (${allRatePairs.length} rows)`)
-      setExchangeRates(rates)
-
-      // Get the most recent timestamp - EXACTLY MATCHING /rates PAGE LOGIC
-      // Prefer actual fetch-rates execution time from cached_rates, fallback to pair timestamps
-      let mostRecentTimestamp = new Date()
-      const fetchInfo = await getLastFetchInfo()
-
-      if (fetchInfo && fetchInfo.fetchedAt) {
-        mostRecentTimestamp = fetchInfo.fetchedAt
-        console.log(`[Deposits] ✓ Using fetch-rates execution time: ${fetchInfo.isoString}`)
-      } else if (timestamps.length > 0) {
-        timestamps.sort((a, b) => b - a)
-        mostRecentTimestamp = timestamps[0]
-        console.log('[Deposits] ✓ Using most recent pair update timestamp (fallback)')
+        })
       }
 
-      setLastFetchedRates({
-        fetchedAt: mostRecentTimestamp,
-        isoString: mostRecentTimestamp.toISOString()
-      })
+      // Try reverse pairs from public.pairs
+      const missingCodes = currencies
+        .map(c => c.code)
+        .filter(code => !rates[code] && code !== target)
 
-      console.log(`[Deposits] ✓ Last fetch timestamp set: ${mostRecentTimestamp.toISOString()}`)
+      if (missingCodes.length > 0) {
+        const { data: reversePairs } = await supabase
+          .from('pairs')
+          .select('from_currency, to_currency, rate')
+          .eq('from_currency', target)
+          .in('to_currency', missingCodes)
+          .gt('rate', 0)
 
+        if (reversePairs) {
+          reversePairs.forEach(pair => {
+            const toCode = pair.to_currency.toUpperCase()
+            if (isFinite(Number(pair.rate)) && Number(pair.rate) > 0) {
+              rates[toCode] = 1 / Number(pair.rate)
+            }
+          })
+        }
+      }
+
+      // PHASE 2: Fill gaps with currency_rates table
+      const stillMissing = currencies
+        .map(c => c.code)
+        .filter(code => !rates[code] && code !== target)
+
+      if (stillMissing.length > 0) {
+        const { data: fiatRates } = await supabase
+          .from('currency_rates')
+          .select('from_currency, to_currency, rate')
+          .in('from_currency', stillMissing)
+          .eq('to_currency', target)
+          .gt('rate', 0)
+
+        if (fiatRates) {
+          fiatRates.forEach(pair => {
+            const fromCode = pair.from_currency.toUpperCase()
+            if (isFinite(Number(pair.rate)) && Number(pair.rate) > 0) {
+              rates[fromCode] = Number(pair.rate)
+            }
+          })
+        }
+      }
+
+      // PHASE 3: Fill remaining gaps with cryptocurrency_rates
+      const stillMissingCrypto = currencies
+        .map(c => c.code)
+        .filter(code => !rates[code] && code !== target)
+
+      if (stillMissingCrypto.length > 0) {
+        const { data: cryptoRates } = await supabase
+          .from('cryptocurrency_rates')
+          .select('from_currency, to_currency, rate')
+          .in('from_currency', stillMissingCrypto)
+          .eq('to_currency', target)
+          .gt('rate', 0)
+
+        if (cryptoRates) {
+          cryptoRates.forEach(pair => {
+            const fromCode = pair.from_currency.toUpperCase()
+            if (isFinite(Number(pair.rate)) && Number(pair.rate) > 0) {
+              rates[fromCode] = Number(pair.rate)
+            }
+          })
+        }
+      }
+
+      // Add target currency as 1.0
+      rates[target] = 1.0
+
+      setExchangeRates(rates)
+      console.log(`[Deposits] Loaded ${Object.keys(rates).length}/${currencies.length} rates`)
       setRatesLoading(false)
     } catch (err) {
       console.error('[Deposits] Error fetching exchange rates:', err.message)
