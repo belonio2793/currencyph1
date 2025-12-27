@@ -210,6 +210,21 @@ export const multiCurrencyDepositService = {
         )
       }
 
+      // CRITICAL FIX: If payment method currency differs from input currency,
+      // calculate how much of the payment currency is needed
+      let paymentConversion = null
+      if (paymentMethodCurrency && paymentMethodCurrency !== depositCurrency) {
+        console.debug(
+          `[Three-Currency Model] Calculating payment amount: ` +
+          `${amount} ${depositCurrency} → ? ${paymentMethodCurrency}`
+        )
+        paymentConversion = await this.convertAmount(amount, depositCurrency, paymentMethodCurrency)
+        console.debug(
+          `[Three-Currency Model] Payment amount calculated: ` +
+          `${paymentConversion.toAmount} ${paymentMethodCurrency}`
+        )
+      }
+
       // Get current timestamp
       const now = new Date()
       const isoTimestamp = now.toISOString()
