@@ -1460,13 +1460,14 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
               <table className="w-full text-xs sm:text-sm border-collapse">
                 <thead>
                   <tr className="border-b border-slate-200">
+                    <th className="text-left py-2 sm:py-3 px-2 sm:px-3 text-slate-600 font-medium text-xs">Deposit ID</th>
                     <th className="text-left py-2 sm:py-3 px-2 sm:px-3 text-slate-600 font-medium text-xs">Date & Time</th>
                     <th className="text-left py-2 sm:py-3 px-2 sm:px-3 text-slate-600 font-medium text-xs">You Sent</th>
                     <th className="text-left py-2 sm:py-3 px-2 sm:px-3 text-slate-600 font-medium text-xs">Payment</th>
                     <th className="hidden xl:table-cell text-left py-2 sm:py-3 px-2 sm:px-3 text-slate-600 font-medium text-xs">Rate</th>
                     <th className="text-left py-2 sm:py-3 px-2 sm:px-3 text-slate-600 font-medium text-xs">Received</th>
                     <th className="text-left py-2 sm:py-3 px-2 sm:px-3 text-slate-600 font-medium text-xs">Status</th>
-                    <th className="text-left py-2 sm:py-3 px-2 sm:px-3 text-slate-600 font-medium text-xs">Reconciliation</th>
+                    <th className="text-left py-2 sm:py-3 px-2 sm:px-3 text-slate-600 font-medium text-xs">Balance</th>
                     <th className="text-left py-2 sm:py-3 px-2 sm:px-3 text-slate-600 font-medium text-xs">Action</th>
                   </tr>
                 </thead>
