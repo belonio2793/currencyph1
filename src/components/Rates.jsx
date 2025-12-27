@@ -75,40 +75,38 @@ export default function Rates() {
 
       const codeArray = Array.from(codes)
 
-      // Fetch fiat currency metadata
+      // Fetch fiat currency codes
       const { data: fiatData } = await supabase
         .from('currency_rates')
-        .select('from_currency, rate')
+        .select('distinct(from_currency)')
         .limit(1000)
 
-      // Fetch crypto currency metadata
+      // Fetch crypto currency codes
       const { data: cryptoData } = await supabase
         .from('cryptocurrency_rates')
-        .select('from_currency, rate')
+        .select('distinct(from_currency)')
         .limit(1000)
 
-      // Build metadata map
-      const fiatMetadata = {}
-      const cryptoMetadata = {}
-
-      if (fiatData) {
-        fiatData.forEach(row => {
-          fiatMetadata[row.from_currency] = { type: 'currency', isActive: true }
-        })
-      }
-
-      if (cryptoData) {
-        cryptoData.forEach(row => {
-          cryptoMetadata[row.from_currency] = { type: 'cryptocurrency', isActive: true }
-        })
-      }
+      // Build metadata map - preference: crypto first, then fiat
+      const cryptoCodes = new Set(cryptoData?.map(row => row.from_currency) || [])
+      const fiatCodes = new Set(fiatData?.map(row => row.from_currency) || [])
 
       // Build rates list - one entry per unique currency code
       const ratesByCode = {}
       let mostRecentTime = new Date()
 
       codeArray.forEach(code => {
-        const type = cryptoMetadata[code] ? 'cryptocurrency' : 'currency'
+        const isCrypto = cryptoCodes.has(code)
+        const isFiat = fiatCodes.has(code)
+
+        // Determine type: if in both tables, prefer crypto
+        let type = 'currency'
+        if (isCrypto) {
+          type = 'cryptocurrency'
+        } else if (isFiat) {
+          type = 'currency'
+        }
+
         ratesByCode[code] = {
           code,
           rate: null,
