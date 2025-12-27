@@ -83,21 +83,27 @@ function NavbarComponent({ activeTab, onTabChange, globalCurrency, setGlobalCurr
         })
 
         if (error) {
-          console.error('Error calculating wallet valuation:', error)
-          setConsolidatedHoldingsInCrypto(null)
+          const errorMsg = error instanceof Error ? error.message : (error?.message || JSON.stringify(error))
+          console.error('Error calculating wallet valuation:', errorMsg)
+          setConsolidatedHoldingsInCrypto(0)
           setLoadingConsolidated(false)
           return
         }
 
-        if (data && data[0]) {
+        if (data && Array.isArray(data) && data.length > 0) {
           // Display the total fiat value
-          setConsolidatedHoldingsInCrypto(data[0].total_balance_in_target_currency || 0)
+          const totalValue = data[0].total_balance_in_target_currency || 0
+          setConsolidatedHoldingsInCrypto(parseFloat(totalValue) || 0)
+        } else if (data && typeof data === 'object' && data.total_balance_in_target_currency !== undefined) {
+          // Handle case where data might be single object instead of array
+          setConsolidatedHoldingsInCrypto(parseFloat(data.total_balance_in_target_currency) || 0)
         } else {
           setConsolidatedHoldingsInCrypto(0)
         }
       } catch (error) {
-        console.error('Failed to calculate wallet valuation:', error)
-        setConsolidatedHoldingsInCrypto(null)
+        const errorMsg = error instanceof Error ? error.message : JSON.stringify(error)
+        console.error('Failed to calculate wallet valuation:', errorMsg)
+        setConsolidatedHoldingsInCrypto(0)
       } finally {
         setLoadingConsolidated(false)
       }
