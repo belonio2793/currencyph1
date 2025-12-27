@@ -160,7 +160,7 @@ export default function TransactionHistory({ userId }) {
 
   if (loading) {
     return (
-      <div className="max-w-7xl mx-auto px-6 py-6">
+      <div className="w-full px-3 sm:px-6 py-4 sm:py-6">
         <div className="text-center text-slate-500">Loading transactions...</div>
       </div>
     )
