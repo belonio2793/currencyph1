@@ -1505,10 +1505,10 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
 
                     return (
                       <tr key={deposit.id} className="border-b border-slate-100 hover:bg-slate-50 transition">
-                        <td className="py-3 px-4 font-semibold text-slate-900">
+                        <td className="py-2 sm:py-3 px-2 sm:px-3 font-semibold text-slate-900">
                           {formatAmount(deposit.amount, originalCurrency)} {originalCurrency.toUpperCase()}
                         </td>
-                        <td className="py-3 px-4 text-slate-700 text-xs">
+                        <td className="py-2 sm:py-3 px-2 sm:px-3 text-slate-700 text-xs">
                           {notesMeta.payment_method_currency || deposit.payment_method_currency ? (
                             <>
                               <div className="font-medium text-slate-900">
