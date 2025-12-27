@@ -1427,7 +1427,7 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
               <button
                 onClick={() => setStep('amount')}
                 disabled={submitting}
-                className="flex-1 px-6 py-3 border-2 border-slate-900 rounded-lg text-slate-900 font-medium hover:bg-slate-900 hover:text-white transition disabled:opacity-50"
+                className="flex-1 px-6 py-3 border border-slate-200 rounded-lg text-slate-600 font-medium hover:bg-slate-50 transition disabled:opacity-50"
               >
                 Back
               </button>
