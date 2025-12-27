@@ -1569,11 +1569,11 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
                             {deposit.status.charAt(0).toUpperCase() + deposit.status.slice(1)}
                           </span>
                         </td>
-                        <td className="py-2 sm:py-3 px-2 sm:px-3 text-xs text-slate-600">
+                        <td className="py-2 sm:py-3 px-2 sm:px-3 text-xs">
                           <div className="space-y-0.5">
-                            <p className="whitespace-nowrap"><span className="font-semibold text-slate-700">B:</span> {formatAmount(previousBalance, walletCurrency)}</p>
+                            <p className="whitespace-nowrap text-slate-600"><span className="font-semibold">Before:</span> <span className="text-slate-900 font-semibold">{formatAmount(previousBalance, walletCurrency)}</span></p>
                             <p className="text-emerald-600 font-semibold whitespace-nowrap">+{formatAmount(currentAmount, walletCurrency)}</p>
-                            <p className="text-slate-900 font-semibold whitespace-nowrap"><span className="text-slate-600 font-normal">A:</span> {formatAmount(newBalance, walletCurrency)}</p>
+                            <p className="text-slate-900 font-semibold whitespace-nowrap"><span className="text-slate-600 font-normal">After:</span> {formatAmount(newBalance, walletCurrency)}</p>
                           </div>
                         </td>
                         <td className="py-2 sm:py-3 px-2 sm:px-3 whitespace-nowrap">
