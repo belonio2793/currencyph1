@@ -762,8 +762,8 @@ export default function Rates() {
                 </div>
                 <div className="space-y-4">
                   <div className="flex justify-between items-center p-3 bg-slate-50 rounded-lg">
-                    <span className="text-sm font-medium text-slate-700">Total Rates</span>
-                    <span className="text-lg font-bold text-slate-900">{rates.length}</span>
+                    <span className="text-sm font-medium text-slate-700">Total Currencies</span>
+                    <span className="text-lg font-bold text-slate-900">{currencies.length}</span>
                   </div>
                   <div className="flex justify-between items-center p-3 bg-slate-100 rounded-lg">
                     <span className="text-sm font-medium text-slate-700">Fiat Currencies</span>
