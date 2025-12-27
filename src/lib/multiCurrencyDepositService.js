@@ -291,6 +291,8 @@ export const multiCurrencyDepositService = {
           input_currency: depositCurrency.toUpperCase(),
           // Payment layer
           payment_method_currency: paymentMethodCurrency ? paymentMethodCurrency.toUpperCase() : null,
+          payment_amount: paymentConversion ? paymentConversion.toAmount : null,
+          payment_currency_rate: paymentConversion ? paymentConversion.rateRounded : null,
           // Wallet layer
           received_amount: conversion.toAmount,
           received_currency: walletCurrency.toUpperCase(),
@@ -313,11 +315,13 @@ export const multiCurrencyDepositService = {
           // input amount was confused with payment method currency.
           // Example: User sends 90,000 USD via Ethereum into PHP wallet
           // - input_amount: 90,000, input_currency: USD
-          // - payment_method_currency: ETH (for reference)
+          // - payment_amount: 0.03, payment_method_currency: ETH
           // - received_amount: ~4,500,000, received_currency: PHP
           input_amount: conversion.fromAmount,
           input_currency: depositCurrency.toUpperCase(),
+          payment_amount: paymentConversion ? paymentConversion.toAmount : null,
           payment_method_currency: paymentMethodCurrency ? paymentMethodCurrency.toUpperCase() : null,
+          payment_currency_rate: paymentConversion ? paymentConversion.rateRounded : null,
           received_amount: conversion.toAmount,
           received_currency: walletCurrency.toUpperCase(),
           exchange_rate: conversion.rateRounded,
@@ -328,7 +332,14 @@ export const multiCurrencyDepositService = {
           wallet_id: walletId,
           // Audit trail
           three_currency_model: true,
-          bug_fix_applied: 'input_amount_vs_payment_method_currency'
+          bug_fix_applied: 'input_amount_vs_payment_method_currency',
+          // For debugging: document the three conversions
+          conversions: paymentConversion ? [
+            { from: depositCurrency, to: walletCurrency, rate: conversion.rateRounded },
+            { from: depositCurrency, to: paymentMethodCurrency, rate: paymentConversion.rateRounded }
+          ] : [
+            { from: depositCurrency, to: walletCurrency, rate: conversion.rateRounded }
+          ]
         }
       }
 
