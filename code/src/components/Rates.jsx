@@ -25,7 +25,7 @@ export default function Rates() {
   const [sortDirection, setSortDirection] = useState('asc')
   const [favorites, setFavorites] = useState([])
 
-  // Load all pairs from public.pairs table
+  // Load all pairs from public.pairs table (primary source of truth)
   useEffect(() => {
     loadData()
     const interval = setInterval(loadData, 5 * 60 * 1000)
@@ -35,13 +35,11 @@ export default function Rates() {
   // Set default currencies when rates load
   useEffect(() => {
     if (rates.length > 0 && !selectedFrom) {
-      // Find PHP or use first currency
       const phpRate = rates.find(r => r.code === 'PHP')
       setSelectedFrom(phpRate?.code || rates[0].code)
     }
 
     if (rates.length > 0 && !selectedTo) {
-      // Find USD or use second currency
       const usdRate = rates.find(r => r.code === 'USD')
       const firstNonSelected = rates.find(r => r.code !== selectedFrom)
       setSelectedTo(usdRate?.code || firstNonSelected?.code)
@@ -58,46 +56,34 @@ export default function Rates() {
         throw new Error('Supabase client not properly initialized')
       }
 
-      // Hybrid approach: Use specialized tables + public.pairs as fallback
-      // This ensures we get all rates: fiat, crypto, and anything else
-      const [currencyRatesRes, cryptoRatesRes, pairsRes] = await Promise.all([
-        supabase
-          .from('currency_rates')
-          .select('from_currency, to_currency, rate, updated_at'),
-        supabase
-          .from('cryptocurrency_rates')
-          .select('from_currency, to_currency, rate, updated_at'),
-        supabase
-          .from('pairs')
-          .select('from_currency, to_currency, rate, updated_at')
-      ])
+      // Primary source: pairs table (contains all currency and crypto rates)
+      // The pairs table is populated by the fetch-rates edge function and contains:
+      // from_currency, to_currency, rate, source_table, updated_at
+      const { data: pairsData, error: pairsError } = await supabase
+        .from('pairs')
+        .select('from_currency, to_currency, rate, source_table, updated_at')
+        .limit(10000)
 
-      if (currencyRatesRes.error) {
-        console.warn('Error fetching currency_rates:', currencyRatesRes.error.message)
+      if (pairsError) {
+        console.warn('Error fetching pairs table:', pairsError.message)
       }
 
-      if (cryptoRatesRes.error) {
-        console.warn('Error fetching cryptocurrency_rates:', cryptoRatesRes.error.message)
+      // Fallback: crypto_rates table (fallback if pairs is empty)
+      const { data: cryptoRatesData, error: cryptoError } = await supabase
+        .from('crypto_rates')
+        .select('from_currency, to_currency, rate, updated_at')
+        .limit(10000)
+
+      if (cryptoError) {
+        console.warn('Error fetching crypto_rates table:', cryptoError.message)
       }
 
-      if (pairsRes.error) {
-        console.warn('Error fetching public.pairs:', pairsRes.error.message)
-      }
-
-      // Combine all rate sources (with deduplication)
-      // Priority: currency_rates → cryptocurrency_rates → public.pairs
+      // Combine data sources (deduplication)
       const seenPairs = new Set()
       const allRatePairs = []
 
-      // Add fiat currency rates (priority 1)
-      (currencyRatesRes.data || []).forEach(pair => {
-        const key = `${pair.from_currency}-${pair.to_currency}`
-        seenPairs.add(key)
-        allRatePairs.push(pair)
-      })
-
-      // Add crypto rates (priority 2, skip if already in currency_rates)
-      (cryptoRatesRes.data || []).forEach(pair => {
+      // Add pairs from main pairs table (priority 1)
+      (pairsData || []).forEach(pair => {
         const key = `${pair.from_currency}-${pair.to_currency}`
         if (!seenPairs.has(key)) {
           seenPairs.add(key)
@@ -105,8 +91,8 @@ export default function Rates() {
         }
       })
 
-      // Add public.pairs as fallback (priority 3, skip if already added)
-      (pairsRes.data || []).forEach(pair => {
+      // Add crypto rates as fallback (priority 2)
+      (cryptoRatesData || []).forEach(pair => {
         const key = `${pair.from_currency}-${pair.to_currency}`
         if (!seenPairs.has(key)) {
           seenPairs.add(key)
@@ -114,10 +100,10 @@ export default function Rates() {
         }
       })
 
-      console.log(`Fetched ${currencyRatesRes.data?.length || 0} fiat currency rates`)
-      console.log(`Fetched ${cryptoRatesRes.data?.length || 0} cryptocurrency rates`)
-      console.log(`Fetched ${pairsRes.data?.length || 0} pairs (fallback)`)
+      console.log(`Fetched ${pairsData?.length || 0} pairs from pairs table`)
+      console.log(`Fetched ${cryptoRatesData?.length || 0} crypto rates (fallback)`)
       console.log(`Total combined (deduplicated): ${allRatePairs.length} rate pairs`)
+
       setAllPairs(allRatePairs || [])
 
       // Get unique currency codes from all rates
@@ -164,7 +150,7 @@ export default function Rates() {
         console.log(`Loaded metadata for ${cryptosRes.data.length} cryptocurrencies`)
       }
 
-      // Add fallback entries for codes without metadata (rates that don't have metadata yet)
+      // Add fallback entries for codes without metadata
       codeArray.forEach(code => {
         if (!allMetadata[code]) {
           allMetadata[code] = {
@@ -199,8 +185,7 @@ export default function Rates() {
         }
       })
 
-      // Collect all rates from combined currency_rates and cryptocurrency_rates tables
-      // Each pair represents a from_currency → to_currency rate
+      // Collect all rates from combined pairs and crypto_rates tables
       allRatePairs?.forEach(pair => {
         if (pair.updated_at) {
           timestamps.push(new Date(pair.updated_at))
@@ -229,11 +214,9 @@ export default function Rates() {
       const fetchInfo = await getLastFetchInfo()
 
       if (fetchInfo && fetchInfo.fetchedAt) {
-        // Use the actual fetch-rates edge function execution time (most accurate)
         mostRecentTimestamp = fetchInfo.fetchedAt
         console.log(`Using fetch-rates execution time: ${fetchInfo.isoString}`)
       } else if (timestamps.length > 0) {
-        // Fallback to most recent pair timestamp if fetch info not available
         timestamps.sort((a, b) => b - a)
         mostRecentTimestamp = timestamps[0]
         console.log('Using most recent pair update timestamp (fallback)')
@@ -252,12 +235,12 @@ export default function Rates() {
 
       setRates(validRates)
       setLastUpdated(mostRecentTimestamp)
-      console.log(`OK Final rates list: ${validRates.length} items (${ratesWithValues.length} with rates)`)
-      console.log(`Clock Last fetch date set to: ${formatFullDateTime(mostRecentTimestamp)}`)
+      console.log(`Final rates list: ${validRates.length} items (${ratesWithValues.length} with rates)`)
+      console.log(`Last fetch date set to: ${formatFullDateTime(mostRecentTimestamp)}`)
       setError(null)
     } catch (err) {
       const errorMsg = err?.message || String(err) || 'Unknown error'
-      console.error('ERROR Error loading rates:', errorMsg)
+      console.error('Error loading rates:', errorMsg)
       console.error('Full error object:', err)
 
       let userFriendlyError = 'Failed to load exchange rates'
@@ -532,11 +515,11 @@ export default function Rates() {
                         <p className="text-xs text-slate-600 mt-1">
                           {(() => {
                             const minutes = Math.floor((Date.now() - new Date(lastUpdated).getTime()) / 1000 / 60)
-                            if (minutes < 1) return 'OK Just now'
-                            if (minutes < 60) return `OK ${minutes} minute${minutes !== 1 ? 's' : ''} ago`
+                            if (minutes < 1) return 'Just now'
+                            if (minutes < 60) return `${minutes} minute${minutes !== 1 ? 's' : ''} ago`
                             const hours = Math.floor(minutes / 60)
-                            if (hours < 24) return `OK ${hours} hour${hours !== 1 ? 's' : ''} ago`
-                            return `WARNING ${Math.floor(hours / 24)} day${Math.floor(hours / 24) !== 1 ? 's' : ''} ago`
+                            if (hours < 24) return `${hours} hour${hours !== 1 ? 's' : ''} ago`
+                            return `${Math.floor(hours / 24)} day${Math.floor(hours / 24) !== 1 ? 's' : ''} ago`
                           })()}
                         </p>
                       )}
@@ -616,7 +599,7 @@ export default function Rates() {
                           }}
                           className="text-left py-3 px-4 font-semibold text-slate-700 text-sm cursor-pointer hover:bg-slate-100 transition select-none"
                         >
-                          Currency {sortBy === 'code' && (sortDirection === 'asc' ? ' UP' : ' DOWN')}
+                          Currency {sortBy === 'code' && (sortDirection === 'asc' ? '↑' : '↓')}
                         </th>
                         <th
                           onClick={() => {
@@ -667,7 +650,7 @@ export default function Rates() {
                           <td className="py-3 px-4 text-slate-600">{currency.metadata?.name || currency.code}</td>
                           <td className="py-3 px-4">
                             <span className="inline-block px-3 py-1 rounded-full text-xs font-medium bg-slate-200 text-slate-900">
-                              {currency.metadata?.type === 'cryptocurrency' ? 'Cryptocurrency' : 'FIAT'}
+                              {currency.metadata?.type === 'cryptocurrency' ? 'Cryptocurrency' : 'Fiat'}
                             </span>
                           </td>
                           <td className="py-3 px-4 text-right font-mono text-slate-900 font-medium">
@@ -769,7 +752,7 @@ export default function Rates() {
                 <div className="pb-4 border-b border-slate-300">
                   <p className="text-xs text-slate-600 font-medium mb-1 uppercase tracking-wider">Data Source</p>
                   <p className="text-xs text-slate-500">
-                    OK Real-time rates from fiat and crypto markets
+                    Real-time rates from fiat and crypto markets
                   </p>
                 </div>
 
@@ -800,13 +783,13 @@ export default function Rates() {
                   </div>
                   <div className="flex justify-between items-center p-3 bg-slate-100 rounded-lg">
                     <span className="text-sm font-medium text-slate-700 flex items-center gap-1">
-                      <span className="font-bold">FIA</span>
+                      <span className="font-bold">Fiat</span>
                     </span>
                     <span className="text-lg font-bold text-slate-900">{rates.filter(r => r.metadata?.type === 'currency').length}</span>
                   </div>
                   <div className="flex justify-between items-center p-3 bg-slate-100 rounded-lg">
                     <span className="text-sm font-medium text-slate-700 flex items-center gap-1">
-                      <span className="font-bold">CRY</span>
+                      <span className="font-bold">Crypto</span>
                     </span>
                     <span className="text-lg font-bold text-slate-900">{rates.filter(r => r.metadata?.type === 'cryptocurrency').length}</span>
                   </div>
