@@ -314,7 +314,7 @@ export default function TransactionHistory({ userId }) {
                     {/* Primary Amount - in wallet currency */}
                     <div className="flex items-baseline justify-between gap-3">
                       <span className="text-xs sm:text-sm font-medium text-slate-600 uppercase tracking-wide">
-                        {transaction.currency_code?.toUpperCase() || 'Currency'}
+                        Amount in {getCurrencySymbol(transaction.currency_code)}
                       </span>
                       <p className={`text-base sm:text-lg font-light flex-shrink-0 ${
                         isOutgoing
@@ -322,8 +322,7 @@ export default function TransactionHistory({ userId }) {
                           : 'text-emerald-600'
                       }`}>
                         {isOutgoing ? '-' : '+'}
-                        {getCurrencySymbol(transaction.currency_code)}
-                        {formatFullPrecision(transaction.amount)} {transaction.currency_code?.toUpperCase()}
+                        {formatFullPrecision(transaction.amount)} {getCurrencySymbol(transaction.currency_code)}
                       </p>
                     </div>
 
@@ -331,11 +330,10 @@ export default function TransactionHistory({ userId }) {
                     {transaction.original_currency && transaction.original_currency !== transaction.currency_code && transaction.original_amount && (
                       <div className="flex items-baseline justify-between gap-3 pt-2 border-t border-slate-200">
                         <span className="text-xs font-medium text-slate-500 uppercase tracking-wide">
-                          {transaction.original_currency?.toUpperCase()} (Original)
+                          Original Amount in {transaction.original_currency?.toUpperCase()}
                         </span>
                         <p className="text-sm font-light flex-shrink-0 text-slate-700">
-                          {getCurrencySymbol(transaction.original_currency)}
-                          {formatFullPrecision(transaction.original_amount)} {transaction.original_currency?.toUpperCase()}
+                          {formatFullPrecision(transaction.original_amount)} {getCurrencySymbol(transaction.original_currency)}
                         </p>
                       </div>
                     )}
@@ -344,11 +342,10 @@ export default function TransactionHistory({ userId }) {
                     {transaction.received_currency && transaction.received_currency !== transaction.currency_code && transaction.received_amount && (
                       <div className="flex items-baseline justify-between gap-3 pt-2 border-t border-slate-200">
                         <span className="text-xs font-medium text-slate-500 uppercase tracking-wide">
-                          {transaction.received_currency?.toUpperCase()} (Received)
+                          Received in {transaction.received_currency?.toUpperCase()}
                         </span>
                         <p className="text-sm font-light flex-shrink-0 text-slate-700">
-                          {getCurrencySymbol(transaction.received_currency)}
-                          {formatFullPrecision(transaction.received_amount)} {transaction.received_currency?.toUpperCase()}
+                          {formatFullPrecision(transaction.received_amount)} {getCurrencySymbol(transaction.received_currency)}
                         </p>
                       </div>
                     )}
@@ -358,8 +355,7 @@ export default function TransactionHistory({ userId }) {
                       <div className="flex items-baseline justify-between gap-3 pt-2 border-t border-amber-200">
                         <span className="text-xs font-medium text-amber-600 uppercase tracking-wide">Conversion Fee</span>
                         <p className="text-sm font-light flex-shrink-0 text-amber-700">
-                          {getCurrencySymbol(transaction.conversion_fee_currency || transaction.currency_code)}
-                          {formatFullPrecision(transaction.conversion_fee)} {transaction.conversion_fee_currency?.toUpperCase() || transaction.currency_code?.toUpperCase()}
+                          {formatFullPrecision(transaction.conversion_fee)} {getCurrencySymbol(transaction.conversion_fee_currency || transaction.currency_code)}
                         </p>
                       </div>
                     )}
@@ -367,14 +363,14 @@ export default function TransactionHistory({ userId }) {
                     {/* Crypto to USD Value - only for crypto transactions */}
                     {isCryptoCurrency(transaction.currency_code) && usdValue !== null && (
                       <div className="flex items-baseline justify-between gap-3 pt-2 border-t border-slate-200">
-                        <span className="text-xs font-medium text-slate-500 uppercase tracking-wide">USD VALUE</span>
+                        <span className="text-xs font-medium text-slate-500 uppercase tracking-wide">USD Reference Value</span>
                         <p className={`text-sm font-light flex-shrink-0 ${
                           isOutgoing
                             ? 'text-red-600'
                             : 'text-emerald-600'
                         }`}>
                           {isOutgoing ? '-' : '+'}
-                          ${formatFullPrecision(usdValue.toFixed(2))} USD
+                          {formatFullPrecision(usdValue.toFixed(2))} USD
                         </p>
                       </div>
                     )}
