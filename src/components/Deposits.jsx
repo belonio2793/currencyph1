@@ -390,9 +390,35 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
 
       if (walletsResult.error) throw walletsResult.error
       if (currenciesResult.error) throw currenciesResult.error
+      if (cryptosResult.error) throw cryptosResult.error
 
       let walletsData = walletsResult.data || []
-      const allCurrencies = currenciesResult.data || []
+      let allCurrencies = currenciesResult.data || []
+      const allCryptos = cryptosResult.data || []
+
+      // Merge cryptocurrency metadata into currencies list
+      // This ensures cryptocurrencies have the coingecko_id for better rate calculations
+      const cryptoMap = Object.fromEntries(allCryptos.map(c => [c.code, c]))
+      allCurrencies = allCurrencies.map(c => {
+        if (cryptoMap[c.code]) {
+          return { ...c, ...cryptoMap[c.code], type: 'crypto' }
+        }
+        return c
+      })
+
+      // Add any cryptocurrencies not in the currencies table
+      allCryptos.forEach(crypto => {
+        if (!allCurrencies.find(c => c.code === crypto.code)) {
+          allCurrencies.push({
+            code: crypto.code,
+            name: crypto.name,
+            type: 'crypto',
+            symbol: '',
+            decimals: 8,
+            coingecko_id: crypto.coingecko_id
+          })
+        }
+      })
 
       // Create a map of currencies for quick lookup
       const currencyMap = Object.fromEntries(
