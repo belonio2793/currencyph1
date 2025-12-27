@@ -331,7 +331,6 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
       }
 
       console.log(`[Deposits] Fetched ${canonicalPairs?.length || 0} pairs + ${cryptoRatesData?.length || 0} crypto_rates (deduplicated: ${allRatePairs.length})`)
-      const canonicalPairs_used = allRatePairs
 
       // 🎯 CRITICAL: Store canonical rates (X→PHP) directly
       // This ensures crypto rates are large numbers (BTC→PHP: 2,500,000)
