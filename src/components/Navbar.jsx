@@ -4,6 +4,7 @@ import HeaderMap from './HeaderMap'
 import CurrencySelectionModal from './CurrencySelectionModal'
 import { convertFiatToCryptoDb, getCryptoRateWithTimestamp } from '../lib/cryptoRatesDb'
 import { formatNumber } from '../lib/currency'
+import { supabase } from '../lib/supabaseClient'
 
 const currencyLabels = {
   'PHP': 'Philippine Peso',
