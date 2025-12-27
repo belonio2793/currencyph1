@@ -1168,11 +1168,11 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
 
             {/* THREE-CURRENCY MODEL DISPLAY: Show all three currencies clearly */}
             {selectedAddressMethod && selectedCurrency !== selectedAddressMethod?.cryptoSymbol?.toUpperCase() && (
-              <div className="mb-8 p-6 bg-slate-50 border border-slate-300 rounded-lg">
-                <h3 className="font-bold text-slate-900 mb-4 flex items-center gap-2">
+              <div className="mb-8 p-4 bg-slate-50 border border-slate-300 rounded-lg">
+                <h3 className="font-bold text-slate-900 mb-3 flex items-center gap-2 text-base">
                   <span className="text-lg">🔄</span> Three-Currency Deposit Model
                 </h3>
-                <div className="space-y-4">
+                <div className="space-y-3">
                   {/* INPUT CURRENCY */}
                   <div className="bg-white p-4 rounded-lg border-l-4 border-slate-400">
                     <p className="text-xs text-slate-600 font-semibold mb-1">1️⃣ INPUT CURRENCY (What you specify)</p>
