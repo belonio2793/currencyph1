@@ -281,8 +281,11 @@ export default function Rates() {
   if (loading) {
     return (
       <div className="bg-white rounded-2xl shadow-lg p-12 text-center">
-        <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mb-4"></div>
-        <p className="text-slate-500 text-lg">Loading exchange rates...</p>
+        <div className="flex justify-center mb-4">
+          <div className="inline-block animate-spin rounded-full h-10 w-10 border-4 border-slate-200 border-t-blue-600"></div>
+        </div>
+        <p className="text-slate-600 text-lg font-medium">Loading exchange rates...</p>
+        <p className="text-slate-500 text-sm mt-2">Please wait while we fetch the latest rates</p>
       </div>
     )
   }
