@@ -1596,7 +1596,7 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
                                 setSelectedDepositForDetails(deposit)
                                 setShowDepositDetailsModal(true)
                               }}
-                              className="px-2 py-1 bg-slate-900 text-white text-xs font-medium rounded hover:bg-slate-800 transition"
+                              className="px-3 py-1.5 bg-slate-100 text-slate-700 text-xs font-medium rounded hover:bg-slate-200 transition border border-slate-200"
                             >
                               Details
                             </button>
@@ -1604,7 +1604,7 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
                               <button
                                 onClick={() => handleDeleteDeposit(deposit.id)}
                                 disabled={submitting}
-                                className="px-2 py-1 bg-red-600 text-white text-xs font-medium rounded hover:bg-red-700 transition disabled:opacity-50"
+                                className="px-3 py-1.5 bg-slate-100 text-slate-600 text-xs font-medium rounded hover:bg-slate-150 transition disabled:opacity-50 border border-slate-200"
                               >
                                 Cancel
                               </button>
@@ -1648,7 +1648,7 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
             <div className="flex gap-2 mt-6">
               <button
                 onClick={() => setShowWalletModal(false)}
-                className="flex-1 px-3 py-2 border-2 border-slate-900 rounded text-slate-900 text-sm font-medium hover:bg-slate-900 hover:text-white transition"
+                className="flex-1 px-3 py-2 border border-slate-200 rounded text-slate-600 text-sm font-medium hover:bg-slate-50 transition"
               >
                 Cancel
               </button>
@@ -1795,13 +1795,13 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
                     <button
                       onClick={() => handleDeleteDeposit(deposit.id)}
                       disabled={submitting}
-                      className="flex-1 px-3 py-2 bg-red-600 text-white rounded text-sm font-medium hover:bg-red-700 transition disabled:opacity-50"
+                      className="flex-1 px-3 py-2 border border-slate-200 text-slate-600 rounded text-sm font-medium hover:bg-slate-50 transition disabled:opacity-50"
                     >
                       {submitting ? 'Cancelling...' : 'Cancel Deposit'}
                     </button>
                     <button
                       onClick={() => setShowDepositDetailsModal(false)}
-                      className="flex-1 px-3 py-2 bg-slate-300 text-slate-900 rounded text-sm font-medium hover:bg-slate-400 transition"
+                      className="flex-1 px-3 py-2 bg-slate-100 text-slate-700 rounded text-sm font-medium hover:bg-slate-150 transition border border-slate-200"
                     >
                       Close
                     </button>
