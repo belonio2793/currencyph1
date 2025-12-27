@@ -1222,11 +1222,11 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
 
             {/* Exchange Rate Summary */}
             {ratesLoading ? (
-              <div className="mb-8 p-6 bg-blue-50 border border-blue-200 rounded-lg">
+              <div className="mb-8 p-6 bg-slate-50 border border-slate-300 rounded-lg">
                 <p className="text-slate-700">Loading exchange rates...</p>
               </div>
             ) : (
-              <div className="mb-8 p-6 bg-blue-50 border border-blue-200 rounded-lg">
+              <div className="mb-8 p-6 bg-slate-50 border border-slate-300 rounded-lg">
                 <h3 className="font-semibold text-slate-900 mb-4">Exchange Rate Summary</h3>
                 <div className="space-y-3">
                   <div className="flex justify-between items-center gap-4 flex-wrap">
