@@ -1194,12 +1194,12 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
 
                   {/* WALLET CURRENCY */}
                   <div className="flex items-center justify-center">
-                    <div className="text-indigo-400 text-2xl">↓</div>
+                    <div className="text-slate-400 text-2xl">↓</div>
                   </div>
-                  <div className="bg-white p-4 rounded-lg border-l-4 border-emerald-500">
+                  <div className="bg-white p-4 rounded-lg border-l-4 border-slate-400">
                     <p className="text-xs text-slate-600 font-semibold mb-1">3️⃣ WALLET CURRENCY (What you receive)</p>
-                    <p className="text-2xl font-bold text-emerald-600 break-words">{formatNumber(calculateConvertedAmount(), selectedWalletData?.currency_code)} {selectedWalletData?.currency_code}</p>
-                    <p className="text-xs text-emerald-600 mt-2">Credited to your {selectedWalletData?.currency_code} wallet</p>
+                    <p className="text-2xl font-bold text-slate-900 break-words">{formatNumber(calculateConvertedAmount(), selectedWalletData?.currency_code)} {selectedWalletData?.currency_code}</p>
+                    <p className="text-xs text-slate-600 mt-2">Credited to your {selectedWalletData?.currency_code} wallet</p>
                   </div>
                 </div>
 
