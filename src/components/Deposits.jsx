@@ -1141,7 +1141,7 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
                       <p className="text-xs text-slate-500 mb-1">{activeType === 'cryptocurrency' ? 'Network' : 'Payment Method'}</p>
                       <p className="text-lg font-semibold text-slate-900">{activeMethodData.name}</p>
                       {activeMethodData.network && (
-                        <p className="text-xs text-blue-600 font-medium mt-1">🔗 {activeMethodData.network}</p>
+                        <p className="text-xs text-slate-600 font-medium mt-1">🔗 {activeMethodData.network}</p>
                       )}
                     </div>
                   </div>
