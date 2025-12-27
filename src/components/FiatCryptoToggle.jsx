@@ -27,7 +27,7 @@ export default function CurrencyCryptoToggle({ active, onChange }) {
         onClick={() => onChange('cryptocurrency')}
         className={`px-6 py-2 rounded text-sm font-medium transition-colors ${
           active === 'cryptocurrency'
-            ? 'bg-orange-600 text-white'
+            ? 'bg-blue-700 text-white'
             : 'text-slate-700 hover:bg-slate-100'
         }`}
       >
