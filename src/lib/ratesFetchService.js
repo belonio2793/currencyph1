@@ -257,6 +257,64 @@ export async function checkAndRefreshRatesIfNeeded() {
   }
 }
 
+/**
+ * Check if we should refresh rates for Deposits page with 15-minute limit
+ * Uses localStorage to track last fetch time specific to deposits
+ * Only triggers if more than 15 minutes have passed since last client-side trigger
+ *
+ * This is more aggressive than the 1-hour limit used in /rates page
+ * and ensures deposits page always has fresh rates
+ */
+export async function checkAndRefreshRatesIfNeededForDeposits() {
+  try {
+    const LAST_FETCH_KEY = 'rates_last_deposits_fetch'
+    const CACHE_DURATION_MS = 15 * 60 * 1000 // 15 minutes in milliseconds
+
+    // Check localStorage for last fetch
+    const lastFetchStr = localStorage.getItem(LAST_FETCH_KEY)
+    const lastFetch = lastFetchStr ? new Date(lastFetchStr) : null
+    const now = new Date()
+
+    // Calculate time since last fetch
+    const timeSinceLastFetch = lastFetch ? now.getTime() - lastFetch.getTime() : CACHE_DURATION_MS
+
+    if (timeSinceLastFetch >= CACHE_DURATION_MS) {
+      console.log(`[RatesFetch-Deposits] Refreshing rates (${lastFetch ? Math.round(timeSinceLastFetch / 1000 / 60) + ' minutes' : 'never'} since last fetch)`)
+
+      // Trigger the edge function
+      const success = await triggerFetchRatesEdgeFunction()
+
+      if (success) {
+        // Update localStorage with current time
+        localStorage.setItem(LAST_FETCH_KEY, now.toISOString())
+        return {
+          triggered: true,
+          message: 'Rates refreshed successfully'
+        }
+      } else {
+        return {
+          triggered: false,
+          message: 'Failed to trigger rates refresh'
+        }
+      }
+    } else {
+      const minutesUntilNextFetch = Math.ceil((CACHE_DURATION_MS - timeSinceLastFetch) / 1000 / 60)
+      console.log(`[RatesFetch-Deposits] Rates were refreshed recently (${Math.round(timeSinceLastFetch / 1000 / 60)} minutes ago). Next refresh in ~${minutesUntilNextFetch} minutes.`)
+      return {
+        triggered: false,
+        message: `Rates refreshed ${Math.round(timeSinceLastFetch / 1000 / 60)} minutes ago. Next refresh in ~${minutesUntilNextFetch} minutes.`,
+        minutesUntilNextFetch: minutesUntilNextFetch
+      }
+    }
+  } catch (err) {
+    console.warn('[RatesFetch-Deposits] Error checking rates refresh:', err.message)
+    return {
+      triggered: false,
+      message: 'Error checking rates refresh'
+    }
+  }
+}
+
 export default {
   getLastRatesFetchTime,
   getLatestPairUpdateTime,
