@@ -206,7 +206,7 @@ export default function TransactionHistory({ userId }) {
 
       {/* Transactions List */}
       {filteredTransactions.length === 0 ? (
-        <div className="bg-white border border-slate-200 rounded-xl p-6 text-center">
+        <div className="bg-white border border-slate-200 rounded-xl p-4 sm:p-6 text-center">
           <p className="text-slate-500 text-sm">No transactions found</p>
         </div>
       ) : (
