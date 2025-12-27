@@ -171,14 +171,14 @@ export default function TransactionHistory({ userId }) {
       <h2 className="text-3xl font-light text-slate-900 mb-6 tracking-tight">Transaction History</h2>
 
       {/* Filters */}
-      <div className="bg-white border border-slate-200 rounded-xl p-6 mb-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="bg-white border border-slate-200 rounded-xl p-4 sm:p-6 mb-6 sm:mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-2">Transaction Type</label>
+            <label className="block text-xs sm:text-sm font-medium text-slate-700 mb-2">Transaction Type</label>
             <select
               value={filter}
               onChange={e => setFilter(e.target.value)}
-              className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent"
+              className="w-full px-3 sm:px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent text-sm"
             >
               <option value="all">All Types</option>
               <option value="transfer_sent">Money Sent</option>
@@ -189,11 +189,11 @@ export default function TransactionHistory({ userId }) {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-2">Currency</label>
+            <label className="block text-xs sm:text-sm font-medium text-slate-700 mb-2">Currency</label>
             <select
               value={selectedCurrency}
               onChange={e => setSelectedCurrency(e.target.value)}
-              className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent"
+              className="w-full px-3 sm:px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent text-sm"
             >
               <option value="all">All Currencies</option>
               {currencies.map(curr => (
