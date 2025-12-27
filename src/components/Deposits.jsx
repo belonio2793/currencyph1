@@ -336,11 +336,11 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
       // 🎯 CRITICAL: Store canonical rates (X→PHP) directly
       // This ensures crypto rates are large numbers (BTC→PHP: 2,500,000)
       // NOT small decimals (PHP→BTC: 0.0000004)
-      canonicalPairs.forEach(pair => {
+      allRatePairs.forEach(pair => {
         const fromCode = pair.from_currency.toUpperCase()
         const rate = Number(pair.rate)
 
-        // Collect timestamps from pairs for fallback timestamp logic (matching /rates page)
+        // Collect timestamps from all rate sources for timestamp logic
         if (pair.updated_at) {
           timestamps.push(new Date(pair.updated_at))
         }
@@ -357,9 +357,8 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
 
       // Ensure PHP base rate exists (always 1 PHP = 1 PHP)
       if (!rates['PHP']) rates['PHP'] = 1
-      // Note: USD rate must come from database, no hardcoded fallback
 
-      console.log(`[Deposits] ✅ Loaded ${Object.keys(rates).length} canonical rates from public.pairs (${canonicalPairs.length} rows, ~${Math.round(canonicalPairs.length * 0.1)}ms)`)
+      console.log(`[Deposits] ✅ Loaded ${Object.keys(rates).length} rates from combined sources (${allRatePairs.length} rows)`)
       setExchangeRates(rates)
 
       // Fetch and display last fetch info - MATCHING /rates PAGE LOGIC
