@@ -84,7 +84,13 @@ function NavbarComponent({ activeTab, onTabChange, globalCurrency, setGlobalCurr
 
         if (error) {
           const errorMsg = error instanceof Error ? error.message : (error?.message || JSON.stringify(error))
-          console.error('Error calculating wallet valuation:', errorMsg)
+          // Check if it's the missing function error
+          if (errorMsg.includes('Could not find the function')) {
+            console.warn('⚠️ Wallet valuation function not yet deployed. Please run deployment script.')
+            console.warn('📄 See: DEPLOY_MISSING_FUNCTIONS.md for instructions')
+          } else {
+            console.error('Error calculating wallet valuation:', errorMsg)
+          }
           setConsolidatedHoldingsInCrypto(0)
           setLoadingConsolidated(false)
           return
