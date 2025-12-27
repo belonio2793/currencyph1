@@ -355,6 +355,12 @@ export default function Rates() {
                     onChange={setSelectedFrom}
                     options={rates}
                     label="From"
+                    placeholder="Search currency code or name..."
+                    searchKeys={['code', 'value', 'label']}
+                    autofillThreshold={1}
+                    maxResults={50}
+                    debounceMs={100}
+                    highlightMatches={true}
                   />
 
                   {/* Amount Input */}
