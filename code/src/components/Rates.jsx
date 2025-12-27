@@ -627,8 +627,9 @@ export default function Rates() {
                           className="text-right py-3 px-4 font-semibold text-slate-700 text-sm cursor-pointer hover:bg-slate-100 transition select-none"
                         >
                           <span className="flex items-center justify-end gap-1.5">
+                            <span className="inline-block w-7 h-7 flex items-center justify-center bg-blue-100 text-blue-700 font-bold border border-blue-300 text-xs" title="Philippine Peso - Base Currency">₱</span>
                             <span>Rate to</span>
-                            <span className="inline-block w-7 h-7 flex items-center justify-center bg-blue-100 text-blue-700 font-bold border border-blue-300 text-xs" title="Philippine Peso">₱</span>
+                            <span className="inline-block w-7 h-7 flex items-center justify-center bg-blue-100 text-blue-700 font-bold border border-blue-300 text-xs" title="Philippine Peso - Target Currency">₱</span>
                           </span>
                           {sortBy === 'rate' && (sortDirection === 'asc' ? '↑' : '↓')}
                         </th>
