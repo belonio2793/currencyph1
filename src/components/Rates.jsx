@@ -75,17 +75,19 @@ export default function Rates() {
 
       const codeArray = Array.from(codes)
 
-      // Fetch fiat currency codes
+      // Fetch fiat currency codes - use the pairs table which has all data
       const { data: fiatData } = await supabase
-        .from('currency_rates')
-        .select('distinct(from_currency)')
-        .limit(1000)
+        .from('pairs')
+        .select('from_currency')
+        .eq('source_table', 'currency_rates')
+        .limit(10000)
 
       // Fetch crypto currency codes
       const { data: cryptoData } = await supabase
-        .from('cryptocurrency_rates')
-        .select('distinct(from_currency)')
-        .limit(1000)
+        .from('pairs')
+        .select('from_currency')
+        .eq('source_table', 'cryptocurrency_rates')
+        .limit(10000)
 
       // Build metadata map - preference: crypto first, then fiat
       const cryptoCodes = new Set(cryptoData?.map(row => row.from_currency) || [])
