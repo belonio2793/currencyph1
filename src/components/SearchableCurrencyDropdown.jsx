@@ -88,7 +88,9 @@ function SearchableCurrencyDropdown({
         <div>
           {selectedCurrencyData ? (
             <div className="text-slate-900 font-medium">
-              {selectedCurrencyData.name} ({selectedCurrencyData.code})
+              {selectedCurrencyData.name}
+              {selectedCurrencyData.symbol && <span className="text-xs text-slate-500 font-normal ml-1">{selectedCurrencyData.symbol}</span>}
+              <span className="text-xs text-slate-500 font-normal ml-2">({selectedCurrencyData.code})</span>
             </div>
           ) : (
             <span className="text-slate-500">Select a currency</span>
