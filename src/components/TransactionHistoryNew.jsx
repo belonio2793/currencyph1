@@ -622,7 +622,7 @@ export default function TransactionHistory({ userId }) {
                 {selectedTransaction.reversal_reason && (
                   <div className="bg-red-50 border border-red-200 rounded-lg p-4">
                     <p className="text-xs font-medium text-red-700 uppercase tracking-wide mb-2">Why This Transaction Was Reversed</p>
-                    <p className="text-sm text-red-800">{selectedTransaction.reversal_reason}</p>
+                    <p className="text-sm text-red-800">{capitalizeCurrencyCodes(selectedTransaction.reversal_reason)}</p>
                   </div>
                 )}
 
