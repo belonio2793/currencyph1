@@ -1031,7 +1031,7 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
                       </div>
                       <div className="text-right flex-1 min-w-0">
                         <p className="text-sm text-slate-600">You will receive</p>
-                        <p className={`text-2xl font-bold break-words ${calculateConvertedAmount() ? 'text-blue-600' : 'text-amber-600'}`}>
+                        <p className={`text-2xl font-bold break-words ${calculateConvertedAmount() ? 'text-slate-900' : 'text-amber-600'}`}>
                           {calculateConvertedAmount() ? calculateConvertedAmount().toLocaleString(undefined, { maximumFractionDigits: 8 }) : (
                             exchangeRates[selectedCurrency] && exchangeRates[selectedWalletData?.currency_code] ? (
                               selectedWalletData?.currency_type === 'crypto'
