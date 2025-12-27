@@ -268,27 +268,41 @@ export const multiCurrencyDepositService = {
         created_at: isoTimestamp,
         updated_at: isoTimestamp,
 
-        // Metadata with complete transaction context
+        // Metadata with complete transaction context (THREE-CURRENCY MODEL)
         metadata: {
           ...metadata,
-          original_amount: conversion.fromAmount,
-          original_currency: depositCurrency.toUpperCase(),
+          // Input layer
+          input_amount: conversion.fromAmount,
+          input_currency: depositCurrency.toUpperCase(),
+          // Payment layer
+          payment_method_currency: paymentMethodCurrency ? paymentMethodCurrency.toUpperCase() : null,
+          // Wallet layer
           received_amount: conversion.toAmount,
           received_currency: walletCurrency.toUpperCase(),
+          // Rates
           conversion_rate: conversion.rateRounded,
           from_currency: depositCurrency.toUpperCase(),
           to_currency: walletCurrency.toUpperCase(),
-          created_via: 'multi_currency_deposit_service',
+          created_via: 'multi_currency_deposit_service_v3',
           rate_source: 'public.pairs',
+          deposit_model: 'three_currency',
           deposit_type: depositCurrency !== walletCurrency ? 'cross_currency' : 'same_currency',
           created_at: isoTimestamp,
           rate_fetched_at: isoTimestamp
         },
 
-        // Transaction details for audit trail
+        // Transaction details for audit trail (THREE-CURRENCY MODEL)
         notes: {
-          original_amount: conversion.fromAmount,
-          original_currency: depositCurrency.toUpperCase(),
+          // CRITICAL FIX DOCUMENTATION:
+          // This deposit uses the THREE-CURRENCY model to fix the bug where
+          // input amount was confused with payment method currency.
+          // Example: User sends 90,000 USD via Ethereum into PHP wallet
+          // - input_amount: 90,000, input_currency: USD
+          // - payment_method_currency: ETH (for reference)
+          // - received_amount: ~4,500,000, received_currency: PHP
+          input_amount: conversion.fromAmount,
+          input_currency: depositCurrency.toUpperCase(),
+          payment_method_currency: paymentMethodCurrency ? paymentMethodCurrency.toUpperCase() : null,
           received_amount: conversion.toAmount,
           received_currency: walletCurrency.toUpperCase(),
           exchange_rate: conversion.rateRounded,
@@ -296,7 +310,10 @@ export const multiCurrencyDepositService = {
           conversion_type: depositCurrency !== walletCurrency ? 'cross_currency' : 'same_currency',
           initiator_type: 'user_deposit',
           user_id: userId,
-          wallet_id: walletId
+          wallet_id: walletId,
+          // Audit trail
+          three_currency_model: true,
+          bug_fix_applied: 'input_amount_vs_payment_method_currency'
         }
       }
 
