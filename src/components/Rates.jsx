@@ -561,7 +561,10 @@ export default function Rates() {
                             </span>
                           </td>
                           <td className="py-3 px-4 text-right font-mono text-slate-900 font-medium">
-                            {formatNumber(currency.rate, currency.decimals)}
+                            <span className="flex items-center justify-end gap-2">
+                              <span>{formatNumber(currency.rate, currency.decimals)}</span>
+                              {currency.symbol && <span className="text-xs text-slate-500">{currency.symbol}</span>}
+                            </span>
                           </td>
                           <td className="py-3 px-4 text-center">
                             <button
