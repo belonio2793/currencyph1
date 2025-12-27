@@ -274,7 +274,7 @@ export default function TransactionHistory({ userId }) {
                       }`}>
                         {isOutgoing ? '-' : '+'}
                         $
-                        {usdValue.toFixed(2)}
+                        {formatFullPrecision(usdValue.toFixed(2))}
                       </p>
                     </div>
                   )}
