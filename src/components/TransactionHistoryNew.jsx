@@ -412,19 +412,19 @@ export default function TransactionHistory({ userId }) {
               {/* Primary Information */}
               <div className="space-y-4">
                 <div>
-                  <p className="text-xs font-medium text-slate-500 uppercase tracking-wide mb-1">Transaction Type</p>
-                  <p className="text-base font-medium text-slate-900">{getTransactionLabel(selectedTransaction.transaction_type || selectedTransaction.type)}</p>
+                  <p className="text-xs font-medium text-slate-500 uppercase tracking-wide mb-1">What Happened</p>
+                  <p className="text-lg font-semibold text-slate-900">{getTransactionLabel(selectedTransaction.transaction_type || selectedTransaction.type)}</p>
                 </div>
 
                 <div>
-                  <p className="text-xs font-medium text-slate-500 uppercase tracking-wide mb-1">Status</p>
-                  <p className="text-base font-medium text-slate-900 capitalize">{selectedTransaction.status || 'Completed'}</p>
+                  <p className="text-xs font-medium text-slate-500 uppercase tracking-wide mb-1">Current Status</p>
+                  <p className="text-base font-medium text-slate-900">{getStatusDisplay(selectedTransaction.status)}</p>
                 </div>
 
                 <div>
-                  <p className="text-xs font-medium text-slate-500 uppercase tracking-wide mb-1">Date & Time</p>
+                  <p className="text-xs font-medium text-slate-500 uppercase tracking-wide mb-1">When It Happened</p>
                   <p className="text-base text-slate-700">
-                    {new Date(selectedTransaction.created_at).toLocaleDateString()} at {new Date(selectedTransaction.created_at).toLocaleTimeString()}
+                    {new Date(selectedTransaction.created_at).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })} at {new Date(selectedTransaction.created_at).toLocaleTimeString([], {hour: '2-digit', minute: '2-digit', second: '2-digit'})}
                   </p>
                 </div>
               </div>
