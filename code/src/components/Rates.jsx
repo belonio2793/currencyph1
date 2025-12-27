@@ -626,7 +626,11 @@ export default function Rates() {
                           }}
                           className="text-right py-3 px-4 font-semibold text-slate-700 text-sm cursor-pointer hover:bg-slate-100 transition select-none"
                         >
-                          Rate (per 1 PHP) {sortBy === 'rate' && (sortDirection === 'asc' ? '↑' : '↓')}
+                          <span className="flex items-center justify-end gap-2">
+                            <span>Rate (per 1 PHP)</span>
+                            <span className="text-lg" title="Converting to PHP">💱</span>
+                          </span>
+                          {sortBy === 'rate' && (sortDirection === 'asc' ? '↑' : '↓')}
                         </th>
                         <th className="text-center py-3 px-4 font-semibold text-slate-700 text-sm">Action</th>
                       </tr>
