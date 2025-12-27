@@ -69,7 +69,9 @@ export default function CurrencySelect({ value, onChange, options = [], label })
     }
   }
 
-  const selectedLabel = selectedOption?.label || selectedOption?.code || value || 'Select Currency'
+  const selectedLabel = selectedOption
+    ? `${selectedOption.name || selectedOption.code}${selectedOption.symbol ? ` ${selectedOption.symbol}` : ''} (${selectedOption.code})`
+    : value || 'Select Currency'
 
   return (
     <div ref={containerRef} className="relative w-full">
