@@ -286,6 +286,7 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
     try {
       setRatesLoading(true)
       const rates = {}
+      const timestamps = []
 
       // ⚡ OPTIMIZED: Direct database query ONLY - NO external API calls
       // This provides ~0.1ms lookup time with guaranteed canonical direction
@@ -317,6 +318,11 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
         const fromCode = pair.from_currency.toUpperCase()
         const rate = Number(pair.rate)
 
+        // Collect timestamps from pairs for fallback timestamp logic (matching /rates page)
+        if (pair.updated_at) {
+          timestamps.push(new Date(pair.updated_at))
+        }
+
         // Validate rate before storing
         if (isFinite(rate) && rate > 0) {
           // If we don't have this rate yet, store it (prefer most recent)
@@ -334,13 +340,28 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
       console.log(`[Deposits] ✅ Loaded ${Object.keys(rates).length} canonical rates from public.pairs (${canonicalPairs.length} rows, ~${Math.round(canonicalPairs.length * 0.1)}ms)`)
       setExchangeRates(rates)
 
-      // Fetch and display last fetch info
+      // Fetch and display last fetch info - MATCHING /rates PAGE LOGIC
+      // Prefer cached_rates (edge function execution time), fallback to most recent pair update
       try {
+        let mostRecentTimestamp = new Date()
         const fetchInfo = await getLastFetchInfo()
-        if (fetchInfo) {
-          setLastFetchedRates(fetchInfo)
-          console.log(`[Deposits] Last fetch info: ${fetchInfo.isoString}`)
+
+        if (fetchInfo && fetchInfo.fetchedAt) {
+          mostRecentTimestamp = fetchInfo.fetchedAt
+          console.log(`[Deposits] Using edge-function execution time: ${fetchInfo.isoString}`)
+        } else if (timestamps.length > 0) {
+          // Fallback: Use most recent pair update timestamp (same as /rates page does)
+          timestamps.sort((a, b) => b - a)
+          mostRecentTimestamp = timestamps[0]
+          console.log('[Deposits] Using most recent pair update timestamp (fallback)')
         }
+
+        setLastFetchedRates({
+          fetchedAt: mostRecentTimestamp,
+          isoString: mostRecentTimestamp.toISOString(),
+          source: fetchInfo?.source || 'pairs-table',
+          isFresh: (Date.now() - mostRecentTimestamp.getTime()) / 1000 / 60 < 60
+        })
       } catch (e) {
         console.warn('[Deposits] Could not fetch last fetch info:', e.message)
       }
