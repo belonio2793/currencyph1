@@ -110,16 +110,27 @@ GRANT EXECUTE ON FUNCTION credit_wallet_on_deposit_approved TO authenticated, se
 -- Notes and Documentation
 -- ============================================================================
 
-COMMENT ON FUNCTION credit_wallet_on_deposit_approved() IS 
+COMMENT ON FUNCTION credit_wallet_on_deposit_approved() IS
 'Automatically credits the user wallet when a deposit status is updated to approved.
 This trigger ensures atomic, transactional crediting of user balances with proper
 record-keeping in the wallet_transactions ledger.
 
+CRITICAL FIX: THREE-CURRENCY MODEL
+====================================
+This trigger uses received_amount (converted amount in wallet currency), NOT amount.
+
+Example:
+- User deposits: 95,588 PHP (input_currency = PHP, input_amount = 95,588)
+- Wallet currency: BTC
+- Received amount: 1.73745506 BTC
+- Wallet is credited: 1.73745506 BTC ✓ (CORRECT)
+- NOT credited: 95,588 BTC ✗ (WRONG - this was the bug)
+
 Workflow:
 1. Admin or automated process updates deposit status to approved
 2. Trigger fires and credits the wallet atomically
-3. Wallet balance is updated
-4. Transaction is recorded in wallet_transactions ledger
+3. received_amount (in wallet currency) is added to wallet balance
+4. Transaction is recorded in wallet_transactions ledger with correct amount
 5. Deposit completed_at timestamp is set (if not already set)
 
 The trigger locks the wallet row to prevent race conditions and ensure
