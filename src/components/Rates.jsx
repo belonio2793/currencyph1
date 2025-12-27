@@ -743,7 +743,7 @@ export default function Rates() {
                 <div className="pb-4 border-b border-slate-300">
                   <p className="text-xs text-slate-600 font-medium mb-1 uppercase tracking-wider">Coverage</p>
                   <p className="text-xs text-slate-500">
-                    {rates.length} currencies ({fiatCount} fiat, {cryptoCount} crypto)
+                    {currencies.length} currencies ({fiatCount} fiat, {cryptoCount} crypto)
                   </p>
                 </div>
 
