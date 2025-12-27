@@ -22,7 +22,7 @@ export default function Rates() {
   const [sortDirection, setSortDirection] = useState('asc')
   const [favorites, setFavorites] = useState([])
 
-  // Load all rates from public_pairs (unified source for all currency pairs)
+  // Load all rates from database (currencies table + pairs table)
   useEffect(() => {
     loadData()
     const interval = setInterval(loadData, 5 * 60 * 1000) // Refresh every 5 minutes
@@ -52,117 +52,88 @@ export default function Rates() {
         throw new Error('Supabase client not properly initialized')
       }
 
-      // Fetch all currency pairs from public_pairs (primary unified source)
-      // Remove limit to get ALL pairs
+      // Fetch all active currencies from the currencies table
+      const { data: currenciesData, error: currenciesError } = await supabase
+        .from('currencies')
+        .select('code, name, type, symbol, decimals, is_default, active')
+        .eq('active', true)
+
+      if (currenciesError) {
+        throw new Error(`Failed to fetch currencies: ${currenciesError.message}`)
+      }
+
+      if (!currenciesData || currenciesData.length === 0) {
+        throw new Error('No currencies available in database')
+      }
+
+      console.log(`Fetched ${currenciesData.length} currencies from database`)
+
+      // Fetch all exchange rates from pairs table
       const { data: pairsData, error: pairsError } = await supabase
         .from('pairs')
-        .select('from_currency, to_currency, rate, source_table, updated_at')
+        .select('from_currency, rate, updated_at')
 
       if (pairsError) {
-        throw new Error(`Failed to fetch pairs: ${pairsError.message}`)
+        console.warn('Warning fetching pairs:', pairsError)
+        // Don't throw - we can still display currencies without rates
       }
 
-      if (!pairsData || pairsData.length === 0) {
-        throw new Error('No currency pairs available in database')
-      }
-
-      console.log(`Fetched ${pairsData.length} total pairs from database`)
-
-      // Get unique currency codes from all pairs (from_currency AND to_currency)
-      const codes = new Set()
-      pairsData.forEach(pair => {
-        if (pair.from_currency) codes.add(pair.from_currency)
-        if (pair.to_currency) codes.add(pair.to_currency)
-      })
-
-      const codeArray = Array.from(codes)
-      console.log(`Extracted ${codeArray.length} unique currencies`)
-
-      // Fetch fiat currency codes - no limit
-      const { data: fiatData } = await supabase
-        .from('pairs')
-        .select('from_currency')
-        .eq('source_table', 'currency_rates')
-
-      // Fetch crypto currency codes - no limit
-      const { data: cryptoData } = await supabase
-        .from('pairs')
-        .select('from_currency')
-        .eq('source_table', 'cryptocurrency_rates')
-
-      console.log(`Fiat currencies: ${fiatData?.length || 0}, Crypto currencies: ${cryptoData?.length || 0}`)
-
-      // Build metadata map - preference: crypto first, then fiat
-      const cryptoCodes = new Set(cryptoData?.map(row => row.from_currency) || [])
-      const fiatCodes = new Set(fiatData?.map(row => row.from_currency) || [])
-
-      // Build rates list - one entry per unique currency code
+      // Build rates map from pairs data
       const ratesByCode = {}
       let mostRecentTime = new Date()
 
-      codeArray.forEach(code => {
-        const isCrypto = cryptoCodes.has(code)
-        const isFiat = fiatCodes.has(code)
+      if (pairsData && pairsData.length > 0) {
+        pairsData.forEach(pair => {
+          if (pair.rate && isFinite(Number(pair.rate)) && Number(pair.rate) > 0) {
+            const fromCode = pair.from_currency
+            if (!ratesByCode[fromCode] || !ratesByCode[fromCode].rate) {
+              ratesByCode[fromCode] = {
+                rate: Number(pair.rate),
+                updatedAt: pair.updated_at || new Date().toISOString()
+              }
 
-        // Determine type: if in both tables, prefer crypto
-        let type = 'currency'
-        if (isCrypto) {
-          type = 'cryptocurrency'
-        } else if (isFiat) {
-          type = 'currency'
-        }
-
-        ratesByCode[code] = {
-          code,
-          rate: null,
-          type,
-          updatedAt: new Date().toISOString()
-        }
-      })
-
-      // Populate rates from pairs data
-      pairsData.forEach(pair => {
-        if (pair.rate && isFinite(Number(pair.rate)) && Number(pair.rate) > 0) {
-          const fromCode = pair.from_currency
-          if (ratesByCode[fromCode]) {
-            ratesByCode[fromCode].rate = Number(pair.rate)
-            ratesByCode[fromCode].updatedAt = pair.updated_at || new Date().toISOString()
-
-            // Track most recent timestamp
-            const pairTime = new Date(pair.updated_at || 0)
-            if (pairTime > mostRecentTime) {
-              mostRecentTime = pairTime
+              // Track most recent timestamp
+              const pairTime = new Date(pair.updated_at || 0)
+              if (pairTime > mostRecentTime) {
+                mostRecentTime = pairTime
+              }
             }
           }
-        }
-      })
+        })
+      }
 
-      // Convert to array and sort (rates with values first)
-      const ratesWithValues = Object.values(ratesByCode)
-        .filter(r => r.rate !== null && isFinite(r.rate) && r.rate > 0)
-        .sort((a, b) => a.code.localeCompare(b.code))
-        .map(r => ({
-          ...r,
-          value: r.code,
-          label: r.code,
-          id: r.code
+      // Build final rates array from currencies table, enriched with rate data
+      const validRates = currenciesData
+        .map(curr => ({
+          code: curr.code,
+          name: curr.name,
+          type: curr.type, // 'fiat' or 'crypto' from database
+          symbol: curr.symbol,
+          decimals: curr.decimals,
+          is_default: curr.is_default,
+          rate: ratesByCode[curr.code]?.rate || null,
+          updatedAt: ratesByCode[curr.code]?.updatedAt || new Date().toISOString(),
+          value: curr.code,
+          label: curr.code,
+          id: curr.code
         }))
+        // Sort: with rates first, then by type (fiat before crypto), then alphabetically
+        .sort((a, b) => {
+          // Rates first
+          const aHasRate = a.rate !== null && isFinite(a.rate) && a.rate > 0
+          const bHasRate = b.rate !== null && isFinite(b.rate) && b.rate > 0
+          if (aHasRate !== bHasRate) return aHasRate ? -1 : 1
 
-      const ratesWithoutValues = Object.values(ratesByCode)
-        .filter(r => r.rate === null || !isFinite(r.rate) || r.rate <= 0)
-        .sort((a, b) => a.code.localeCompare(b.code))
-        .map(r => ({
-          ...r,
-          value: r.code,
-          label: r.code,
-          id: r.code
-        }))
+          // Then by type (fiat before crypto)
+          if (a.type !== b.type) return a.type === 'fiat' ? -1 : 1
 
-      const validRates = [...ratesWithValues, ...ratesWithoutValues]
+          // Then alphabetically by code
+          return a.code.localeCompare(b.code)
+        })
 
       setRates(validRates)
       setLastUpdated(mostRecentTime)
-      console.log(`Loaded ${validRates.length} rates (${ratesWithValues.length} with values, ${ratesWithoutValues.length} without)`)
+      console.log(`Loaded ${validRates.length} currencies with proper type separation`)
       setError(null)
     } catch (err) {
       const errorMsg = err?.message || String(err) || 'Unknown error'
