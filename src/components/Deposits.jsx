@@ -282,8 +282,8 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
       const rates = {}
       const timestamps = []
 
-      // ⚡ OPTIMIZED: Direct database query ONLY - NO external API calls
-      // This provides ~0.1ms lookup time with guaranteed canonical direction
+      // Primary source: pairs table (contains all currency and crypto rates)
+      // The pairs table is populated by the fetch-rates edge function
       const { data: canonicalPairs, error: canonicalError } = await supabase
         .from('pairs')
         .select('from_currency, to_currency, rate, updated_at, source_table')
@@ -291,19 +291,47 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
         .gt('rate', 0)
         .order('updated_at', { ascending: false })
 
+      // Fallback: crypto_rates table (like /rates page does)
+      const { data: cryptoRatesData, error: cryptoError } = await supabase
+        .from('crypto_rates')
+        .select('from_currency, to_currency, rate, updated_at')
+        .eq('to_currency', 'PHP')
+        .gt('rate', 0)
+        .order('updated_at', { ascending: false })
+
       if (canonicalError) {
-        console.error('[Deposits] Error fetching canonical pairs:', canonicalError.message)
+        console.warn('[Deposits] Warning fetching canonical pairs:', canonicalError.message)
+      }
+
+      if (cryptoError) {
+        console.warn('[Deposits] Warning fetching crypto_rates:', cryptoError.message)
+      }
+
+      // Combine data sources - prioritize pairs, fallback to crypto_rates
+      let allRatePairs = (canonicalPairs || [])
+
+      if (cryptoRatesData && cryptoRatesData.length > 0) {
+        const seenPairs = new Set()
+        allRatePairs.forEach(p => {
+          seenPairs.add(`${p.from_currency}-${p.to_currency}`)
+        })
+
+        cryptoRatesData.forEach(p => {
+          if (!seenPairs.has(`${p.from_currency}-${p.to_currency}`)) {
+            allRatePairs.push(p)
+          }
+        })
+      }
+
+      if (!allRatePairs || allRatePairs.length === 0) {
+        console.warn('[Deposits] No rates available from pairs or crypto_rates')
         setExchangeRates({})
         setRatesLoading(false)
         return
       }
 
-      if (!canonicalPairs || canonicalPairs.length === 0) {
-        console.warn('[Deposits] No canonical pairs available in database')
-        setExchangeRates({})
-        setRatesLoading(false)
-        return
-      }
+      console.log(`[Deposits] Fetched ${canonicalPairs?.length || 0} pairs + ${cryptoRatesData?.length || 0} crypto_rates (deduplicated: ${allRatePairs.length})`)
+      const canonicalPairs_used = allRatePairs
 
       // 🎯 CRITICAL: Store canonical rates (X→PHP) directly
       // This ensures crypto rates are large numbers (BTC→PHP: 2,500,000)
