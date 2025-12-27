@@ -1303,7 +1303,7 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
                       </p>
                       <button
                         onClick={() => copyToClipboard(activeMethodData.address)}
-                        className="text-sm text-purple-600 hover:text-purple-700 font-medium"
+                        className="text-sm text-slate-700 hover:text-slate-900 font-medium"
                       >
                         Copy Address
                       </button>
