@@ -1530,24 +1530,38 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
                         <td className="py-3 px-4 font-semibold text-emerald-600">
                           {convertedAmount ? `${formatAmount(convertedAmount, walletCurrency)} ${walletCurrency.toUpperCase()}` : '—'}
                         </td>
-                        <td className="py-3 px-4 text-xs text-slate-600 font-mono">
-                          {deposit.reference_number || deposit.phone_number || '—'}
+                        <td className="py-3 px-4 text-xs text-slate-600">
+                          {new Date(deposit.created_at).toLocaleDateString()} {new Date(deposit.created_at).toLocaleTimeString()}
                         </td>
                         <td className="py-3 px-4">
-                          <span className="px-3 py-1 rounded-full text-xs font-medium bg-slate-200 text-slate-900">
+                          <span className={`px-3 py-1 rounded-full text-xs font-medium ${
+                            deposit.status === 'completed' ? 'bg-emerald-100 text-emerald-700' :
+                            deposit.status === 'pending' ? 'bg-amber-100 text-amber-700' :
+                            deposit.status === 'approved' ? 'bg-blue-100 text-blue-700' :
+                            'bg-slate-200 text-slate-900'
+                          }`}>
                             {deposit.status.charAt(0).toUpperCase() + deposit.status.slice(1)}
                           </span>
                         </td>
                         <td className="py-3 px-4">
-                          <button
-                            onClick={() => {
-                              setSelectedDepositForDetails(deposit)
-                              setShowDepositDetailsModal(true)
-                            }}
-                            className="px-3 py-1 bg-blue-600 text-white text-xs font-medium rounded hover:bg-blue-700 transition"
-                          >
-                            Details
-                          </button>
+                          <div className="flex gap-2">
+                            <button
+                              onClick={() => {
+                                setSelectedDepositForDetails(deposit)
+                                setShowDepositDetailsModal(true)
+                              }}
+                              className="px-3 py-1 bg-blue-600 text-white text-xs font-medium rounded hover:bg-blue-700 transition"
+                            >
+                              Details
+                            </button>
+                            <button
+                              onClick={() => handleDeleteDeposit(deposit.id)}
+                              disabled={submitting}
+                              className="px-3 py-1 bg-red-600 text-white text-xs font-medium rounded hover:bg-red-700 transition disabled:opacity-50"
+                            >
+                              Cancel
+                            </button>
+                          </div>
                         </td>
                       </tr>
                     )
