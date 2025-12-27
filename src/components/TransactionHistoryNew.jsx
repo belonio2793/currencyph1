@@ -561,71 +561,57 @@ export default function TransactionHistory({ userId }) {
               <div className="border-t border-slate-200 pt-4 space-y-3">
                 {selectedTransaction.description && (
                   <div>
-                    <p className="text-xs font-medium text-slate-500 uppercase tracking-wide mb-1">Description</p>
+                    <p className="text-xs font-medium text-slate-600 uppercase tracking-wide mb-1">What This Transaction Was For</p>
                     <p className="text-sm text-slate-700">{selectedTransaction.description}</p>
                   </div>
                 )}
 
                 {selectedTransaction.note && (
                   <div>
-                    <p className="text-xs font-medium text-slate-500 uppercase tracking-wide mb-1">Note</p>
+                    <p className="text-xs font-medium text-slate-600 uppercase tracking-wide mb-1">Additional Notes</p>
                     <p className="text-sm text-slate-700">{selectedTransaction.note}</p>
                   </div>
                 )}
 
-                {selectedTransaction.deposit_method && (
-                  <div>
-                    <p className="text-xs font-medium text-slate-500 uppercase tracking-wide mb-1">Deposit Method</p>
-                    <p className="text-sm text-slate-700 capitalize">{selectedTransaction.deposit_method.replace(/_/g, ' ')}</p>
-                  </div>
-                )}
-
                 {selectedTransaction.payment_reference && (
-                  <div>
-                    <p className="text-xs font-medium text-slate-500 uppercase tracking-wide mb-1">Payment Reference</p>
-                    <p className="text-sm font-mono text-slate-700 break-all">{selectedTransaction.payment_reference}</p>
+                  <div className="bg-slate-50 rounded-lg p-3">
+                    <p className="text-xs font-medium text-slate-600 uppercase tracking-wide mb-1">Payment Reference Code</p>
+                    <p className="text-sm font-mono text-slate-700 break-all bg-white rounded p-2 mt-1">{selectedTransaction.payment_reference}</p>
                   </div>
                 )}
 
                 {selectedTransaction.reference_number && (
-                  <div>
-                    <p className="text-xs font-medium text-slate-500 uppercase tracking-wide mb-1">Reference Number</p>
-                    <p className="text-sm font-mono text-slate-700">{selectedTransaction.reference_number}</p>
-                  </div>
-                )}
-
-                {selectedTransaction.rate_source && (
-                  <div>
-                    <p className="text-xs font-medium text-slate-500 uppercase tracking-wide mb-1">Rate Source</p>
-                    <p className="text-sm text-slate-700 capitalize">{selectedTransaction.rate_source}</p>
-                  </div>
-                )}
-
-                {selectedTransaction.approved_by && (
-                  <div>
-                    <p className="text-xs font-medium text-slate-500 uppercase tracking-wide mb-1">Approved By</p>
-                    <p className="text-sm font-mono text-slate-700">{selectedTransaction.approved_by}</p>
+                  <div className="bg-slate-50 rounded-lg p-3">
+                    <p className="text-xs font-medium text-slate-600 uppercase tracking-wide mb-1">Reference Number</p>
+                    <p className="text-sm font-mono text-slate-700 break-all bg-white rounded p-2 mt-1">{selectedTransaction.reference_number}</p>
                   </div>
                 )}
 
                 {selectedTransaction.approved_at && (
                   <div>
-                    <p className="text-xs font-medium text-slate-500 uppercase tracking-wide mb-1">Approved At</p>
-                    <p className="text-sm text-slate-700">{new Date(selectedTransaction.approved_at).toLocaleString()}</p>
+                    <p className="text-xs font-medium text-slate-600 uppercase tracking-wide mb-1">When This Was Approved</p>
+                    <p className="text-sm text-slate-700">{new Date(selectedTransaction.approved_at).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })} at {new Date(selectedTransaction.approved_at).toLocaleTimeString()}</p>
+                  </div>
+                )}
+
+                {selectedTransaction.approved_by && (
+                  <div>
+                    <p className="text-xs font-medium text-slate-600 uppercase tracking-wide mb-1">Approved By Administrator</p>
+                    <p className="text-sm font-mono text-slate-700">{selectedTransaction.approved_by}</p>
                   </div>
                 )}
 
                 {selectedTransaction.reversal_reason && (
-                  <div className="bg-red-50 border border-red-200 rounded-lg p-3">
-                    <p className="text-xs font-medium text-slate-500 uppercase tracking-wide mb-1">Reversal Reason</p>
-                    <p className="text-sm text-red-700">{selectedTransaction.reversal_reason}</p>
+                  <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+                    <p className="text-xs font-medium text-red-700 uppercase tracking-wide mb-2">Why This Transaction Was Reversed</p>
+                    <p className="text-sm text-red-800">{selectedTransaction.reversal_reason}</p>
                   </div>
                 )}
 
                 {selectedTransaction.id && (
-                  <div>
-                    <p className="text-xs font-medium text-slate-500 uppercase tracking-wide mb-1">Transaction ID</p>
-                    <p className="text-xs font-mono text-slate-500 break-all">{selectedTransaction.id}</p>
+                  <div className="bg-slate-50 rounded-lg p-3 pt-4">
+                    <p className="text-xs font-medium text-slate-600 uppercase tracking-wide mb-1">Transaction Record ID (For Support)</p>
+                    <p className="text-xs font-mono text-slate-600 break-all bg-white rounded p-2 mt-1">{selectedTransaction.id}</p>
                   </div>
                 )}
               </div>
