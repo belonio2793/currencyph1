@@ -1181,15 +1181,15 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
 
                   {/* PAYMENT CURRENCY */}
                   <div className="flex items-center justify-center">
-                    <div className="text-indigo-400 text-2xl">↓</div>
+                    <div className="text-slate-400 text-2xl">↓</div>
                   </div>
-                  <div className="bg-white p-4 rounded-lg border-l-4 border-purple-500">
+                  <div className="bg-white p-4 rounded-lg border-l-4 border-slate-400">
                     <p className="text-xs text-slate-600 font-semibold mb-1">2️⃣ PAYMENT CURRENCY (How you pay)</p>
-                    <p className="text-2xl font-bold text-purple-600 break-words">{getDepositMethodAmount()?.toLocaleString(undefined, {
+                    <p className="text-2xl font-bold text-slate-900 break-words">{getDepositMethodAmount()?.toLocaleString(undefined, {
                       minimumFractionDigits: isCryptoCurrency(selectedAddressMethod?.cryptoSymbol) ? 2 : 2,
                       maximumFractionDigits: isCryptoCurrency(selectedAddressMethod?.cryptoSymbol) ? 8 : 2
                     })} {selectedAddressMethod?.cryptoSymbol?.toUpperCase()}</p>
-                    <p className="text-xs text-purple-600 mt-2">Send this amount via {activeMethodData?.name || 'cryptocurrency'}</p>
+                    <p className="text-xs text-slate-600 mt-2">Send this amount via {activeMethodData?.name || 'cryptocurrency'}</p>
                   </div>
 
                   {/* WALLET CURRENCY */}
