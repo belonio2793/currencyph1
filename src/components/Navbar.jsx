@@ -43,14 +43,14 @@ function NavbarComponent({ activeTab, onTabChange, globalCurrency, setGlobalCurr
   // Convert crypto holdings to selected cryptocurrency
   useEffect(() => {
     const convertCryptoHoldings = async () => {
-      if (!globalCryptocurrency || !globalCurrency || !userEmail || totalCryptoBalancePHP === 0) {
+      if (!globalCryptocurrency || !globalCurrency || !userEmail || cryptoHoldingsConverted === 0) {
         setTotalCryptoInSelectedCrypto(0)
         return
       }
 
       setLoadingCryptoConversion(true)
       try {
-        const converted = await convertFiatToCryptoDb(totalCryptoBalancePHP, globalCurrency, globalCryptocurrency)
+        const converted = await convertFiatToCryptoDb(cryptoHoldingsConverted, globalCurrency, globalCryptocurrency)
         setTotalCryptoInSelectedCrypto(converted || 0)
       } catch (error) {
         console.error('Failed to convert crypto holdings to selected cryptocurrency:', error)
@@ -61,60 +61,7 @@ function NavbarComponent({ activeTab, onTabChange, globalCurrency, setGlobalCurr
     }
 
     convertCryptoHoldings()
-  }, [totalCryptoBalancePHP, globalCryptocurrency, globalCurrency, userEmail])
-
-  // Calculate total fiat wallet valuation from all user wallets
-  useEffect(() => {
-    const calculateTotalWalletValuation = async () => {
-      if (!userId || !globalCurrency) {
-        setConsolidatedHoldingsInCrypto(0)
-        setLoadingConsolidated(false)
-        return
-      }
-
-      setLoadingConsolidated(true)
-      try {
-        // Call RPC function to get total fiat valuation of all wallets
-        const { data, error } = await supabase.rpc('get_total_wallet_valuation_in_fiat', {
-          p_user_id: userId,
-          p_target_currency: globalCurrency
-        })
-
-        if (error) {
-          const errorMsg = error instanceof Error ? error.message : (error?.message || JSON.stringify(error))
-          // Check if it's the missing function error
-          if (errorMsg.includes('Could not find the function')) {
-            console.warn('⚠️ Wallet valuation function not yet deployed. Please run deployment script.')
-            console.warn('📄 See: DEPLOY_MISSING_FUNCTIONS.md for instructions')
-          } else {
-            console.error('Error calculating wallet valuation:', errorMsg)
-          }
-          setConsolidatedHoldingsInCrypto(0)
-          setLoadingConsolidated(false)
-          return
-        }
-
-        if (data && Array.isArray(data) && data.length > 0) {
-          // Display the total fiat value
-          const totalValue = data[0].total_balance_in_target_currency || 0
-          setConsolidatedHoldingsInCrypto(parseFloat(totalValue) || 0)
-        } else if (data && typeof data === 'object' && data.total_balance_in_target_currency !== undefined) {
-          // Handle case where data might be single object instead of array
-          setConsolidatedHoldingsInCrypto(parseFloat(data.total_balance_in_target_currency) || 0)
-        } else {
-          setConsolidatedHoldingsInCrypto(0)
-        }
-      } catch (error) {
-        const errorMsg = error instanceof Error ? error.message : JSON.stringify(error)
-        console.error('Failed to calculate wallet valuation:', errorMsg)
-        setConsolidatedHoldingsInCrypto(0)
-      } finally {
-        setLoadingConsolidated(false)
-      }
-    }
-
-    calculateTotalWalletValuation()
-  }, [userId, globalCurrency])
+  }, [cryptoHoldingsConverted, globalCryptocurrency, globalCurrency, userEmail])
 
 
   return (
