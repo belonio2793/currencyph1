@@ -1456,18 +1456,18 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
         {deposits.length > 0 && (
           <div className="bg-white rounded-lg shadow border border-slate-200 p-4 sm:p-8">
             <h3 className="text-xl font-semibold text-slate-900 mb-4">Recent Deposits</h3>
-            <div className="w-full overflow-x-auto">
+            <div className="w-full">
               <table className="w-full text-xs sm:text-sm">
                 <thead>
                   <tr className="border-b border-slate-200">
-                    <th className="text-left py-2 sm:py-3 px-2 sm:px-3 text-slate-600 font-medium">Date</th>
-                    <th className="text-left py-2 sm:py-3 px-2 sm:px-3 text-slate-600 font-medium">You Sent</th>
-                    <th className="text-left py-2 sm:py-3 px-2 sm:px-3 text-slate-600 font-medium">Payment</th>
-                    <th className="hidden md:table-cell text-left py-2 sm:py-3 px-2 sm:px-3 text-slate-600 font-medium">Rate</th>
-                    <th className="text-left py-2 sm:py-3 px-2 sm:px-3 text-slate-600 font-medium">Received</th>
-                    <th className="text-left py-2 sm:py-3 px-2 sm:px-3 text-slate-600 font-medium">Status</th>
-                    <th className="text-left py-2 sm:py-3 px-2 sm:px-3 text-slate-600 font-medium">Reconciliation</th>
-                    <th className="text-left py-2 sm:py-3 px-2 sm:px-3 text-slate-600 font-medium">Action</th>
+                    <th className="text-left py-2 sm:py-3 px-2 sm:px-3 text-slate-600 font-medium min-w-max">Date & Time</th>
+                    <th className="text-left py-2 sm:py-3 px-2 sm:px-3 text-slate-600 font-medium min-w-max">You Sent</th>
+                    <th className="text-left py-2 sm:py-3 px-2 sm:px-3 text-slate-600 font-medium min-w-max">Payment</th>
+                    <th className="hidden lg:table-cell text-left py-2 sm:py-3 px-2 sm:px-3 text-slate-600 font-medium min-w-max">Rate</th>
+                    <th className="text-left py-2 sm:py-3 px-2 sm:px-3 text-slate-600 font-medium min-w-max">Received</th>
+                    <th className="text-left py-2 sm:py-3 px-2 sm:px-3 text-slate-600 font-medium min-w-max">Status</th>
+                    <th className="text-left py-2 sm:py-3 px-2 sm:px-3 text-slate-600 font-medium min-w-max">Reconciliation</th>
+                    <th className="text-left py-2 sm:py-3 px-2 sm:px-3 text-slate-600 font-medium min-w-max">Action</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -1516,13 +1516,20 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
                     // Check if deposit is approved
                     const isApproved = deposit.status === 'approved' || deposit.status === 'completed'
 
+                    // Format date with time
+                    const depositDate = new Date(deposit.created_at)
+                    const dateTimeStr = depositDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+                    const timeStr = depositDate.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' })
+
                     return (
                       <tr key={deposit.id} className="border-b border-slate-100 hover:bg-slate-50 transition">
-                        <td className="py-2 sm:py-3 px-2 sm:px-3 text-xs text-slate-600 whitespace-nowrap">
-                          {new Date(deposit.created_at).toLocaleDateString()}
+                        <td className="py-2 sm:py-3 px-2 sm:px-3 text-xs text-slate-600">
+                          <div>{dateTimeStr}</div>
+                          <div className="text-slate-500 text-xs">{timeStr}</div>
                         </td>
-                        <td className="py-2 sm:py-3 px-2 sm:px-3 font-semibold text-slate-900">
-                          {formatAmount(deposit.amount, originalCurrency)} {originalCurrency.toUpperCase()}
+                        <td className="py-2 sm:py-3 px-2 sm:px-3 font-semibold text-slate-900 text-xs sm:text-sm">
+                          <div>{formatAmount(deposit.amount, originalCurrency)}</div>
+                          <div className="text-slate-600 text-xs">{originalCurrency.toUpperCase()}</div>
                         </td>
                         <td className="py-2 sm:py-3 px-2 sm:px-3 text-slate-700 text-xs">
                           {notesMeta.payment_method_currency || deposit.payment_method_currency ? (
@@ -1531,7 +1538,7 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
                                 {notesMeta.payment_method_currency || deposit.payment_method_currency}
                               </div>
                               {(notesMeta.payment_amount || deposit.payment_amount) && (
-                                <div className="text-slate-600">
+                                <div className="text-slate-600 text-xs">
                                   {formatAmount(notesMeta.payment_amount || deposit.payment_amount, notesMeta.payment_method_currency || deposit.payment_method_currency)}
                                 </div>
                               )}
@@ -1540,14 +1547,15 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
                             '—'
                           )}
                         </td>
-                        <td className="hidden md:table-cell py-2 sm:py-3 px-2 sm:px-3 text-slate-700 text-xs">
+                        <td className="hidden lg:table-cell py-2 sm:py-3 px-2 sm:px-3 text-slate-700 text-xs">
                           {exchangeRate ? `1 ${originalCurrency.toUpperCase()} = ${formatExchangeRate(exchangeRate)} ${walletCurrency.toUpperCase()}` : '—'}
                         </td>
                         <td className="py-2 sm:py-3 px-2 sm:px-3 font-semibold text-emerald-600 text-xs sm:text-sm">
-                          {convertedAmount ? `${formatAmount(convertedAmount, walletCurrency)} ${walletCurrency.toUpperCase()}` : '—'}
+                          <div>{convertedAmount ? formatAmount(convertedAmount, walletCurrency) : '—'}</div>
+                          <div className="text-slate-600 text-xs">{walletCurrency.toUpperCase()}</div>
                         </td>
                         <td className="py-2 sm:py-3 px-2 sm:px-3">
-                          <span className={`px-2 sm:px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap ${
+                          <span className={`px-2 sm:px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap block ${
                             deposit.status === 'completed' ? 'bg-emerald-100 text-emerald-700' :
                             deposit.status === 'pending' ? 'bg-amber-100 text-amber-700' :
                             deposit.status === 'approved' ? 'bg-blue-100 text-blue-700' :
@@ -1558,13 +1566,13 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
                         </td>
                         <td className="py-2 sm:py-3 px-2 sm:px-3 text-xs text-slate-600">
                           <div className="space-y-1">
-                            <p className="text-slate-600"><span className="font-semibold">Before:</span> {formatAmount(previousBalance, walletCurrency)} {walletCurrency}</p>
+                            <p><span className="font-semibold">Before:</span> {formatAmount(previousBalance, walletCurrency)}</p>
                             <p className="text-emerald-600 font-semibold">+{formatAmount(currentAmount, walletCurrency)}</p>
-                            <p className="text-slate-900 font-semibold"><span className="text-slate-600 font-normal">After:</span> {formatAmount(newBalance, walletCurrency)} {walletCurrency}</p>
+                            <p className="text-slate-900 font-semibold"><span className="text-slate-600 font-normal">After:</span> {formatAmount(newBalance, walletCurrency)}</p>
                           </div>
                         </td>
                         <td className="py-2 sm:py-3 px-2 sm:px-3">
-                          <div className="flex flex-col sm:flex-row gap-1 sm:gap-2">
+                          <div className="flex flex-col gap-1">
                             <button
                               onClick={() => {
                                 setSelectedDepositForDetails(deposit)
