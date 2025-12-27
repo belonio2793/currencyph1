@@ -255,33 +255,36 @@ export default function Rates() {
   const calculateConversion = () => {
     const numAmount = parseFloat(amount)
     if (!isNaN(numAmount) && numAmount > 0) {
-      const fromRate = rates.find(r => r.code === selectedFrom)
-      const toRate = rates.find(r => r.code === selectedTo)
+      const fromCurr = currencies.find(c => c.code === selectedFrom)
+      const toCurr = currencies.find(c => c.code === selectedTo)
 
-      if (!fromRate || !toRate) {
+      if (!fromCurr || !toCurr) {
         setResult({
-          error: 'Rate not available',
-          message: `Exchange rate for ${!fromRate ? selectedFrom : selectedTo} is not available.`
+          error: 'Currency not found',
+          message: `Currency ${!fromCurr ? selectedFrom : selectedTo} is not available.`
         })
         return
       }
 
-      const fromRateValid = isFinite(fromRate.rate) && fromRate.rate > 0
-      const toRateValid = isFinite(toRate.rate) && toRate.rate > 0
+      // Get rates relative to USD (or current target)
+      const fromToUSD = exchangeRates[selectedFrom]
+      const toToUSD = exchangeRates[selectedTo]
 
-      if (!fromRateValid || !toRateValid) {
+      if (!fromToUSD || !toToUSD || !isFinite(fromToUSD) || !isFinite(toToUSD) || fromToUSD <= 0 || toToUSD <= 0) {
         setResult({
           error: 'Rate not available',
-          message: 'Exchange rate data is not available for the selected currencies.'
+          message: `Exchange rate data is not available for the selected currencies.`
         })
         return
       }
 
-      const convertedAmount = (numAmount * toRate.rate) / fromRate.rate
+      // Convert: X from_currency to Y to_currency
+      // If rates are relative to USD: (numAmount * toToUSD) / fromToUSD
+      const convertedAmount = (numAmount * toToUSD) / fromToUSD
       setResult({
         amount: convertedAmount.toFixed(2),
         decimals: 2,
-        rate: toRate.rate / fromRate.rate
+        rate: toToUSD / fromToUSD
       })
     } else {
       setResult(null)
@@ -290,7 +293,7 @@ export default function Rates() {
 
   useEffect(() => {
     calculateConversion()
-  }, [amount, selectedFrom, selectedTo, rates])
+  }, [amount, selectedFrom, selectedTo, exchangeRates])
 
   const toggleFavorite = (code) => {
     setFavorites(prev =>
