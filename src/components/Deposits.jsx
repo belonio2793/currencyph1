@@ -539,6 +539,40 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
     }
   }
 
+  // Delete a deposit from the database
+  const handleDeleteDeposit = async (depositId) => {
+    if (!window.confirm('Are you sure you want to cancel this deposit? This action cannot be undone.')) {
+      return
+    }
+
+    try {
+      setSubmitting(true)
+      const { error } = await supabase
+        .from('deposits')
+        .delete()
+        .eq('id', depositId)
+        .eq('user_id', userId)
+
+      if (error) {
+        throw error
+      }
+
+      // Remove from state
+      setDeposits(prev => prev.filter(d => d.id !== depositId))
+      setShowDepositDetailsModal(false)
+      setSelectedDepositForDetails(null)
+
+      setSuccess('Deposit cancelled successfully')
+      setTimeout(() => setSuccess(''), 3000)
+    } catch (err) {
+      console.error('Error deleting deposit:', err)
+      setError(err.message || 'Failed to cancel deposit')
+      setTimeout(() => setError(''), 3000)
+    } finally {
+      setSubmitting(false)
+    }
+  }
+
   // Calculate the exchange rate between two currencies from pairs data
   const getExchangeRate = (fromCurrency, toCurrency) => {
     if (!fromCurrency || !toCurrency) return null
