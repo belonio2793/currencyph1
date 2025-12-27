@@ -283,7 +283,16 @@ function PaymentMethodsGrid({
                         <div className="flex items-start justify-between mb-3">
                           <div className="flex-1">
                             <div className="flex items-center gap-2 mb-1">
-                              <span className="text-2xl">{method.icon}</span>
+                              <div
+                                className={`w-8 h-8 flex items-center justify-center font-bold text-white text-sm border border-orange-600 ${
+                                  method.type === 'crypto'
+                                    ? 'bg-orange-500'
+                                    : 'bg-blue-500'
+                                }`}
+                                title={method.type === 'crypto' ? 'Cryptocurrency' : 'Fiat Currency'}
+                              >
+                                {method.icon}
+                              </div>
                               <div>
                                 <div className="text-slate-900 font-semibold text-sm">
                                   {method.name}
