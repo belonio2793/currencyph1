@@ -652,7 +652,7 @@ export default function Rates() {
                                 {/* Fiat Currencies Section */}
                                 {fiat.length > 0 && (
                                   <div>
-                                    <div className="sticky top-12 px-4 py-2 bg-blue-50 border-b border-blue-200 font-semibold text-sm text-blue-900 flex items-center gap-2">
+                                    <div className="sticky top-0 z-20 px-4 py-2 bg-blue-50 border-b border-blue-200 font-semibold text-sm text-blue-900 flex items-center gap-2">
                                       <div className="w-5 h-5 flex items-center justify-center font-bold text-white text-xs bg-blue-500 rounded">F</div>
                                       Fiat Currencies
                                     </div>
@@ -685,7 +685,7 @@ export default function Rates() {
                                 {/* Crypto Currencies Section */}
                                 {crypto.length > 0 && (
                                   <div>
-                                    <div className="sticky px-4 py-2 bg-orange-50 border-b border-orange-200 font-semibold text-sm text-orange-900 flex items-center gap-2">
+                                    <div className="sticky top-11 z-10 px-4 py-2 bg-orange-50 border-b border-orange-200 font-semibold text-sm text-orange-900 flex items-center gap-2">
                                       <div className="w-5 h-5 flex items-center justify-center font-bold text-white text-xs bg-orange-500 rounded">C</div>
                                       Cryptocurrencies
                                     </div>
