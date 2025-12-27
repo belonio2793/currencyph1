@@ -1204,11 +1204,11 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
                 </div>
 
                 {/* WARNING BOX */}
-                <div className="mt-4 p-3 bg-amber-50 border border-amber-200 rounded-lg">
+                <div className="mt-3 p-2 bg-amber-50 border border-amber-200 rounded-lg">
                   <p className="text-xs text-amber-900 font-medium">
                     ⚠️ Make sure you understand all three steps:
                   </p>
-                  <ul className="text-xs text-amber-800 mt-2 space-y-1 ml-4">
+                  <ul className="text-xs text-amber-800 mt-1 space-y-0 ml-4">
                     <li>• You specify: <strong>{formatNumber(parseFloat(amount) || 0, selectedCurrency)} {selectedCurrency}</strong></li>
                     <li>• You send: <strong>{getDepositMethodAmount()?.toLocaleString(undefined, {
                       minimumFractionDigits: isCryptoCurrency(selectedAddressMethod?.cryptoSymbol) ? 2 : 2,
