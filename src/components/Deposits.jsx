@@ -1993,14 +1993,13 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
                 handleStartNewDeposit()
               }}
               className="w-full px-4 py-2 bg-slate-800 text-white rounded text-sm font-medium hover:bg-slate-900 transition"
-              className="w-full px-6 py-3 bg-emerald-600 text-white rounded-lg font-semibold hover:bg-emerald-700 transition"
             >
               Start New Deposit
             </button>
 
             <button
               onClick={() => setShowSuccessModal(false)}
-              className="w-full px-6 py-3 mt-3 bg-slate-200 text-slate-900 rounded-lg font-semibold hover:bg-slate-300 transition"
+              className="w-full px-4 py-2 mt-3 bg-slate-200 text-slate-900 rounded text-sm font-semibold hover:bg-slate-300 transition"
             >
               Close
             </button>
