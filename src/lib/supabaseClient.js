@@ -161,6 +161,14 @@ function createDummyClient() {
 
 function initClient() {
   if (_client) return _client
+
+  // Verify createClient is a function
+  if (typeof createClient !== 'function') {
+    console.error('[supabase-client] createClient is not a function. Supabase library may not be properly loaded.')
+    _client = createDummyClient()
+    return _client
+  }
+
   if (SUPABASE_URL && SUPABASE_ANON_KEY) {
     // Basic URL sanity check
     if (typeof SUPABASE_URL !== 'string' || (!SUPABASE_URL.startsWith('http://') && !SUPABASE_URL.startsWith('https://'))) {
@@ -181,6 +189,12 @@ function initClient() {
           }
         }
       })
+
+      // Verify the client was created successfully
+      if (!_client || typeof _client.from !== 'function') {
+        console.error('[supabase-client] Client created but missing required methods')
+        _client = createDummyClient()
+      }
     } catch (clientErr) {
       console.error('Failed to initialize Supabase client:', clientErr)
       _client = createDummyClient()
