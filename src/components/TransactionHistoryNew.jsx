@@ -167,8 +167,8 @@ export default function TransactionHistory({ userId }) {
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-6 py-6">
-      <h2 className="text-3xl font-light text-slate-900 mb-6 tracking-tight">Transaction History</h2>
+    <div className="w-full px-3 sm:px-6 py-4 sm:py-6">
+      <h2 className="text-2xl sm:text-3xl font-light text-slate-900 mb-4 sm:mb-6 tracking-tight">Transaction History</h2>
 
       {/* Filters */}
       <div className="bg-white border border-slate-200 rounded-xl p-4 sm:p-6 mb-6 sm:mb-8">
