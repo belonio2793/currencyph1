@@ -190,25 +190,31 @@ export default function Rates() {
   }
 
   const filteredRates = useMemo(() => {
-    let filtered = rates
+    let filtered = currencies
 
     // Filter by type (using actual database values: 'fiat' or 'crypto')
     if (typeFilter !== 'all') {
       const typeValue = typeFilter === 'currency' ? 'fiat' : (typeFilter === 'cryptocurrency' ? 'crypto' : typeFilter)
-      filtered = filtered.filter(r => r.type === typeValue)
+      filtered = filtered.filter(c => c.type === typeValue)
     }
 
     if (searchTerm) {
       const search = searchTerm.toLowerCase()
-      filtered = filtered.filter(r =>
-        r.code.toLowerCase().includes(search) ||
-        r.name.toLowerCase().includes(search)
+      filtered = filtered.filter(c =>
+        c.code.toLowerCase().includes(search) ||
+        c.name.toLowerCase().includes(search)
       )
     }
 
-    // Separate rates with values from those without
-    const ratesWithValues = filtered.filter(r => r.rate !== null && isFinite(r.rate) && r.rate > 0)
-    const ratesWithoutValues = filtered.filter(r => r.rate === null || !isFinite(r.rate) || r.rate <= 0)
+    // Enrich with exchange rates and separate by availability
+    const enriched = filtered.map(c => ({
+      ...c,
+      rate: exchangeRates[c.code] || null
+    }))
+
+    // Separate currencies with rates from those without
+    const currenciesWithRates = enriched.filter(c => c.rate !== null && isFinite(c.rate) && c.rate > 0)
+    const currenciesWithoutRates = enriched.filter(c => c.rate === null || !isFinite(c.rate) || c.rate <= 0)
 
     // Sort each group
     const sortGroup = (group) => {
@@ -223,7 +229,8 @@ export default function Rates() {
             comparison = (a.rate || 0) - (b.rate || 0)
             break
           case 'recent':
-            comparison = new Date(b.updatedAt || 0) - new Date(a.updatedAt || 0)
+            // All rates from public.pairs updated at same time, so use code as tiebreaker
+            comparison = a.code.localeCompare(b.code)
             break
           default:
             comparison = 0
@@ -233,8 +240,8 @@ export default function Rates() {
       })
     }
 
-    return [...sortGroup(ratesWithValues), ...sortGroup(ratesWithoutValues)]
-  }, [rates, typeFilter, searchTerm, sortBy, sortDirection])
+    return [...sortGroup(currenciesWithRates), ...sortGroup(currenciesWithoutRates)]
+  }, [currencies, exchangeRates, typeFilter, searchTerm, sortBy, sortDirection])
 
   const favoriteRates = useMemo(() => {
     return rates.filter(r => favorites.includes(r.code))
