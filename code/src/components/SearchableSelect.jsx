@@ -282,9 +282,10 @@ export default function SearchableSelect({ value, onChange, options = [], label 
                 {filteredCrypto.length > 0 && (
                   <>
                     <div className="px-4 py-3 text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-2 bg-slate-100">
-                      <span className="inline-flex items-center px-2 py-1 bg-slate-300 rounded-md text-slate-900">
-                        CRY Crypto Currencies
-                      </span>
+                      <div className="w-6 h-6 flex items-center justify-center font-bold text-white text-xs bg-orange-500 border border-orange-600">
+                        C
+                      </div>
+                      <span className="text-slate-700">Crypto Currencies</span>
                       <div className="flex-1 h-px bg-slate-300 ml-auto"></div>
                     </div>
                     {filteredCrypto.map((option) => (
