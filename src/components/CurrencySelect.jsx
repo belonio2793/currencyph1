@@ -11,10 +11,10 @@ export default function CurrencySelect({ value, onChange, options = [], label })
     return options.find(opt => opt.code === value || opt.value === value)
   }, [value, options])
 
-  // Separate currencies by type
+  // Separate currencies by type (from database: 'fiat' or 'crypto')
   const separatedCurrencies = useMemo(() => {
-    const fiat = options.filter(opt => opt.type === 'currency')
-    const crypto = options.filter(opt => opt.type === 'cryptocurrency')
+    const fiat = options.filter(opt => opt.type === 'fiat' || opt.type === 'currency')
+    const crypto = options.filter(opt => opt.type === 'crypto' || opt.type === 'cryptocurrency')
     return { fiat, crypto }
   }, [options])
 
