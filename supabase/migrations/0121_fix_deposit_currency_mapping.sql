@@ -52,7 +52,7 @@ ON deposits(payment_method_currency);
 CREATE OR REPLACE FUNCTION validate_three_currency_deposit()
 RETURNS trigger AS $$
 BEGIN
-  -- Only validate when new model is used
+  -- Only validate when new three-currency model is explicitly used
   IF NEW.input_currency IS NOT NULL THEN
 
     -- Input must be valid
@@ -84,6 +84,12 @@ BEGIN
         RAISE EXCEPTION
           'Invalid deposit: wallet currency differs from input_currency but exchange_rate is missing';
       END IF;
+    END IF;
+  ELSE
+    -- Backwards compatibility: if using legacy original_currency model, auto-populate input_currency
+    IF NEW.original_currency IS NOT NULL AND NEW.input_currency IS NULL THEN
+      NEW.input_currency := NEW.original_currency;
+      NEW.input_amount := NEW.amount;
     END IF;
   END IF;
 
