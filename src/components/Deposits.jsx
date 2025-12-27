@@ -342,20 +342,29 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
 
         if (fetchInfo && fetchInfo.fetchedAt) {
           mostRecentTimestamp = fetchInfo.fetchedAt
-          console.log(`[Deposits] Using edge-function execution time: ${fetchInfo.isoString}`)
+          console.log(`[Deposits] ✓ Using edge-function execution time: ${fetchInfo.isoString}`)
+        } else if (canonicalPairs && canonicalPairs.length > 0 && canonicalPairs[0].updated_at) {
+          // Fallback: Use most recent pair's timestamp (already ordered DESC)
+          mostRecentTimestamp = new Date(canonicalPairs[0].updated_at)
+          console.log(`[Deposits] ✓ Using most recent pair update timestamp: ${mostRecentTimestamp.toISOString()} (fallback)`)
         } else if (timestamps.length > 0) {
-          // Fallback: Use most recent pair update timestamp (same as /rates page does)
+          // Last resort: Find most recent from collected timestamps
           timestamps.sort((a, b) => b - a)
           mostRecentTimestamp = timestamps[0]
-          console.log('[Deposits] Using most recent pair update timestamp (fallback)')
+          console.log('[Deposits] ✓ Using most recent timestamp from pairs collection (final fallback)')
         }
+
+        const minutesSinceFetch = Math.floor((Date.now() - mostRecentTimestamp.getTime()) / 1000 / 60)
 
         setLastFetchedRates({
           fetchedAt: mostRecentTimestamp,
           isoString: mostRecentTimestamp.toISOString(),
           source: fetchInfo?.source || 'pairs-table',
-          isFresh: (Date.now() - mostRecentTimestamp.getTime()) / 1000 / 60 < 60
+          isFresh: minutesSinceFetch < 60,
+          minutesSinceFetch: minutesSinceFetch
         })
+
+        console.log(`[Deposits] Timestamp set: ${mostRecentTimestamp.toISOString()} (${minutesSinceFetch} minutes ago)`)
       } catch (e) {
         console.warn('[Deposits] Could not fetch last fetch info:', e.message)
       }
