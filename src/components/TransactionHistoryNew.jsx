@@ -136,7 +136,7 @@ export default function TransactionHistory({ userId }) {
             >
               <option value="all">All Currencies</option>
               {currencies.map(curr => (
-                <option key={curr} value={curr}>{curr}</option>
+                <option key={curr} value={curr}>{curr?.toUpperCase()}</option>
               ))}
             </select>
           </div>
