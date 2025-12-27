@@ -5,7 +5,7 @@ import CurrencyCryptoToggle from './FiatCryptoToggle'
 import CurrencySelect from './CurrencySelect'
 
 export default function Rates() {
-  const [rates, setRates] = useState([])
+  const [currencies, setCurrencies] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [lastUpdated, setLastUpdated] = useState(new Date())
@@ -14,6 +14,10 @@ export default function Rates() {
   const [selectedTo, setSelectedTo] = useState(null)
   const [amount, setAmount] = useState('1')
   const [result, setResult] = useState(null)
+
+  // Rates table view - default conversion target is USD
+  const [targetCurrency, setTargetCurrency] = useState('USD')
+  const [exchangeRates, setExchangeRates] = useState({})
 
   const [searchTerm, setSearchTerm] = useState('')
   const [typeFilter, setTypeFilter] = useState('all')
