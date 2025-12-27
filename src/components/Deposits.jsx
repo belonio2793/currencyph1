@@ -829,7 +829,7 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
           <div className="text-5xl font-light text-slate-900 mb-2">currency.ph</div>
           <p className="text-slate-500 text-sm">Loading...</p>
