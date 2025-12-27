@@ -1543,21 +1543,21 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
                             {deposit.status.charAt(0).toUpperCase() + deposit.status.slice(1)}
                           </span>
                         </td>
-                        <td className="py-3 px-4">
-                          <div className="flex gap-2">
+                        <td className="py-2 sm:py-3 px-2 sm:px-3">
+                          <div className="flex flex-col sm:flex-row gap-1 sm:gap-2">
                             <button
                               onClick={() => {
                                 setSelectedDepositForDetails(deposit)
                                 setShowDepositDetailsModal(true)
                               }}
-                              className="px-3 py-1 bg-blue-600 text-white text-xs font-medium rounded hover:bg-blue-700 transition"
+                              className="px-2 sm:px-3 py-1 bg-blue-600 text-white text-xs font-medium rounded hover:bg-blue-700 transition whitespace-nowrap"
                             >
                               Details
                             </button>
                             <button
                               onClick={() => handleDeleteDeposit(deposit.id)}
                               disabled={submitting}
-                              className="px-3 py-1 bg-red-600 text-white text-xs font-medium rounded hover:bg-red-700 transition disabled:opacity-50"
+                              className="px-2 sm:px-3 py-1 bg-red-600 text-white text-xs font-medium rounded hover:bg-red-700 transition disabled:opacity-50 whitespace-nowrap"
                             >
                               Cancel
                             </button>
