@@ -79,59 +79,17 @@ export default function Rates() {
 
       console.log(`Fetched ${currenciesData.length} currencies from database`)
 
-      // Fetch all exchange rates from both currency_rates and cryptocurrency_rates tables
-      const [{ data: fiatRatesData, error: fiatError }, { data: cryptoRatesData, error: cryptoError }] = await Promise.all([
-        supabase
-          .from('currency_rates')
-          .select('from_currency, to_currency, rate, updated_at'),
-        supabase
-          .from('cryptocurrency_rates')
-          .select('from_currency, to_currency, rate, updated_at')
-      ])
+      // Get the most recent update time from public.pairs
+      const { data: latestPair } = await supabase
+        .from('pairs')
+        .select('updated_at')
+        .order('updated_at', { ascending: false })
+        .limit(1)
 
-      // Build rates map from both sources
-      const ratesByCode = {}
-      let mostRecentTime = new Date()
+      const mostRecentTime = latestPair?.[0]?.updated_at ? new Date(latestPair[0].updated_at) : new Date()
 
-      const processRatesData = (ratesData, source) => {
-        if (!ratesData) return
-        ratesData.forEach(pair => {
-          if (pair.rate && isFinite(Number(pair.rate)) && Number(pair.rate) > 0) {
-            const fromCode = pair.from_currency.toUpperCase()
-            // Store rate if we don't have it yet
-            if (!ratesByCode[fromCode]) {
-              ratesByCode[fromCode] = {
-                rate: Number(pair.rate),
-                updatedAt: pair.updated_at || new Date().toISOString(),
-                source
-              }
-
-              // Track most recent timestamp
-              const pairTime = new Date(pair.updated_at || 0)
-              if (pairTime > mostRecentTime) {
-                mostRecentTime = pairTime
-              }
-            }
-          }
-        })
-      }
-
-      if (!fiatError) {
-        console.log(`Fetched ${fiatRatesData?.length || 0} fiat rates from currency_rates`)
-        processRatesData(fiatRatesData, 'currency_rates')
-      } else {
-        console.warn('Warning fetching currency_rates:', fiatError.message)
-      }
-
-      if (!cryptoError) {
-        console.log(`Fetched ${cryptoRatesData?.length || 0} crypto rates from cryptocurrency_rates`)
-        processRatesData(cryptoRatesData, 'cryptocurrency_rates')
-      } else {
-        console.warn('Warning fetching cryptocurrency_rates:', cryptoError.message)
-      }
-
-      // Build final rates array from currencies table, enriched with rate data
-      const validRates = currenciesData
+      // Build final currencies array with metadata
+      const validCurrencies = currenciesData
         .map(curr => ({
           code: curr.code,
           name: curr.name,
@@ -139,37 +97,95 @@ export default function Rates() {
           symbol: curr.symbol,
           decimals: curr.decimals,
           is_default: curr.is_default,
-          rate: ratesByCode[curr.code]?.rate || null,
-          updatedAt: ratesByCode[curr.code]?.updatedAt || new Date().toISOString(),
           value: curr.code,
           label: curr.code,
           id: curr.code
         }))
-        // Sort: with rates first, then by type (fiat before crypto), then alphabetically
+        // Sort: fiat before crypto, then alphabetically by code
         .sort((a, b) => {
-          // Rates first
-          const aHasRate = a.rate !== null && isFinite(a.rate) && a.rate > 0
-          const bHasRate = b.rate !== null && isFinite(b.rate) && b.rate > 0
-          if (aHasRate !== bHasRate) return aHasRate ? -1 : 1
-
-          // Then by type (fiat before crypto)
+          // By type (fiat before crypto)
           if (a.type !== b.type) return a.type === 'fiat' ? -1 : 1
 
           // Then alphabetically by code
           return a.code.localeCompare(b.code)
         })
 
-      setRates(validRates)
+      setCurrencies(validCurrencies)
       setLastUpdated(mostRecentTime)
-      console.log(`Loaded ${validRates.length} currencies with proper type separation`)
+      console.log(`Loaded ${validCurrencies.length} currencies`)
       setError(null)
     } catch (err) {
       const errorMsg = err?.message || String(err) || 'Unknown error'
-      console.error('Error loading rates:', errorMsg)
-      setError(`Failed to load exchange rates: ${errorMsg}`)
-      setRates([])
+      console.error('Error loading currencies:', errorMsg)
+      setError(`Failed to load currencies: ${errorMsg}`)
+      setCurrencies([])
     } finally {
       setLoading(false)
+    }
+  }
+
+  const loadExchangeRates = async (targetCurr) => {
+    try {
+      if (!supabase || !targetCurr) return
+
+      const target = targetCurr.toUpperCase()
+      const rates = {}
+
+      // Get all pairs where to_currency is the target
+      const { data: pairsData, error: pairsError } = await supabase
+        .from('pairs')
+        .select('from_currency, to_currency, rate, updated_at')
+        .eq('to_currency', target)
+        .gt('rate', 0)
+
+      if (pairsError) {
+        console.warn(`Warning fetching rates for ${target}:`, pairsError.message)
+        setExchangeRates({})
+        return
+      }
+
+      // Build rates map from direct pairs
+      if (pairsData) {
+        pairsData.forEach(pair => {
+          const fromCode = pair.from_currency.toUpperCase()
+          if (isFinite(Number(pair.rate)) && Number(pair.rate) > 0) {
+            rates[fromCode] = Number(pair.rate)
+          }
+        })
+      }
+
+      // For currencies not found in direct pairs, try reverse pairs
+      const missingCodes = currencies
+        .map(c => c.code)
+        .filter(code => !rates[code] && code !== target)
+
+      if (missingCodes.length > 0) {
+        const { data: reversePairs, error: reverseError } = await supabase
+          .from('pairs')
+          .select('from_currency, to_currency, rate')
+          .eq('from_currency', target)
+          .in('to_currency', missingCodes)
+          .gt('rate', 0)
+
+        if (!reverseError && reversePairs) {
+          reversePairs.forEach(pair => {
+            const toCode = pair.to_currency.toUpperCase()
+            if (isFinite(Number(pair.rate)) && Number(pair.rate) > 0) {
+              // Use mathematical inversion: if target→other = r, then other→target = 1/r
+              rates[toCode] = 1 / Number(pair.rate)
+            }
+          })
+        }
+      }
+
+      // Add target currency with rate 1.0
+      rates[target] = 1.0
+
+      setExchangeRates(rates)
+      console.log(`Loaded ${Object.keys(rates).length} exchange rates to ${target}`)
+    } catch (err) {
+      console.error('Error loading exchange rates:', err)
+      setExchangeRates({})
     }
   }
 
