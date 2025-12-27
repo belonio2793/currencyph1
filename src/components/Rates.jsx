@@ -244,8 +244,13 @@ export default function Rates() {
   }, [currencies, exchangeRates, typeFilter, searchTerm, sortBy, sortDirection])
 
   const favoriteRates = useMemo(() => {
-    return rates.filter(r => favorites.includes(r.code))
-  }, [rates, favorites])
+    return currencies
+      .filter(c => favorites.includes(c.code))
+      .map(c => ({
+        ...c,
+        rate: exchangeRates[c.code] || null
+      }))
+  }, [currencies, favorites, exchangeRates])
 
   const calculateConversion = () => {
     const numAmount = parseFloat(amount)
