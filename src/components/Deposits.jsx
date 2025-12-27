@@ -120,38 +120,9 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
     loadInitialData()
   }, [userId])
 
-  // Set up rate polling (every 5 minutes) and realtime subscriptions - matching /rates page approach
+  // Fetch rates on component mount
   useEffect(() => {
-    // Poll rates every 5 minutes (exactly like /rates page does)
-    const interval = setInterval(() => {
-      console.log('[Deposits] Polling rates every 5 minutes')
-      fetchExchangeRates()
-    }, 5 * 60 * 1000)
-
-    // Subscribe to realtime rate updates on pairs table
-    const channel = supabase
-      .channel('deposits-rates-updates')
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'pairs'
-        },
-        () => {
-          console.log('[Deposits] Rate update detected via realtime')
-          // Reload rates with a small debounce to batch multiple updates
-          setTimeout(() => {
-            fetchExchangeRates()
-          }, 100)
-        }
-      )
-      .subscribe()
-
-    return () => {
-      clearInterval(interval)
-      channel.unsubscribe()
-    }
+    fetchExchangeRates()
   }, [])
 
   // Subscribe to real-time deposit updates
