@@ -401,7 +401,7 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
       const cryptoMap = Object.fromEntries(allCryptos.map(c => [c.code, c]))
       allCurrencies = allCurrencies.map(c => {
         if (cryptoMap[c.code]) {
-          return { ...c, ...cryptoMap[c.code], type: 'crypto' }
+          return { ...c, ...cryptoMap[c.code] }
         }
         return c
       })
