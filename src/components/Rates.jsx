@@ -658,10 +658,10 @@ export default function Rates() {
                 <div className="pb-4 border-b border-slate-300">
                   <p className="text-xs text-slate-600 font-medium mb-1 uppercase tracking-wider">Data Source</p>
                   <p className="text-xs text-slate-500">
-                    Database aggregates multiple trusted sources for accurate rates
+                    Real-time rates from currency_rates & cryptocurrency_rates tables
                   </p>
                   <p className="text-xs text-slate-400 mt-2">
-                    Includes: Open Exchange Rates, CoinGecko, Exconvert, Wise, Coins.ph
+                    Sources: Open Exchange Rates, CoinGecko, Exconvert, Wise, Coins.ph
                   </p>
                 </div>
 
