@@ -1456,21 +1456,22 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
         {deposits.length > 0 && (
           <div className="bg-white rounded-lg shadow border border-slate-200 p-4 sm:p-8">
             <h3 className="text-xl font-semibold text-slate-900 mb-4">Recent Deposits</h3>
-            <div className="w-full">
+            <div className="w-full overflow-x-auto">
               <table className="w-full text-xs sm:text-sm">
                 <thead>
                   <tr className="border-b border-slate-200">
+                    <th className="text-left py-2 sm:py-3 px-2 sm:px-3 text-slate-600 font-medium">Date</th>
                     <th className="text-left py-2 sm:py-3 px-2 sm:px-3 text-slate-600 font-medium">You Sent</th>
                     <th className="text-left py-2 sm:py-3 px-2 sm:px-3 text-slate-600 font-medium">Payment</th>
                     <th className="hidden md:table-cell text-left py-2 sm:py-3 px-2 sm:px-3 text-slate-600 font-medium">Rate</th>
                     <th className="text-left py-2 sm:py-3 px-2 sm:px-3 text-slate-600 font-medium">Received</th>
-                    <th className="text-left py-2 sm:py-3 px-2 sm:px-3 text-slate-600 font-medium">Date</th>
                     <th className="text-left py-2 sm:py-3 px-2 sm:px-3 text-slate-600 font-medium">Status</th>
+                    <th className="text-left py-2 sm:py-3 px-2 sm:px-3 text-slate-600 font-medium">Reconciliation</th>
                     <th className="text-left py-2 sm:py-3 px-2 sm:px-3 text-slate-600 font-medium">Action</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {deposits.slice(0, 5).map(deposit => {
+                  {deposits.slice(0, 5).map((deposit, index) => {
                     // Parse notes to get stored metadata
                     let notesMeta = {}
                     try {
@@ -1503,8 +1504,23 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
                     // Calculate exchange rate
                     const exchangeRate = convertedAmount && deposit.amount ? (convertedAmount / deposit.amount) : null
 
+                    // Calculate running balance for reconciliation
+                    const previousDeposits = deposits.slice(0, index)
+                    const previousBalance = previousDeposits.reduce((sum, d) => {
+                      const depAmount = d.converted_amount || d.amount || 0
+                      return sum + parseFloat(depAmount)
+                    }, 0)
+                    const currentAmount = parseFloat(convertedAmount || deposit.amount || 0)
+                    const newBalance = previousBalance + currentAmount
+
+                    // Check if deposit is approved
+                    const isApproved = deposit.status === 'approved' || deposit.status === 'completed'
+
                     return (
                       <tr key={deposit.id} className="border-b border-slate-100 hover:bg-slate-50 transition">
+                        <td className="py-2 sm:py-3 px-2 sm:px-3 text-xs text-slate-600 whitespace-nowrap">
+                          {new Date(deposit.created_at).toLocaleDateString()}
+                        </td>
                         <td className="py-2 sm:py-3 px-2 sm:px-3 font-semibold text-slate-900">
                           {formatAmount(deposit.amount, originalCurrency)} {originalCurrency.toUpperCase()}
                         </td>
@@ -1530,9 +1546,6 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
                         <td className="py-2 sm:py-3 px-2 sm:px-3 font-semibold text-emerald-600 text-xs sm:text-sm">
                           {convertedAmount ? `${formatAmount(convertedAmount, walletCurrency)} ${walletCurrency.toUpperCase()}` : '—'}
                         </td>
-                        <td className="py-2 sm:py-3 px-2 sm:px-3 text-xs text-slate-600 whitespace-nowrap">
-                          {new Date(deposit.created_at).toLocaleDateString()}
-                        </td>
                         <td className="py-2 sm:py-3 px-2 sm:px-3">
                           <span className={`px-2 sm:px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap ${
                             deposit.status === 'completed' ? 'bg-emerald-100 text-emerald-700' :
@@ -1542,6 +1555,13 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
                           }`}>
                             {deposit.status.charAt(0).toUpperCase() + deposit.status.slice(1)}
                           </span>
+                        </td>
+                        <td className="py-2 sm:py-3 px-2 sm:px-3 text-xs text-slate-600">
+                          <div className="space-y-1">
+                            <p className="text-slate-600"><span className="font-semibold">Before:</span> {formatAmount(previousBalance, walletCurrency)} {walletCurrency}</p>
+                            <p className="text-emerald-600 font-semibold">+{formatAmount(currentAmount, walletCurrency)}</p>
+                            <p className="text-slate-900 font-semibold"><span className="text-slate-600 font-normal">After:</span> {formatAmount(newBalance, walletCurrency)} {walletCurrency}</p>
+                          </div>
                         </td>
                         <td className="py-2 sm:py-3 px-2 sm:px-3">
                           <div className="flex flex-col sm:flex-row gap-1 sm:gap-2">
@@ -1554,13 +1574,15 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
                             >
                               Details
                             </button>
-                            <button
-                              onClick={() => handleDeleteDeposit(deposit.id)}
-                              disabled={submitting}
-                              className="px-2 sm:px-3 py-1 bg-red-600 text-white text-xs font-medium rounded hover:bg-red-700 transition disabled:opacity-50 whitespace-nowrap"
-                            >
-                              Cancel
-                            </button>
+                            {!isApproved && (
+                              <button
+                                onClick={() => handleDeleteDeposit(deposit.id)}
+                                disabled={submitting}
+                                className="px-2 sm:px-3 py-1 bg-red-600 text-white text-xs font-medium rounded hover:bg-red-700 transition disabled:opacity-50 whitespace-nowrap"
+                              >
+                                Cancel
+                              </button>
+                            )}
                           </div>
                         </td>
                       </tr>
