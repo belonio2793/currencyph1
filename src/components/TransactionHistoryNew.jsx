@@ -511,11 +511,11 @@ export default function TransactionHistory({ userId }) {
               {/* Balance Information */}
               {(selectedTransaction.balance_before !== undefined || selectedTransaction.balance_after !== undefined) && (
                 <div className="border-t border-slate-200 pt-4 space-y-4">
-                  <h4 className="font-medium text-slate-900">Balance Information</h4>
-                  
+                  <h4 className="font-medium text-slate-900">Wallet Balance</h4>
+
                   {selectedTransaction.balance_before !== undefined && (
                     <div className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
-                      <span className="text-sm text-slate-600">Balance Before</span>
+                      <span className="text-sm text-slate-600">Balance Before ({selectedTransaction.currency_code?.toUpperCase()})</span>
                       <span className="font-light text-slate-900">
                         {getCurrencySymbol(selectedTransaction.currency_code)}
                         {formatFullPrecision(selectedTransaction.balance_before)} {selectedTransaction.currency_code?.toUpperCase()}
@@ -524,9 +524,9 @@ export default function TransactionHistory({ userId }) {
                   )}
 
                   {selectedTransaction.balance_after !== undefined && (
-                    <div className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
-                      <span className="text-sm text-slate-600">Balance After</span>
-                      <span className="font-light text-slate-900">
+                    <div className="flex items-center justify-between p-3 bg-blue-50 rounded-lg border border-blue-200">
+                      <span className="text-sm font-medium text-slate-600">Balance After ({selectedTransaction.currency_code?.toUpperCase()})</span>
+                      <span className="font-light text-blue-900 font-medium">
                         {getCurrencySymbol(selectedTransaction.currency_code)}
                         {formatFullPrecision(selectedTransaction.balance_after)} {selectedTransaction.currency_code?.toUpperCase()}
                       </span>
