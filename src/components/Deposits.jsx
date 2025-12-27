@@ -1185,7 +1185,7 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
                   </div>
                   <div className="bg-white p-4 rounded-lg border-l-4 border-slate-400">
                     <p className="text-xs text-slate-600 font-semibold mb-1">2️⃣ PAYMENT CURRENCY (How you pay)</p>
-                    <p className="text-2xl font-bold text-slate-900 break-words">{getDepositMethodAmount()?.toLocaleString(undefined, {
+                    <p className="text-lg font-bold text-slate-900 break-words">{getDepositMethodAmount()?.toLocaleString(undefined, {
                       minimumFractionDigits: isCryptoCurrency(selectedAddressMethod?.cryptoSymbol) ? 2 : 2,
                       maximumFractionDigits: isCryptoCurrency(selectedAddressMethod?.cryptoSymbol) ? 8 : 2
                     })} {selectedAddressMethod?.cryptoSymbol?.toUpperCase()}</p>
