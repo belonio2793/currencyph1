@@ -581,7 +581,7 @@ export default function Rates() {
                           }}
                           className="text-right py-3 px-4 font-semibold text-slate-700 text-sm cursor-pointer hover:bg-slate-100 transition select-none"
                         >
-                          Rate {sortBy === 'rate' && (sortDirection === 'asc' ? '↑' : '↓')}
+                          Rate ({targetCurrencyData?.symbol || targetCurrency}) {sortBy === 'rate' && (sortDirection === 'asc' ? '↑' : '↓')}
                         </th>
                         <th className="text-center py-3 px-4 font-semibold text-slate-700 text-sm">Action</th>
                       </tr>
