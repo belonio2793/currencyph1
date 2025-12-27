@@ -349,7 +349,7 @@ export default function Rates() {
     )
   }
 
-  if (rates.length === 0) {
+  if (currencies.length === 0) {
     return (
       <div className="bg-white rounded-2xl shadow-lg p-12 text-center">
         <div className="inline-block p-3 bg-slate-100 rounded-full mb-4">
@@ -357,16 +357,17 @@ export default function Rates() {
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
         </div>
-        <p className="text-slate-600 text-lg font-semibold">No exchange rates available</p>
+        <p className="text-slate-600 text-lg font-semibold">No currencies available</p>
         <p className="text-slate-500 text-sm mt-2">The database appears to be empty. Please check back later.</p>
       </div>
     )
   }
 
-  const fromCurrency = rates.find(r => r.code === selectedFrom)
-  const toCurrency = rates.find(r => r.code === selectedTo)
-  const fiatCount = rates.filter(r => r.type === 'fiat').length
-  const cryptoCount = rates.filter(r => r.type === 'crypto').length
+  const fromCurrency = currencies.find(c => c.code === selectedFrom)
+  const toCurrency = currencies.find(c => c.code === selectedTo)
+  const fiatCount = currencies.filter(c => c.type === 'fiat').length
+  const cryptoCount = currencies.filter(c => c.type === 'crypto').length
+  const targetCurrencyData = currencies.find(c => c.code === targetCurrency)
 
   return (
     <div className="w-full min-h-screen bg-gradient-to-b from-slate-50 to-white">
