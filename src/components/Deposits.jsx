@@ -1698,7 +1698,7 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
                   <div className="flex gap-2 mt-4">
                     <button
                       onClick={() => setShowDepositDetailsModal(false)}
-                      className="flex-1 px-3 py-2 bg-slate-800 text-white rounded text-sm font-medium hover:bg-slate-900 transition"
+                      className="flex-1 px-3 py-2 bg-blue-600 text-white rounded text-sm font-medium hover:bg-blue-700 transition"
                     >
                       Close
                     </button>
