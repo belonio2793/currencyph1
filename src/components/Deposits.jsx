@@ -988,7 +988,7 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
                   ) : activeType === 'cryptocurrency' ? (
                     <>
                       <h3 className="text-lg font-semibold text-slate-900 mb-4">
-                        Converting {selectedCurrency} <span className="text-indigo-600">{selectedCurrency}</span> to {selectedWalletData?.currency_name} <span className="text-indigo-600">{selectedWalletData?.currency_code}</span>
+                        Converting {selectedCurrency} <span className="text-slate-700">{selectedCurrency}</span> to {selectedWalletData?.currency_name} <span className="text-slate-700">{selectedWalletData?.currency_code}</span>
                       </h3>
                       <p className="text-sm text-slate-600 mb-4">
                         {!exchangeRates[selectedCurrency] ? (
