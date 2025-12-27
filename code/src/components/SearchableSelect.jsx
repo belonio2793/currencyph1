@@ -128,14 +128,8 @@ export default function SearchableSelect({ value, onChange, options = [], label 
     setHighlightedIndex(0)
   }, [searchTerm, isOpen])
 
-  const getCurrencyTypeColor = (type) => {
-    return type === 'cryptocurrency'
-      ? 'bg-slate-200 text-slate-900 border-slate-400'
-      : 'bg-slate-200 text-slate-900 border-slate-400'
-  }
-
   const getCurrencyTypeLabel = (type) => {
-    return type === 'cryptocurrency' ? 'CRY Cryptocurrency' : 'FIA Fiat'
+    return type === 'cryptocurrency' ? 'Cryptocurrency' : 'Fiat Currency'
   }
 
   return (
