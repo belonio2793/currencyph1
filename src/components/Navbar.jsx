@@ -145,9 +145,6 @@ function NavbarComponent({ activeTab, onTabChange, globalCurrency, setGlobalCurr
                   </>
                 )}
               </p>
-              <p className="text-sm text-slate-600">
-                All Wallets Combined (Excluding Debt)
-              </p>
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-6">
               <div>
