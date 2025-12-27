@@ -1523,39 +1523,39 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
 
                     return (
                       <tr key={deposit.id} className="border-b border-slate-100 hover:bg-slate-50 transition">
-                        <td className="py-2 sm:py-3 px-2 sm:px-3 text-xs text-slate-600">
-                          <div>{dateTimeStr}</div>
+                        <td className="py-2 sm:py-3 px-2 sm:px-3 text-xs text-slate-600 whitespace-nowrap">
+                          <div className="font-medium">{dateTimeStr}</div>
                           <div className="text-slate-500 text-xs">{timeStr}</div>
                         </td>
-                        <td className="py-2 sm:py-3 px-2 sm:px-3 font-semibold text-slate-900 text-xs sm:text-sm">
-                          <div>{formatAmount(deposit.amount, originalCurrency)}</div>
-                          <div className="text-slate-600 text-xs">{originalCurrency.toUpperCase()}</div>
+                        <td className="py-2 sm:py-3 px-2 sm:px-3 font-semibold text-slate-900 text-xs">
+                          <div className="font-bold">{formatAmount(deposit.amount, originalCurrency)}</div>
+                          <div className="text-slate-500 text-xs">{originalCurrency.toUpperCase()}</div>
                         </td>
-                        <td className="py-2 sm:py-3 px-2 sm:px-3 text-slate-700 text-xs">
+                        <td className="py-2 sm:py-3 px-2 sm:px-3 text-slate-700 text-xs whitespace-nowrap">
                           {notesMeta.payment_method_currency || deposit.payment_method_currency ? (
                             <>
                               <div className="font-medium text-slate-900">
                                 {notesMeta.payment_method_currency || deposit.payment_method_currency}
                               </div>
                               {(notesMeta.payment_amount || deposit.payment_amount) && (
-                                <div className="text-slate-600 text-xs">
+                                <div className="text-slate-500 text-xs">
                                   {formatAmount(notesMeta.payment_amount || deposit.payment_amount, notesMeta.payment_method_currency || deposit.payment_method_currency)}
                                 </div>
                               )}
                             </>
                           ) : (
-                            '—'
+                            <span>—</span>
                           )}
                         </td>
-                        <td className="hidden lg:table-cell py-2 sm:py-3 px-2 sm:px-3 text-slate-700 text-xs">
+                        <td className="hidden xl:table-cell py-2 sm:py-3 px-2 sm:px-3 text-slate-700 text-xs whitespace-nowrap">
                           {exchangeRate ? `1 ${originalCurrency.toUpperCase()} = ${formatExchangeRate(exchangeRate)} ${walletCurrency.toUpperCase()}` : '—'}
                         </td>
-                        <td className="py-2 sm:py-3 px-2 sm:px-3 font-semibold text-emerald-600 text-xs sm:text-sm">
-                          <div>{convertedAmount ? formatAmount(convertedAmount, walletCurrency) : '—'}</div>
-                          <div className="text-slate-600 text-xs">{walletCurrency.toUpperCase()}</div>
+                        <td className="py-2 sm:py-3 px-2 sm:px-3 font-semibold text-emerald-600 text-xs whitespace-nowrap">
+                          <div className="font-bold">{convertedAmount ? formatAmount(convertedAmount, walletCurrency) : '—'}</div>
+                          <div className="text-slate-500 text-xs">{walletCurrency.toUpperCase()}</div>
                         </td>
-                        <td className="py-2 sm:py-3 px-2 sm:px-3">
-                          <span className={`px-2 sm:px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap block ${
+                        <td className="py-2 sm:py-3 px-2 sm:px-3 whitespace-nowrap">
+                          <span className={`px-2 sm:px-3 py-1 rounded text-xs font-semibold inline-block ${
                             deposit.status === 'completed' ? 'bg-emerald-100 text-emerald-700' :
                             deposit.status === 'pending' ? 'bg-amber-100 text-amber-700' :
                             deposit.status === 'approved' ? 'bg-blue-100 text-blue-700' :
@@ -1565,20 +1565,20 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
                           </span>
                         </td>
                         <td className="py-2 sm:py-3 px-2 sm:px-3 text-xs text-slate-600">
-                          <div className="space-y-1">
-                            <p><span className="font-semibold">Before:</span> {formatAmount(previousBalance, walletCurrency)}</p>
-                            <p className="text-emerald-600 font-semibold">+{formatAmount(currentAmount, walletCurrency)}</p>
-                            <p className="text-slate-900 font-semibold"><span className="text-slate-600 font-normal">After:</span> {formatAmount(newBalance, walletCurrency)}</p>
+                          <div className="space-y-0.5">
+                            <p className="whitespace-nowrap"><span className="font-semibold text-slate-700">B:</span> {formatAmount(previousBalance, walletCurrency)}</p>
+                            <p className="text-emerald-600 font-semibold whitespace-nowrap">+{formatAmount(currentAmount, walletCurrency)}</p>
+                            <p className="text-slate-900 font-semibold whitespace-nowrap"><span className="text-slate-600 font-normal">A:</span> {formatAmount(newBalance, walletCurrency)}</p>
                           </div>
                         </td>
-                        <td className="py-2 sm:py-3 px-2 sm:px-3">
-                          <div className="flex flex-col gap-1">
+                        <td className="py-2 sm:py-3 px-2 sm:px-3 whitespace-nowrap">
+                          <div className="flex flex-col gap-0.5 sm:gap-1">
                             <button
                               onClick={() => {
                                 setSelectedDepositForDetails(deposit)
                                 setShowDepositDetailsModal(true)
                               }}
-                              className="px-2 sm:px-3 py-1 bg-blue-600 text-white text-xs font-medium rounded hover:bg-blue-700 transition whitespace-nowrap"
+                              className="px-2 py-1 bg-blue-600 text-white text-xs font-medium rounded hover:bg-blue-700 transition"
                             >
                               Details
                             </button>
@@ -1586,7 +1586,7 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
                               <button
                                 onClick={() => handleDeleteDeposit(deposit.id)}
                                 disabled={submitting}
-                                className="px-2 sm:px-3 py-1 bg-red-600 text-white text-xs font-medium rounded hover:bg-red-700 transition disabled:opacity-50 whitespace-nowrap"
+                                className="px-2 py-1 bg-red-600 text-white text-xs font-medium rounded hover:bg-red-700 transition disabled:opacity-50"
                               >
                                 Cancel
                               </button>
