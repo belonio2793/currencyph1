@@ -861,8 +861,8 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 py-8 px-4">
-      <div className="max-w-4xl mx-auto">
+    <div className="min-h-screen bg-white py-4 px-4">
+      <div className="max-w-3xl mx-auto">
         {/* Header with Toggle */}
         <div className="mb-8 flex items-center justify-between flex-wrap gap-4">
           <div>
@@ -886,7 +886,7 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
 
         {/* Step 1: Enter Amount */}
         {step === 'amount' && (
-          <div className="bg-white rounded-xl shadow-lg border border-slate-200 p-8 mb-6">
+          <div className="bg-white rounded-lg shadow border border-slate-200 p-8 mb-6">
             <h2 className="text-2xl font-semibold text-slate-900 mb-2">How much would you like to deposit?</h2>
             <p className="text-slate-600 text-sm mb-6">Deposit any currency to any wallet - we'll handle the conversion automatically</p>
 
@@ -1119,7 +1119,7 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
 
         {/* Step 2: Payment Instructions */}
         {step === 'confirm' && (activeMethodData || selectedMethod) && selectedWalletData && (
-          <div className="bg-white rounded-xl shadow-lg border border-slate-200 p-8 mb-6">
+          <div className="bg-white rounded-lg shadow border border-slate-200 p-8 mb-6">
             <h2 className="text-2xl font-semibold text-slate-900 mb-6 break-words">
               {formatNumber(parseFloat(amount) || 0, selectedCurrency)} {selectedCurrency.toUpperCase()} via {activeMethodData?.name || DEPOSIT_METHODS[selectedMethod]?.name || 'Payment'}
             </h2>
@@ -1420,7 +1420,7 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
 
         {/* Recent Deposits */}
         {deposits.length > 0 && (
-          <div className="bg-white rounded-xl shadow-lg border border-slate-200 p-8">
+          <div className="bg-white rounded-lg shadow border border-slate-200 p-8">
             <h3 className="text-xl font-semibold text-slate-900 mb-4">Recent Deposits</h3>
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
