@@ -1176,7 +1176,7 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
                   {/* INPUT CURRENCY */}
                   <div className="bg-white p-4 rounded-lg border-l-4 border-slate-400">
                     <p className="text-xs text-slate-600 font-semibold mb-1">1️⃣ INPUT CURRENCY (What you specify)</p>
-                    <p className="text-2xl font-bold text-slate-900 break-words">{formatNumber(parseFloat(amount) || 0, selectedCurrency)} {selectedCurrency}</p>
+                    <p className="text-lg font-bold text-slate-900 break-words">{formatNumber(parseFloat(amount) || 0, selectedCurrency)} {selectedCurrency}</p>
                   </div>
 
                   {/* PAYMENT CURRENCY */}
