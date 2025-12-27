@@ -58,7 +58,7 @@ BEGIN
     NEW.input_amount := NEW.amount;
   END IF;
 
-  -- Only validate when three-currency model is explicitly used
+  -- Validate when three-currency model is used
   IF NEW.input_currency IS NOT NULL THEN
 
     -- Input must be valid
@@ -77,24 +77,17 @@ BEGIN
       END IF;
     END IF;
 
-    -- Wallet conversion validation
-    IF NEW.currency_code IS NOT NULL
-       AND NEW.currency_code <> NEW.input_currency THEN
+    -- Wallet conversion validation: If wallet currency differs, auto-calculate exchange_rate
+    IF NEW.currency_code IS NOT NULL AND NEW.currency_code <> NEW.input_currency THEN
 
       IF NEW.received_amount IS NULL OR NEW.received_amount <= 0 THEN
         RAISE EXCEPTION
           'Invalid deposit: wallet currency differs from input_currency but received_amount is missing';
       END IF;
 
-      -- Auto-calculate exchange_rate if missing but can be derived
-      IF (NEW.exchange_rate IS NULL OR NEW.exchange_rate <= 0) THEN
-        IF NEW.received_amount > 0 AND NEW.input_amount > 0 THEN
-          NEW.exchange_rate := NEW.received_amount / NEW.input_amount;
-        ELSE
-          -- Only raise if we truly cannot calculate it
-          RAISE EXCEPTION
-            'Invalid deposit: wallet currency differs from input_currency but exchange_rate cannot be calculated';
-        END IF;
+      -- Auto-calculate exchange_rate if missing using: rate = received_amount / input_amount
+      IF NEW.exchange_rate IS NULL OR NEW.exchange_rate <= 0 THEN
+        NEW.exchange_rate := NEW.received_amount / NEW.input_amount;
       END IF;
     END IF;
   END IF;
