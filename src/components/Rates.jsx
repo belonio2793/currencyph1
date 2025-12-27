@@ -289,11 +289,18 @@ export default function Rates() {
 
   if (error) {
     return (
-      <div className="bg-white rounded-2xl shadow-lg p-12 border border-red-200">
-        <p className="text-red-600 text-center text-lg font-medium">{error}</p>
+      <div className="bg-white rounded-2xl shadow-lg p-8 border border-red-200">
+        <div className="text-center mb-6">
+          <div className="inline-block p-3 bg-red-100 rounded-full mb-4">
+            <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4v2m0 0v2m0-6v-2m0 0V7a2 2 0 012-2h.5a2 2 0 012 2v1m0 0a2 2 0 012 2v3m0 0a2 2 0 01-2 2h-.5a2 2 0 01-2-2m0 0V9m0 0a2 2 0 00-2-2H7a2 2 0 00-2 2m6 6a2 2 0 01-2-2m0 0V7a2 2 0 012-2h.5a2 2 0 012 2v1" />
+            </svg>
+          </div>
+          <p className="text-red-600 text-center text-lg font-semibold">{error}</p>
+        </div>
         <button
           onClick={loadData}
-          className="mt-4 mx-auto px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+          className="w-full px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 active:bg-blue-800 transition-colors shadow-md hover:shadow-lg"
         >
           Try Again
         </button>
