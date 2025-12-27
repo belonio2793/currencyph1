@@ -372,7 +372,7 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
       }
 
       // Load wallets, currencies, and crypto addresses in parallel
-      const [walletsResult, currenciesResult] = await Promise.all([
+      const [walletsResult, currenciesResult, cryptosResult] = await Promise.all([
         supabase
           .from('wallets')
           .select('id, user_id, currency_code, balance, total_deposited, total_withdrawn, is_active, created_at, updated_at, account_number, type')
@@ -381,8 +381,11 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
           .order('currency_code'),
         supabase
           .from('currencies')
-          .select('code, name, type, symbol')
-          .eq('active', true)
+          .select('code, name, type, symbol, decimals')
+          .eq('active', true),
+        supabase
+          .from('cryptocurrencies')
+          .select('code, name, coingecko_id')
       ])
 
       if (walletsResult.error) throw walletsResult.error
