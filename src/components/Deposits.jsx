@@ -1865,7 +1865,7 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
               <div className="flex gap-2">
                 <button
                   onClick={() => setShowCryptoAddressModal(false)}
-                  className="flex-1 px-4 py-2 border border-slate-300 rounded text-slate-900 text-sm font-medium hover:bg-slate-50 transition"
+                  className="flex-1 px-4 py-2 border-2 border-slate-900 rounded text-slate-900 text-sm font-medium hover:bg-slate-900 hover:text-white transition"
                 >
                   Close
                 </button>
@@ -1879,7 +1879,7 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
                       setError('Invalid method selected. Please try again.')
                     }
                   }}
-                  className="flex-1 px-4 py-2 bg-slate-800 text-white rounded text-sm font-medium hover:bg-slate-900 transition"
+                  className="flex-1 px-4 py-2 bg-blue-600 text-white rounded text-sm font-medium hover:bg-blue-700 transition"
                 >
                   Proceed with Deposit
                 </button>
