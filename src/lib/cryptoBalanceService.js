@@ -79,7 +79,8 @@ export function calculateTotalCryptoInPHP(cryptoWallets, cryptoPrices) {
 
     return totalPHP
   } catch (error) {
-    console.error('Error calculating crypto total:', error)
+    const errorMsg = error instanceof Error ? error.message : JSON.stringify(error)
+    console.error('Error calculating crypto total:', errorMsg)
     return 0
   }
 }
