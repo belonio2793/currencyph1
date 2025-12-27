@@ -1476,6 +1476,22 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
                           {formatAmount(deposit.amount, originalCurrency)} {originalCurrency.toUpperCase()}
                         </td>
                         <td className="py-3 px-4 text-slate-700 text-xs">
+                          {notesMeta.payment_method_currency || deposit.payment_method_currency ? (
+                            <>
+                              <div className="font-medium text-slate-900">
+                                {notesMeta.payment_method_currency || deposit.payment_method_currency}
+                              </div>
+                              {notesMeta.payment_amount || deposit.payment_amount && (
+                                <div className="text-slate-600">
+                                  {formatAmount(notesMeta.payment_amount || deposit.payment_amount, notesMeta.payment_method_currency || deposit.payment_method_currency)}
+                                </div>
+                              )}
+                            </>
+                          ) : (
+                            '—'
+                          )}
+                        </td>
+                        <td className="py-3 px-4 text-slate-700 text-xs">
                           {exchangeRate ? `1 ${originalCurrency.toUpperCase()} = ${formatExchangeRate(exchangeRate)} ${walletCurrency.toUpperCase()}` : '—'}
                         </td>
                         <td className="py-3 px-4 font-semibold text-emerald-600">
