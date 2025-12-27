@@ -600,16 +600,6 @@ export default function TransactionHistory({ userId }) {
                   </div>
                 )}
 
-                {selectedTransaction.net_received_amount && (
-                  <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-3">
-                    <p className="text-xs font-medium text-slate-500 uppercase tracking-wide mb-1">Net Received Amount</p>
-                    <p className="text-sm text-emerald-700 font-medium">
-                      {getCurrencySymbol(selectedTransaction.currency_code)}
-                      {formatFullPrecision(selectedTransaction.net_received_amount)} {selectedTransaction.currency_code?.toUpperCase()}
-                    </p>
-                  </div>
-                )}
-
                 {selectedTransaction.id && (
                   <div>
                     <p className="text-xs font-medium text-slate-500 uppercase tracking-wide mb-1">Transaction ID</p>
