@@ -315,7 +315,10 @@ export default function SearchableSelect({ value, onChange, options = [], label 
                       >
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-3 flex-1 min-w-0">
-                            <span className="font-semibold text-slate-900 w-12">{option.code}</span>
+                            <div className="w-6 h-6 flex items-center justify-center font-bold text-white text-xs bg-orange-500 border border-orange-600 flex-shrink-0">
+                              C
+                            </div>
+                            <span className="font-semibold text-slate-900">{option.code}</span>
                             <span className="text-slate-600 text-sm truncate">
                               {option.metadata?.name}
                             </span>
