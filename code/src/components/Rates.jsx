@@ -53,6 +53,11 @@ export default function Rates() {
       setLoading(true)
       setError(null)
 
+      // Verify Supabase client is properly initialized
+      if (!supabase || typeof supabase.from !== 'function') {
+        throw new Error('Supabase client not properly initialized')
+      }
+
       // Hybrid approach: Use specialized tables + public.pairs as fallback
       // This ensures we get all rates: fiat, crypto, and anything else
       const [currencyRatesRes, cryptoRatesRes, pairsRes] = await Promise.all([
