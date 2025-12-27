@@ -53,10 +53,10 @@ export default function Rates() {
       }
 
       // Fetch all currency pairs from public_pairs (primary unified source)
+      // Remove limit to get ALL pairs
       const { data: pairsData, error: pairsError } = await supabase
         .from('pairs')
         .select('from_currency, to_currency, rate, source_table, updated_at')
-        .limit(10000)
 
       if (pairsError) {
         throw new Error(`Failed to fetch pairs: ${pairsError.message}`)
@@ -66,7 +66,9 @@ export default function Rates() {
         throw new Error('No currency pairs available in database')
       }
 
-      // Get unique currency codes
+      console.log(`Fetched ${pairsData.length} total pairs from database`)
+
+      // Get unique currency codes from all pairs (from_currency AND to_currency)
       const codes = new Set()
       pairsData.forEach(pair => {
         if (pair.from_currency) codes.add(pair.from_currency)
@@ -74,20 +76,21 @@ export default function Rates() {
       })
 
       const codeArray = Array.from(codes)
+      console.log(`Extracted ${codeArray.length} unique currencies`)
 
-      // Fetch fiat currency codes - use the pairs table which has all data
+      // Fetch fiat currency codes - no limit
       const { data: fiatData } = await supabase
         .from('pairs')
         .select('from_currency')
         .eq('source_table', 'currency_rates')
-        .limit(10000)
 
-      // Fetch crypto currency codes
+      // Fetch crypto currency codes - no limit
       const { data: cryptoData } = await supabase
         .from('pairs')
         .select('from_currency')
         .eq('source_table', 'cryptocurrency_rates')
-        .limit(10000)
+
+      console.log(`Fiat currencies: ${fiatData?.length || 0}, Crypto currencies: ${cryptoData?.length || 0}`)
 
       // Build metadata map - preference: crypto first, then fiat
       const cryptoCodes = new Set(cryptoData?.map(row => row.from_currency) || [])
@@ -369,21 +372,20 @@ export default function Rates() {
                   </div>
 
                   {/* Swap Button */}
-                  <div className="flex justify-center">
-                    <button
-                      onClick={() => {
-                        const temp = selectedFrom
-                        setSelectedFrom(selectedTo)
-                        setSelectedTo(temp)
-                      }}
-                      className="p-2 bg-slate-100 hover:bg-slate-200 rounded-full transition text-slate-700 font-semibold"
-                      title="Swap currencies"
-                    >
-                      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16V4m0 0L3 8m0 0l4 4m10-4v12m0 0l4-4m0 0l-4-4" />
-                      </svg>
-                    </button>
-                  </div>
+                  <button
+                    onClick={() => {
+                      const temp = selectedFrom
+                      setSelectedFrom(selectedTo)
+                      setSelectedTo(temp)
+                    }}
+                    className="w-full px-4 py-3 bg-gradient-to-r from-slate-100 to-slate-50 hover:from-slate-200 hover:to-slate-100 text-slate-700 font-semibold rounded-lg transition-all shadow-sm hover:shadow-md active:shadow-inner flex items-center justify-center gap-2"
+                    title="Swap currencies"
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16V4m0 0L3 8m0 0l4 4m10-4v12m0 0l4-4m0 0l-4-4" />
+                    </svg>
+                    <span>Swap</span>
+                  </button>
 
                   {/* To Currency */}
                   <SearchableSelect
