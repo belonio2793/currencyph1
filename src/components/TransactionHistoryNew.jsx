@@ -538,21 +538,19 @@ export default function TransactionHistory({ userId }) {
                   <h4 className="font-semibold text-slate-900">Wallet Balance History</h4>
 
                   {selectedTransaction.balance_before !== undefined && (
-                    <div className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
-                      <span className="text-sm text-slate-600">Balance Before ({selectedTransaction.currency_code?.toUpperCase()})</span>
-                      <span className="font-light text-slate-900">
-                        {getCurrencySymbol(selectedTransaction.currency_code)}
-                        {formatFullPrecision(selectedTransaction.balance_before)} {selectedTransaction.currency_code?.toUpperCase()}
+                    <div className="flex items-center justify-between p-4 bg-slate-50 rounded-lg">
+                      <span className="text-sm font-medium text-slate-600">Wallet Balance Before This Transaction</span>
+                      <span className="text-lg font-semibold text-slate-900">
+                        {formatFullPrecision(selectedTransaction.balance_before)} {getCurrencySymbol(selectedTransaction.currency_code)}
                       </span>
                     </div>
                   )}
 
                   {selectedTransaction.balance_after !== undefined && (
-                    <div className="flex items-center justify-between p-3 bg-blue-50 rounded-lg border border-blue-200">
-                      <span className="text-sm font-medium text-slate-600">Balance After ({selectedTransaction.currency_code?.toUpperCase()})</span>
-                      <span className="font-light text-blue-900 font-medium">
-                        {getCurrencySymbol(selectedTransaction.currency_code)}
-                        {formatFullPrecision(selectedTransaction.balance_after)} {selectedTransaction.currency_code?.toUpperCase()}
+                    <div className="flex items-center justify-between p-4 bg-green-50 rounded-lg border border-green-200">
+                      <span className="text-sm font-medium text-slate-700">Wallet Balance After This Transaction</span>
+                      <span className="text-lg font-semibold text-green-900">
+                        {formatFullPrecision(selectedTransaction.balance_after)} {getCurrencySymbol(selectedTransaction.currency_code)}
                       </span>
                     </div>
                   )}
