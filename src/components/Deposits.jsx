@@ -1004,37 +1004,35 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
                 )}
               </div>
 
-              {/* Last Fetched Rates Info */}
+              {/* Last Fetched Rates Info - Matching /rates page format */}
               {lastFetchedRates && (
-                <div className={`mb-6 p-4 rounded-lg border ${lastFetchedRates.isFresh ? 'bg-blue-50 border-blue-200' : 'bg-amber-50 border-amber-200'}`}>
+                <div className="mb-6 p-4 bg-slate-50 border border-slate-300 rounded-lg">
                   <div className="flex items-center justify-between flex-wrap gap-2">
                     <div>
-                      <p className={`text-sm ${lastFetchedRates.isFresh ? 'text-blue-900' : 'text-amber-900'}`}>
+                      <p className="text-sm text-slate-900">
                         <span className="font-semibold">Last Fetched Rates:</span>{' '}
-                        {formatFullDateTime(lastFetchedRates.fetchedAt)}
+                        <span className="text-slate-700">{formatFullDateTime(lastFetchedRates.fetchedAt)}</span>
                       </p>
-                      {lastFetchedRates.isFresh !== undefined && (
-                        <p className={`text-xs mt-1 ${lastFetchedRates.isFresh ? 'text-blue-700' : 'text-amber-700'}`}>
-                          {lastFetchedRates.isFresh ? (
-                            <span>✓ Fresh (updated within last hour)</span>
-                          ) : (
-                            <span>
-                              {lastFetchedRates.minutesSinceFetch < 1440 ? (
-                                `✓ Updated ${lastFetchedRates.minutesSinceFetch < 60 ? Math.floor(lastFetchedRates.minutesSinceFetch) + ' min' : Math.floor(lastFetchedRates.minutesSinceFetch / 60) + ' hr'} ago`
-                              ) : (
-                                '⚠ Data may be stale'
-                              )}
-                            </span>
-                          )}
+                      {lastFetchedRates && (
+                        <p className="text-xs text-slate-600 mt-1">
+                          {(() => {
+                            const minutes = Math.floor((Date.now() - new Date(lastFetchedRates.fetchedAt).getTime()) / 1000 / 60)
+                            if (minutes < 1) return 'Just now'
+                            if (minutes < 60) return `${minutes} minute${minutes !== 1 ? 's' : ''} ago`
+                            const hours = Math.floor(minutes / 60)
+                            if (hours < 24) return `${hours} hour${hours !== 1 ? 's' : ''} ago`
+                            return '⚠ Data may be stale'
+                          })()}
                         </p>
                       )}
                     </div>
                     {!ratesLoading && (
                       <button
                         onClick={() => fetchExchangeRates()}
-                        className="px-3 py-1 bg-blue-600 text-white text-xs font-medium rounded hover:bg-blue-700 transition whitespace-nowrap"
+                        disabled={ratesLoading}
+                        className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition whitespace-nowrap"
                       >
-                        Refresh Rates
+                        {ratesLoading ? 'Refreshing...' : 'Refresh Rates'}
                       </button>
                     )}
                   </div>
