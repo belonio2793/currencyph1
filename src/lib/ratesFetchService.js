@@ -322,5 +322,6 @@ export default {
   getMinutesSinceLastFetch,
   areRatesFresh,
   triggerFetchRatesEdgeFunction,
-  checkAndRefreshRatesIfNeeded
+  checkAndRefreshRatesIfNeeded,
+  checkAndRefreshRatesIfNeededForDeposits
 }
