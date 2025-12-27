@@ -306,8 +306,8 @@ export default function Rates() {
 
   const fromCurrency = rates.find(r => r.code === selectedFrom)
   const toCurrency = rates.find(r => r.code === selectedTo)
-  const fiatCount = rates.filter(r => r.type === 'currency').length
-  const cryptoCount = rates.filter(r => r.type === 'cryptocurrency').length
+  const fiatCount = rates.filter(r => r.type === 'fiat').length
+  const cryptoCount = rates.filter(r => r.type === 'crypto').length
 
   return (
     <div className="w-full min-h-screen bg-gradient-to-b from-slate-50 to-white">
