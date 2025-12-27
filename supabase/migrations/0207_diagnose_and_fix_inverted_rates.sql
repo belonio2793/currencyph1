@@ -361,35 +361,35 @@ BEGIN
 
   -- Strategy 1: Try canonical pair (from < to alphabetically)
   RETURN QUERY SELECT
-    pairs.rate,
-    pairs.is_inverted,
-    pairs.source_table,
-    pairs.updated_at,
-    CASE 
-      WHEN pairs.pair_direction = 'canonical' THEN 1.0
-      WHEN EXTRACT(EPOCH FROM (NOW() - pairs.updated_at)) < 3600 THEN 0.8  -- Fresh
+    p.rate,
+    p.is_inverted,
+    p.source_table,
+    p.updated_at,
+    CASE
+      WHEN p.pair_direction = 'canonical' THEN 1.0
+      WHEN EXTRACT(EPOCH FROM (NOW() - p.updated_at)) < 3600 THEN 0.8  -- Fresh
       ELSE 0.6
     END
-  FROM pairs
-  WHERE (pairs.from_currency = UPPER(p_from_currency) AND pairs.to_currency = UPPER(p_to_currency))
-    AND pairs.rate > 0
+  FROM pairs p
+  WHERE (p.from_currency = UPPER(p_from_currency) AND p.to_currency = UPPER(p_to_currency))
+    AND p.rate > 0
   LIMIT 1;
 
   -- If not found, try inverse with 1/rate calculation
   IF NOT FOUND THEN
     RETURN QUERY SELECT
-      (1.0 / pairs.rate)::NUMERIC,
-      NOT pairs.is_inverted,
-      pairs.source_table,
-      pairs.updated_at,
-      CASE 
-        WHEN pairs.pair_direction = 'inverse' THEN 0.9  -- Slightly lower confidence
-        WHEN EXTRACT(EPOCH FROM (NOW() - pairs.updated_at)) < 3600 THEN 0.7
+      (1.0 / p.rate)::NUMERIC,
+      NOT p.is_inverted,
+      p.source_table,
+      p.updated_at,
+      CASE
+        WHEN p.pair_direction = 'inverse' THEN 0.9  -- Slightly lower confidence
+        WHEN EXTRACT(EPOCH FROM (NOW() - p.updated_at)) < 3600 THEN 0.7
         ELSE 0.5
       END
-    FROM pairs
-    WHERE (pairs.from_currency = UPPER(p_to_currency) AND pairs.to_currency = UPPER(p_from_currency))
-      AND pairs.rate > 0
+    FROM pairs p
+    WHERE (p.from_currency = UPPER(p_to_currency) AND p.to_currency = UPPER(p_from_currency))
+      AND p.rate > 0
     LIMIT 1;
   END IF;
 
