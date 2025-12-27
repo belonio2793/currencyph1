@@ -506,10 +506,36 @@ export default function TransactionHistory({ userId }) {
                 )}
               </div>
 
+              {/* Wallet Information */}
+              <div className="border-t border-slate-200 pt-4 space-y-4">
+                <h4 className="font-semibold text-slate-900">Your Wallet Details</h4>
+
+                <div className="bg-slate-50 rounded-lg p-4 border border-slate-200 space-y-3">
+                  {selectedTransaction.wallet_id && (
+                    <div>
+                      <p className="text-xs font-medium text-slate-600 uppercase tracking-wide mb-1">Wallet Used For This Transaction</p>
+                      <p className="text-sm font-semibold text-slate-900 font-mono">{selectedTransaction.wallet_id}</p>
+                    </div>
+                  )}
+
+                  <div>
+                    <p className="text-xs font-medium text-slate-600 uppercase tracking-wide mb-1">Wallet Currency</p>
+                    <p className="text-base font-semibold text-slate-900">{getCurrencySymbol(selectedTransaction.currency_code)}</p>
+                  </div>
+
+                  {selectedTransaction.deposit_method && (
+                    <div className="pt-2 border-t border-slate-200">
+                      <p className="text-xs font-medium text-slate-600 uppercase tracking-wide mb-1">Payment Method Used</p>
+                      <p className="text-sm font-semibold text-slate-900 capitalize">{selectedTransaction.deposit_method.replace(/_/g, ' ')}</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+
               {/* Balance Information */}
               {(selectedTransaction.balance_before !== undefined || selectedTransaction.balance_after !== undefined) && (
                 <div className="border-t border-slate-200 pt-4 space-y-4">
-                  <h4 className="font-medium text-slate-900">Wallet Balance</h4>
+                  <h4 className="font-semibold text-slate-900">Wallet Balance History</h4>
 
                   {selectedTransaction.balance_before !== undefined && (
                     <div className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
