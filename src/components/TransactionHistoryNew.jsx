@@ -147,11 +147,11 @@ export default function TransactionHistory({ userId }) {
 
                 <div className="text-right">
                   <p className={`text-lg font-light ${
-                    transaction.transaction_type.includes('sent') || transaction.transaction_type === 'bill_payment'
+                    transaction.transaction_type?.includes('sent') || transaction.transaction_type === 'bill_payment'
                       ? 'text-red-600'
                       : 'text-emerald-600'
                   }`}>
-                    {transaction.transaction_type.includes('sent') || transaction.transaction_type === 'bill_payment' ? '-' : '+'}
+                    {transaction.transaction_type?.includes('sent') || transaction.transaction_type === 'bill_payment' ? '-' : '+'}
                     {transaction.currency_code === 'PHP' ? '₱' : transaction.currency_code === 'EUR' ? '€' : transaction.currency_code === 'GBP' ? '£' : '$'}
                     {formatNumber(transaction.amount)}
                   </p>
