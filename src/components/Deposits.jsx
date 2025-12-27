@@ -283,21 +283,17 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
       const timestamps = []
 
       // Primary source: pairs table (contains all currency and crypto rates)
-      // The pairs table is populated by the fetch-rates edge function
-      const { data: canonicalPairs, error: canonicalError } = await supabase
+      // Query ALL pairs like /rates page does (not filtered) to ensure we get the freshest data
+      const { data: pairsData, error: pairsError } = await supabase
         .from('pairs')
-        .select('from_currency, to_currency, rate, updated_at, source_table')
-        .eq('to_currency', 'PHP')
-        .gt('rate', 0)
-        .order('updated_at', { ascending: false })
+        .select('from_currency, to_currency, rate, source_table, updated_at')
+        .limit(10000)
 
       // Fallback: crypto_rates table (like /rates page does)
       const { data: cryptoRatesData, error: cryptoError } = await supabase
         .from('crypto_rates')
         .select('from_currency, to_currency, rate, updated_at')
-        .eq('to_currency', 'PHP')
-        .gt('rate', 0)
-        .order('updated_at', { ascending: false })
+        .limit(10000)
 
       if (canonicalError) {
         console.warn('[Deposits] Warning fetching canonical pairs:', canonicalError.message)
