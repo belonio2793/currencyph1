@@ -1310,9 +1310,8 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
                     </div>
 
                     {activeMethodData.network && (
-                      <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg text-xs text-slate-700">
-                        <span className="font-medium">Network: </span>
-                        <span className="font-semibold">{activeMethodData.network}</span>
+                      <div className="p-2 bg-slate-50 border border-slate-300 rounded text-xs text-slate-700">
+                        <span className="font-semibold">Network: {activeMethodData.network}</span>
                       </div>
                     )}
                   </>
@@ -1528,8 +1527,8 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
 
       {/* Create Wallet Modal */}
       {showWalletModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-xl shadow-xl max-w-sm w-full p-6">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50 overflow-y-auto">
+          <div className="bg-white rounded-lg shadow-lg max-w-sm w-full p-4 my-4">
             <h3 className="text-xl font-semibold text-slate-900 mb-4">Create New Wallet</h3>
             <p className="text-slate-600 text-sm mb-4">Select a currency for your new wallet</p>
 
@@ -1550,17 +1549,17 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
               )}
             </select>
 
-            <div className="flex gap-3">
+            <div className="flex gap-2 mt-6">
               <button
                 onClick={() => setShowWalletModal(false)}
-                className="flex-1 px-4 py-3 border border-slate-300 rounded-lg text-slate-900 font-medium hover:bg-slate-50 transition"
+                className="flex-1 px-3 py-2 border border-slate-300 rounded text-slate-900 text-sm font-medium hover:bg-slate-50 transition"
               >
                 Cancel
               </button>
               <button
                 onClick={handleCreateWallet}
                 disabled={submitting}
-                className="flex-1 px-4 py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition disabled:opacity-50"
+                className="flex-1 px-3 py-2 bg-slate-800 text-white rounded text-sm font-medium hover:bg-slate-900 transition disabled:opacity-50"
               >
                 {submitting ? 'Creating...' : 'Create Wallet'}
               </button>
@@ -1571,8 +1570,8 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
 
       {/* Deposit Details Modal */}
       {showDepositDetailsModal && selectedDepositForDetails && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50" onClick={() => setShowDepositDetailsModal(false)}>
-          <div className="bg-white rounded-xl shadow-2xl max-w-2xl w-full p-8" onClick={(e) => e.stopPropagation()}>
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50 overflow-y-auto" onClick={() => setShowDepositDetailsModal(false)}>
+          <div className="bg-white rounded-lg shadow-lg max-w-2xl w-full p-4 sm:p-6 my-4" onClick={(e) => e.stopPropagation()}>
             {(() => {
               const deposit = selectedDepositForDetails
               let notesMeta = {}
@@ -1595,8 +1594,8 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
 
               return (
                 <>
-                  <div className="flex items-center justify-between mb-6">
-                    <h3 className="text-2xl font-semibold text-slate-900">Deposit Details</h3>
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-lg font-semibold text-slate-900">Deposit Details</h3>
                     <button
                       onClick={() => setShowDepositDetailsModal(false)}
                       className="text-slate-500 hover:text-slate-700 text-3xl leading-none"
@@ -1605,9 +1604,9 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
                     </button>
                   </div>
 
-                  <div className="space-y-6">
+                  <div className="space-y-3">
                     {/* Transaction Status */}
-                    <div className="bg-gradient-to-r from-slate-50 to-slate-100 rounded-lg p-4 border border-slate-200">
+                    <div className="bg-slate-50 rounded p-3 border border-slate-200">
                       <div className="flex items-center justify-between">
                         <div>
                           <p className="text-xs text-slate-600 uppercase tracking-wide mb-1">Status</p>
@@ -1620,16 +1619,16 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
                     </div>
 
                     {/* Amount Information */}
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       <div>
-                        <p className="text-xs text-slate-600 uppercase tracking-wide mb-2">Original Amount</p>
-                        <p className="text-2xl font-bold text-slate-900">
+                        <p className="text-xs text-slate-600 font-semibold mb-1">Original Amount</p>
+                        <p className="text-lg font-bold text-slate-900">
                           {deposit.amount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: isCryptoCurrency(originalCurrency) ? 8 : 2 })} {originalCurrency.toUpperCase()}
                         </p>
                       </div>
                       <div>
-                        <p className="text-xs text-slate-600 uppercase tracking-wide mb-2">Received Amount</p>
-                        <p className="text-2xl font-bold text-slate-900">
+                        <p className="text-xs text-slate-600 font-semibold mb-1">Received Amount</p>
+                        <p className="text-lg font-bold text-slate-900">
                           {convertedAmount ? `${convertedAmount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: isCryptoCurrency(walletCurrency) ? 8 : 2 })} ${walletCurrency.toUpperCase()}` : '—'}
                         </p>
                       </div>
@@ -1637,55 +1636,52 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
 
                     {/* Exchange Rate */}
                     {exchangeRate && (
-                      <div className="border-l-4 border-blue-500 bg-blue-50 p-4 rounded">
-                        <p className="text-xs text-slate-600 uppercase tracking-wide mb-1">Exchange Rate</p>
-                        <p className="text-xl font-semibold text-slate-900">1 {originalCurrency.toUpperCase()} = {exchangeRate} {walletCurrency.toUpperCase()}</p>
+                      <div className="border-l-4 border-slate-400 bg-slate-50 p-3 rounded">
+                        <p className="text-xs text-slate-600 font-semibold mb-1">Exchange Rate</p>
+                        <p className="text-sm font-semibold text-slate-900">1 {originalCurrency.toUpperCase()} = {exchangeRate} {walletCurrency.toUpperCase()}</p>
                       </div>
                     )}
 
                     {/* Deposit Method & Reference */}
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       <div>
-                        <p className="text-xs text-slate-600 uppercase tracking-wide mb-2">Deposit Method</p>
-                        <p className="text-base font-semibold text-slate-900">{methodName}</p>
+                        <p className="text-xs text-slate-600 font-semibold mb-1">Deposit Method</p>
+                        <p className="text-sm font-semibold text-slate-900">{methodName}</p>
                       </div>
                       <div>
-                        <p className="text-xs text-slate-600 uppercase tracking-wide mb-2">Reference Number</p>
-                        <p className="text-base font-mono text-slate-900 break-all">{deposit.reference_number || deposit.phone_number || '—'}</p>
+                        <p className="text-xs text-slate-600 font-semibold mb-1">Reference Number</p>
+                        <p className="text-xs font-mono text-slate-900 break-all">{deposit.reference_number || deposit.phone_number || '—'}</p>
                       </div>
                     </div>
 
                     {/* Wallet Information */}
-                    <div className="bg-slate-50 rounded-lg p-4 border border-slate-200">
-                      <p className="text-xs text-slate-600 uppercase tracking-wide mb-3 font-semibold">Deposited To Wallet</p>
-                      <div className="space-y-2">
+                    <div className="bg-slate-50 rounded p-3 border border-slate-200">
+                      <p className="text-xs text-slate-600 font-semibold mb-2">Deposited To Wallet</p>
+                      <div className="space-y-1 text-xs">
                         <div>
-                          <p className="text-xs text-slate-600">Wallet Currency</p>
-                          <p className="text-sm font-semibold text-slate-900">{depositWallet?.currency_name || walletCurrency}</p>
+                          <p className="text-slate-600">Currency: <span className="font-semibold text-slate-900">{depositWallet?.currency_name || walletCurrency}</span></p>
                         </div>
                         <div>
-                          <p className="text-xs text-slate-600">Wallet ID</p>
-                          <p className="text-xs font-mono text-slate-900 break-all">{depositWallet?.id || deposit.wallet_id}</p>
+                          <p className="text-slate-600">ID: <span className="font-mono text-slate-900">{depositWallet?.id || deposit.wallet_id}</span></p>
                         </div>
                         {depositWallet?.account_number && (
                           <div>
-                            <p className="text-xs text-slate-600">Account Number</p>
-                            <p className="text-xs font-mono text-slate-900">{depositWallet.account_number}</p>
+                            <p className="text-slate-600">Account: <span className="font-mono text-slate-900">{depositWallet.account_number}</span></p>
                           </div>
                         )}
                       </div>
                     </div>
 
                     {/* Timestamps */}
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
                       <div>
-                        <p className="text-xs text-slate-600 uppercase tracking-wide mb-2">Created At</p>
-                        <p className="text-sm font-semibold text-slate-900">{createdDate.toLocaleString()}</p>
+                        <p className="text-slate-600 font-semibold mb-1">Created At</p>
+                        <p className="text-slate-900">{createdDate.toLocaleString()}</p>
                       </div>
                       {completedDate && (
                         <div>
-                          <p className="text-xs text-slate-600 uppercase tracking-wide mb-2">Completed At</p>
-                          <p className="text-sm font-semibold text-slate-900">{completedDate.toLocaleString()}</p>
+                          <p className="text-slate-600 font-semibold mb-1">Completed At</p>
+                          <p className="text-slate-900">{completedDate.toLocaleString()}</p>
                         </div>
                       )}
                     </div>
@@ -1693,16 +1689,16 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
                     {/* Description */}
                     {deposit.description && (
                       <div>
-                        <p className="text-xs text-slate-600 uppercase tracking-wide mb-2">Description</p>
-                        <p className="text-sm text-slate-700 bg-slate-50 p-3 rounded border border-slate-200">{deposit.description}</p>
+                        <p className="text-xs text-slate-600 font-semibold mb-1">Description</p>
+                        <p className="text-xs text-slate-700 bg-slate-50 p-2 rounded border border-slate-200">{deposit.description}</p>
                       </div>
                     )}
                   </div>
 
-                  <div className="flex gap-3 mt-6">
+                  <div className="flex gap-2 mt-4">
                     <button
                       onClick={() => setShowDepositDetailsModal(false)}
-                      className="flex-1 px-4 py-3 bg-slate-200 text-slate-900 rounded-lg font-medium hover:bg-slate-300 transition"
+                      className="flex-1 px-3 py-2 bg-slate-800 text-white rounded text-sm font-medium hover:bg-slate-900 transition"
                     >
                       Close
                     </button>
@@ -1716,11 +1712,11 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
 
       {/* Crypto Deposit Instructions Modal */}
       {showCryptoAddressModal && selectedAddressMethod && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50" onClick={() => setShowCryptoAddressModal(false)}>
-          <div className="bg-white rounded-xl shadow-2xl max-w-3xl w-full p-8" onClick={(e) => e.stopPropagation()}>
-            <div className="flex items-center justify-between mb-6">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50 overflow-y-auto" onClick={() => setShowCryptoAddressModal(false)}>
+          <div className="bg-white rounded-lg shadow-lg max-w-2xl w-full p-4 sm:p-6 my-4" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between mb-4">
               <div>
-                <h3 className="text-2xl font-semibold text-slate-900">
+                <h3 className="text-lg font-semibold text-slate-900">
                   {selectedAddressMethod.name} Deposit Instructions
                 </h3>
                 {selectedAddressMethod.network && (
@@ -1735,15 +1731,15 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
               </button>
             </div>
 
-            <div className="space-y-6">
+            <div className="space-y-4">
               {/* Amount to Send Section */}
               {amount && selectedCurrency && getDepositMethodAmount() && (
-                <div className="p-6 bg-gradient-to-r from-blue-50 to-indigo-50 border-2 border-blue-200 rounded-lg">
-                  <h4 className="font-semibold text-slate-900 mb-4">💰 Amount to Send</h4>
-                  <div className="space-y-3">
-                    <div className="flex items-baseline justify-between gap-4 flex-wrap">
-                      <span className="text-slate-700">You need to send:</span>
-                      <span className="text-3xl font-bold text-blue-600 break-words">
+                <div className="p-4 bg-slate-50 border border-slate-300 rounded">
+                  <h4 className="font-semibold text-slate-900 mb-3 text-sm">Amount to Send</h4>
+                  <div className="space-y-2">
+                    <div className="flex items-baseline justify-between gap-2 flex-wrap">
+                      <span className="text-sm text-slate-700">You need to send:</span>
+                      <span className="text-2xl font-bold text-slate-900 break-words">
                         {getDepositMethodAmount()?.toLocaleString(undefined, {
                           minimumFractionDigits: isCryptoCurrency(selectedAddressMethod.cryptoSymbol) ? 2 : 2,
                           maximumFractionDigits: isCryptoCurrency(selectedAddressMethod.cryptoSymbol) ? 8 : 2
@@ -1751,9 +1747,9 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
                       </span>
                     </div>
                     {selectedCurrency.toUpperCase() !== selectedAddressMethod.cryptoSymbol?.toUpperCase() && (
-                      <div className="flex items-baseline justify-between pt-3 border-t border-blue-200 gap-4 flex-wrap">
-                        <span className="text-slate-600 text-sm">Original amount:</span>
-                        <span className="text-lg font-semibold text-slate-900 break-words">
+                      <div className="flex items-baseline justify-between pt-2 border-t border-slate-200 gap-2 flex-wrap">
+                        <span className="text-slate-600 text-xs">Original amount:</span>
+                        <span className="text-sm font-semibold text-slate-900 break-words">
                           {parseFloat(amount).toLocaleString(undefined, {
                             minimumFractionDigits: 2,
                             maximumFractionDigits: 8
@@ -1767,34 +1763,34 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
 
               {/* Instructions */}
               <div>
-                <h4 className="font-semibold text-slate-900 mb-4">Steps to Deposit</h4>
-                <ol className="space-y-3">
-                  <li className="flex gap-3">
-                    <span className="flex-shrink-0 w-6 h-6 rounded-full bg-blue-100 text-blue-700 text-sm font-semibold flex items-center justify-center">
+                <h4 className="font-semibold text-slate-900 mb-3 text-sm">Steps to Deposit</h4>
+                <ol className="space-y-2">
+                  <li className="flex gap-2 text-sm">
+                    <span className="flex-shrink-0 w-5 h-5 rounded-full bg-slate-200 text-slate-700 text-xs font-semibold flex items-center justify-center">
                       1
                     </span>
                     <span className="text-slate-700">Open your cryptocurrency wallet</span>
                   </li>
-                  <li className="flex gap-3">
-                    <span className="flex-shrink-0 w-6 h-6 rounded-full bg-blue-100 text-blue-700 text-sm font-semibold flex items-center justify-center">
+                  <li className="flex gap-2 text-sm">
+                    <span className="flex-shrink-0 w-5 h-5 rounded-full bg-slate-200 text-slate-700 text-xs font-semibold flex items-center justify-center">
                       2
                     </span>
                     <span className="text-slate-700">Click "Send" and enter the deposit address below</span>
                   </li>
-                  <li className="flex gap-3">
-                    <span className="flex-shrink-0 w-6 h-6 rounded-full bg-blue-100 text-blue-700 text-sm font-semibold flex items-center justify-center">
+                  <li className="flex gap-2 text-sm">
+                    <span className="flex-shrink-0 w-5 h-5 rounded-full bg-slate-200 text-slate-700 text-xs font-semibold flex items-center justify-center">
                       3
                     </span>
                     <span className="text-slate-700">Enter the amount you wish to deposit</span>
                   </li>
-                  <li className="flex gap-3">
-                    <span className="flex-shrink-0 w-6 h-6 rounded-full bg-blue-100 text-blue-700 text-sm font-semibold flex items-center justify-center">
+                  <li className="flex gap-2 text-sm">
+                    <span className="flex-shrink-0 w-5 h-5 rounded-full bg-slate-200 text-slate-700 text-xs font-semibold flex items-center justify-center">
                       4
                     </span>
                     <span className="text-slate-700">Review the transaction details and confirm</span>
                   </li>
-                  <li className="flex gap-3">
-                    <span className="flex-shrink-0 w-6 h-6 rounded-full bg-blue-100 text-blue-700 text-sm font-semibold flex items-center justify-center">
+                  <li className="flex gap-2 text-sm">
+                    <span className="flex-shrink-0 w-5 h-5 rounded-full bg-slate-200 text-slate-700 text-xs font-semibold flex items-center justify-center">
                       5
                     </span>
                     <span className="text-slate-700">Save the transaction hash for your records</span>
@@ -1804,11 +1800,11 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
 
               {/* Deposit Summary - What you receive */}
               {selectedWallet && calculateConvertedAmount() && selectedCurrency !== selectedWallet.currency_code && (
-                <div className="p-6 bg-emerald-50 border border-emerald-200 rounded-lg">
-                  <h4 className="font-semibold text-slate-900 mb-4">✓ What You Will Receive</h4>
-                  <div className="flex items-baseline justify-between gap-4 flex-wrap">
-                    <span className="text-slate-700">Deposited to your {selectedWallet.currency_code} wallet:</span>
-                    <span className="text-3xl font-bold text-emerald-600 break-words">
+                <div className="p-4 bg-slate-50 border border-slate-300 rounded">
+                  <h4 className="font-semibold text-slate-900 mb-3 text-sm">What You Will Receive</h4>
+                  <div className="flex items-baseline justify-between gap-2 flex-wrap">
+                    <span className="text-sm text-slate-700">Deposited to your {selectedWallet.currency_code} wallet:</span>
+                    <span className="text-xl font-bold text-slate-900 break-words">
                       {calculateConvertedAmount()?.toLocaleString(undefined, {
                         minimumFractionDigits: 2,
                         maximumFractionDigits: 8
@@ -1820,30 +1816,30 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
 
               {/* Deposit Address */}
               {selectedAddressMethod.address && (
-                <div className="p-6 bg-purple-50 border border-purple-200 rounded-lg">
-                  <p className="text-sm font-semibold text-slate-900 mb-4">Deposit Address</p>
+                <div className="p-4 bg-slate-50 border border-slate-300 rounded">
+                  <p className="text-sm font-semibold text-slate-900 mb-3">Deposit Address</p>
 
-                  <div className="grid grid-cols-2 gap-4 mb-4">
+                  <div className="grid grid-cols-2 gap-3 mb-3">
                     <div>
-                      <p className="text-xs text-slate-600">Currency</p>
-                      <p className="font-semibold text-slate-900">{selectedAddressMethod.cryptoSymbol}</p>
+                      <p className="text-xs text-slate-600 font-semibold">Currency</p>
+                      <p className="text-sm font-semibold text-slate-900">{selectedAddressMethod.cryptoSymbol}</p>
                     </div>
                     {selectedAddressMethod.network && (
                       <div>
-                        <p className="text-xs text-slate-600">Network</p>
-                        <p className="font-semibold text-slate-900">{selectedAddressMethod.network}</p>
+                        <p className="text-xs text-slate-600 font-semibold">Network</p>
+                        <p className="text-sm font-semibold text-slate-900">{selectedAddressMethod.network}</p>
                       </div>
                     )}
                   </div>
 
-                  <div className="mb-4">
-                    <p className="text-xs font-medium text-slate-600 mb-2">Copy the address below:</p>
-                    <p className="font-mono text-xs bg-white p-3 rounded border border-slate-300 break-all text-slate-800 mb-2">
+                  <div className="mb-3">
+                    <p className="text-xs font-semibold text-slate-600 mb-2">Copy the address below:</p>
+                    <p className="font-mono text-xs bg-white p-2 rounded border border-slate-300 break-all text-slate-800 mb-2">
                       {selectedAddressMethod.address}
                     </p>
                     <button
                       onClick={() => copyToClipboard(selectedAddressMethod.address)}
-                      className="text-sm text-purple-600 hover:text-purple-700 font-medium"
+                      className="text-xs text-slate-700 hover:text-slate-900 font-semibold"
                     >
                       Copy Address
                     </button>
@@ -1853,9 +1849,9 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
               )}
 
               {/* Important Notes */}
-              <div className="p-4 bg-slate-50 border border-slate-300 rounded-lg">
-                <p className="font-semibold text-slate-900 mb-2">Important:</p>
-                <ul className="text-sm text-yellow-800 space-y-1">
+              <div className="p-3 bg-slate-50 border border-slate-300 rounded">
+                <p className="font-semibold text-slate-900 mb-2 text-sm">Important:</p>
+                <ul className="text-xs text-slate-700 space-y-1">
                   <li>• Only send {selectedAddressMethod.cryptoName} ({selectedAddressMethod.cryptoSymbol}) to this address</li>
                   {selectedAddressMethod.network && <li>• Network: {selectedAddressMethod.network}</li>}
                   <li>• Do not send other tokens or cryptocurrencies</li>
@@ -1866,10 +1862,10 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
               </div>
 
               {/* Action Buttons */}
-              <div className="flex gap-3">
+              <div className="flex gap-2">
                 <button
                   onClick={() => setShowCryptoAddressModal(false)}
-                  className="flex-1 px-6 py-3 border border-slate-300 rounded-lg text-slate-900 font-medium hover:bg-slate-50 transition"
+                  className="flex-1 px-4 py-2 border border-slate-300 rounded text-slate-900 text-sm font-medium hover:bg-slate-50 transition"
                 >
                   Close
                 </button>
@@ -1883,7 +1879,7 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
                       setError('Invalid method selected. Please try again.')
                     }
                   }}
-                  className="flex-1 px-6 py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition"
+                  className="flex-1 px-4 py-2 bg-slate-800 text-white rounded text-sm font-medium hover:bg-slate-900 transition"
                 >
                   Proceed with Deposit
                 </button>
@@ -1896,26 +1892,24 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
       {/* Deposit Success Modal */}
       {showSuccessModal && lastSuccessDeposit && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50 overflow-y-auto" onClick={() => setShowSuccessModal(false)}>
-          <div className="bg-white rounded-xl shadow-2xl max-w-md w-full p-4 sm:p-6 md:p-8 my-8" onClick={(e) => e.stopPropagation()}>
+          <div className="bg-white rounded-lg shadow-lg max-w-md w-full p-4 my-4" onClick={(e) => e.stopPropagation()}>
             {/* Celebration Animation */}
-            <div className="text-center mb-6">
-              <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-emerald-50 to-teal-50 rounded-full mb-4">
-                <span className="text-5xl animate-bounce">✓</span>
+            <div className="text-center mb-4">
+              <div className="inline-flex items-center justify-center w-16 h-16 bg-slate-100 rounded-full mb-3">
+                <span className="text-3xl animate-bounce">✓</span>
               </div>
-              <h2 className="text-2xl font-bold text-slate-900 mb-2">Deposit Confirmed!</h2>
-              <p className="text-slate-600">Your deposit has been initiated successfully</p>
+              <h2 className="text-lg font-bold text-slate-900 mb-1">Deposit Confirmed!</h2>
+              <p className="text-xs text-slate-600">Your deposit has been initiated successfully</p>
             </div>
 
             {/* Deposit Summary - THREE-CURRENCY MODEL */}
-            <div className="bg-gradient-to-br from-blue-50 via-indigo-50 to-cyan-50 rounded-lg p-6 mb-6 border-2 border-indigo-100">
-              <h3 className="font-semibold text-slate-900 mb-4 flex items-center gap-2">
-                <span>🔄</span> Deposit Details
-              </h3>
-              <div className="space-y-3">
+            <div className="bg-slate-50 rounded p-3 mb-4 border border-slate-300">
+              <h3 className="font-semibold text-slate-900 mb-3 text-sm">Deposit Details</h3>
+              <div className="space-y-2">
                 {/* INPUT AMOUNT */}
-                <div className="bg-white/70 rounded p-3 border-l-4 border-blue-500">
-                  <p className="text-xs text-slate-600 uppercase tracking-wide mb-1">1️⃣ You Specified</p>
-                  <p className="text-xl font-bold text-blue-600">
+                <div className="bg-white rounded p-2 border-l-4 border-slate-400">
+                  <p className="text-xs text-slate-600 font-semibold mb-1">1. You Specified</p>
+                  <p className="text-sm font-bold text-slate-900">
                     {(lastSuccessDeposit.input_amount || lastSuccessDeposit.amount).toLocaleString(undefined, {
                       minimumFractionDigits: 2,
                       maximumFractionDigits: 8
@@ -1925,9 +1919,9 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
 
                 {/* PAYMENT AMOUNT (if different from input) */}
                 {lastSuccessDeposit.payment_amount && lastSuccessDeposit.payment_method_currency && (
-                  <div className="bg-white/70 rounded p-3 border-l-4 border-purple-500">
-                    <p className="text-xs text-slate-600 uppercase tracking-wide mb-1">2️⃣ Send via {lastSuccessDeposit.deposit_method?.toUpperCase() || lastSuccessDeposit.payment_method_currency}</p>
-                    <p className="text-xl font-bold text-purple-600">
+                  <div className="bg-white rounded p-2 border-l-4 border-slate-400">
+                    <p className="text-xs text-slate-600 font-semibold mb-1">2. Send via {lastSuccessDeposit.deposit_method?.toUpperCase() || lastSuccessDeposit.payment_method_currency}</p>
+                    <p className="text-sm font-bold text-slate-900">
                       {lastSuccessDeposit.payment_amount.toLocaleString(undefined, {
                         minimumFractionDigits: 2,
                         maximumFractionDigits: 8
@@ -1938,9 +1932,9 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
 
                 {/* WALLET CREDIT */}
                 {lastSuccessDeposit.received_amount && (
-                  <div className="bg-white/70 rounded p-3 border-l-4 border-emerald-500">
-                    <p className="text-xs text-slate-600 uppercase tracking-wide mb-1">3️⃣ You'll Receive</p>
-                    <p className="text-xl font-bold text-emerald-600">
+                  <div className="bg-white rounded p-2 border-l-4 border-slate-400">
+                    <p className="text-xs text-slate-600 font-semibold mb-1">3. You'll Receive</p>
+                    <p className="text-sm font-bold text-slate-900">
                       {lastSuccessDeposit.received_amount.toLocaleString(undefined, {
                         minimumFractionDigits: 2,
                         maximumFractionDigits: 8
@@ -1951,9 +1945,9 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
 
                 {/* FALLBACK for old deposits without received_amount */}
                 {lastSuccessDeposit.converted_amount && !lastSuccessDeposit.received_amount && (
-                  <div className="bg-white/70 rounded p-3 border-l-4 border-emerald-500">
-                    <p className="text-xs text-slate-600 uppercase tracking-wide mb-1">You'll Receive</p>
-                    <p className="text-xl font-bold text-emerald-600">
+                  <div className="bg-white rounded p-2 border-l-4 border-slate-400">
+                    <p className="text-xs text-slate-600 font-semibold mb-1">You'll Receive</p>
+                    <p className="text-sm font-bold text-slate-900">
                       {lastSuccessDeposit.converted_amount.toLocaleString(undefined, {
                         minimumFractionDigits: 2,
                         maximumFractionDigits: 8
@@ -1966,27 +1960,27 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
 
             {/* Reference Number */}
             {lastSuccessDeposit.reference_number && (
-              <div className="bg-slate-50 rounded-lg p-4 mb-6 border border-slate-200">
-                <p className="text-xs text-slate-600 uppercase tracking-wide mb-2">Reference Number</p>
-                <p className="text-sm font-mono font-semibold text-slate-900 break-all">{lastSuccessDeposit.reference_number}</p>
-                <p className="text-xs text-slate-600 mt-2">Save this for your records</p>
+              <div className="bg-slate-50 rounded p-3 mb-3 border border-slate-300">
+                <p className="text-xs text-slate-600 font-semibold mb-1">Reference Number</p>
+                <p className="text-xs font-mono font-semibold text-slate-900 break-all">{lastSuccessDeposit.reference_number}</p>
+                <p className="text-xs text-slate-600 mt-1">Save this for your records</p>
               </div>
             )}
 
             {/* Next Steps */}
-            <div className="bg-amber-50 rounded-lg p-4 mb-6 border border-amber-200">
-              <h4 className="font-semibold text-slate-900 mb-3">📝 What's Next?</h4>
-              <ul className="space-y-2 text-sm text-slate-700">
+            <div className="bg-slate-50 rounded p-3 mb-4 border border-slate-300">
+              <h4 className="font-semibold text-slate-900 mb-2 text-sm">What's Next</h4>
+              <ul className="space-y-1 text-xs text-slate-700">
                 <li className="flex gap-2">
-                  <span className="text-amber-600 font-semibold">•</span>
+                  <span className="font-semibold">•</span>
                   <span>Your deposit is being processed</span>
                 </li>
                 <li className="flex gap-2">
-                  <span className="text-amber-600 font-semibold">•</span>
+                  <span className="font-semibold">•</span>
                   <span>Status will update to Approved shortly</span>
                 </li>
                 <li className="flex gap-2">
-                  <span className="text-amber-600 font-semibold">•</span>
+                  <span className="font-semibold">•</span>
                   <span>Check the Recent Deposits table for updates</span>
                 </li>
               </ul>
@@ -1998,6 +1992,7 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
                 setShowSuccessModal(false)
                 handleStartNewDeposit()
               }}
+              className="w-full px-4 py-2 bg-slate-800 text-white rounded text-sm font-medium hover:bg-slate-900 transition"
               className="w-full px-6 py-3 bg-emerald-600 text-white rounded-lg font-semibold hover:bg-emerald-700 transition"
             >
               Start New Deposit
