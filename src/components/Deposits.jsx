@@ -1524,16 +1524,16 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
                             '—'
                           )}
                         </td>
-                        <td className="py-3 px-4 text-slate-700 text-xs">
+                        <td className="hidden md:table-cell py-2 sm:py-3 px-2 sm:px-3 text-slate-700 text-xs">
                           {exchangeRate ? `1 ${originalCurrency.toUpperCase()} = ${formatExchangeRate(exchangeRate)} ${walletCurrency.toUpperCase()}` : '—'}
                         </td>
-                        <td className="py-3 px-4 font-semibold text-emerald-600">
+                        <td className="py-2 sm:py-3 px-2 sm:px-3 font-semibold text-emerald-600 text-xs sm:text-sm">
                           {convertedAmount ? `${formatAmount(convertedAmount, walletCurrency)} ${walletCurrency.toUpperCase()}` : '—'}
                         </td>
-                        <td className="py-3 px-4 text-xs text-slate-600">
-                          {new Date(deposit.created_at).toLocaleDateString()} {new Date(deposit.created_at).toLocaleTimeString()}
+                        <td className="py-2 sm:py-3 px-2 sm:px-3 text-xs text-slate-600 whitespace-nowrap">
+                          {new Date(deposit.created_at).toLocaleDateString()}
                         </td>
-                        <td className="py-3 px-4">
+                        <td className="py-2 sm:py-3 px-2 sm:px-3">
                           <span className={`px-3 py-1 rounded-full text-xs font-medium ${
                             deposit.status === 'completed' ? 'bg-emerald-100 text-emerald-700' :
                             deposit.status === 'pending' ? 'bg-amber-100 text-amber-700' :
