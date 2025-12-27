@@ -37,22 +37,23 @@ export default function TransactionHistory({ userId }) {
   const [selectedTransaction, setSelectedTransaction] = useState(null)
 
   const getCurrencySymbol = (currencyCode) => {
+    return currencyCode?.toUpperCase() || 'USD'
+  }
+
+  const getCurrencyDisplayName = (currencyCode) => {
     const code = currencyCode?.toUpperCase() || 'USD'
-    if (CRYPTO_CURRENCIES.includes(code)) {
-      return '' // No symbol for crypto, just show the code
+    const currencyNames = {
+      'PHP': 'Philippine Peso',
+      'USD': 'US Dollar',
+      'EUR': 'Euro',
+      'GBP': 'British Pound',
+      'JPY': 'Japanese Yen',
+      'BTC': 'Bitcoin',
+      'ETH': 'Ethereum',
+      'USDC': 'USD Coin',
+      'USDT': 'Tether'
     }
-    switch (code) {
-      case 'PHP':
-        return '₱'
-      case 'EUR':
-        return '€'
-      case 'GBP':
-        return '£'
-      case 'JPY':
-        return '¥'
-      default:
-        return '$'
-    }
+    return currencyNames[code] || code
   }
 
   const isCryptoCurrency = (currencyCode) => {
