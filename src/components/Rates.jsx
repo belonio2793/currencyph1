@@ -441,15 +441,13 @@ export default function Rates() {
                         </p>
                       )}
                     </div>
-                    {!loading && (
-                      <button
-                        onClick={loadData}
-                        disabled={loading}
-                        className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition whitespace-nowrap"
-                      >
-                        {loading ? 'Refreshing...' : 'Refresh'}
-                      </button>
-                    )}
+                    <button
+                      onClick={loadData}
+                      disabled={loading}
+                      className="px-6 py-2 bg-blue-600 text-white text-sm font-semibold rounded-lg hover:bg-blue-700 active:bg-blue-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors whitespace-nowrap shadow-sm hover:shadow-md"
+                    >
+                      {loading ? 'Refreshing...' : '↻ Refresh'}
+                    </button>
                   </div>
                 </div>
 
