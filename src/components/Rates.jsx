@@ -384,7 +384,7 @@ export default function Rates() {
                       setSelectedFrom(selectedTo)
                       setSelectedTo(temp)
                     }}
-                    className="w-full px-4 py-3 bg-gradient-to-r from-slate-100 to-slate-50 hover:from-slate-200 hover:to-slate-100 text-slate-700 font-semibold rounded-lg transition-all shadow-sm hover:shadow-md active:shadow-inner flex items-center justify-center gap-2"
+                    className="w-full px-4 py-3 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-semibold rounded-lg transition-all shadow-md hover:shadow-lg active:shadow-inner flex items-center justify-center gap-2"
                     title="Swap currencies"
                   >
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
