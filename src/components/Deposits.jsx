@@ -179,21 +179,15 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
     loadInitialData()
   }, [userId])
 
-  // Set up rate polling (every 5 minutes) and realtime subscriptions
+  // Set up rate polling (every 5 minutes) and realtime subscriptions - matching /rates page approach
   useEffect(() => {
-    // Start polling rates every 5 minutes (like /rates page does)
-    const interval = setInterval(async () => {
+    // Poll rates every 5 minutes (exactly like /rates page does)
+    const interval = setInterval(() => {
       console.log('[Deposits] Polling rates every 5 minutes')
-      await checkAndRefreshRatesIfNeededForDeposits()
-      await fetchExchangeRates()
+      fetchExchangeRates()
     }, 5 * 60 * 1000)
 
-    // Check rates on initial mount
-    ;(async () => {
-      await checkAndRefreshRatesIfNeededForDeposits()
-    })()
-
-    // Subscribe to realtime rate updates
+    // Subscribe to realtime rate updates on pairs table
     const channel = supabase
       .channel('deposits-rates-updates')
       .on(
@@ -203,8 +197,8 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
           schema: 'public',
           table: 'pairs'
         },
-        async (payload) => {
-          console.log('[Deposits] Rate update detected via realtime:', payload.eventType)
+        () => {
+          console.log('[Deposits] Rate update detected via realtime')
           // Reload rates with a small debounce to batch multiple updates
           setTimeout(() => {
             fetchExchangeRates()
