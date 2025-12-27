@@ -320,7 +320,7 @@ export default function TransactionHistory({ userId }) {
 
                     <div className="flex-grow min-w-0">
                       <p className="font-medium text-slate-900 text-sm sm:text-base">{getTransactionLabel(transactionType)}</p>
-                      <p className="text-xs sm:text-sm text-slate-500 mt-1 break-words">{transaction.description || transaction.note || '—'}</p>
+                      <p className="text-xs sm:text-sm text-slate-500 mt-1 break-words">{capitalizeCurrencyCodes(transaction.description || transaction.note || '—')}</p>
                       <p className="text-xs text-slate-400 mt-1">
                         {new Date(transaction.created_at).toLocaleDateString()} {new Date(transaction.created_at).toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'})}
                       </p>
