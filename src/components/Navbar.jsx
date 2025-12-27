@@ -34,11 +34,9 @@ const currencyLabels = {
   'AED': 'UAE Dirham'
 }
 
-function NavbarComponent({ activeTab, onTabChange, globalCurrency, setGlobalCurrency, globalCryptocurrency, setGlobalCryptocurrency, userEmail, userId, totalBalancePHP, totalBalanceConverted, totalDebtConverted, totalNet, totalCryptoBalancePHP = 0, onShowAuth, onSignOut }) {
+function NavbarComponent({ activeTab, onTabChange, globalCurrency, setGlobalCurrency, globalCryptocurrency, setGlobalCryptocurrency, userEmail, userId, totalBalancePHP, totalBalanceConverted, totalDebtConverted, totalNet, totalCryptoBalancePHP = 0, fiatHoldingsConverted = 0, cryptoHoldingsConverted = 0, onShowAuth, onSignOut }) {
   const { isMobile, isTablet } = useDevice()
   const [showCurrencyModal, setShowCurrencyModal] = useState(false)
-  const [consolidatedHoldingsInCrypto, setConsolidatedHoldingsInCrypto] = useState(null)
-  const [loadingConsolidated, setLoadingConsolidated] = useState(false)
   const [totalCryptoInSelectedCrypto, setTotalCryptoInSelectedCrypto] = useState(0)
   const [loadingCryptoConversion, setLoadingCryptoConversion] = useState(false)
 
