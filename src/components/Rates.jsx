@@ -131,21 +131,14 @@ export default function Rates() {
       const target = targetCurr.toUpperCase()
       const rates = {}
 
-      // Get all pairs where to_currency is the target
+      // PHASE 1: Try public.pairs as primary source
       const { data: pairsData, error: pairsError } = await supabase
         .from('pairs')
         .select('from_currency, to_currency, rate, updated_at')
         .eq('to_currency', target)
         .gt('rate', 0)
 
-      if (pairsError) {
-        console.warn(`Warning fetching rates for ${target}:`, pairsError.message)
-        setExchangeRates({})
-        return
-      }
-
-      // Build rates map from direct pairs
-      if (pairsData) {
+      if (!pairsError && pairsData) {
         pairsData.forEach(pair => {
           const fromCode = pair.from_currency.toUpperCase()
           if (isFinite(Number(pair.rate)) && Number(pair.rate) > 0) {
@@ -154,24 +147,117 @@ export default function Rates() {
         })
       }
 
-      // For currencies not found in direct pairs, try reverse pairs
-      const missingCodes = currencies
+      // Try reverse pairs from public.pairs
+      const initialMissing = currencies
         .map(c => c.code)
         .filter(code => !rates[code] && code !== target)
 
-      if (missingCodes.length > 0) {
+      if (initialMissing.length > 0) {
         const { data: reversePairs, error: reverseError } = await supabase
           .from('pairs')
           .select('from_currency, to_currency, rate')
           .eq('from_currency', target)
-          .in('to_currency', missingCodes)
+          .in('to_currency', initialMissing)
           .gt('rate', 0)
 
         if (!reverseError && reversePairs) {
           reversePairs.forEach(pair => {
             const toCode = pair.to_currency.toUpperCase()
             if (isFinite(Number(pair.rate)) && Number(pair.rate) > 0) {
-              // Use mathematical inversion: if target→other = r, then other→target = 1/r
+              rates[toCode] = 1 / Number(pair.rate)
+            }
+          })
+        }
+      }
+
+      // PHASE 2: Fill remaining gaps with currency_rates table (fiat currencies)
+      const stillMissing = currencies
+        .map(c => c.code)
+        .filter(code => !rates[code] && code !== target)
+
+      if (stillMissing.length > 0) {
+        const { data: fiatRates, error: fiatError } = await supabase
+          .from('currency_rates')
+          .select('from_currency, to_currency, rate')
+          .in('from_currency', stillMissing)
+          .eq('to_currency', target)
+          .gt('rate', 0)
+
+        if (!fiatError && fiatRates) {
+          fiatRates.forEach(pair => {
+            const fromCode = pair.from_currency.toUpperCase()
+            if (isFinite(Number(pair.rate)) && Number(pair.rate) > 0) {
+              rates[fromCode] = Number(pair.rate)
+            }
+          })
+        }
+      }
+
+      // Check again for missing after fiat lookup
+      const afterFiat = currencies
+        .map(c => c.code)
+        .filter(code => !rates[code] && code !== target)
+
+      if (afterFiat.length > 0) {
+        // Try reverse lookup from target currency in currency_rates
+        const { data: reverseFiat, error: reverseFiatError } = await supabase
+          .from('currency_rates')
+          .select('from_currency, to_currency, rate')
+          .eq('from_currency', target)
+          .in('to_currency', afterFiat)
+          .gt('rate', 0)
+
+        if (!reverseFiatError && reverseFiat) {
+          reverseFiat.forEach(pair => {
+            const toCode = pair.to_currency.toUpperCase()
+            if (isFinite(Number(pair.rate)) && Number(pair.rate) > 0) {
+              rates[toCode] = 1 / Number(pair.rate)
+            }
+          })
+        }
+      }
+
+      // PHASE 3: Fill remaining gaps with cryptocurrency_rates table (crypto)
+      const stillMissingCrypto = currencies
+        .map(c => c.code)
+        .filter(code => !rates[code] && code !== target)
+
+      if (stillMissingCrypto.length > 0) {
+        const { data: cryptoRates, error: cryptoError } = await supabase
+          .from('cryptocurrency_rates')
+          .select('from_currency, to_currency, rate')
+          .in('from_currency', stillMissingCrypto)
+          .eq('to_currency', target)
+          .gt('rate', 0)
+
+        if (!cryptoError && cryptoRates) {
+          cryptoRates.forEach(pair => {
+            const fromCode = pair.from_currency.toUpperCase()
+            if (isFinite(Number(pair.rate)) && Number(pair.rate) > 0) {
+              rates[fromCode] = Number(pair.rate)
+            }
+          })
+        }
+      }
+
+      // Check again for missing after crypto lookup
+      const afterCrypto = currencies
+        .map(c => c.code)
+        .filter(code => !rates[code] && code !== target)
+
+      if (afterCrypto.length > 0) {
+        // Try reverse lookup from target currency in cryptocurrency_rates
+        const { data: reverseCrypto, error: reverseCryptoError } = await supabase
+          .from('cryptocurrency_rates')
+          .select('from_currency, to_currency, rate')
+          .eq('from_currency', target)
+          .in('to_currency', afterCrypto)
+          .gt('rate', 0)
+
+        if (!reverseCryptoError && reverseCrypto) {
+          reverseCrypto.forEach(pair => {
+            const toCode = pair.to_currency.toUpperCase()
+            if (isFinite(Number(pair.rate)) && Number(pair.rate) > 0) {
               rates[toCode] = 1 / Number(pair.rate)
             }
           })
@@ -182,7 +268,8 @@ export default function Rates() {
       rates[target] = 1.0
 
       setExchangeRates(rates)
-      console.log(`Loaded ${Object.keys(rates).length} exchange rates to ${target}`)
+      const coveredCount = Object.keys(rates).length
+      console.log(`Loaded ${coveredCount}/${currencies.length} exchange rates to ${target}`)
     } catch (err) {
       console.error('Error loading exchange rates:', err)
       setExchangeRates({})
