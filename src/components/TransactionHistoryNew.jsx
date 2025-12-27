@@ -431,36 +431,33 @@ export default function TransactionHistory({ userId }) {
 
               {/* Amount Details - Show all relevant currencies */}
               <div className="border-t border-slate-200 pt-4 space-y-4">
-                <h4 className="font-medium text-slate-900">Amount Details</h4>
+                <h4 className="font-semibold text-slate-900">Transaction Amount Details</h4>
 
                 {/* Primary Amount in Wallet Currency */}
-                <div className="bg-blue-50 rounded-lg p-4">
-                  <p className="text-xs font-medium text-slate-500 uppercase tracking-wide mb-1">
-                    Amount ({selectedTransaction.currency_code?.toUpperCase() || 'Primary Currency'})
-                  </p>
-                  <p className="text-2xl font-light text-slate-900">
-                    {getCurrencySymbol(selectedTransaction.currency_code)}
-                    {formatFullPrecision(selectedTransaction.amount)} {selectedTransaction.currency_code?.toUpperCase()}
+                <div className="bg-blue-50 rounded-lg p-4 border border-blue-200">
+                  <p className="text-xs font-medium text-slate-600 uppercase tracking-wide mb-2">Final Amount in Your {getCurrencySymbol(selectedTransaction.currency_code)} Wallet</p>
+                  <p className="text-3xl font-semibold text-slate-900">
+                    {formatFullPrecision(selectedTransaction.amount)} {getCurrencySymbol(selectedTransaction.currency_code)}
                   </p>
                 </div>
 
                 {/* Original Amount - If converted from another currency */}
                 {selectedTransaction.original_amount && selectedTransaction.original_currency && selectedTransaction.original_currency !== selectedTransaction.currency_code && (
                   <div className="bg-slate-50 rounded-lg p-4 border border-slate-200">
-                    <p className="text-xs font-medium text-slate-500 uppercase tracking-wide mb-1">
-                      Original Amount ({selectedTransaction.original_currency?.toUpperCase()})
-                    </p>
-                    <p className="text-xl font-light text-slate-900 mb-2">
-                      {getCurrencySymbol(selectedTransaction.original_currency)}
-                      {formatFullPrecision(selectedTransaction.original_amount)} {selectedTransaction.original_currency?.toUpperCase()}
+                    <p className="text-xs font-medium text-slate-600 uppercase tracking-wide mb-2">Amount You Sent</p>
+                    <p className="text-2xl font-semibold text-slate-900 mb-3">
+                      {formatFullPrecision(selectedTransaction.original_amount)} {getCurrencySymbol(selectedTransaction.original_currency)}
                     </p>
                     {selectedTransaction.exchange_rate && (
-                      <div className="bg-white rounded p-2 mt-2">
-                        <p className="text-sm text-slate-600">
-                          <span className="font-medium">Exchange Rate:</span> 1 {selectedTransaction.original_currency?.toUpperCase()} = {formatFullPrecision(selectedTransaction.exchange_rate)} {selectedTransaction.currency_code?.toUpperCase()}
+                      <div className="bg-white rounded-md p-3 mt-2 border border-slate-100">
+                        <p className="text-sm text-slate-700 mb-1">
+                          <span className="font-medium">Exchange Rate Applied:</span>
+                        </p>
+                        <p className="text-base font-semibold text-slate-900">
+                          1 {getCurrencySymbol(selectedTransaction.original_currency)} = {formatFullPrecision(selectedTransaction.exchange_rate)} {getCurrencySymbol(selectedTransaction.currency_code)}
                         </p>
                         {selectedTransaction.rate_source && (
-                          <p className="text-xs text-slate-500 mt-1">Source: {selectedTransaction.rate_source}</p>
+                          <p className="text-xs text-slate-500 mt-2">Rate source: {selectedTransaction.rate_source}</p>
                         )}
                       </div>
                     )}
@@ -470,12 +467,9 @@ export default function TransactionHistory({ userId }) {
                 {/* Received Amount - If different from primary */}
                 {selectedTransaction.received_amount && selectedTransaction.received_currency && selectedTransaction.received_currency !== selectedTransaction.currency_code && (
                   <div className="bg-emerald-50 rounded-lg p-4 border border-emerald-200">
-                    <p className="text-xs font-medium text-slate-500 uppercase tracking-wide mb-1">
-                      Received Amount ({selectedTransaction.received_currency?.toUpperCase()})
-                    </p>
-                    <p className="text-xl font-light text-slate-900">
-                      {getCurrencySymbol(selectedTransaction.received_currency)}
-                      {formatFullPrecision(selectedTransaction.received_amount)} {selectedTransaction.received_currency?.toUpperCase()}
+                    <p className="text-xs font-medium text-slate-600 uppercase tracking-wide mb-2">Amount Received In {getCurrencySymbol(selectedTransaction.received_currency)}</p>
+                    <p className="text-2xl font-semibold text-emerald-900">
+                      {formatFullPrecision(selectedTransaction.received_amount)} {getCurrencySymbol(selectedTransaction.received_currency)}
                     </p>
                   </div>
                 )}
@@ -483,12 +477,9 @@ export default function TransactionHistory({ userId }) {
                 {/* Net Received Amount - Final amount after fees */}
                 {selectedTransaction.net_received_amount && selectedTransaction.net_received_amount !== selectedTransaction.amount && (
                   <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-4">
-                    <p className="text-xs font-medium text-slate-500 uppercase tracking-wide mb-1">
-                      Net Received Amount ({selectedTransaction.currency_code?.toUpperCase()})
-                    </p>
-                    <p className="text-xl font-light text-emerald-700 font-medium">
-                      {getCurrencySymbol(selectedTransaction.currency_code)}
-                      {formatFullPrecision(selectedTransaction.net_received_amount)} {selectedTransaction.currency_code?.toUpperCase()}
+                    <p className="text-xs font-medium text-slate-600 uppercase tracking-wide mb-2">Final Amount After Fees</p>
+                    <p className="text-2xl font-semibold text-emerald-900">
+                      {formatFullPrecision(selectedTransaction.net_received_amount)} {getCurrencySymbol(selectedTransaction.currency_code)}
                     </p>
                   </div>
                 )}
@@ -496,10 +487,9 @@ export default function TransactionHistory({ userId }) {
                 {/* Conversion Fee - in its own currency */}
                 {selectedTransaction.conversion_fee && selectedTransaction.conversion_fee > 0 && (
                   <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
-                    <p className="text-xs font-medium text-amber-600 uppercase tracking-wide mb-1">Conversion Fee</p>
-                    <p className="text-lg font-light text-amber-900">
-                      {getCurrencySymbol(selectedTransaction.conversion_fee_currency || selectedTransaction.currency_code)}
-                      {formatFullPrecision(selectedTransaction.conversion_fee)} {selectedTransaction.conversion_fee_currency?.toUpperCase() || selectedTransaction.currency_code?.toUpperCase()}
+                    <p className="text-xs font-medium text-amber-700 uppercase tracking-wide mb-2">Conversion Fee Charged</p>
+                    <p className="text-xl font-semibold text-amber-900">
+                      {formatFullPrecision(selectedTransaction.conversion_fee)} {getCurrencySymbol(selectedTransaction.conversion_fee_currency || selectedTransaction.currency_code)}
                     </p>
                   </div>
                 )}
@@ -507,11 +497,11 @@ export default function TransactionHistory({ userId }) {
                 {/* Crypto to USD Value - only for crypto transactions */}
                 {isCryptoCurrency(selectedTransaction.currency_code) && getCryptoInUSD(selectedTransaction.amount, selectedTransaction.currency_code) && (
                   <div className="bg-slate-50 rounded-lg p-4">
-                    <p className="text-xs font-medium text-slate-500 uppercase tracking-wide mb-1">USD Value Reference</p>
-                    <p className="text-xl font-light text-slate-900">
-                      ${formatFullPrecision(getCryptoInUSD(selectedTransaction.amount, selectedTransaction.currency_code).toFixed(2))} USD
+                    <p className="text-xs font-medium text-slate-600 uppercase tracking-wide mb-2">USD Reference Value (For Information)</p>
+                    <p className="text-xl font-semibold text-slate-900">
+                      {formatFullPrecision(getCryptoInUSD(selectedTransaction.amount, selectedTransaction.currency_code).toFixed(2))} USD
                     </p>
-                    <p className="text-xs text-slate-500 mt-1">For reference only, actual transaction was in {selectedTransaction.currency_code?.toUpperCase()}</p>
+                    <p className="text-xs text-slate-500 mt-2">This is the equivalent US Dollar value at the time of the transaction. Your actual transaction was completed in {getCurrencySymbol(selectedTransaction.currency_code)}.</p>
                   </div>
                 )}
               </div>
