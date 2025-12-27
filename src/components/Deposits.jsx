@@ -1228,10 +1228,10 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
             ) : (
               <div className="mb-8 p-6 bg-slate-50 border border-slate-300 rounded-lg">
                 <h3 className="font-semibold text-slate-900 mb-4">Exchange Rate Summary</h3>
-                <div className="space-y-3">
+                <div className="space-y-4">
                   <div className="flex justify-between items-center gap-4 flex-wrap">
-                    <span className="text-slate-700">You Send:</span>
-                    <span className="font-semibold text-slate-900 break-words">{formatNumber(parseFloat(amount) || 0, selectedCurrency)} {selectedCurrency}</span>
+                    <span className="text-base font-semibold text-slate-700">You Send:</span>
+                    <span className="text-2xl font-bold text-slate-900 break-words">{formatNumber(parseFloat(amount) || 0, selectedCurrency)} {selectedCurrency}</span>
                   </div>
                   {selectedCurrency !== selectedWalletData.currency_code && (
                     <div className="flex justify-between items-center text-sm text-slate-600 gap-4 flex-wrap">
@@ -1246,9 +1246,9 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
                     </div>
                   )}
                   {calculateConvertedAmount() && selectedCurrency !== selectedWalletData.currency_code && (
-                    <div className="flex justify-between items-center pt-3 border-t border-blue-200 gap-4 flex-wrap">
-                      <span className="text-slate-900 font-medium">You Receive:</span>
-                      <span className="text-lg font-bold text-slate-900 break-words">{formatNumber(calculateConvertedAmount(), selectedWalletData.currency_code)} {selectedWalletData.currency_code}</span>
+                    <div className="flex justify-between items-center pt-4 border-t border-blue-200 gap-4 flex-wrap">
+                      <span className="text-base font-semibold text-slate-900">You Receive:</span>
+                      <span className="text-2xl font-bold text-slate-900 break-words">{formatNumber(calculateConvertedAmount(), selectedWalletData.currency_code)} {selectedWalletData.currency_code}</span>
                     </div>
                   )}
                 </div>
@@ -1889,27 +1889,33 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
         </div>
       )}
 
-      {/* Deposit Success Modal */}
+      {/* Deposit Success Modal - Enhanced */}
       {showSuccessModal && lastSuccessDeposit && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50 overflow-y-auto" onClick={() => setShowSuccessModal(false)}>
-          <div className="bg-white rounded-lg shadow-lg max-w-md w-full p-4 my-4" onClick={(e) => e.stopPropagation()}>
-            {/* Celebration Animation */}
-            <div className="text-center mb-4">
-              <div className="inline-flex items-center justify-center w-16 h-16 bg-slate-100 rounded-full mb-3">
-                <span className="text-3xl animate-bounce">✓</span>
+          <div className="bg-white rounded-xl shadow-2xl max-w-md w-full p-6 my-4" onClick={(e) => e.stopPropagation()}>
+            {/* Success Header */}
+            <div className="text-center mb-6">
+              <div className="inline-flex items-center justify-center w-20 h-20 bg-emerald-100 rounded-full mb-4">
+                <span className="text-4xl animate-bounce">✓</span>
               </div>
-              <h2 className="text-lg font-bold text-slate-900 mb-1">Deposit Confirmed!</h2>
-              <p className="text-xs text-slate-600">Your deposit has been initiated successfully</p>
+              <h2 className="text-2xl font-bold text-slate-900 mb-2">Deposit Confirmed!</h2>
+              <p className="text-sm text-slate-600">Your deposit has been initiated and is being processed</p>
+            </div>
+
+            {/* Timestamp */}
+            <div className="text-center mb-6 pb-4 border-b border-slate-200">
+              <p className="text-xs text-slate-500">Processed at</p>
+              <p className="text-sm font-semibold text-slate-900">{lastSuccessDeposit.created_at ? new Date(lastSuccessDeposit.created_at).toLocaleString() : new Date().toLocaleString()}</p>
             </div>
 
             {/* Deposit Summary - THREE-CURRENCY MODEL */}
-            <div className="bg-slate-50 rounded p-3 mb-4 border border-slate-300">
-              <h3 className="font-semibold text-slate-900 mb-3 text-sm">Deposit Details</h3>
-              <div className="space-y-2">
+            <div className="bg-gradient-to-br from-slate-50 to-slate-100 rounded-lg p-4 mb-5 border border-slate-200">
+              <h3 className="font-bold text-slate-900 mb-4 text-sm">Transaction Details</h3>
+              <div className="space-y-3">
                 {/* INPUT AMOUNT */}
-                <div className="bg-white rounded p-2 border-l-4 border-slate-400">
-                  <p className="text-xs text-slate-600 font-semibold mb-1">1. You Specified</p>
-                  <p className="text-sm font-bold text-slate-900">
+                <div className="bg-white rounded-lg p-3 border-l-4 border-blue-500">
+                  <p className="text-xs text-slate-600 font-semibold mb-2">Amount Specified</p>
+                  <p className="text-lg font-bold text-slate-900">
                     {(lastSuccessDeposit.input_amount || lastSuccessDeposit.amount).toLocaleString(undefined, {
                       minimumFractionDigits: 2,
                       maximumFractionDigits: 8
@@ -1919,9 +1925,9 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
 
                 {/* PAYMENT AMOUNT (if different from input) */}
                 {lastSuccessDeposit.payment_amount && lastSuccessDeposit.payment_method_currency && (
-                  <div className="bg-white rounded p-2 border-l-4 border-slate-400">
-                    <p className="text-xs text-slate-600 font-semibold mb-1">2. Send via {lastSuccessDeposit.deposit_method?.toUpperCase() || lastSuccessDeposit.payment_method_currency}</p>
-                    <p className="text-sm font-bold text-slate-900">
+                  <div className="bg-white rounded-lg p-3 border-l-4 border-purple-500">
+                    <p className="text-xs text-slate-600 font-semibold mb-2">To Send Via {lastSuccessDeposit.deposit_method?.toUpperCase() || lastSuccessDeposit.payment_method_currency}</p>
+                    <p className="text-lg font-bold text-slate-900">
                       {lastSuccessDeposit.payment_amount.toLocaleString(undefined, {
                         minimumFractionDigits: 2,
                         maximumFractionDigits: 8
@@ -1932,9 +1938,9 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
 
                 {/* WALLET CREDIT */}
                 {lastSuccessDeposit.received_amount && (
-                  <div className="bg-white rounded p-2 border-l-4 border-slate-400">
-                    <p className="text-xs text-slate-600 font-semibold mb-1">3. You'll Receive</p>
-                    <p className="text-sm font-bold text-slate-900">
+                  <div className="bg-white rounded-lg p-3 border-l-4 border-emerald-500">
+                    <p className="text-xs text-slate-600 font-semibold mb-2">Will Be Credited</p>
+                    <p className="text-lg font-bold text-emerald-600">
                       {lastSuccessDeposit.received_amount.toLocaleString(undefined, {
                         minimumFractionDigits: 2,
                         maximumFractionDigits: 8
@@ -1945,9 +1951,9 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
 
                 {/* FALLBACK for old deposits without received_amount */}
                 {lastSuccessDeposit.converted_amount && !lastSuccessDeposit.received_amount && (
-                  <div className="bg-white rounded p-2 border-l-4 border-slate-400">
-                    <p className="text-xs text-slate-600 font-semibold mb-1">You'll Receive</p>
-                    <p className="text-sm font-bold text-slate-900">
+                  <div className="bg-white rounded-lg p-3 border-l-4 border-emerald-500">
+                    <p className="text-xs text-slate-600 font-semibold mb-2">Will Be Credited</p>
+                    <p className="text-lg font-bold text-emerald-600">
                       {lastSuccessDeposit.converted_amount.toLocaleString(undefined, {
                         minimumFractionDigits: 2,
                         maximumFractionDigits: 8
@@ -1958,51 +1964,84 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
               </div>
             </div>
 
-            {/* Reference Number */}
-            {lastSuccessDeposit.reference_number && (
-              <div className="bg-slate-50 rounded p-3 mb-3 border border-slate-300">
-                <p className="text-xs text-slate-600 font-semibold mb-1">Reference Number</p>
-                <p className="text-xs font-mono font-semibold text-slate-900 break-all">{lastSuccessDeposit.reference_number}</p>
-                <p className="text-xs text-slate-600 mt-1">Save this for your records</p>
+            {/* Deposit Metadata */}
+            <div className="bg-slate-50 rounded-lg p-4 mb-5 border border-slate-200">
+              <h4 className="font-semibold text-slate-900 mb-3 text-sm">Deposit Information</h4>
+              <div className="space-y-2 text-xs">
+                {lastSuccessDeposit.id && (
+                  <div className="flex justify-between items-start gap-2">
+                    <span className="text-slate-600 font-medium">Deposit ID:</span>
+                    <span className="font-mono text-slate-900 text-right break-all">{lastSuccessDeposit.id.substring(0, 12)}...</span>
+                  </div>
+                )}
+                {lastSuccessDeposit.deposit_method && (
+                  <div className="flex justify-between items-start gap-2">
+                    <span className="text-slate-600 font-medium">Method:</span>
+                    <span className="text-slate-900 font-semibold">{lastSuccessDeposit.deposit_method.toUpperCase()}</span>
+                  </div>
+                )}
+                {lastSuccessDeposit.status && (
+                  <div className="flex justify-between items-start gap-2">
+                    <span className="text-slate-600 font-medium">Status:</span>
+                    <span className={`px-2 py-1 rounded-full text-xs font-semibold ${
+                      lastSuccessDeposit.status === 'completed' ? 'bg-emerald-100 text-emerald-700' :
+                      lastSuccessDeposit.status === 'pending' ? 'bg-amber-100 text-amber-700' :
+                      lastSuccessDeposit.status === 'approved' ? 'bg-blue-100 text-blue-700' :
+                      'bg-slate-200 text-slate-700'
+                    }`}>
+                      {lastSuccessDeposit.status?.toUpperCase() || 'PENDING'}
+                    </span>
+                  </div>
+                )}
+                {lastSuccessDeposit.reference_number && (
+                  <div className="flex justify-between items-start gap-2">
+                    <span className="text-slate-600 font-medium">Reference:</span>
+                    <span className="font-mono text-slate-900 text-right break-all text-xs">{lastSuccessDeposit.reference_number}</span>
+                  </div>
+                )}
               </div>
-            )}
+            </div>
 
             {/* Next Steps */}
-            <div className="bg-slate-50 rounded p-3 mb-4 border border-slate-300">
-              <h4 className="font-semibold text-slate-900 mb-2 text-sm">What's Next</h4>
-              <ul className="space-y-1 text-xs text-slate-700">
+            <div className="bg-blue-50 rounded-lg p-4 mb-5 border border-blue-200">
+              <h4 className="font-semibold text-slate-900 mb-3 text-sm flex items-center gap-2">
+                <span className="text-lg">📋</span> What's Next
+              </h4>
+              <ul className="space-y-2 text-xs text-slate-700">
                 <li className="flex gap-2">
-                  <span className="font-semibold">•</span>
+                  <span className="text-blue-600 font-bold min-w-4">1.</span>
                   <span>Your deposit is being processed</span>
                 </li>
                 <li className="flex gap-2">
-                  <span className="font-semibold">•</span>
+                  <span className="text-blue-600 font-bold min-w-4">2.</span>
                   <span>Status will update to Approved shortly</span>
                 </li>
                 <li className="flex gap-2">
-                  <span className="font-semibold">•</span>
-                  <span>Check the Recent Deposits table for updates</span>
+                  <span className="text-blue-600 font-bold min-w-4">3.</span>
+                  <span>Check Recent Deposits table for updates</span>
                 </li>
               </ul>
             </div>
 
-            {/* Action Button */}
-            <button
-              onClick={() => {
-                setShowSuccessModal(false)
-                handleStartNewDeposit()
-              }}
-              className="w-full px-4 py-2 bg-blue-600 text-white rounded text-sm font-medium hover:bg-blue-700 transition"
-            >
-              Start New Deposit
-            </button>
+            {/* Action Buttons */}
+            <div className="space-y-3">
+              <button
+                onClick={() => {
+                  setShowSuccessModal(false)
+                  handleStartNewDeposit()
+                }}
+                className="w-full px-4 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg text-sm font-bold hover:from-blue-700 hover:to-blue-800 transition shadow-md"
+              >
+                Start New Deposit
+              </button>
 
-            <button
-              onClick={() => setShowSuccessModal(false)}
-              className="w-full px-4 py-2 mt-3 border-2 border-slate-900 text-slate-900 rounded text-sm font-semibold hover:bg-slate-900 hover:text-white transition"
-            >
-              Close
-            </button>
+              <button
+                onClick={() => setShowSuccessModal(false)}
+                className="w-full px-4 py-3 border-2 border-slate-300 text-slate-900 rounded-lg text-sm font-semibold hover:bg-slate-100 transition"
+              >
+                Close
+              </button>
+            </div>
           </div>
         </div>
       )}
