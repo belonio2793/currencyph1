@@ -513,24 +513,31 @@ export default function Rates() {
                         <tr
                           key={currency.code}
                           className={`border-b border-slate-100 hover:bg-slate-50 transition ${
-                            currency.type === 'cryptocurrency' ? 'hover:bg-orange-50' : 'hover:bg-blue-50'
+                            currency.type === 'crypto' ? 'hover:bg-orange-50' : 'hover:bg-blue-50'
                           }`}
                         >
                           <td className="py-3 px-4">
                             <div className="flex items-center gap-2">
                               <span className="text-sm font-semibold text-slate-600">
-                                {currency.type === 'cryptocurrency' ? 'CRY' : 'FIA'}
+                                {currency.type === 'crypto' ? '₿' : '$'}
                               </span>
-                              <span className="font-semibold text-slate-900">{currency.code}</span>
+                              <div className="min-w-0">
+                                <div className="font-semibold text-slate-900">{currency.code}</div>
+                                <div className="text-xs text-slate-500">{currency.name}</div>
+                              </div>
                             </div>
                           </td>
                           <td className="py-3 px-4">
-                            <span className="inline-block px-3 py-1 rounded-full text-xs font-medium bg-slate-200 text-slate-900">
-                              {currency.type === 'cryptocurrency' ? 'Cryptocurrency' : 'Fiat'}
+                            <span className={`inline-block px-3 py-1 rounded-full text-xs font-medium ${
+                              currency.type === 'crypto'
+                                ? 'bg-orange-100 text-orange-700'
+                                : 'bg-blue-100 text-blue-700'
+                            }`}>
+                              {currency.type === 'crypto' ? 'Cryptocurrency' : 'Fiat'}
                             </span>
                           </td>
                           <td className="py-3 px-4 text-right font-mono text-slate-900 font-medium">
-                            {formatNumber(currency.rate, 2)}
+                            {formatNumber(currency.rate, currency.decimals)}
                           </td>
                           <td className="py-3 px-4 text-center">
                             <button
