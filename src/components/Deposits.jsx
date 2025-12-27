@@ -1848,23 +1848,54 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
               <p className="text-slate-600">Your deposit has been initiated successfully</p>
             </div>
 
-            {/* Deposit Summary */}
-            <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg p-6 mb-6 border border-blue-100">
-              <div className="space-y-4">
-                <div>
-                  <p className="text-xs text-slate-600 uppercase tracking-wide mb-1">Amount Sent</p>
-                  <p className="text-2xl font-bold text-slate-900">
-                    {lastSuccessDeposit.amount.toLocaleString(undefined, {
+            {/* Deposit Summary - THREE-CURRENCY MODEL */}
+            <div className="bg-gradient-to-br from-blue-50 via-indigo-50 to-cyan-50 rounded-lg p-6 mb-6 border-2 border-indigo-100">
+              <h3 className="font-semibold text-slate-900 mb-4 flex items-center gap-2">
+                <span>🔄</span> Deposit Details
+              </h3>
+              <div className="space-y-3">
+                {/* INPUT AMOUNT */}
+                <div className="bg-white/70 rounded p-3 border-l-4 border-blue-500">
+                  <p className="text-xs text-slate-600 uppercase tracking-wide mb-1">1️⃣ You Specified</p>
+                  <p className="text-xl font-bold text-blue-600">
+                    {(lastSuccessDeposit.input_amount || lastSuccessDeposit.amount).toLocaleString(undefined, {
                       minimumFractionDigits: 2,
                       maximumFractionDigits: 8
-                    })} {(lastSuccessDeposit.original_currency || lastSuccessDeposit.currency_code).toUpperCase()}
+                    })} {(lastSuccessDeposit.input_currency || lastSuccessDeposit.original_currency || lastSuccessDeposit.currency_code).toUpperCase()}
                   </p>
                 </div>
 
-                {lastSuccessDeposit.converted_amount && (
-                  <div className="pt-4 border-t border-slate-300">
+                {/* PAYMENT AMOUNT (if different from input) */}
+                {lastSuccessDeposit.payment_amount && lastSuccessDeposit.payment_method_currency && (
+                  <div className="bg-white/70 rounded p-3 border-l-4 border-purple-500">
+                    <p className="text-xs text-slate-600 uppercase tracking-wide mb-1">2️⃣ Send via {lastSuccessDeposit.deposit_method?.toUpperCase() || lastSuccessDeposit.payment_method_currency}</p>
+                    <p className="text-xl font-bold text-purple-600">
+                      {lastSuccessDeposit.payment_amount.toLocaleString(undefined, {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 8
+                      })} {lastSuccessDeposit.payment_method_currency.toUpperCase()}
+                    </p>
+                  </div>
+                )}
+
+                {/* WALLET CREDIT */}
+                {lastSuccessDeposit.received_amount && (
+                  <div className="bg-white/70 rounded p-3 border-l-4 border-emerald-500">
+                    <p className="text-xs text-slate-600 uppercase tracking-wide mb-1">3️⃣ You'll Receive</p>
+                    <p className="text-xl font-bold text-emerald-600">
+                      {lastSuccessDeposit.received_amount.toLocaleString(undefined, {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 8
+                      })} {(lastSuccessDeposit.received_currency || lastSuccessDeposit.currency_code).toUpperCase()}
+                    </p>
+                  </div>
+                )}
+
+                {/* FALLBACK for old deposits without received_amount */}
+                {lastSuccessDeposit.converted_amount && !lastSuccessDeposit.received_amount && (
+                  <div className="bg-white/70 rounded p-3 border-l-4 border-emerald-500">
                     <p className="text-xs text-slate-600 uppercase tracking-wide mb-1">You'll Receive</p>
-                    <p className="text-2xl font-bold text-emerald-600">
+                    <p className="text-xl font-bold text-emerald-600">
                       {lastSuccessDeposit.converted_amount.toLocaleString(undefined, {
                         minimumFractionDigits: 2,
                         maximumFractionDigits: 8
