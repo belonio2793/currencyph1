@@ -84,61 +84,6 @@ const DEPOSIT_METHODS = {
 
 const SOLANA_ADDRESS = 'CbcWb97K3TEFJZJYLZRqdsMSdVXTFaMaUcF6yPQgY9yS'
 
-// Helper function to query public.pairs with safe inversion (1/rate formula)
-// SECURITY FIX: Uses getPairRate which properly calculates inverse if needed
-async function getRatesFromPublicPairs(currencies, toCurrency = 'PHP') {
-  try {
-    const toUpper = toCurrency.toUpperCase()
-    const currencyUpperCase = currencies.map(c => c.toUpperCase())
-
-    console.log(`[Deposits] Querying rates with safe inversion: ${currencyUpperCase.join(', ')} → ${toUpper}`)
-
-    // Import safe rate lookup function
-    const { getPairRate, getPairRateWithMetadata } = await import('../lib/pairsRateService.js')
-
-    const rates = {}
-    const rateMetadata = {}
-
-    // Fetch all rates using safe inversion logic
-    const ratePromises = currencyUpperCase.map(async (currency) => {
-      try {
-        // Get rate with metadata (includes is_inverted flag)
-        const metadata = await getPairRateWithMetadata(currency, toUpper)
-
-        if (metadata && metadata.rate && isFinite(metadata.rate) && metadata.rate > 0) {
-          rates[currency] = metadata.rate
-          rateMetadata[currency] = metadata
-
-          const inversionLabel = metadata.is_inverted ? '(calculated via 1/rate)' : '(direct)'
-          console.log(`[Deposits] ✓ ${inversionLabel}: ${currency} → ${toUpper} = ${metadata.rate}`)
-          return { success: true, currency }
-        } else {
-          console.warn(`[Deposits] ✗ No rate found for ${currency} → ${toUpper}`)
-          return { success: false, currency }
-        }
-      } catch (err) {
-        console.warn(`[Deposits] Error fetching rate for ${currency} → ${toUpper}:`, err.message)
-        return { success: false, currency }
-      }
-    })
-
-    // Wait for all rate fetches to complete
-    const results = await Promise.all(ratePromises)
-    const successCount = results.filter(r => r.success).length
-
-    if (successCount === 0) {
-      console.warn('[Deposits] Failed to load any rates for:', currencyUpperCase.join(', '))
-      return {}
-    }
-
-    console.log(`[Deposits] Successfully loaded ${successCount}/${currencyUpperCase.length} rates`)
-    return rates
-  } catch (e) {
-    console.error('[Deposits] Rates helper failed:', e.message)
-    return {}
-  }
-}
-
 function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
   // Form state
   const [amount, setAmount] = useState('')
