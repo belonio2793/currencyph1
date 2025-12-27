@@ -42,6 +42,21 @@ export default function Rates() {
     }
   }, [targetCurrency, currencies])
 
+  // Close target currency dropdown on outside click
+  useEffect(() => {
+    if (!targetCurrencySearchOpen) return
+
+    const handleClickOutside = (e) => {
+      const dropdown = document.querySelector('[data-target-currency-dropdown]')
+      if (dropdown && !dropdown.contains(e.target)) {
+        setTargetCurrencySearchOpen(false)
+      }
+    }
+
+    document.addEventListener('click', handleClickOutside)
+    return () => document.removeEventListener('click', handleClickOutside)
+  }, [targetCurrencySearchOpen])
+
   // Set default currencies when currencies load
   useEffect(() => {
     if (currencies.length > 0 && !selectedFrom) {
