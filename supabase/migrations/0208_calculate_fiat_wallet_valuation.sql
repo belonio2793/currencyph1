@@ -30,12 +30,13 @@ DECLARE
 BEGIN
   -- Iterate through all wallets for this user
   FOR v_wallet_record IN
-    SELECT 
+    SELECT
       w.id,
       w.currency_code,
       w.balance,
-      w.currency_type
+      c.type AS currency_type
     FROM wallets w
+    JOIN currencies c ON c.code = w.currency_code
     WHERE w.user_id = p_user_id
       AND w.balance > 0
   LOOP
